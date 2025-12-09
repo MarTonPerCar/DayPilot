@@ -1,37 +1,64 @@
 package com.example.daypilot.ui.theme
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.graphics.Color
 
+// ===============================================================
+//  LIGHT THEME
+// ===============================================================
 private val LightColors = lightColorScheme(
-    primary = Red,
-    secondary = Orange,
-    tertiary = Blue,
 
+    // Colores principales del UI
+    primary = BrandBlue,
+    secondary = BrandOrange,
+    tertiary = BrandPurple,
+
+    // Fondos
     background = BackgroundLight,
     surface = SurfaceLight,
 
-    onPrimary = BackgroundLight,
-    onSecondary = BackgroundLight,
-    onBackground = TextPrimary,
-    onSurface = TextPrimary
+    // Texto
+    onPrimary = Color.White,
+    onSecondary = Color.White,
+    onBackground = TextPrimaryLight,
+    onSurface = TextPrimaryLight,
+
+    // Errores
+    error = BrandRed,
+    onError = Color.White
 )
 
+// ===============================================================
+//  DARK THEME
+// ===============================================================
 private val DarkColors = darkColorScheme(
-    primary = RedDarkMode,
-    secondary = OrangeDarkMode,
 
+    // Colores principales del UI
+    primary = BrandBlue,
+    secondary = BrandOrange,
+    tertiary = BrandPurple,
+
+    // Fondos
     background = BackgroundDark,
     surface = SurfaceDark,
 
-    onPrimary = TextPrimaryDark,
-    onSecondary = TextPrimaryDark,
+    // Texto
+    onPrimary = Color.White,
+    onSecondary = Color.White,
     onBackground = TextPrimaryDark,
-    onSurface = TextPrimaryDark
+    onSurface = TextPrimaryDark,
+
+    // Errores
+    error = BrandRedDeep,
+    onError = Color.White
 )
 
+// ===============================================================
+//  APLICACIÓN DEL TEMA
+// ===============================================================
 @Composable
 fun DayPilotTheme(
     darkTheme: Boolean = false,
