@@ -1,12 +1,14 @@
 package com.example.daypilot.login
 
-import android.content.Intent
+import android.app.AlertDialog
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.lifecycleScope
-import com.example.daypilot.MainActivity
 import com.example.daypilot.authLogic.AuthRepository
 import com.example.daypilot.ui.theme.DayPilotTheme
 import kotlinx.coroutines.launch
@@ -19,43 +21,59 @@ class RegisterActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
+            var isLoading by remember { mutableStateOf(false) }
+
             DayPilotTheme {
                 RegisterScreen(
                     onRegisterClick = { name, email, password ->
-                        registerUser(name, email, password)
+                        isLoading = true
+
+                        lifecycleScope.launch {
+                            try {
+                                val result = authRepo.register(email, password)
+
+                                if (result.isSuccess) {
+                                    val user = result.getOrNull()
+
+                                    if (user != null) {
+                                        try {
+                                            authRepo.saveUserProfile(user.uid, name, email)
+                                            finish()
+                                        } catch (e: Exception) {
+                                            showError(
+                                                e.localizedMessage ?: "Error guardando el perfil."
+                                            )
+                                        }
+                                    } else {
+                                        showError("No se pudo crear el usuario.")
+                                    }
+                                } else {
+                                    val error = result.exceptionOrNull()
+                                    showError(
+                                        error?.localizedMessage ?: "Ocurrió un error inesperado."
+                                    )
+                                }
+                            } catch (e: Exception) {
+                                showError(
+                                    e.localizedMessage ?: "Error durante el registro."
+                                )
+                            } finally {
+                                isLoading = false
+                            }
+                        }
                     },
-                    onBackToLogin = { finish() }
+                    onBackToLogin = { finish() },
+                    isLoading = isLoading
                 )
             }
         }
     }
 
-    private fun registerUser(name: String, email: String, password: String) {
-        lifecycleScope.launch {
-            try {
-                val result = authRepo.register(email, password)
-
-                if (result.isSuccess) {
-                    val user = result.getOrNull()
-                    if (user != null) {
-                        authRepo.saveUserProfile(user.uid, name, email)
-
-                        Toast.makeText(this@RegisterActivity, "Cuenta creada", Toast.LENGTH_SHORT).show()
-
-                        startActivity(Intent(this@RegisterActivity, MainActivity::class.java))
-                        finish()
-                    }
-                } else {
-                    Toast.makeText(
-                        this@RegisterActivity,
-                        "Error: ${result.exceptionOrNull()?.message}",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-
-            } catch (e: Exception) {
-                Toast.makeText(this@RegisterActivity, "Error inesperado: ${e.message}", Toast.LENGTH_LONG).show()
-            }
-        }
+    private fun showError(message: String) {
+        AlertDialog.Builder(this@RegisterActivity)
+            .setTitle("Error")
+            .setMessage(message)
+            .setPositiveButton("OK", null)
+            .show()
     }
 }

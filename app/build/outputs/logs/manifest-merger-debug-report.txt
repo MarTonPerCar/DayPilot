@@ -1,0 +1,754 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:2:1-28:12
+INJECTED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:2:1-28:12
+INJECTED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:2:1-28:12
+INJECTED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:2:1-28:12
+MERGED from [com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:17:1-75:12
+MERGED from [com.google.firebase:firebase-firestore:26.0.2] /home/mario/.gradle/caches/8.13/transforms/4c2782b7d408e01bf513291f94313098/transformed/firebase-firestore-26.0.2/AndroidManifest.xml:2:1-26:12
+MERGED from [com.google.firebase:firebase-storage:22.0.1] /home/mario/.gradle/caches/8.13/transforms/1331cc3b5725c43a95ab6de47057bbdd/transformed/firebase-storage-22.0.1/AndroidManifest.xml:15:1-39:12
+MERGED from [androidx.compose.material3:material3-android:1.4.0] /home/mario/.gradle/caches/8.13/transforms/1029363bbe313c39e19d4a4228325dad/transformed/material3/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.credentials:credentials:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/1348bec305dcd5c4626db80c71232012/transformed/credentials-1.2.0-rc01/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/72bbc5f7d815ffe53e85e26b7d784cde/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:17:1-44:12
+MERGED from [com.google.android.gms:play-services-auth:20.7.0] /home/mario/.gradle/caches/8.13/transforms/29408a52d667fe41031f2b85ffcd7d33/transformed/play-services-auth-20.7.0/AndroidManifest.xml:17:1-40:12
+MERGED from [com.google.android.gms:play-services-auth-api-phone:18.0.2] /home/mario/.gradle/caches/8.13/transforms/26c940636ea9bdb283817f6108e9a02b/transformed/play-services-auth-api-phone-18.0.2/AndroidManifest.xml:2:1-7:12
+MERGED from [com.google.android.recaptcha:recaptcha:18.6.1] /home/mario/.gradle/caches/8.13/transforms/924183b0268f7c0c2bb37c8d5507fbdc/transformed/recaptcha-18.6.1/AndroidManifest.xml:2:1-11:12
+MERGED from [com.google.android.play:integrity:1.3.0] /home/mario/.gradle/caches/8.13/transforms/86db85b71451a342da18b5c808564739/transformed/integrity-1.3.0/AndroidManifest.xml:2:1-7:12
+MERGED from [com.google.firebase:firebase-auth-interop:20.0.0] /home/mario/.gradle/caches/8.13/transforms/1431e55e68b0db459052eb2089833bb3/transformed/firebase-auth-interop-20.0.0/AndroidManifest.xml:2:1-10:12
+MERGED from [com.google.firebase:firebase-common:22.0.1] /home/mario/.gradle/caches/8.13/transforms/73025ec9a7e2e690fc83aa54307e4a51/transformed/firebase-common-22.0.1/AndroidManifest.xml:15:1-41:12
+MERGED from [com.google.firebase:firebase-database-collection:18.0.1] /home/mario/.gradle/caches/8.13/transforms/69610f08cd1b4c68ca4c0057905868c3/transformed/firebase-database-collection-18.0.1/AndroidManifest.xml:2:1-9:12
+MERGED from [com.google.firebase:firebase-appcheck:18.0.0] /home/mario/.gradle/caches/8.13/transforms/f6e88d416ca99cd5b7b5daad4106704e/transformed/firebase-appcheck-18.0.0/AndroidManifest.xml:15:1-34:12
+MERGED from [com.google.firebase:firebase-appcheck-interop:17.1.0] /home/mario/.gradle/caches/8.13/transforms/b6e783c8e467cee9dfe358599ac3a133/transformed/firebase-appcheck-interop-17.1.0/AndroidManifest.xml:15:1-23:12
+MERGED from [com.google.android.gms:play-services-fido:20.1.0] /home/mario/.gradle/caches/8.13/transforms/ee42e321ebf9af2b4a3aaaaa3694151c/transformed/play-services-fido-20.1.0/AndroidManifest.xml:2:1-10:12
+MERGED from [com.google.android.gms:play-services-auth-base:18.0.4] /home/mario/.gradle/caches/8.13/transforms/937ebab9313c50a6e78b8277949d95c8/transformed/play-services-auth-base-18.0.4/AndroidManifest.xml:2:1-7:12
+MERGED from [com.google.android.gms:play-services-base:18.1.0] /home/mario/.gradle/caches/8.13/transforms/3dd4afef777021b6c4e94116e7c0bb61/transformed/play-services-base-18.1.0/AndroidManifest.xml:16:1-24:12
+MERGED from [androidx.compose.animation:animation-core-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/e3e93521d38f16263eb563cee90bcade/transformed/animation-core/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.animation:animation-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/0506761036db62f3d3ba2aa498215344/transformed/animation/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.foundation:foundation-layout-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/aebde532f5055335e8c9f11a6717d484/transformed/foundation-layout/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.ui:ui-tooling-data-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/33edab6302e28b8eb4ad55e434d0b8fe/transformed/ui-tooling-data/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.ui:ui-geometry-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/e5b437ff6791fdcaf5def2445ff2f1e3/transformed/ui-geometry/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.ui:ui-tooling-preview-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/8caa414368d025b70b7a30fc2ab517ca/transformed/ui-tooling-preview/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.compose.ui:ui-graphics-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/51d6e2a76bdb58fc636af64cacd8355b/transformed/ui-graphics/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.ui:ui-unit-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/a100d722d1b81a885e1ca799ef33f0dd/transformed/ui-unit/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.ui:ui-test-manifest:1.10.0] /home/mario/.gradle/caches/8.13/transforms/1e1b2d4a349d23f6f7f9b8d7128dec75/transformed/ui-test-manifest-1.10.0/AndroidManifest.xml:17:1-29:12
+MERGED from [androidx.compose.ui:ui-util-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/1e099f8876a57fc660c5ae83dcd2de0e/transformed/ui-util/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.ui:ui-text-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/e80bd490b6430def35231d0cc92024e2/transformed/ui-text/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.runtime:runtime-retain-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/74a5da146c9675450eeb323a6cce8447/transformed/runtime-retain/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.runtime:runtime-annotation-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/eaf403d9540fefd9ac07012d6cc957fa/transformed/runtime-annotation/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.runtime:runtime-saveable-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/d458d43c35f280b00a26ffb88dceb151/transformed/runtime-saveable/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.transition:transition:1.6.0] /home/mario/.gradle/caches/8.13/transforms/68eb0f373607f196039d54988a4009d6/transformed/transition-1.6.0/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.dynamicanimation:dynamicanimation:1.0.0] /home/mario/.gradle/caches/8.13/transforms/795cf00adb490b40fb6cd59bf0696a46/transformed/dynamicanimation-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.legacy:legacy-support-core-utils:1.0.0] /home/mario/.gradle/caches/8.13/transforms/22b6fbfc04b1b9cf9bf04c80290492d7/transformed/legacy-support-core-utils-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.loader:loader:1.0.0] /home/mario/.gradle/caches/8.13/transforms/65d92d7c1daae953a1c9ba5b56c9f2dd/transformed/loader-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.emoji2:emoji2:1.4.0] /home/mario/.gradle/caches/8.13/transforms/590747b935e41c009731aa6102883d11/transformed/emoji2-1.4.0/AndroidManifest.xml:17:1-35:12
+MERGED from [androidx.activity:activity-ktx:1.8.2] /home/mario/.gradle/caches/8.13/transforms/be6820a50c4480fe74dd9b69e4f967c2/transformed/activity-ktx-1.8.2/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.browser:browser:1.4.0] /home/mario/.gradle/caches/8.13/transforms/d7ad9656e530be813a407211cd939452/transformed/browser-1.4.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.viewpager:viewpager:1.0.0] /home/mario/.gradle/caches/8.13/transforms/674bc27560ad2798894b9d3934a1dff7/transformed/viewpager-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.customview:customview:1.0.0] /home/mario/.gradle/caches/8.13/transforms/17bd511a70be5c62f51366b01cd8f709/transformed/customview-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.autofill:autofill:1.0.0] /home/mario/.gradle/caches/8.13/transforms/1ac0bd0a4b0c45ddba8c6322ed0378b7/transformed/autofill-1.0.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.window:window-core-android:1.5.0] /home/mario/.gradle/caches/8.13/transforms/a080cd8e06e543968cf402a273ba95f7/transformed/window-core/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.window:window:1.5.0] /home/mario/.gradle/caches/8.13/transforms/1d537e2cba050728e7149d360ab5104e/transformed/window-1.5.0/AndroidManifest.xml:17:1-31:12
+MERGED from [androidx.customview:customview-poolingcontainer:1.0.0] /home/mario/.gradle/caches/8.13/transforms/e242d4ad31b1817d82c2211d8a8bea8a/transformed/customview-poolingcontainer-1.0.0/AndroidManifest.xml:17:1-23:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.9.4] /home/mario/.gradle/caches/8.13/transforms/c394b74700739491e4cafc915042abaa/transformed/lifecycle-viewmodel-2.9.4/AndroidManifest.xml:2:1-5:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-android:2.9.4] /home/mario/.gradle/caches/8.13/transforms/8547125d4b0009d426b8b075880c262e/transformed/lifecycle-viewmodel-release/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-livedata-core-ktx:2.9.4] /home/mario/.gradle/caches/8.13/transforms/1089cf4a2f739b071b5f6b0fbc64fb36/transformed/lifecycle-livedata-core-ktx-2.9.4/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.lifecycle:lifecycle-runtime-ktx-android:2.9.4] /home/mario/.gradle/caches/8.13/transforms/5aa9c50bc64e177da774ed1f637f6702/transformed/lifecycle-runtime-ktx/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate-android:2.9.4] /home/mario/.gradle/caches/8.13/transforms/ff6badd4e8a48f006bac9b860ec02387/transformed/lifecycle-viewmodel-savedstate-release/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.savedstate:savedstate-android:1.3.2] /home/mario/.gradle/caches/8.13/transforms/40d3ceccab79755d1e73d74baaeaf9a5/transformed/savedstate-release/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.savedstate:savedstate-ktx:1.3.2] /home/mario/.gradle/caches/8.13/transforms/736be601ba52a8083cc7f5eb2cd2fbce/transformed/savedstate-ktx-1.3.2/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.savedstate:savedstate-compose-android:1.3.2] /home/mario/.gradle/caches/8.13/transforms/ce896ede4894168b2395b99527124fdb/transformed/savedstate-compose/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.core:core-ktx:1.16.0] /home/mario/.gradle/caches/8.13/transforms/aab475ce8f79675b15130582c8a65f93/transformed/core-ktx-1.16.0/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.graphics:graphics-path:1.0.1] /home/mario/.gradle/caches/8.13/transforms/eac0740bfbb39b335bbb7030c63a3a56/transformed/graphics-path-1.0.1/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.core:core:1.16.0] /home/mario/.gradle/caches/8.13/transforms/2e619266833b106540768d8ae786a779/transformed/core-1.16.0/AndroidManifest.xml:17:1-30:12
+MERGED from [androidx.lifecycle:lifecycle-runtime-android:2.9.4] /home/mario/.gradle/caches/8.13/transforms/4f236c3ffccf6e0bec90e7bc3d2483aa/transformed/lifecycle-runtime-release/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.4] /home/mario/.gradle/caches/8.13/transforms/b2e852ed5e753db54fd6cabc7c9c6274/transformed/lifecycle-viewmodel-ktx-2.9.4/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.lifecycle:lifecycle-process:2.9.4] /home/mario/.gradle/caches/8.13/transforms/0da32728e8981d82274bf9a01b7851c3/transformed/lifecycle-process-2.9.4/AndroidManifest.xml:17:1-35:12
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.9.4] /home/mario/.gradle/caches/8.13/transforms/5c091419b6e70a3ec603ceec086ed030/transformed/lifecycle-livedata-core-2.9.4/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.9.4] /home/mario/.gradle/caches/8.13/transforms/b4ca53f55947c3d36a11ef8c3f242fdd/transformed/lifecycle-livedata-2.9.4/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-runtime-compose-android:2.9.4] /home/mario/.gradle/caches/8.13/transforms/2852c0cd76457d1b36a21e14672ad84a/transformed/lifecycle-runtime-compose-release/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.runtime:runtime-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/26bd31ac72687d73f9fdf6c366ae5a96/transformed/runtime/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.datastore:datastore-core-android:1.1.7] /home/mario/.gradle/caches/8.13/transforms/bd9fcff5c34ca4cc66112e6d29268c10/transformed/datastore-core-release/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.datastore:datastore-preferences-core-android:1.1.7] /home/mario/.gradle/caches/8.13/transforms/0206238aee693188a58508647ca95f70/transformed/datastore-preferences-core-release/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.datastore:datastore-android:1.1.7] /home/mario/.gradle/caches/8.13/transforms/a55438dc78ec84f55368c6da5823fbf6/transformed/datastore-release/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.datastore:datastore-preferences-android:1.1.7] /home/mario/.gradle/caches/8.13/transforms/02a7278c85ef36aee45c07ae5830916d/transformed/datastore-preferences-release/AndroidManifest.xml:17:1-22:12
+MERGED from [com.google.android.gms:play-services-tasks:18.2.0] /home/mario/.gradle/caches/8.13/transforms/ce231e6c5dba3d3c8881c6b9261bd6c2/transformed/play-services-tasks-18.2.0/AndroidManifest.xml:2:1-5:12
+MERGED from [com.google.android.gms:play-services-basement:18.8.0] /home/mario/.gradle/caches/8.13/transforms/d23de935f55fb39caf4f6ad2efbe2196/transformed/play-services-basement-18.8.0/AndroidManifest.xml:16:1-26:12
+MERGED from [androidx.fragment:fragment:1.1.0] /home/mario/.gradle/caches/8.13/transforms/9d736cbe4e0f1867bc30091d6327e7f7/transformed/fragment-1.1.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.activity:activity:1.8.2] /home/mario/.gradle/caches/8.13/transforms/e10830bac9e739c0ae78e9cfb4d62731/transformed/activity-1.8.2/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.activity:activity-compose:1.8.2] /home/mario/.gradle/caches/8.13/transforms/77d77022955768e51a060ce5bddf67cc/transformed/activity-compose-1.8.2/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.material:material-icons-extended-android:1.7.0] /home/mario/.gradle/caches/8.13/transforms/5916adf5e622bb2126c61e8878ea0e66/transformed/material-icons-extended-release/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.material:material-icons-core-android:1.7.0] /home/mario/.gradle/caches/8.13/transforms/082746ffd370b86f522682ccc3e6b078/transformed/material-icons-core-release/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.ui:ui-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/11b691e77d67e52e248253c1e64f4af2/transformed/ui/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.ui:ui-tooling-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/35df5be08809421405f832aebcf770f2/transformed/ui-tooling/AndroidManifest.xml:17:1-28:12
+MERGED from [androidx.compose.material:material-android:1.7.0] /home/mario/.gradle/caches/8.13/transforms/032fbe371d4097bd1a7c28fb55b4f2ae/transformed/material-release/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.material:material-ripple-android:1.8.1] /home/mario/.gradle/caches/8.13/transforms/bb9f825ed5b1a8c6667b90520cf529f6/transformed/material-ripple-release/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.foundation:foundation-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/9ba4bd090f55f25a51e67228705125fa/transformed/foundation/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.annotation:annotation-experimental:1.4.1] /home/mario/.gradle/caches/8.13/transforms/acc2180556bc2097538cf675fefe25da/transformed/annotation-experimental-1.4.1/AndroidManifest.xml:2:1-7:12
+MERGED from [com.google.android.libraries.identity.googleid:googleid:1.1.0] /home/mario/.gradle/caches/8.13/transforms/41e867d8a637049e63fc213ba0321efe/transformed/googleid-1.1.0/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/mario/.gradle/caches/8.13/transforms/fa7b9c00e7478ec0f0de6da86a9aa71c/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:17:1-27:12
+MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] /home/mario/.gradle/caches/8.13/transforms/71fc7c299d353864f2b2a2c1c7f0bb42/transformed/localbroadcastmanager-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [com.google.firebase:firebase-components:19.0.0] /home/mario/.gradle/caches/8.13/transforms/774e36d7b740b3b821ee3da18a7789c6/transformed/firebase-components-19.0.0/AndroidManifest.xml:15:1-20:12
+MERGED from [androidx.interpolator:interpolator:1.0.0] /home/mario/.gradle/caches/8.13/transforms/f99bf680bc9135e42d51468df5c72da5/transformed/interpolator-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:17:1-55:12
+MERGED from [androidx.startup:startup-runtime:1.1.1] /home/mario/.gradle/caches/8.13/transforms/852a25b7c1a11936514e6698b5c339df/transformed/startup-runtime-1.1.1/AndroidManifest.xml:17:1-33:12
+MERGED from [androidx.tracing:tracing:1.2.0] /home/mario/.gradle/caches/8.13/transforms/46d9cfe75e8c9017660c996ad550526b/transformed/tracing-1.2.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.documentfile:documentfile:1.0.0] /home/mario/.gradle/caches/8.13/transforms/8b7dc0ad84ac4fe0e6ed8775e1f14cbb/transformed/documentfile-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.print:print:1.0.0] /home/mario/.gradle/caches/8.13/transforms/0ca669d0a319c28b7bffc494f805c87d/transformed/print-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.arch.core:core-runtime:2.2.0] /home/mario/.gradle/caches/8.13/transforms/afbf89b34cbea804bc15c54753e4e16f/transformed/core-runtime-2.2.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.core:core-viewtree:1.0.0] /home/mario/.gradle/caches/8.13/transforms/086b624334764b9ba88cfbe63c4d55d1/transformed/core-viewtree-1.0.0/AndroidManifest.xml:2:1-7:12
+MERGED from [com.google.firebase:protolite-well-known-types:18.0.1] /home/mario/.gradle/caches/8.13/transforms/060b3e15658f35e1898c1e6f9eb43448/transformed/protolite-well-known-types-18.0.1/AndroidManifest.xml:2:1-7:12
+MERGED from [io.grpc:grpc-android:1.62.2] /home/mario/.gradle/caches/8.13/transforms/1041e04fa85a34925f78d5a2bf1eda29/transformed/grpc-android-1.62.2/AndroidManifest.xml:2:1-9:12
+MERGED from [com.google.android.play:core-common:2.0.3] /home/mario/.gradle/caches/8.13/transforms/849975fc6a4fc57498ae02a3541b4e80/transformed/core-common-2.0.3/AndroidManifest.xml:2:1-21:12
+	package
+		INJECTED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml
+	android:versionName
+		INJECTED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml
+	xmlns:tools
+		ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:3:5-51
+	android:versionCode
+		INJECTED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml
+	xmlns:android
+		ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:2:11-69
+application
+ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:5:5-26:19
+INJECTED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:5:5-26:19
+MERGED from [com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:28:5-73:19
+MERGED from [com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:28:5-73:19
+MERGED from [com.google.firebase:firebase-firestore:26.0.2] /home/mario/.gradle/caches/8.13/transforms/4c2782b7d408e01bf513291f94313098/transformed/firebase-firestore-26.0.2/AndroidManifest.xml:13:5-24:19
+MERGED from [com.google.firebase:firebase-firestore:26.0.2] /home/mario/.gradle/caches/8.13/transforms/4c2782b7d408e01bf513291f94313098/transformed/firebase-firestore-26.0.2/AndroidManifest.xml:13:5-24:19
+MERGED from [com.google.firebase:firebase-storage:22.0.1] /home/mario/.gradle/caches/8.13/transforms/1331cc3b5725c43a95ab6de47057bbdd/transformed/firebase-storage-22.0.1/AndroidManifest.xml:26:5-37:19
+MERGED from [com.google.firebase:firebase-storage:22.0.1] /home/mario/.gradle/caches/8.13/transforms/1331cc3b5725c43a95ab6de47057bbdd/transformed/firebase-storage-22.0.1/AndroidManifest.xml:26:5-37:19
+MERGED from [androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/72bbc5f7d815ffe53e85e26b7d784cde/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:23:5-42:19
+MERGED from [androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/72bbc5f7d815ffe53e85e26b7d784cde/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:23:5-42:19
+MERGED from [com.google.android.gms:play-services-auth:20.7.0] /home/mario/.gradle/caches/8.13/transforms/29408a52d667fe41031f2b85ffcd7d33/transformed/play-services-auth-20.7.0/AndroidManifest.xml:22:5-38:19
+MERGED from [com.google.android.gms:play-services-auth:20.7.0] /home/mario/.gradle/caches/8.13/transforms/29408a52d667fe41031f2b85ffcd7d33/transformed/play-services-auth-20.7.0/AndroidManifest.xml:22:5-38:19
+MERGED from [com.google.android.play:integrity:1.3.0] /home/mario/.gradle/caches/8.13/transforms/86db85b71451a342da18b5c808564739/transformed/integrity-1.3.0/AndroidManifest.xml:5:5-6:19
+MERGED from [com.google.android.play:integrity:1.3.0] /home/mario/.gradle/caches/8.13/transforms/86db85b71451a342da18b5c808564739/transformed/integrity-1.3.0/AndroidManifest.xml:5:5-6:19
+MERGED from [com.google.firebase:firebase-auth-interop:20.0.0] /home/mario/.gradle/caches/8.13/transforms/1431e55e68b0db459052eb2089833bb3/transformed/firebase-auth-interop-20.0.0/AndroidManifest.xml:7:5-8:19
+MERGED from [com.google.firebase:firebase-auth-interop:20.0.0] /home/mario/.gradle/caches/8.13/transforms/1431e55e68b0db459052eb2089833bb3/transformed/firebase-auth-interop-20.0.0/AndroidManifest.xml:7:5-8:19
+MERGED from [com.google.firebase:firebase-common:22.0.1] /home/mario/.gradle/caches/8.13/transforms/73025ec9a7e2e690fc83aa54307e4a51/transformed/firebase-common-22.0.1/AndroidManifest.xml:22:5-39:19
+MERGED from [com.google.firebase:firebase-common:22.0.1] /home/mario/.gradle/caches/8.13/transforms/73025ec9a7e2e690fc83aa54307e4a51/transformed/firebase-common-22.0.1/AndroidManifest.xml:22:5-39:19
+MERGED from [com.google.firebase:firebase-appcheck:18.0.0] /home/mario/.gradle/caches/8.13/transforms/f6e88d416ca99cd5b7b5daad4106704e/transformed/firebase-appcheck-18.0.0/AndroidManifest.xml:21:5-32:19
+MERGED from [com.google.firebase:firebase-appcheck:18.0.0] /home/mario/.gradle/caches/8.13/transforms/f6e88d416ca99cd5b7b5daad4106704e/transformed/firebase-appcheck-18.0.0/AndroidManifest.xml:21:5-32:19
+MERGED from [com.google.firebase:firebase-appcheck-interop:17.1.0] /home/mario/.gradle/caches/8.13/transforms/b6e783c8e467cee9dfe358599ac3a133/transformed/firebase-appcheck-interop-17.1.0/AndroidManifest.xml:21:5-20
+MERGED from [com.google.firebase:firebase-appcheck-interop:17.1.0] /home/mario/.gradle/caches/8.13/transforms/b6e783c8e467cee9dfe358599ac3a133/transformed/firebase-appcheck-interop-17.1.0/AndroidManifest.xml:21:5-20
+MERGED from [com.google.android.gms:play-services-fido:20.1.0] /home/mario/.gradle/caches/8.13/transforms/ee42e321ebf9af2b4a3aaaaa3694151c/transformed/play-services-fido-20.1.0/AndroidManifest.xml:7:5-8:19
+MERGED from [com.google.android.gms:play-services-fido:20.1.0] /home/mario/.gradle/caches/8.13/transforms/ee42e321ebf9af2b4a3aaaaa3694151c/transformed/play-services-fido-20.1.0/AndroidManifest.xml:7:5-8:19
+MERGED from [com.google.android.gms:play-services-base:18.1.0] /home/mario/.gradle/caches/8.13/transforms/3dd4afef777021b6c4e94116e7c0bb61/transformed/play-services-base-18.1.0/AndroidManifest.xml:19:5-23:19
+MERGED from [com.google.android.gms:play-services-base:18.1.0] /home/mario/.gradle/caches/8.13/transforms/3dd4afef777021b6c4e94116e7c0bb61/transformed/play-services-base-18.1.0/AndroidManifest.xml:19:5-23:19
+MERGED from [androidx.compose.ui:ui-test-manifest:1.10.0] /home/mario/.gradle/caches/8.13/transforms/1e1b2d4a349d23f6f7f9b8d7128dec75/transformed/ui-test-manifest-1.10.0/AndroidManifest.xml:22:5-27:19
+MERGED from [androidx.compose.ui:ui-test-manifest:1.10.0] /home/mario/.gradle/caches/8.13/transforms/1e1b2d4a349d23f6f7f9b8d7128dec75/transformed/ui-test-manifest-1.10.0/AndroidManifest.xml:22:5-27:19
+MERGED from [androidx.emoji2:emoji2:1.4.0] /home/mario/.gradle/caches/8.13/transforms/590747b935e41c009731aa6102883d11/transformed/emoji2-1.4.0/AndroidManifest.xml:23:5-33:19
+MERGED from [androidx.emoji2:emoji2:1.4.0] /home/mario/.gradle/caches/8.13/transforms/590747b935e41c009731aa6102883d11/transformed/emoji2-1.4.0/AndroidManifest.xml:23:5-33:19
+MERGED from [androidx.window:window:1.5.0] /home/mario/.gradle/caches/8.13/transforms/1d537e2cba050728e7149d360ab5104e/transformed/window-1.5.0/AndroidManifest.xml:22:5-29:19
+MERGED from [androidx.window:window:1.5.0] /home/mario/.gradle/caches/8.13/transforms/1d537e2cba050728e7149d360ab5104e/transformed/window-1.5.0/AndroidManifest.xml:22:5-29:19
+MERGED from [androidx.core:core:1.16.0] /home/mario/.gradle/caches/8.13/transforms/2e619266833b106540768d8ae786a779/transformed/core-1.16.0/AndroidManifest.xml:28:5-89
+MERGED from [androidx.core:core:1.16.0] /home/mario/.gradle/caches/8.13/transforms/2e619266833b106540768d8ae786a779/transformed/core-1.16.0/AndroidManifest.xml:28:5-89
+MERGED from [androidx.lifecycle:lifecycle-process:2.9.4] /home/mario/.gradle/caches/8.13/transforms/0da32728e8981d82274bf9a01b7851c3/transformed/lifecycle-process-2.9.4/AndroidManifest.xml:23:5-33:19
+MERGED from [androidx.lifecycle:lifecycle-process:2.9.4] /home/mario/.gradle/caches/8.13/transforms/0da32728e8981d82274bf9a01b7851c3/transformed/lifecycle-process-2.9.4/AndroidManifest.xml:23:5-33:19
+MERGED from [com.google.android.gms:play-services-tasks:18.2.0] /home/mario/.gradle/caches/8.13/transforms/ce231e6c5dba3d3c8881c6b9261bd6c2/transformed/play-services-tasks-18.2.0/AndroidManifest.xml:4:5-20
+MERGED from [com.google.android.gms:play-services-tasks:18.2.0] /home/mario/.gradle/caches/8.13/transforms/ce231e6c5dba3d3c8881c6b9261bd6c2/transformed/play-services-tasks-18.2.0/AndroidManifest.xml:4:5-20
+MERGED from [com.google.android.gms:play-services-basement:18.8.0] /home/mario/.gradle/caches/8.13/transforms/d23de935f55fb39caf4f6ad2efbe2196/transformed/play-services-basement-18.8.0/AndroidManifest.xml:20:5-24:19
+MERGED from [com.google.android.gms:play-services-basement:18.8.0] /home/mario/.gradle/caches/8.13/transforms/d23de935f55fb39caf4f6ad2efbe2196/transformed/play-services-basement-18.8.0/AndroidManifest.xml:20:5-24:19
+MERGED from [androidx.compose.ui:ui-tooling-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/35df5be08809421405f832aebcf770f2/transformed/ui-tooling/AndroidManifest.xml:22:5-26:19
+MERGED from [androidx.compose.ui:ui-tooling-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/35df5be08809421405f832aebcf770f2/transformed/ui-tooling/AndroidManifest.xml:22:5-26:19
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/mario/.gradle/caches/8.13/transforms/fa7b9c00e7478ec0f0de6da86a9aa71c/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:24:5-25:19
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/mario/.gradle/caches/8.13/transforms/fa7b9c00e7478ec0f0de6da86a9aa71c/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:24:5-25:19
+MERGED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:23:5-53:19
+MERGED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:23:5-53:19
+MERGED from [androidx.startup:startup-runtime:1.1.1] /home/mario/.gradle/caches/8.13/transforms/852a25b7c1a11936514e6698b5c339df/transformed/startup-runtime-1.1.1/AndroidManifest.xml:25:5-31:19
+MERGED from [androidx.startup:startup-runtime:1.1.1] /home/mario/.gradle/caches/8.13/transforms/852a25b7c1a11936514e6698b5c339df/transformed/startup-runtime-1.1.1/AndroidManifest.xml:25:5-31:19
+MERGED from [com.google.android.play:core-common:2.0.3] /home/mario/.gradle/caches/8.13/transforms/849975fc6a4fc57498ae02a3541b4e80/transformed/core-common-2.0.3/AndroidManifest.xml:11:5-19:19
+MERGED from [com.google.android.play:core-common:2.0.3] /home/mario/.gradle/caches/8.13/transforms/849975fc6a4fc57498ae02a3541b4e80/transformed/core-common-2.0.3/AndroidManifest.xml:11:5-19:19
+	android:extractNativeLibs
+		INJECTED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml
+	android:appComponentFactory
+		ADDED from [androidx.core:core:1.16.0] /home/mario/.gradle/caches/8.13/transforms/2e619266833b106540768d8ae786a779/transformed/core-1.16.0/AndroidManifest.xml:28:18-86
+	android:supportsRtl
+		ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:12:9-35
+	android:label
+		ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:10:9-41
+	android:fullBackupContent
+		ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:8:9-54
+	android:roundIcon
+		ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:11:9-54
+	android:icon
+		ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:9:9-43
+	android:allowBackup
+		ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:6:9-35
+	android:theme
+		ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:13:9-46
+	android:dataExtractionRules
+		ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:7:9-65
+activity#com.example.daypilot.login.LoginActivity
+ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:14:9-20:20
+	android:exported
+		ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:15:13-36
+	android:name
+		ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:14:19-54
+intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
+ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:16:13-19:29
+action#android.intent.action.MAIN
+ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:17:17-69
+	android:name
+		ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:17:25-66
+category#android.intent.category.LAUNCHER
+ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:18:17-77
+	android:name
+		ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:18:27-74
+activity#com.example.daypilot.login.ResetPasswordActivity
+ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:22:9-90
+	android:exported
+		ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:22:63-87
+	android:name
+		ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:22:19-62
+activity#com.example.daypilot.login.RegisterActivity
+ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:24:9-59
+	android:name
+		ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:24:19-57
+activity#com.example.daypilot.MainActivity
+ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:25:9-50
+	android:name
+		ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:25:19-47
+uses-sdk
+INJECTED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml
+INJECTED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml
+MERGED from [com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:21:5-23:151
+MERGED from [com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:21:5-23:151
+MERGED from [com.google.firebase:firebase-firestore:26.0.2] /home/mario/.gradle/caches/8.13/transforms/4c2782b7d408e01bf513291f94313098/transformed/firebase-firestore-26.0.2/AndroidManifest.xml:6:5-44
+MERGED from [com.google.firebase:firebase-firestore:26.0.2] /home/mario/.gradle/caches/8.13/transforms/4c2782b7d408e01bf513291f94313098/transformed/firebase-firestore-26.0.2/AndroidManifest.xml:6:5-44
+MERGED from [com.google.firebase:firebase-storage:22.0.1] /home/mario/.gradle/caches/8.13/transforms/1331cc3b5725c43a95ab6de47057bbdd/transformed/firebase-storage-22.0.1/AndroidManifest.xml:19:5-44
+MERGED from [com.google.firebase:firebase-storage:22.0.1] /home/mario/.gradle/caches/8.13/transforms/1331cc3b5725c43a95ab6de47057bbdd/transformed/firebase-storage-22.0.1/AndroidManifest.xml:19:5-44
+MERGED from [androidx.compose.material3:material3-android:1.4.0] /home/mario/.gradle/caches/8.13/transforms/1029363bbe313c39e19d4a4228325dad/transformed/material3/AndroidManifest.xml:20:5-44
+MERGED from [androidx.compose.material3:material3-android:1.4.0] /home/mario/.gradle/caches/8.13/transforms/1029363bbe313c39e19d4a4228325dad/transformed/material3/AndroidManifest.xml:20:5-44
+MERGED from [androidx.credentials:credentials:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/1348bec305dcd5c4626db80c71232012/transformed/credentials-1.2.0-rc01/AndroidManifest.xml:5:5-44
+MERGED from [androidx.credentials:credentials:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/1348bec305dcd5c4626db80c71232012/transformed/credentials-1.2.0-rc01/AndroidManifest.xml:5:5-44
+MERGED from [androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/72bbc5f7d815ffe53e85e26b7d784cde/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:21:5-44
+MERGED from [androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/72bbc5f7d815ffe53e85e26b7d784cde/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:21:5-44
+MERGED from [com.google.android.gms:play-services-auth:20.7.0] /home/mario/.gradle/caches/8.13/transforms/29408a52d667fe41031f2b85ffcd7d33/transformed/play-services-auth-20.7.0/AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.gms:play-services-auth:20.7.0] /home/mario/.gradle/caches/8.13/transforms/29408a52d667fe41031f2b85ffcd7d33/transformed/play-services-auth-20.7.0/AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.gms:play-services-auth-api-phone:18.0.2] /home/mario/.gradle/caches/8.13/transforms/26c940636ea9bdb283817f6108e9a02b/transformed/play-services-auth-api-phone-18.0.2/AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-auth-api-phone:18.0.2] /home/mario/.gradle/caches/8.13/transforms/26c940636ea9bdb283817f6108e9a02b/transformed/play-services-auth-api-phone-18.0.2/AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.recaptcha:recaptcha:18.6.1] /home/mario/.gradle/caches/8.13/transforms/924183b0268f7c0c2bb37c8d5507fbdc/transformed/recaptcha-18.6.1/AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.recaptcha:recaptcha:18.6.1] /home/mario/.gradle/caches/8.13/transforms/924183b0268f7c0c2bb37c8d5507fbdc/transformed/recaptcha-18.6.1/AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.play:integrity:1.3.0] /home/mario/.gradle/caches/8.13/transforms/86db85b71451a342da18b5c808564739/transformed/integrity-1.3.0/AndroidManifest.xml:4:5-44
+MERGED from [com.google.android.play:integrity:1.3.0] /home/mario/.gradle/caches/8.13/transforms/86db85b71451a342da18b5c808564739/transformed/integrity-1.3.0/AndroidManifest.xml:4:5-44
+MERGED from [com.google.firebase:firebase-auth-interop:20.0.0] /home/mario/.gradle/caches/8.13/transforms/1431e55e68b0db459052eb2089833bb3/transformed/firebase-auth-interop-20.0.0/AndroidManifest.xml:5:5-44
+MERGED from [com.google.firebase:firebase-auth-interop:20.0.0] /home/mario/.gradle/caches/8.13/transforms/1431e55e68b0db459052eb2089833bb3/transformed/firebase-auth-interop-20.0.0/AndroidManifest.xml:5:5-44
+MERGED from [com.google.firebase:firebase-common:22.0.1] /home/mario/.gradle/caches/8.13/transforms/73025ec9a7e2e690fc83aa54307e4a51/transformed/firebase-common-22.0.1/AndroidManifest.xml:19:5-44
+MERGED from [com.google.firebase:firebase-common:22.0.1] /home/mario/.gradle/caches/8.13/transforms/73025ec9a7e2e690fc83aa54307e4a51/transformed/firebase-common-22.0.1/AndroidManifest.xml:19:5-44
+MERGED from [com.google.firebase:firebase-database-collection:18.0.1] /home/mario/.gradle/caches/8.13/transforms/69610f08cd1b4c68ca4c0057905868c3/transformed/firebase-database-collection-18.0.1/AndroidManifest.xml:5:5-7:41
+MERGED from [com.google.firebase:firebase-database-collection:18.0.1] /home/mario/.gradle/caches/8.13/transforms/69610f08cd1b4c68ca4c0057905868c3/transformed/firebase-database-collection-18.0.1/AndroidManifest.xml:5:5-7:41
+MERGED from [com.google.firebase:firebase-appcheck:18.0.0] /home/mario/.gradle/caches/8.13/transforms/f6e88d416ca99cd5b7b5daad4106704e/transformed/firebase-appcheck-18.0.0/AndroidManifest.xml:18:5-44
+MERGED from [com.google.firebase:firebase-appcheck:18.0.0] /home/mario/.gradle/caches/8.13/transforms/f6e88d416ca99cd5b7b5daad4106704e/transformed/firebase-appcheck-18.0.0/AndroidManifest.xml:18:5-44
+MERGED from [com.google.firebase:firebase-appcheck-interop:17.1.0] /home/mario/.gradle/caches/8.13/transforms/b6e783c8e467cee9dfe358599ac3a133/transformed/firebase-appcheck-interop-17.1.0/AndroidManifest.xml:18:5-44
+MERGED from [com.google.firebase:firebase-appcheck-interop:17.1.0] /home/mario/.gradle/caches/8.13/transforms/b6e783c8e467cee9dfe358599ac3a133/transformed/firebase-appcheck-interop-17.1.0/AndroidManifest.xml:18:5-44
+MERGED from [com.google.android.gms:play-services-fido:20.1.0] /home/mario/.gradle/caches/8.13/transforms/ee42e321ebf9af2b4a3aaaaa3694151c/transformed/play-services-fido-20.1.0/AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-fido:20.1.0] /home/mario/.gradle/caches/8.13/transforms/ee42e321ebf9af2b4a3aaaaa3694151c/transformed/play-services-fido-20.1.0/AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-auth-base:18.0.4] /home/mario/.gradle/caches/8.13/transforms/937ebab9313c50a6e78b8277949d95c8/transformed/play-services-auth-base-18.0.4/AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-auth-base:18.0.4] /home/mario/.gradle/caches/8.13/transforms/937ebab9313c50a6e78b8277949d95c8/transformed/play-services-auth-base-18.0.4/AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-base:18.1.0] /home/mario/.gradle/caches/8.13/transforms/3dd4afef777021b6c4e94116e7c0bb61/transformed/play-services-base-18.1.0/AndroidManifest.xml:18:5-43
+MERGED from [com.google.android.gms:play-services-base:18.1.0] /home/mario/.gradle/caches/8.13/transforms/3dd4afef777021b6c4e94116e7c0bb61/transformed/play-services-base-18.1.0/AndroidManifest.xml:18:5-43
+MERGED from [androidx.compose.animation:animation-core-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/e3e93521d38f16263eb563cee90bcade/transformed/animation-core/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.animation:animation-core-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/e3e93521d38f16263eb563cee90bcade/transformed/animation-core/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.animation:animation-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/0506761036db62f3d3ba2aa498215344/transformed/animation/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.animation:animation-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/0506761036db62f3d3ba2aa498215344/transformed/animation/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.foundation:foundation-layout-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/aebde532f5055335e8c9f11a6717d484/transformed/foundation-layout/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.foundation:foundation-layout-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/aebde532f5055335e8c9f11a6717d484/transformed/foundation-layout/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-tooling-data-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/33edab6302e28b8eb4ad55e434d0b8fe/transformed/ui-tooling-data/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-tooling-data-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/33edab6302e28b8eb4ad55e434d0b8fe/transformed/ui-tooling-data/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-geometry-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/e5b437ff6791fdcaf5def2445ff2f1e3/transformed/ui-geometry/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-geometry-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/e5b437ff6791fdcaf5def2445ff2f1e3/transformed/ui-geometry/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-tooling-preview-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/8caa414368d025b70b7a30fc2ab517ca/transformed/ui-tooling-preview/AndroidManifest.xml:20:5-44
+MERGED from [androidx.compose.ui:ui-tooling-preview-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/8caa414368d025b70b7a30fc2ab517ca/transformed/ui-tooling-preview/AndroidManifest.xml:20:5-44
+MERGED from [androidx.compose.ui:ui-graphics-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/51d6e2a76bdb58fc636af64cacd8355b/transformed/ui-graphics/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-graphics-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/51d6e2a76bdb58fc636af64cacd8355b/transformed/ui-graphics/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-unit-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/a100d722d1b81a885e1ca799ef33f0dd/transformed/ui-unit/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-unit-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/a100d722d1b81a885e1ca799ef33f0dd/transformed/ui-unit/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-test-manifest:1.10.0] /home/mario/.gradle/caches/8.13/transforms/1e1b2d4a349d23f6f7f9b8d7128dec75/transformed/ui-test-manifest-1.10.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.compose.ui:ui-test-manifest:1.10.0] /home/mario/.gradle/caches/8.13/transforms/1e1b2d4a349d23f6f7f9b8d7128dec75/transformed/ui-test-manifest-1.10.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.compose.ui:ui-util-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/1e099f8876a57fc660c5ae83dcd2de0e/transformed/ui-util/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-util-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/1e099f8876a57fc660c5ae83dcd2de0e/transformed/ui-util/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-text-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/e80bd490b6430def35231d0cc92024e2/transformed/ui-text/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-text-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/e80bd490b6430def35231d0cc92024e2/transformed/ui-text/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.runtime:runtime-retain-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/74a5da146c9675450eeb323a6cce8447/transformed/runtime-retain/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.runtime:runtime-retain-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/74a5da146c9675450eeb323a6cce8447/transformed/runtime-retain/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.runtime:runtime-annotation-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/eaf403d9540fefd9ac07012d6cc957fa/transformed/runtime-annotation/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.runtime:runtime-annotation-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/eaf403d9540fefd9ac07012d6cc957fa/transformed/runtime-annotation/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.runtime:runtime-saveable-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/d458d43c35f280b00a26ffb88dceb151/transformed/runtime-saveable/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.runtime:runtime-saveable-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/d458d43c35f280b00a26ffb88dceb151/transformed/runtime-saveable/AndroidManifest.xml:5:5-44
+MERGED from [androidx.transition:transition:1.6.0] /home/mario/.gradle/caches/8.13/transforms/68eb0f373607f196039d54988a4009d6/transformed/transition-1.6.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.transition:transition:1.6.0] /home/mario/.gradle/caches/8.13/transforms/68eb0f373607f196039d54988a4009d6/transformed/transition-1.6.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.dynamicanimation:dynamicanimation:1.0.0] /home/mario/.gradle/caches/8.13/transforms/795cf00adb490b40fb6cd59bf0696a46/transformed/dynamicanimation-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.dynamicanimation:dynamicanimation:1.0.0] /home/mario/.gradle/caches/8.13/transforms/795cf00adb490b40fb6cd59bf0696a46/transformed/dynamicanimation-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.legacy:legacy-support-core-utils:1.0.0] /home/mario/.gradle/caches/8.13/transforms/22b6fbfc04b1b9cf9bf04c80290492d7/transformed/legacy-support-core-utils-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.legacy:legacy-support-core-utils:1.0.0] /home/mario/.gradle/caches/8.13/transforms/22b6fbfc04b1b9cf9bf04c80290492d7/transformed/legacy-support-core-utils-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.loader:loader:1.0.0] /home/mario/.gradle/caches/8.13/transforms/65d92d7c1daae953a1c9ba5b56c9f2dd/transformed/loader-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.loader:loader:1.0.0] /home/mario/.gradle/caches/8.13/transforms/65d92d7c1daae953a1c9ba5b56c9f2dd/transformed/loader-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.emoji2:emoji2:1.4.0] /home/mario/.gradle/caches/8.13/transforms/590747b935e41c009731aa6102883d11/transformed/emoji2-1.4.0/AndroidManifest.xml:21:5-44
+MERGED from [androidx.emoji2:emoji2:1.4.0] /home/mario/.gradle/caches/8.13/transforms/590747b935e41c009731aa6102883d11/transformed/emoji2-1.4.0/AndroidManifest.xml:21:5-44
+MERGED from [androidx.activity:activity-ktx:1.8.2] /home/mario/.gradle/caches/8.13/transforms/be6820a50c4480fe74dd9b69e4f967c2/transformed/activity-ktx-1.8.2/AndroidManifest.xml:5:5-44
+MERGED from [androidx.activity:activity-ktx:1.8.2] /home/mario/.gradle/caches/8.13/transforms/be6820a50c4480fe74dd9b69e4f967c2/transformed/activity-ktx-1.8.2/AndroidManifest.xml:5:5-44
+MERGED from [androidx.browser:browser:1.4.0] /home/mario/.gradle/caches/8.13/transforms/d7ad9656e530be813a407211cd939452/transformed/browser-1.4.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.browser:browser:1.4.0] /home/mario/.gradle/caches/8.13/transforms/d7ad9656e530be813a407211cd939452/transformed/browser-1.4.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.viewpager:viewpager:1.0.0] /home/mario/.gradle/caches/8.13/transforms/674bc27560ad2798894b9d3934a1dff7/transformed/viewpager-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.viewpager:viewpager:1.0.0] /home/mario/.gradle/caches/8.13/transforms/674bc27560ad2798894b9d3934a1dff7/transformed/viewpager-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.customview:customview:1.0.0] /home/mario/.gradle/caches/8.13/transforms/17bd511a70be5c62f51366b01cd8f709/transformed/customview-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.customview:customview:1.0.0] /home/mario/.gradle/caches/8.13/transforms/17bd511a70be5c62f51366b01cd8f709/transformed/customview-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.autofill:autofill:1.0.0] /home/mario/.gradle/caches/8.13/transforms/1ac0bd0a4b0c45ddba8c6322ed0378b7/transformed/autofill-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.autofill:autofill:1.0.0] /home/mario/.gradle/caches/8.13/transforms/1ac0bd0a4b0c45ddba8c6322ed0378b7/transformed/autofill-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.window:window-core-android:1.5.0] /home/mario/.gradle/caches/8.13/transforms/a080cd8e06e543968cf402a273ba95f7/transformed/window-core/AndroidManifest.xml:5:5-44
+MERGED from [androidx.window:window-core-android:1.5.0] /home/mario/.gradle/caches/8.13/transforms/a080cd8e06e543968cf402a273ba95f7/transformed/window-core/AndroidManifest.xml:5:5-44
+MERGED from [androidx.window:window:1.5.0] /home/mario/.gradle/caches/8.13/transforms/1d537e2cba050728e7149d360ab5104e/transformed/window-1.5.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.window:window:1.5.0] /home/mario/.gradle/caches/8.13/transforms/1d537e2cba050728e7149d360ab5104e/transformed/window-1.5.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.customview:customview-poolingcontainer:1.0.0] /home/mario/.gradle/caches/8.13/transforms/e242d4ad31b1817d82c2211d8a8bea8a/transformed/customview-poolingcontainer-1.0.0/AndroidManifest.xml:20:5-21:38
+MERGED from [androidx.customview:customview-poolingcontainer:1.0.0] /home/mario/.gradle/caches/8.13/transforms/e242d4ad31b1817d82c2211d8a8bea8a/transformed/customview-poolingcontainer-1.0.0/AndroidManifest.xml:20:5-21:38
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.9.4] /home/mario/.gradle/caches/8.13/transforms/c394b74700739491e4cafc915042abaa/transformed/lifecycle-viewmodel-2.9.4/AndroidManifest.xml:4:5-43
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.9.4] /home/mario/.gradle/caches/8.13/transforms/c394b74700739491e4cafc915042abaa/transformed/lifecycle-viewmodel-2.9.4/AndroidManifest.xml:4:5-43
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-android:2.9.4] /home/mario/.gradle/caches/8.13/transforms/8547125d4b0009d426b8b075880c262e/transformed/lifecycle-viewmodel-release/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-android:2.9.4] /home/mario/.gradle/caches/8.13/transforms/8547125d4b0009d426b8b075880c262e/transformed/lifecycle-viewmodel-release/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core-ktx:2.9.4] /home/mario/.gradle/caches/8.13/transforms/1089cf4a2f739b071b5f6b0fbc64fb36/transformed/lifecycle-livedata-core-ktx-2.9.4/AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core-ktx:2.9.4] /home/mario/.gradle/caches/8.13/transforms/1089cf4a2f739b071b5f6b0fbc64fb36/transformed/lifecycle-livedata-core-ktx-2.9.4/AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime-ktx-android:2.9.4] /home/mario/.gradle/caches/8.13/transforms/5aa9c50bc64e177da774ed1f637f6702/transformed/lifecycle-runtime-ktx/AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime-ktx-android:2.9.4] /home/mario/.gradle/caches/8.13/transforms/5aa9c50bc64e177da774ed1f637f6702/transformed/lifecycle-runtime-ktx/AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate-android:2.9.4] /home/mario/.gradle/caches/8.13/transforms/ff6badd4e8a48f006bac9b860ec02387/transformed/lifecycle-viewmodel-savedstate-release/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate-android:2.9.4] /home/mario/.gradle/caches/8.13/transforms/ff6badd4e8a48f006bac9b860ec02387/transformed/lifecycle-viewmodel-savedstate-release/AndroidManifest.xml:20:5-44
+MERGED from [androidx.savedstate:savedstate-android:1.3.2] /home/mario/.gradle/caches/8.13/transforms/40d3ceccab79755d1e73d74baaeaf9a5/transformed/savedstate-release/AndroidManifest.xml:20:5-44
+MERGED from [androidx.savedstate:savedstate-android:1.3.2] /home/mario/.gradle/caches/8.13/transforms/40d3ceccab79755d1e73d74baaeaf9a5/transformed/savedstate-release/AndroidManifest.xml:20:5-44
+MERGED from [androidx.savedstate:savedstate-ktx:1.3.2] /home/mario/.gradle/caches/8.13/transforms/736be601ba52a8083cc7f5eb2cd2fbce/transformed/savedstate-ktx-1.3.2/AndroidManifest.xml:5:5-44
+MERGED from [androidx.savedstate:savedstate-ktx:1.3.2] /home/mario/.gradle/caches/8.13/transforms/736be601ba52a8083cc7f5eb2cd2fbce/transformed/savedstate-ktx-1.3.2/AndroidManifest.xml:5:5-44
+MERGED from [androidx.savedstate:savedstate-compose-android:1.3.2] /home/mario/.gradle/caches/8.13/transforms/ce896ede4894168b2395b99527124fdb/transformed/savedstate-compose/AndroidManifest.xml:5:5-44
+MERGED from [androidx.savedstate:savedstate-compose-android:1.3.2] /home/mario/.gradle/caches/8.13/transforms/ce896ede4894168b2395b99527124fdb/transformed/savedstate-compose/AndroidManifest.xml:5:5-44
+MERGED from [androidx.core:core-ktx:1.16.0] /home/mario/.gradle/caches/8.13/transforms/aab475ce8f79675b15130582c8a65f93/transformed/core-ktx-1.16.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.core:core-ktx:1.16.0] /home/mario/.gradle/caches/8.13/transforms/aab475ce8f79675b15130582c8a65f93/transformed/core-ktx-1.16.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.graphics:graphics-path:1.0.1] /home/mario/.gradle/caches/8.13/transforms/eac0740bfbb39b335bbb7030c63a3a56/transformed/graphics-path-1.0.1/AndroidManifest.xml:5:5-44
+MERGED from [androidx.graphics:graphics-path:1.0.1] /home/mario/.gradle/caches/8.13/transforms/eac0740bfbb39b335bbb7030c63a3a56/transformed/graphics-path-1.0.1/AndroidManifest.xml:5:5-44
+MERGED from [androidx.core:core:1.16.0] /home/mario/.gradle/caches/8.13/transforms/2e619266833b106540768d8ae786a779/transformed/core-1.16.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.core:core:1.16.0] /home/mario/.gradle/caches/8.13/transforms/2e619266833b106540768d8ae786a779/transformed/core-1.16.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime-android:2.9.4] /home/mario/.gradle/caches/8.13/transforms/4f236c3ffccf6e0bec90e7bc3d2483aa/transformed/lifecycle-runtime-release/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime-android:2.9.4] /home/mario/.gradle/caches/8.13/transforms/4f236c3ffccf6e0bec90e7bc3d2483aa/transformed/lifecycle-runtime-release/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.4] /home/mario/.gradle/caches/8.13/transforms/b2e852ed5e753db54fd6cabc7c9c6274/transformed/lifecycle-viewmodel-ktx-2.9.4/AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.4] /home/mario/.gradle/caches/8.13/transforms/b2e852ed5e753db54fd6cabc7c9c6274/transformed/lifecycle-viewmodel-ktx-2.9.4/AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-process:2.9.4] /home/mario/.gradle/caches/8.13/transforms/0da32728e8981d82274bf9a01b7851c3/transformed/lifecycle-process-2.9.4/AndroidManifest.xml:21:5-44
+MERGED from [androidx.lifecycle:lifecycle-process:2.9.4] /home/mario/.gradle/caches/8.13/transforms/0da32728e8981d82274bf9a01b7851c3/transformed/lifecycle-process-2.9.4/AndroidManifest.xml:21:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.9.4] /home/mario/.gradle/caches/8.13/transforms/5c091419b6e70a3ec603ceec086ed030/transformed/lifecycle-livedata-core-2.9.4/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.9.4] /home/mario/.gradle/caches/8.13/transforms/5c091419b6e70a3ec603ceec086ed030/transformed/lifecycle-livedata-core-2.9.4/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.9.4] /home/mario/.gradle/caches/8.13/transforms/b4ca53f55947c3d36a11ef8c3f242fdd/transformed/lifecycle-livedata-2.9.4/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.9.4] /home/mario/.gradle/caches/8.13/transforms/b4ca53f55947c3d36a11ef8c3f242fdd/transformed/lifecycle-livedata-2.9.4/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime-compose-android:2.9.4] /home/mario/.gradle/caches/8.13/transforms/2852c0cd76457d1b36a21e14672ad84a/transformed/lifecycle-runtime-compose-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime-compose-android:2.9.4] /home/mario/.gradle/caches/8.13/transforms/2852c0cd76457d1b36a21e14672ad84a/transformed/lifecycle-runtime-compose-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.runtime:runtime-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/26bd31ac72687d73f9fdf6c366ae5a96/transformed/runtime/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.runtime:runtime-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/26bd31ac72687d73f9fdf6c366ae5a96/transformed/runtime/AndroidManifest.xml:5:5-44
+MERGED from [androidx.datastore:datastore-core-android:1.1.7] /home/mario/.gradle/caches/8.13/transforms/bd9fcff5c34ca4cc66112e6d29268c10/transformed/datastore-core-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.datastore:datastore-core-android:1.1.7] /home/mario/.gradle/caches/8.13/transforms/bd9fcff5c34ca4cc66112e6d29268c10/transformed/datastore-core-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.datastore:datastore-preferences-core-android:1.1.7] /home/mario/.gradle/caches/8.13/transforms/0206238aee693188a58508647ca95f70/transformed/datastore-preferences-core-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.datastore:datastore-preferences-core-android:1.1.7] /home/mario/.gradle/caches/8.13/transforms/0206238aee693188a58508647ca95f70/transformed/datastore-preferences-core-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.datastore:datastore-android:1.1.7] /home/mario/.gradle/caches/8.13/transforms/a55438dc78ec84f55368c6da5823fbf6/transformed/datastore-release/AndroidManifest.xml:20:5-44
+MERGED from [androidx.datastore:datastore-android:1.1.7] /home/mario/.gradle/caches/8.13/transforms/a55438dc78ec84f55368c6da5823fbf6/transformed/datastore-release/AndroidManifest.xml:20:5-44
+MERGED from [androidx.datastore:datastore-preferences-android:1.1.7] /home/mario/.gradle/caches/8.13/transforms/02a7278c85ef36aee45c07ae5830916d/transformed/datastore-preferences-release/AndroidManifest.xml:20:5-44
+MERGED from [androidx.datastore:datastore-preferences-android:1.1.7] /home/mario/.gradle/caches/8.13/transforms/02a7278c85ef36aee45c07ae5830916d/transformed/datastore-preferences-release/AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.gms:play-services-tasks:18.2.0] /home/mario/.gradle/caches/8.13/transforms/ce231e6c5dba3d3c8881c6b9261bd6c2/transformed/play-services-tasks-18.2.0/AndroidManifest.xml:3:5-44
+MERGED from [com.google.android.gms:play-services-tasks:18.2.0] /home/mario/.gradle/caches/8.13/transforms/ce231e6c5dba3d3c8881c6b9261bd6c2/transformed/play-services-tasks-18.2.0/AndroidManifest.xml:3:5-44
+MERGED from [com.google.android.gms:play-services-basement:18.8.0] /home/mario/.gradle/caches/8.13/transforms/d23de935f55fb39caf4f6ad2efbe2196/transformed/play-services-basement-18.8.0/AndroidManifest.xml:18:5-43
+MERGED from [com.google.android.gms:play-services-basement:18.8.0] /home/mario/.gradle/caches/8.13/transforms/d23de935f55fb39caf4f6ad2efbe2196/transformed/play-services-basement-18.8.0/AndroidManifest.xml:18:5-43
+MERGED from [androidx.fragment:fragment:1.1.0] /home/mario/.gradle/caches/8.13/transforms/9d736cbe4e0f1867bc30091d6327e7f7/transformed/fragment-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.fragment:fragment:1.1.0] /home/mario/.gradle/caches/8.13/transforms/9d736cbe4e0f1867bc30091d6327e7f7/transformed/fragment-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.activity:activity:1.8.2] /home/mario/.gradle/caches/8.13/transforms/e10830bac9e739c0ae78e9cfb4d62731/transformed/activity-1.8.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.activity:activity:1.8.2] /home/mario/.gradle/caches/8.13/transforms/e10830bac9e739c0ae78e9cfb4d62731/transformed/activity-1.8.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.activity:activity-compose:1.8.2] /home/mario/.gradle/caches/8.13/transforms/77d77022955768e51a060ce5bddf67cc/transformed/activity-compose-1.8.2/AndroidManifest.xml:5:5-44
+MERGED from [androidx.activity:activity-compose:1.8.2] /home/mario/.gradle/caches/8.13/transforms/77d77022955768e51a060ce5bddf67cc/transformed/activity-compose-1.8.2/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.material:material-icons-extended-android:1.7.0] /home/mario/.gradle/caches/8.13/transforms/5916adf5e622bb2126c61e8878ea0e66/transformed/material-icons-extended-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.material:material-icons-extended-android:1.7.0] /home/mario/.gradle/caches/8.13/transforms/5916adf5e622bb2126c61e8878ea0e66/transformed/material-icons-extended-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.material:material-icons-core-android:1.7.0] /home/mario/.gradle/caches/8.13/transforms/082746ffd370b86f522682ccc3e6b078/transformed/material-icons-core-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.material:material-icons-core-android:1.7.0] /home/mario/.gradle/caches/8.13/transforms/082746ffd370b86f522682ccc3e6b078/transformed/material-icons-core-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/11b691e77d67e52e248253c1e64f4af2/transformed/ui/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/11b691e77d67e52e248253c1e64f4af2/transformed/ui/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-tooling-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/35df5be08809421405f832aebcf770f2/transformed/ui-tooling/AndroidManifest.xml:20:5-44
+MERGED from [androidx.compose.ui:ui-tooling-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/35df5be08809421405f832aebcf770f2/transformed/ui-tooling/AndroidManifest.xml:20:5-44
+MERGED from [androidx.compose.material:material-android:1.7.0] /home/mario/.gradle/caches/8.13/transforms/032fbe371d4097bd1a7c28fb55b4f2ae/transformed/material-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.material:material-android:1.7.0] /home/mario/.gradle/caches/8.13/transforms/032fbe371d4097bd1a7c28fb55b4f2ae/transformed/material-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.material:material-ripple-android:1.8.1] /home/mario/.gradle/caches/8.13/transforms/bb9f825ed5b1a8c6667b90520cf529f6/transformed/material-ripple-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.material:material-ripple-android:1.8.1] /home/mario/.gradle/caches/8.13/transforms/bb9f825ed5b1a8c6667b90520cf529f6/transformed/material-ripple-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.foundation:foundation-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/9ba4bd090f55f25a51e67228705125fa/transformed/foundation/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.foundation:foundation-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/9ba4bd090f55f25a51e67228705125fa/transformed/foundation/AndroidManifest.xml:5:5-44
+MERGED from [androidx.annotation:annotation-experimental:1.4.1] /home/mario/.gradle/caches/8.13/transforms/acc2180556bc2097538cf675fefe25da/transformed/annotation-experimental-1.4.1/AndroidManifest.xml:5:5-44
+MERGED from [androidx.annotation:annotation-experimental:1.4.1] /home/mario/.gradle/caches/8.13/transforms/acc2180556bc2097538cf675fefe25da/transformed/annotation-experimental-1.4.1/AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.libraries.identity.googleid:googleid:1.1.0] /home/mario/.gradle/caches/8.13/transforms/41e867d8a637049e63fc213ba0321efe/transformed/googleid-1.1.0/AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.libraries.identity.googleid:googleid:1.1.0] /home/mario/.gradle/caches/8.13/transforms/41e867d8a637049e63fc213ba0321efe/transformed/googleid-1.1.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/mario/.gradle/caches/8.13/transforms/fa7b9c00e7478ec0f0de6da86a9aa71c/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/mario/.gradle/caches/8.13/transforms/fa7b9c00e7478ec0f0de6da86a9aa71c/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] /home/mario/.gradle/caches/8.13/transforms/71fc7c299d353864f2b2a2c1c7f0bb42/transformed/localbroadcastmanager-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] /home/mario/.gradle/caches/8.13/transforms/71fc7c299d353864f2b2a2c1c7f0bb42/transformed/localbroadcastmanager-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.google.firebase:firebase-components:19.0.0] /home/mario/.gradle/caches/8.13/transforms/774e36d7b740b3b821ee3da18a7789c6/transformed/firebase-components-19.0.0/AndroidManifest.xml:18:5-44
+MERGED from [com.google.firebase:firebase-components:19.0.0] /home/mario/.gradle/caches/8.13/transforms/774e36d7b740b3b821ee3da18a7789c6/transformed/firebase-components-19.0.0/AndroidManifest.xml:18:5-44
+MERGED from [androidx.interpolator:interpolator:1.0.0] /home/mario/.gradle/caches/8.13/transforms/f99bf680bc9135e42d51468df5c72da5/transformed/interpolator-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.interpolator:interpolator:1.0.0] /home/mario/.gradle/caches/8.13/transforms/f99bf680bc9135e42d51468df5c72da5/transformed/interpolator-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:21:5-44
+MERGED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:21:5-44
+MERGED from [androidx.startup:startup-runtime:1.1.1] /home/mario/.gradle/caches/8.13/transforms/852a25b7c1a11936514e6698b5c339df/transformed/startup-runtime-1.1.1/AndroidManifest.xml:21:5-23:41
+MERGED from [androidx.startup:startup-runtime:1.1.1] /home/mario/.gradle/caches/8.13/transforms/852a25b7c1a11936514e6698b5c339df/transformed/startup-runtime-1.1.1/AndroidManifest.xml:21:5-23:41
+MERGED from [androidx.tracing:tracing:1.2.0] /home/mario/.gradle/caches/8.13/transforms/46d9cfe75e8c9017660c996ad550526b/transformed/tracing-1.2.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.tracing:tracing:1.2.0] /home/mario/.gradle/caches/8.13/transforms/46d9cfe75e8c9017660c996ad550526b/transformed/tracing-1.2.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.documentfile:documentfile:1.0.0] /home/mario/.gradle/caches/8.13/transforms/8b7dc0ad84ac4fe0e6ed8775e1f14cbb/transformed/documentfile-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.documentfile:documentfile:1.0.0] /home/mario/.gradle/caches/8.13/transforms/8b7dc0ad84ac4fe0e6ed8775e1f14cbb/transformed/documentfile-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.print:print:1.0.0] /home/mario/.gradle/caches/8.13/transforms/0ca669d0a319c28b7bffc494f805c87d/transformed/print-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.print:print:1.0.0] /home/mario/.gradle/caches/8.13/transforms/0ca669d0a319c28b7bffc494f805c87d/transformed/print-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.arch.core:core-runtime:2.2.0] /home/mario/.gradle/caches/8.13/transforms/afbf89b34cbea804bc15c54753e4e16f/transformed/core-runtime-2.2.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.arch.core:core-runtime:2.2.0] /home/mario/.gradle/caches/8.13/transforms/afbf89b34cbea804bc15c54753e4e16f/transformed/core-runtime-2.2.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.core:core-viewtree:1.0.0] /home/mario/.gradle/caches/8.13/transforms/086b624334764b9ba88cfbe63c4d55d1/transformed/core-viewtree-1.0.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.core:core-viewtree:1.0.0] /home/mario/.gradle/caches/8.13/transforms/086b624334764b9ba88cfbe63c4d55d1/transformed/core-viewtree-1.0.0/AndroidManifest.xml:5:5-44
+MERGED from [com.google.firebase:protolite-well-known-types:18.0.1] /home/mario/.gradle/caches/8.13/transforms/060b3e15658f35e1898c1e6f9eb43448/transformed/protolite-well-known-types-18.0.1/AndroidManifest.xml:5:5-44
+MERGED from [com.google.firebase:protolite-well-known-types:18.0.1] /home/mario/.gradle/caches/8.13/transforms/060b3e15658f35e1898c1e6f9eb43448/transformed/protolite-well-known-types-18.0.1/AndroidManifest.xml:5:5-44
+MERGED from [io.grpc:grpc-android:1.62.2] /home/mario/.gradle/caches/8.13/transforms/1041e04fa85a34925f78d5a2bf1eda29/transformed/grpc-android-1.62.2/AndroidManifest.xml:5:5-44
+MERGED from [io.grpc:grpc-android:1.62.2] /home/mario/.gradle/caches/8.13/transforms/1041e04fa85a34925f78d5a2bf1eda29/transformed/grpc-android-1.62.2/AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.play:core-common:2.0.3] /home/mario/.gradle/caches/8.13/transforms/849975fc6a4fc57498ae02a3541b4e80/transformed/core-common-2.0.3/AndroidManifest.xml:7:5-9:41
+MERGED from [com.google.android.play:core-common:2.0.3] /home/mario/.gradle/caches/8.13/transforms/849975fc6a4fc57498ae02a3541b4e80/transformed/core-common-2.0.3/AndroidManifest.xml:7:5-9:41
+	tools:overrideLibrary
+		ADDED from [com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:23:9-148
+	android:targetSdkVersion
+		INJECTED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml
+uses-permission#android.permission.INTERNET
+ADDED from [com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:25:5-67
+MERGED from [com.google.firebase:firebase-firestore:26.0.2] /home/mario/.gradle/caches/8.13/transforms/4c2782b7d408e01bf513291f94313098/transformed/firebase-firestore-26.0.2/AndroidManifest.xml:11:5-67
+MERGED from [com.google.firebase:firebase-firestore:26.0.2] /home/mario/.gradle/caches/8.13/transforms/4c2782b7d408e01bf513291f94313098/transformed/firebase-firestore-26.0.2/AndroidManifest.xml:11:5-67
+MERGED from [com.google.firebase:firebase-storage:22.0.1] /home/mario/.gradle/caches/8.13/transforms/1331cc3b5725c43a95ab6de47057bbdd/transformed/firebase-storage-22.0.1/AndroidManifest.xml:24:5-67
+MERGED from [com.google.firebase:firebase-storage:22.0.1] /home/mario/.gradle/caches/8.13/transforms/1331cc3b5725c43a95ab6de47057bbdd/transformed/firebase-storage-22.0.1/AndroidManifest.xml:24:5-67
+MERGED from [com.google.android.recaptcha:recaptcha:18.6.1] /home/mario/.gradle/caches/8.13/transforms/924183b0268f7c0c2bb37c8d5507fbdc/transformed/recaptcha-18.6.1/AndroidManifest.xml:7:5-67
+MERGED from [com.google.android.recaptcha:recaptcha:18.6.1] /home/mario/.gradle/caches/8.13/transforms/924183b0268f7c0c2bb37c8d5507fbdc/transformed/recaptcha-18.6.1/AndroidManifest.xml:7:5-67
+	android:name
+		ADDED from [com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:25:22-64
+uses-permission#android.permission.ACCESS_NETWORK_STATE
+ADDED from [com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:26:5-79
+MERGED from [com.google.firebase:firebase-firestore:26.0.2] /home/mario/.gradle/caches/8.13/transforms/4c2782b7d408e01bf513291f94313098/transformed/firebase-firestore-26.0.2/AndroidManifest.xml:10:5-79
+MERGED from [com.google.firebase:firebase-firestore:26.0.2] /home/mario/.gradle/caches/8.13/transforms/4c2782b7d408e01bf513291f94313098/transformed/firebase-firestore-26.0.2/AndroidManifest.xml:10:5-79
+MERGED from [com.google.firebase:firebase-storage:22.0.1] /home/mario/.gradle/caches/8.13/transforms/1331cc3b5725c43a95ab6de47057bbdd/transformed/firebase-storage-22.0.1/AndroidManifest.xml:23:5-79
+MERGED from [com.google.firebase:firebase-storage:22.0.1] /home/mario/.gradle/caches/8.13/transforms/1331cc3b5725c43a95ab6de47057bbdd/transformed/firebase-storage-22.0.1/AndroidManifest.xml:23:5-79
+MERGED from [com.google.android.recaptcha:recaptcha:18.6.1] /home/mario/.gradle/caches/8.13/transforms/924183b0268f7c0c2bb37c8d5507fbdc/transformed/recaptcha-18.6.1/AndroidManifest.xml:8:5-79
+MERGED from [com.google.android.recaptcha:recaptcha:18.6.1] /home/mario/.gradle/caches/8.13/transforms/924183b0268f7c0c2bb37c8d5507fbdc/transformed/recaptcha-18.6.1/AndroidManifest.xml:8:5-79
+MERGED from [io.grpc:grpc-android:1.62.2] /home/mario/.gradle/caches/8.13/transforms/1041e04fa85a34925f78d5a2bf1eda29/transformed/grpc-android-1.62.2/AndroidManifest.xml:7:5-79
+MERGED from [io.grpc:grpc-android:1.62.2] /home/mario/.gradle/caches/8.13/transforms/1041e04fa85a34925f78d5a2bf1eda29/transformed/grpc-android-1.62.2/AndroidManifest.xml:7:5-79
+	android:name
+		ADDED from [com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:26:22-76
+activity#com.google.firebase.auth.internal.GenericIdpActivity
+ADDED from [com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:29:9-46:20
+	android:excludeFromRecents
+		ADDED from [com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:31:13-46
+	android:launchMode
+		ADDED from [com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:33:13-44
+	android:exported
+		ADDED from [com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:32:13-36
+	android:theme
+		ADDED from [com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:34:13-72
+	android:name
+		ADDED from [com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:30:13-80
+intent-filter#action:name:android.intent.action.VIEW+category:name:android.intent.category.BROWSABLE+category:name:android.intent.category.DEFAULT+data:host:firebase.auth+data:path:/+data:scheme:genericidp
+ADDED from [com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:35:13-45:29
+action#android.intent.action.VIEW
+ADDED from [com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:36:17-69
+	android:name
+		ADDED from [com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:36:25-66
+category#android.intent.category.DEFAULT
+ADDED from [com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:38:17-76
+	android:name
+		ADDED from [com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:38:27-73
+category#android.intent.category.BROWSABLE
+ADDED from [com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:39:17-78
+	android:name
+		ADDED from [com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:39:27-75
+data
+ADDED from [com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:41:17-44:51
+	android:path
+		ADDED from [com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:43:21-37
+	android:host
+		ADDED from [com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:42:21-49
+	android:scheme
+		ADDED from [com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:44:21-48
+activity#com.google.firebase.auth.internal.RecaptchaActivity
+ADDED from [com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:47:9-64:20
+	android:excludeFromRecents
+		ADDED from [com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:49:13-46
+	android:launchMode
+		ADDED from [com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:51:13-44
+	android:exported
+		ADDED from [com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:50:13-36
+	android:theme
+		ADDED from [com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:52:13-72
+	android:name
+		ADDED from [com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:48:13-79
+intent-filter#action:name:android.intent.action.VIEW+category:name:android.intent.category.BROWSABLE+category:name:android.intent.category.DEFAULT+data:host:firebase.auth+data:path:/+data:scheme:recaptcha
+ADDED from [com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:53:13-63:29
+service#com.google.firebase.components.ComponentDiscoveryService
+ADDED from [com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:66:9-72:19
+MERGED from [com.google.firebase:firebase-firestore:26.0.2] /home/mario/.gradle/caches/8.13/transforms/4c2782b7d408e01bf513291f94313098/transformed/firebase-firestore-26.0.2/AndroidManifest.xml:14:9-23:19
+MERGED from [com.google.firebase:firebase-firestore:26.0.2] /home/mario/.gradle/caches/8.13/transforms/4c2782b7d408e01bf513291f94313098/transformed/firebase-firestore-26.0.2/AndroidManifest.xml:14:9-23:19
+MERGED from [com.google.firebase:firebase-storage:22.0.1] /home/mario/.gradle/caches/8.13/transforms/1331cc3b5725c43a95ab6de47057bbdd/transformed/firebase-storage-22.0.1/AndroidManifest.xml:27:9-36:19
+MERGED from [com.google.firebase:firebase-storage:22.0.1] /home/mario/.gradle/caches/8.13/transforms/1331cc3b5725c43a95ab6de47057bbdd/transformed/firebase-storage-22.0.1/AndroidManifest.xml:27:9-36:19
+MERGED from [com.google.firebase:firebase-common:22.0.1] /home/mario/.gradle/caches/8.13/transforms/73025ec9a7e2e690fc83aa54307e4a51/transformed/firebase-common-22.0.1/AndroidManifest.xml:30:9-38:19
+MERGED from [com.google.firebase:firebase-common:22.0.1] /home/mario/.gradle/caches/8.13/transforms/73025ec9a7e2e690fc83aa54307e4a51/transformed/firebase-common-22.0.1/AndroidManifest.xml:30:9-38:19
+MERGED from [com.google.firebase:firebase-appcheck:18.0.0] /home/mario/.gradle/caches/8.13/transforms/f6e88d416ca99cd5b7b5daad4106704e/transformed/firebase-appcheck-18.0.0/AndroidManifest.xml:22:9-31:19
+MERGED from [com.google.firebase:firebase-appcheck:18.0.0] /home/mario/.gradle/caches/8.13/transforms/f6e88d416ca99cd5b7b5daad4106704e/transformed/firebase-appcheck-18.0.0/AndroidManifest.xml:22:9-31:19
+	android:exported
+		ADDED from [com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:68:13-37
+	tools:targetApi
+		ADDED from [com.google.firebase:firebase-common:22.0.1] /home/mario/.gradle/caches/8.13/transforms/73025ec9a7e2e690fc83aa54307e4a51/transformed/firebase-common-22.0.1/AndroidManifest.xml:34:13-32
+	android:directBootAware
+		ADDED from [com.google.firebase:firebase-common:22.0.1] /home/mario/.gradle/caches/8.13/transforms/73025ec9a7e2e690fc83aa54307e4a51/transformed/firebase-common-22.0.1/AndroidManifest.xml:32:13-43
+	android:name
+		ADDED from [com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:67:13-84
+meta-data#com.google.firebase.components:com.google.firebase.auth.FirebaseAuthRegistrar
+ADDED from [com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:69:13-71:85
+	android:value
+		ADDED from [com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:71:17-82
+	android:name
+		ADDED from [com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:70:17-109
+meta-data#com.google.firebase.components:com.google.firebase.firestore.FirebaseFirestoreKtxRegistrar
+ADDED from [com.google.firebase:firebase-firestore:26.0.2] /home/mario/.gradle/caches/8.13/transforms/4c2782b7d408e01bf513291f94313098/transformed/firebase-firestore-26.0.2/AndroidManifest.xml:17:13-19:85
+	android:value
+		ADDED from [com.google.firebase:firebase-firestore:26.0.2] /home/mario/.gradle/caches/8.13/transforms/4c2782b7d408e01bf513291f94313098/transformed/firebase-firestore-26.0.2/AndroidManifest.xml:19:17-82
+	android:name
+		ADDED from [com.google.firebase:firebase-firestore:26.0.2] /home/mario/.gradle/caches/8.13/transforms/4c2782b7d408e01bf513291f94313098/transformed/firebase-firestore-26.0.2/AndroidManifest.xml:18:17-122
+meta-data#com.google.firebase.components:com.google.firebase.firestore.FirestoreRegistrar
+ADDED from [com.google.firebase:firebase-firestore:26.0.2] /home/mario/.gradle/caches/8.13/transforms/4c2782b7d408e01bf513291f94313098/transformed/firebase-firestore-26.0.2/AndroidManifest.xml:20:13-22:85
+	android:value
+		ADDED from [com.google.firebase:firebase-firestore:26.0.2] /home/mario/.gradle/caches/8.13/transforms/4c2782b7d408e01bf513291f94313098/transformed/firebase-firestore-26.0.2/AndroidManifest.xml:22:17-82
+	android:name
+		ADDED from [com.google.firebase:firebase-firestore:26.0.2] /home/mario/.gradle/caches/8.13/transforms/4c2782b7d408e01bf513291f94313098/transformed/firebase-firestore-26.0.2/AndroidManifest.xml:21:17-111
+meta-data#com.google.firebase.components:com.google.firebase.storage.FirebaseStorageKtxRegistrar
+ADDED from [com.google.firebase:firebase-storage:22.0.1] /home/mario/.gradle/caches/8.13/transforms/1331cc3b5725c43a95ab6de47057bbdd/transformed/firebase-storage-22.0.1/AndroidManifest.xml:30:13-32:85
+	android:value
+		ADDED from [com.google.firebase:firebase-storage:22.0.1] /home/mario/.gradle/caches/8.13/transforms/1331cc3b5725c43a95ab6de47057bbdd/transformed/firebase-storage-22.0.1/AndroidManifest.xml:32:17-82
+	android:name
+		ADDED from [com.google.firebase:firebase-storage:22.0.1] /home/mario/.gradle/caches/8.13/transforms/1331cc3b5725c43a95ab6de47057bbdd/transformed/firebase-storage-22.0.1/AndroidManifest.xml:31:17-118
+meta-data#com.google.firebase.components:com.google.firebase.storage.StorageRegistrar
+ADDED from [com.google.firebase:firebase-storage:22.0.1] /home/mario/.gradle/caches/8.13/transforms/1331cc3b5725c43a95ab6de47057bbdd/transformed/firebase-storage-22.0.1/AndroidManifest.xml:33:13-35:85
+	android:value
+		ADDED from [com.google.firebase:firebase-storage:22.0.1] /home/mario/.gradle/caches/8.13/transforms/1331cc3b5725c43a95ab6de47057bbdd/transformed/firebase-storage-22.0.1/AndroidManifest.xml:35:17-82
+	android:name
+		ADDED from [com.google.firebase:firebase-storage:22.0.1] /home/mario/.gradle/caches/8.13/transforms/1331cc3b5725c43a95ab6de47057bbdd/transformed/firebase-storage-22.0.1/AndroidManifest.xml:34:17-107
+service#androidx.credentials.playservices.CredentialProviderMetadataHolder
+ADDED from [androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/72bbc5f7d815ffe53e85e26b7d784cde/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:24:9-32:19
+	android:enabled
+		ADDED from [androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/72bbc5f7d815ffe53e85e26b7d784cde/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:26:13-35
+	android:exported
+		ADDED from [androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/72bbc5f7d815ffe53e85e26b7d784cde/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:27:13-37
+	tools:ignore
+		ADDED from [androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/72bbc5f7d815ffe53e85e26b7d784cde/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:28:13-60
+	android:name
+		ADDED from [androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/72bbc5f7d815ffe53e85e26b7d784cde/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:25:13-94
+meta-data#androidx.credentials.CREDENTIAL_PROVIDER_KEY
+ADDED from [androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/72bbc5f7d815ffe53e85e26b7d784cde/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:29:13-31:104
+	android:value
+		ADDED from [androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/72bbc5f7d815ffe53e85e26b7d784cde/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:31:17-101
+	android:name
+		ADDED from [androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/72bbc5f7d815ffe53e85e26b7d784cde/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:30:17-76
+activity#androidx.credentials.playservices.HiddenActivity
+ADDED from [androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/72bbc5f7d815ffe53e85e26b7d784cde/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:34:9-41:20
+	android:fitsSystemWindows
+		ADDED from [androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/72bbc5f7d815ffe53e85e26b7d784cde/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:39:13-45
+	android:enabled
+		ADDED from [androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/72bbc5f7d815ffe53e85e26b7d784cde/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:37:13-35
+	android:exported
+		ADDED from [androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/72bbc5f7d815ffe53e85e26b7d784cde/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:38:13-37
+	android:configChanges
+		ADDED from [androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/72bbc5f7d815ffe53e85e26b7d784cde/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:36:13-87
+	android:theme
+		ADDED from [androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/72bbc5f7d815ffe53e85e26b7d784cde/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:40:13-48
+	android:name
+		ADDED from [androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/72bbc5f7d815ffe53e85e26b7d784cde/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:35:13-76
+activity#com.google.android.gms.auth.api.signin.internal.SignInHubActivity
+ADDED from [com.google.android.gms:play-services-auth:20.7.0] /home/mario/.gradle/caches/8.13/transforms/29408a52d667fe41031f2b85ffcd7d33/transformed/play-services-auth-20.7.0/AndroidManifest.xml:23:9-27:75
+	android:excludeFromRecents
+		ADDED from [com.google.android.gms:play-services-auth:20.7.0] /home/mario/.gradle/caches/8.13/transforms/29408a52d667fe41031f2b85ffcd7d33/transformed/play-services-auth-20.7.0/AndroidManifest.xml:25:13-46
+	android:exported
+		ADDED from [com.google.android.gms:play-services-auth:20.7.0] /home/mario/.gradle/caches/8.13/transforms/29408a52d667fe41031f2b85ffcd7d33/transformed/play-services-auth-20.7.0/AndroidManifest.xml:26:13-37
+	android:theme
+		ADDED from [com.google.android.gms:play-services-auth:20.7.0] /home/mario/.gradle/caches/8.13/transforms/29408a52d667fe41031f2b85ffcd7d33/transformed/play-services-auth-20.7.0/AndroidManifest.xml:27:13-72
+	android:name
+		ADDED from [com.google.android.gms:play-services-auth:20.7.0] /home/mario/.gradle/caches/8.13/transforms/29408a52d667fe41031f2b85ffcd7d33/transformed/play-services-auth-20.7.0/AndroidManifest.xml:24:13-93
+service#com.google.android.gms.auth.api.signin.RevocationBoundService
+ADDED from [com.google.android.gms:play-services-auth:20.7.0] /home/mario/.gradle/caches/8.13/transforms/29408a52d667fe41031f2b85ffcd7d33/transformed/play-services-auth-20.7.0/AndroidManifest.xml:33:9-37:51
+	android:exported
+		ADDED from [com.google.android.gms:play-services-auth:20.7.0] /home/mario/.gradle/caches/8.13/transforms/29408a52d667fe41031f2b85ffcd7d33/transformed/play-services-auth-20.7.0/AndroidManifest.xml:35:13-36
+	android:visibleToInstantApps
+		ADDED from [com.google.android.gms:play-services-auth:20.7.0] /home/mario/.gradle/caches/8.13/transforms/29408a52d667fe41031f2b85ffcd7d33/transformed/play-services-auth-20.7.0/AndroidManifest.xml:37:13-48
+	android:permission
+		ADDED from [com.google.android.gms:play-services-auth:20.7.0] /home/mario/.gradle/caches/8.13/transforms/29408a52d667fe41031f2b85ffcd7d33/transformed/play-services-auth-20.7.0/AndroidManifest.xml:36:13-107
+	android:name
+		ADDED from [com.google.android.gms:play-services-auth:20.7.0] /home/mario/.gradle/caches/8.13/transforms/29408a52d667fe41031f2b85ffcd7d33/transformed/play-services-auth-20.7.0/AndroidManifest.xml:34:13-89
+uses-permission#com.google.android.providers.gsf.permission.READ_GSERVICES
+ADDED from [com.google.android.recaptcha:recaptcha:18.6.1] /home/mario/.gradle/caches/8.13/transforms/924183b0268f7c0c2bb37c8d5507fbdc/transformed/recaptcha-18.6.1/AndroidManifest.xml:9:5-98
+	android:name
+		ADDED from [com.google.android.recaptcha:recaptcha:18.6.1] /home/mario/.gradle/caches/8.13/transforms/924183b0268f7c0c2bb37c8d5507fbdc/transformed/recaptcha-18.6.1/AndroidManifest.xml:9:22-95
+provider#com.google.firebase.provider.FirebaseInitProvider
+ADDED from [com.google.firebase:firebase-common:22.0.1] /home/mario/.gradle/caches/8.13/transforms/73025ec9a7e2e690fc83aa54307e4a51/transformed/firebase-common-22.0.1/AndroidManifest.xml:23:9-28:39
+	android:authorities
+		ADDED from [com.google.firebase:firebase-common:22.0.1] /home/mario/.gradle/caches/8.13/transforms/73025ec9a7e2e690fc83aa54307e4a51/transformed/firebase-common-22.0.1/AndroidManifest.xml:25:13-72
+	android:exported
+		ADDED from [com.google.firebase:firebase-common:22.0.1] /home/mario/.gradle/caches/8.13/transforms/73025ec9a7e2e690fc83aa54307e4a51/transformed/firebase-common-22.0.1/AndroidManifest.xml:27:13-37
+	android:directBootAware
+		ADDED from [com.google.firebase:firebase-common:22.0.1] /home/mario/.gradle/caches/8.13/transforms/73025ec9a7e2e690fc83aa54307e4a51/transformed/firebase-common-22.0.1/AndroidManifest.xml:26:13-43
+	android:initOrder
+		ADDED from [com.google.firebase:firebase-common:22.0.1] /home/mario/.gradle/caches/8.13/transforms/73025ec9a7e2e690fc83aa54307e4a51/transformed/firebase-common-22.0.1/AndroidManifest.xml:28:13-36
+	android:name
+		ADDED from [com.google.firebase:firebase-common:22.0.1] /home/mario/.gradle/caches/8.13/transforms/73025ec9a7e2e690fc83aa54307e4a51/transformed/firebase-common-22.0.1/AndroidManifest.xml:24:13-77
+meta-data#com.google.firebase.components:com.google.firebase.FirebaseCommonKtxRegistrar
+ADDED from [com.google.firebase:firebase-common:22.0.1] /home/mario/.gradle/caches/8.13/transforms/73025ec9a7e2e690fc83aa54307e4a51/transformed/firebase-common-22.0.1/AndroidManifest.xml:35:13-37:85
+	android:value
+		ADDED from [com.google.firebase:firebase-common:22.0.1] /home/mario/.gradle/caches/8.13/transforms/73025ec9a7e2e690fc83aa54307e4a51/transformed/firebase-common-22.0.1/AndroidManifest.xml:37:17-82
+	android:name
+		ADDED from [com.google.firebase:firebase-common:22.0.1] /home/mario/.gradle/caches/8.13/transforms/73025ec9a7e2e690fc83aa54307e4a51/transformed/firebase-common-22.0.1/AndroidManifest.xml:36:17-109
+meta-data#com.google.firebase.components:com.google.firebase.appcheck.FirebaseAppCheckKtxRegistrar
+ADDED from [com.google.firebase:firebase-appcheck:18.0.0] /home/mario/.gradle/caches/8.13/transforms/f6e88d416ca99cd5b7b5daad4106704e/transformed/firebase-appcheck-18.0.0/AndroidManifest.xml:25:13-27:85
+	android:value
+		ADDED from [com.google.firebase:firebase-appcheck:18.0.0] /home/mario/.gradle/caches/8.13/transforms/f6e88d416ca99cd5b7b5daad4106704e/transformed/firebase-appcheck-18.0.0/AndroidManifest.xml:27:17-82
+	android:name
+		ADDED from [com.google.firebase:firebase-appcheck:18.0.0] /home/mario/.gradle/caches/8.13/transforms/f6e88d416ca99cd5b7b5daad4106704e/transformed/firebase-appcheck-18.0.0/AndroidManifest.xml:26:17-120
+meta-data#com.google.firebase.components:com.google.firebase.appcheck.FirebaseAppCheckRegistrar
+ADDED from [com.google.firebase:firebase-appcheck:18.0.0] /home/mario/.gradle/caches/8.13/transforms/f6e88d416ca99cd5b7b5daad4106704e/transformed/firebase-appcheck-18.0.0/AndroidManifest.xml:28:13-30:85
+	android:value
+		ADDED from [com.google.firebase:firebase-appcheck:18.0.0] /home/mario/.gradle/caches/8.13/transforms/f6e88d416ca99cd5b7b5daad4106704e/transformed/firebase-appcheck-18.0.0/AndroidManifest.xml:30:17-82
+	android:name
+		ADDED from [com.google.firebase:firebase-appcheck:18.0.0] /home/mario/.gradle/caches/8.13/transforms/f6e88d416ca99cd5b7b5daad4106704e/transformed/firebase-appcheck-18.0.0/AndroidManifest.xml:29:17-117
+activity#com.google.android.gms.common.api.GoogleApiActivity
+ADDED from [com.google.android.gms:play-services-base:18.1.0] /home/mario/.gradle/caches/8.13/transforms/3dd4afef777021b6c4e94116e7c0bb61/transformed/play-services-base-18.1.0/AndroidManifest.xml:20:9-22:45
+	android:exported
+		ADDED from [com.google.android.gms:play-services-base:18.1.0] /home/mario/.gradle/caches/8.13/transforms/3dd4afef777021b6c4e94116e7c0bb61/transformed/play-services-base-18.1.0/AndroidManifest.xml:22:19-43
+	android:theme
+		ADDED from [com.google.android.gms:play-services-base:18.1.0] /home/mario/.gradle/caches/8.13/transforms/3dd4afef777021b6c4e94116e7c0bb61/transformed/play-services-base-18.1.0/AndroidManifest.xml:21:19-78
+	android:name
+		ADDED from [com.google.android.gms:play-services-base:18.1.0] /home/mario/.gradle/caches/8.13/transforms/3dd4afef777021b6c4e94116e7c0bb61/transformed/play-services-base-18.1.0/AndroidManifest.xml:20:19-85
+activity#androidx.activity.ComponentActivity
+ADDED from [androidx.compose.ui:ui-test-manifest:1.10.0] /home/mario/.gradle/caches/8.13/transforms/1e1b2d4a349d23f6f7f9b8d7128dec75/transformed/ui-test-manifest-1.10.0/AndroidManifest.xml:23:9-26:79
+	android:exported
+		ADDED from [androidx.compose.ui:ui-test-manifest:1.10.0] /home/mario/.gradle/caches/8.13/transforms/1e1b2d4a349d23f6f7f9b8d7128dec75/transformed/ui-test-manifest-1.10.0/AndroidManifest.xml:25:13-36
+	android:theme
+		ADDED from [androidx.compose.ui:ui-test-manifest:1.10.0] /home/mario/.gradle/caches/8.13/transforms/1e1b2d4a349d23f6f7f9b8d7128dec75/transformed/ui-test-manifest-1.10.0/AndroidManifest.xml:26:13-76
+	android:name
+		ADDED from [androidx.compose.ui:ui-test-manifest:1.10.0] /home/mario/.gradle/caches/8.13/transforms/1e1b2d4a349d23f6f7f9b8d7128dec75/transformed/ui-test-manifest-1.10.0/AndroidManifest.xml:24:13-63
+provider#androidx.startup.InitializationProvider
+ADDED from [androidx.emoji2:emoji2:1.4.0] /home/mario/.gradle/caches/8.13/transforms/590747b935e41c009731aa6102883d11/transformed/emoji2-1.4.0/AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.lifecycle:lifecycle-process:2.9.4] /home/mario/.gradle/caches/8.13/transforms/0da32728e8981d82274bf9a01b7851c3/transformed/lifecycle-process-2.9.4/AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.lifecycle:lifecycle-process:2.9.4] /home/mario/.gradle/caches/8.13/transforms/0da32728e8981d82274bf9a01b7851c3/transformed/lifecycle-process-2.9.4/AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.startup:startup-runtime:1.1.1] /home/mario/.gradle/caches/8.13/transforms/852a25b7c1a11936514e6698b5c339df/transformed/startup-runtime-1.1.1/AndroidManifest.xml:26:9-30:34
+MERGED from [androidx.startup:startup-runtime:1.1.1] /home/mario/.gradle/caches/8.13/transforms/852a25b7c1a11936514e6698b5c339df/transformed/startup-runtime-1.1.1/AndroidManifest.xml:26:9-30:34
+	tools:node
+		ADDED from [androidx.emoji2:emoji2:1.4.0] /home/mario/.gradle/caches/8.13/transforms/590747b935e41c009731aa6102883d11/transformed/emoji2-1.4.0/AndroidManifest.xml:28:13-31
+	android:authorities
+		ADDED from [androidx.emoji2:emoji2:1.4.0] /home/mario/.gradle/caches/8.13/transforms/590747b935e41c009731aa6102883d11/transformed/emoji2-1.4.0/AndroidManifest.xml:26:13-68
+	android:exported
+		ADDED from [androidx.emoji2:emoji2:1.4.0] /home/mario/.gradle/caches/8.13/transforms/590747b935e41c009731aa6102883d11/transformed/emoji2-1.4.0/AndroidManifest.xml:27:13-37
+	android:name
+		ADDED from [androidx.emoji2:emoji2:1.4.0] /home/mario/.gradle/caches/8.13/transforms/590747b935e41c009731aa6102883d11/transformed/emoji2-1.4.0/AndroidManifest.xml:25:13-67
+meta-data#androidx.emoji2.text.EmojiCompatInitializer
+ADDED from [androidx.emoji2:emoji2:1.4.0] /home/mario/.gradle/caches/8.13/transforms/590747b935e41c009731aa6102883d11/transformed/emoji2-1.4.0/AndroidManifest.xml:29:13-31:52
+	android:value
+		ADDED from [androidx.emoji2:emoji2:1.4.0] /home/mario/.gradle/caches/8.13/transforms/590747b935e41c009731aa6102883d11/transformed/emoji2-1.4.0/AndroidManifest.xml:31:17-49
+	android:name
+		ADDED from [androidx.emoji2:emoji2:1.4.0] /home/mario/.gradle/caches/8.13/transforms/590747b935e41c009731aa6102883d11/transformed/emoji2-1.4.0/AndroidManifest.xml:30:17-75
+uses-library#androidx.window.extensions
+ADDED from [androidx.window:window:1.5.0] /home/mario/.gradle/caches/8.13/transforms/1d537e2cba050728e7149d360ab5104e/transformed/window-1.5.0/AndroidManifest.xml:23:9-25:40
+	android:required
+		ADDED from [androidx.window:window:1.5.0] /home/mario/.gradle/caches/8.13/transforms/1d537e2cba050728e7149d360ab5104e/transformed/window-1.5.0/AndroidManifest.xml:25:13-37
+	android:name
+		ADDED from [androidx.window:window:1.5.0] /home/mario/.gradle/caches/8.13/transforms/1d537e2cba050728e7149d360ab5104e/transformed/window-1.5.0/AndroidManifest.xml:24:13-54
+uses-library#androidx.window.sidecar
+ADDED from [androidx.window:window:1.5.0] /home/mario/.gradle/caches/8.13/transforms/1d537e2cba050728e7149d360ab5104e/transformed/window-1.5.0/AndroidManifest.xml:26:9-28:40
+	android:required
+		ADDED from [androidx.window:window:1.5.0] /home/mario/.gradle/caches/8.13/transforms/1d537e2cba050728e7149d360ab5104e/transformed/window-1.5.0/AndroidManifest.xml:28:13-37
+	android:name
+		ADDED from [androidx.window:window:1.5.0] /home/mario/.gradle/caches/8.13/transforms/1d537e2cba050728e7149d360ab5104e/transformed/window-1.5.0/AndroidManifest.xml:27:13-51
+permission#${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.16.0] /home/mario/.gradle/caches/8.13/transforms/2e619266833b106540768d8ae786a779/transformed/core-1.16.0/AndroidManifest.xml:22:5-24:47
+	android:protectionLevel
+		ADDED from [androidx.core:core:1.16.0] /home/mario/.gradle/caches/8.13/transforms/2e619266833b106540768d8ae786a779/transformed/core-1.16.0/AndroidManifest.xml:24:9-44
+	android:name
+		ADDED from [androidx.core:core:1.16.0] /home/mario/.gradle/caches/8.13/transforms/2e619266833b106540768d8ae786a779/transformed/core-1.16.0/AndroidManifest.xml:23:9-81
+permission#com.example.daypilot.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.16.0] /home/mario/.gradle/caches/8.13/transforms/2e619266833b106540768d8ae786a779/transformed/core-1.16.0/AndroidManifest.xml:22:5-24:47
+	android:protectionLevel
+		ADDED from [androidx.core:core:1.16.0] /home/mario/.gradle/caches/8.13/transforms/2e619266833b106540768d8ae786a779/transformed/core-1.16.0/AndroidManifest.xml:24:9-44
+	android:name
+		ADDED from [androidx.core:core:1.16.0] /home/mario/.gradle/caches/8.13/transforms/2e619266833b106540768d8ae786a779/transformed/core-1.16.0/AndroidManifest.xml:23:9-81
+uses-permission#${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.16.0] /home/mario/.gradle/caches/8.13/transforms/2e619266833b106540768d8ae786a779/transformed/core-1.16.0/AndroidManifest.xml:26:5-97
+	android:name
+		ADDED from [androidx.core:core:1.16.0] /home/mario/.gradle/caches/8.13/transforms/2e619266833b106540768d8ae786a779/transformed/core-1.16.0/AndroidManifest.xml:26:22-94
+uses-permission#com.example.daypilot.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.16.0] /home/mario/.gradle/caches/8.13/transforms/2e619266833b106540768d8ae786a779/transformed/core-1.16.0/AndroidManifest.xml:26:5-97
+	android:name
+		ADDED from [androidx.core:core:1.16.0] /home/mario/.gradle/caches/8.13/transforms/2e619266833b106540768d8ae786a779/transformed/core-1.16.0/AndroidManifest.xml:26:22-94
+meta-data#androidx.lifecycle.ProcessLifecycleInitializer
+ADDED from [androidx.lifecycle:lifecycle-process:2.9.4] /home/mario/.gradle/caches/8.13/transforms/0da32728e8981d82274bf9a01b7851c3/transformed/lifecycle-process-2.9.4/AndroidManifest.xml:29:13-31:52
+	android:value
+		ADDED from [androidx.lifecycle:lifecycle-process:2.9.4] /home/mario/.gradle/caches/8.13/transforms/0da32728e8981d82274bf9a01b7851c3/transformed/lifecycle-process-2.9.4/AndroidManifest.xml:31:17-49
+	android:name
+		ADDED from [androidx.lifecycle:lifecycle-process:2.9.4] /home/mario/.gradle/caches/8.13/transforms/0da32728e8981d82274bf9a01b7851c3/transformed/lifecycle-process-2.9.4/AndroidManifest.xml:30:17-78
+meta-data#com.google.android.gms.version
+ADDED from [com.google.android.gms:play-services-basement:18.8.0] /home/mario/.gradle/caches/8.13/transforms/d23de935f55fb39caf4f6ad2efbe2196/transformed/play-services-basement-18.8.0/AndroidManifest.xml:21:9-23:69
+	android:value
+		ADDED from [com.google.android.gms:play-services-basement:18.8.0] /home/mario/.gradle/caches/8.13/transforms/d23de935f55fb39caf4f6ad2efbe2196/transformed/play-services-basement-18.8.0/AndroidManifest.xml:23:13-66
+	android:name
+		ADDED from [com.google.android.gms:play-services-basement:18.8.0] /home/mario/.gradle/caches/8.13/transforms/d23de935f55fb39caf4f6ad2efbe2196/transformed/play-services-basement-18.8.0/AndroidManifest.xml:22:13-58
+activity#androidx.compose.ui.tooling.PreviewActivity
+ADDED from [androidx.compose.ui:ui-tooling-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/35df5be08809421405f832aebcf770f2/transformed/ui-tooling/AndroidManifest.xml:23:9-25:39
+	android:exported
+		ADDED from [androidx.compose.ui:ui-tooling-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/35df5be08809421405f832aebcf770f2/transformed/ui-tooling/AndroidManifest.xml:25:13-36
+	android:name
+		ADDED from [androidx.compose.ui:ui-tooling-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/35df5be08809421405f832aebcf770f2/transformed/ui-tooling/AndroidManifest.xml:24:13-71
+meta-data#androidx.profileinstaller.ProfileInstallerInitializer
+ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:29:13-31:52
+	android:value
+		ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:31:17-49
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:30:17-85
+receiver#androidx.profileinstaller.ProfileInstallReceiver
+ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:34:9-52:20
+	android:enabled
+		ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:37:13-35
+	android:exported
+		ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:38:13-36
+	android:permission
+		ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:39:13-57
+	android:directBootAware
+		ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:36:13-44
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:35:13-76
+intent-filter#action:name:androidx.profileinstaller.action.INSTALL_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:40:13-42:29
+action#androidx.profileinstaller.action.INSTALL_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:41:17-91
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:41:25-88
+intent-filter#action:name:androidx.profileinstaller.action.SKIP_FILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:43:13-45:29
+action#androidx.profileinstaller.action.SKIP_FILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:44:17-85
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:44:25-82
+intent-filter#action:name:androidx.profileinstaller.action.SAVE_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:46:13-48:29
+action#androidx.profileinstaller.action.SAVE_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:47:17-88
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:47:25-85
+intent-filter#action:name:androidx.profileinstaller.action.BENCHMARK_OPERATION
+ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:49:13-51:29
+action#androidx.profileinstaller.action.BENCHMARK_OPERATION
+ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:50:17-95
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:50:25-92
+activity#com.google.android.play.core.common.PlayCoreDialogWrapperActivity
+ADDED from [com.google.android.play:core-common:2.0.3] /home/mario/.gradle/caches/8.13/transforms/849975fc6a4fc57498ae02a3541b4e80/transformed/core-common-2.0.3/AndroidManifest.xml:14:9-18:65
+	android:stateNotNeeded
+		ADDED from [com.google.android.play:core-common:2.0.3] /home/mario/.gradle/caches/8.13/transforms/849975fc6a4fc57498ae02a3541b4e80/transformed/core-common-2.0.3/AndroidManifest.xml:17:13-42
+	android:exported
+		ADDED from [com.google.android.play:core-common:2.0.3] /home/mario/.gradle/caches/8.13/transforms/849975fc6a4fc57498ae02a3541b4e80/transformed/core-common-2.0.3/AndroidManifest.xml:16:13-37
+	android:theme
+		ADDED from [com.google.android.play:core-common:2.0.3] /home/mario/.gradle/caches/8.13/transforms/849975fc6a4fc57498ae02a3541b4e80/transformed/core-common-2.0.3/AndroidManifest.xml:18:13-62
+	android:name
+		ADDED from [com.google.android.play:core-common:2.0.3] /home/mario/.gradle/caches/8.13/transforms/849975fc6a4fc57498ae02a3541b4e80/transformed/core-common-2.0.3/AndroidManifest.xml:15:13-93

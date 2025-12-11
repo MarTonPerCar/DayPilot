@@ -19,6 +19,8 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".login.ResetPasswordActivity" android:exported="false" />
+
         <activity android:name=".login.RegisterActivity"/>
         <activity android:name=".MainActivity" />
     </application>
