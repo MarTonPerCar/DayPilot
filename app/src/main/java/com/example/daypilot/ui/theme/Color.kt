@@ -12,16 +12,6 @@ val BrandAmber = Color(0xFFFFC107)
 val BrandBlue = Color(0xFF1E88E5)
 val BrandPurple = Color(0xFF4527A0)
 
-// Color de enfoque de campos (LOGIN / REGISTER)
-val FocusBlue = Color(0xFF2196F3)
-
-// ===============================================================
-//  COLORES DE USO CONSTANTE
-// ===============================================================
-val ButtonPrimary = BrandBlue
-val ButtonDanger = BrandRed
-val ButtonWarning = BrandAmber
-
 // ===============================================================
 //  PALETA MODO CLARO
 // ===============================================================

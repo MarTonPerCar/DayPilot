@@ -19,7 +19,8 @@ import com.example.daypilot.R
 @Composable
 fun RegisterScreen(
     onRegisterClick: (String, String, String) -> Unit, // name, email, pass
-    onBackToLogin: () -> Unit
+    onBackToLogin: () -> Unit,
+    isLoading: Boolean
 ) {
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -190,9 +191,17 @@ fun RegisterScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(50.dp),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(12.dp),
+                        enabled = !isLoading
                     ) {
-                        Text("Registrar")
+                        if (isLoading) {
+                            CircularProgressIndicator(
+                                strokeWidth = 2.dp,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        } else {
+                            Text("Registrar")
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -205,3 +214,6 @@ fun RegisterScreen(
         }
     }
 }
+
+fun isValidEmail(email: String): Boolean =
+    android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()

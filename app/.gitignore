@@ -1,1 +1,10 @@
-/build
+# Android secrets
+local.properties
+google-services.json
+
+# Firebase / Google
+*.keystore
+*.jks
+
+# Build
+app/build/

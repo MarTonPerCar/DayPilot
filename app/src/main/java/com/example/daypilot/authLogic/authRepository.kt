@@ -1,5 +1,6 @@
 package com.example.daypilot.authLogic
 
+import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
@@ -38,10 +39,27 @@ class AuthRepository {
             "createdAt" to System.currentTimeMillis()
         )
 
-        firestore.collection("users")
-            .document(uid)
-            .set(data)
-            .await()
+        try {
+            firestore.collection("users")
+                .document(uid)
+                .set(data)
+                .await()
+
+            Log.d("AuthRepo", "Perfil guardado correctamente para $uid")
+
+        } catch (e: Exception) {
+            Log.e("AuthRepo", "Error guardando perfil", e)
+            throw e
+        }
+    }
+
+    suspend fun sendPasswordReset(email: String): Result<Unit> {
+        return try {
+            auth.sendPasswordResetEmail(email).await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 
     fun logout() {

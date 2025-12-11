@@ -2,13 +2,17 @@ package com.example.daypilot.login
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.lifecycleScope
 import com.example.daypilot.MainActivity
 import com.example.daypilot.authLogic.AuthRepository
 import com.example.daypilot.ui.theme.DayPilotTheme
+import com.google.firebase.auth.FirebaseAuthException
 import kotlinx.coroutines.launch
 
 class LoginActivity : ComponentActivity() {
@@ -19,35 +23,67 @@ class LoginActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
+            var firebaseErrorCode by remember { mutableStateOf<String?>(null) }
+            var isLoading by remember { mutableStateOf(false) }
+
             DayPilotTheme {
                 LoginScreen(
                     onLoginClick = { email, password ->
-                        loginUser(email, password)
+                        firebaseErrorCode = null
+                        isLoading = true
+
+                        loginUser(
+                            email = email,
+                            password = password,
+                            onSuccess = {
+                                isLoading = false
+                                startActivity(
+                                    Intent(this@LoginActivity, MainActivity::class.java)
+                                )
+                                finish()
+                            },
+                            onError = { code ->
+                                isLoading = false
+                                firebaseErrorCode = code
+                            }
+                        )
                     },
                     onRegisterClick = {
+                        firebaseErrorCode = null
                         startActivity(Intent(this, RegisterActivity::class.java))
-                    }
+                    },
+                    onForgotPasswordClick = { email ->
+                        val intent = Intent(this@LoginActivity, ResetPasswordActivity::class.java).apply {
+                            putExtra("email", email)
+                        }
+                        startActivity(intent)
+                    },
+                    firebaseErrorCode = firebaseErrorCode,
+                    isLoading = isLoading
                 )
             }
         }
     }
 
-    private fun loginUser(email: String, password: String) {
+    private fun loginUser(
+        email: String,
+        password: String,
+        onSuccess: () -> Unit,
+        onError: (String?) -> Unit
+    ) {
         lifecycleScope.launch {
-
             val result = authRepo.login(email, password)
 
             if (result.isSuccess) {
-                Toast.makeText(this@LoginActivity, "Bienvenido", Toast.LENGTH_SHORT).show()
-                startActivity(Intent(this@LoginActivity, MainActivity::class.java))
-                finish()
-
+                onSuccess()
             } else {
-                Toast.makeText(
-                    this@LoginActivity,
-                    "Error: ${result.exceptionOrNull()?.message}",
-                    Toast.LENGTH_LONG
-                ).show()
+                val exception = result.exceptionOrNull()
+                val errorCode =
+                    (exception as? FirebaseAuthException)?.errorCode
+                        ?: exception?.message
+                        ?: "ERROR_UNKNOWN"
+
+                onError(errorCode)
             }
         }
     }
