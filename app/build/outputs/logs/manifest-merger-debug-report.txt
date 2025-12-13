@@ -1,9 +1,9 @@
 -- Merging decision tree log ---
 manifest
-ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:2:1-28:12
-INJECTED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:2:1-28:12
-INJECTED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:2:1-28:12
-INJECTED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:2:1-28:12
+ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:2:1-44:12
+INJECTED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:2:1-44:12
+INJECTED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:2:1-44:12
+INJECTED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:2:1-44:12
 MERGED from [com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:17:1-75:12
 MERGED from [com.google.firebase:firebase-firestore:26.0.2] /home/mario/.gradle/caches/8.13/transforms/4c2782b7d408e01bf513291f94313098/transformed/firebase-firestore-26.0.2/AndroidManifest.xml:2:1-26:12
 MERGED from [com.google.firebase:firebase-storage:22.0.1] /home/mario/.gradle/caches/8.13/transforms/1331cc3b5725c43a95ab6de47057bbdd/transformed/firebase-storage-22.0.1/AndroidManifest.xml:15:1-39:12
@@ -110,8 +110,8 @@ MERGED from [com.google.android.play:core-common:2.0.3] /home/mario/.gradle/cach
 	xmlns:android
 		ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:2:11-69
 application
-ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:5:5-26:19
-INJECTED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:5:5-26:19
+ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:5:5-42:19
+INJECTED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:5:5-42:19
 MERGED from [com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:28:5-73:19
 MERGED from [com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:28:5-73:19
 MERGED from [com.google.firebase:firebase-firestore:26.0.2] /home/mario/.gradle/caches/8.13/transforms/4c2782b7d408e01bf513291f94313098/transformed/firebase-firestore-26.0.2/AndroidManifest.xml:13:5-24:19
@@ -181,35 +181,57 @@ MERGED from [com.google.android.play:core-common:2.0.3] /home/mario/.gradle/cach
 	android:dataExtractionRules
 		ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:7:9-65
 activity#com.example.daypilot.login.LoginActivity
-ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:14:9-20:20
+ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:15:9-22:20
 	android:exported
-		ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:15:13-36
+		ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:17:13-36
 	android:name
-		ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:14:19-54
+		ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:16:13-48
 intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
-ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:16:13-19:29
+ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:18:13-21:29
 action#android.intent.action.MAIN
-ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:17:17-69
+ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:19:17-69
 	android:name
-		ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:17:25-66
+		ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:19:25-66
 category#android.intent.category.LAUNCHER
-ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:18:17-77
+ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:20:17-77
 	android:name
-		ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:18:27-74
+		ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:20:27-74
 activity#com.example.daypilot.login.ResetPasswordActivity
-ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:22:9-90
+ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:24:9-26:40
 	android:exported
-		ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:22:63-87
+		ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:26:13-37
 	android:name
-		ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:22:19-62
+		ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:25:13-56
 activity#com.example.daypilot.login.RegisterActivity
-ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:24:9-59
+ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:27:9-29:40
+	android:exported
+		ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:29:13-37
 	android:name
-		ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:24:19-57
-activity#com.example.daypilot.MainActivity
-ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:25:9-50
+		ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:28:13-51
+activity#com.example.daypilot.main.MainActivity
+ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:30:9-32:40
+	android:exported
+		ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:32:13-37
 	android:name
-		ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:25:19-47
+		ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:31:13-46
+activity#com.example.daypilot.profile.MainProfileActivity
+ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:33:9-35:40
+	android:exported
+		ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:35:13-37
+	android:name
+		ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:34:13-56
+activity#com.example.daypilot.profile.SettingsActivity
+ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:36:9-38:40
+	android:exported
+		ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:38:13-37
+	android:name
+		ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:37:13-53
+activity#com.example.daypilot.main.AddFriendActivity
+ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:39:9-41:40
+	android:exported
+		ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:41:13-37
+	android:name
+		ADDED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:40:13-51
 uses-sdk
 INJECTED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from /home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml

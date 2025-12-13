@@ -9,8 +9,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.lifecycleScope
-import com.example.daypilot.MainActivity
+import com.example.daypilot.main.MainActivity
 import com.example.daypilot.authLogic.AuthRepository
+import com.example.daypilot.MainDatabase.SessionManager
 import com.example.daypilot.ui.theme.DayPilotTheme
 import com.google.firebase.auth.FirebaseAuthException
 import kotlinx.coroutines.launch
@@ -18,9 +19,18 @@ import kotlinx.coroutines.launch
 class LoginActivity : ComponentActivity() {
 
     private val authRepo = AuthRepository()
+    private lateinit var sessionManager: SessionManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        sessionManager = SessionManager(this)
+
+        if (sessionManager.isLoggedIn()) {
+            startActivity(Intent(this, MainActivity::class.java))
+            finish()
+            return
+        }
 
         setContent {
             var firebaseErrorCode by remember { mutableStateOf<String?>(null) }
@@ -37,6 +47,8 @@ class LoginActivity : ComponentActivity() {
                             password = password,
                             onSuccess = {
                                 isLoading = false
+                                sessionManager.setLoggedIn(true)
+
                                 startActivity(
                                     Intent(this@LoginActivity, MainActivity::class.java)
                                 )

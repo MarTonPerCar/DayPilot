@@ -10,24 +10,29 @@ import androidx.compose.ui.graphics.Color
 //  LIGHT THEME
 // ===============================================================
 private val LightColors = lightColorScheme(
-
-    // Colores principales del UI
     primary = BrandBlue,
-    secondary = BrandOrange,
-    tertiary = BrandPurple,
-
-    // Fondos
-    background = BackgroundLight,
-    surface = SurfaceLight,
-
-    // Texto
     onPrimary = Color.White,
+    primaryContainer = Color(0xFFE3F2FD),
+    onPrimaryContainer = BrandBlue,
+
+    secondary = BrandOrange,
     onSecondary = Color.White,
+    secondaryContainer = Color(0xFFFFE0B2),
+    onSecondaryContainer = BrandOrange,
+
+    tertiary = BrandPurple,
+    onTertiary = Color.White,
+    background = BackgroundLight,
     onBackground = TextPrimaryLight,
+
+    surface = SurfaceLight,
     onSurface = TextPrimaryLight,
 
-    // Errores
-    error = BrandRed,
+    surfaceVariant = SurfaceVariantLight,
+    onSurfaceVariant = TextSecondaryLight,
+
+    outline = DividerLight,
+    error = ErrorLight,
     onError = Color.White
 )
 
@@ -36,23 +41,29 @@ private val LightColors = lightColorScheme(
 // ===============================================================
 private val DarkColors = darkColorScheme(
 
-    // Colores principales del UI
     primary = BrandBlue,
-    secondary = BrandOrange,
-    tertiary = BrandPurple,
-
-    // Fondos
-    background = BackgroundDark,
-    surface = SurfaceDark,
-
-    // Texto
     onPrimary = Color.White,
+    primaryContainer = Color(0xFF0D47A1),
+    onPrimaryContainer = Color.White,
+
+    secondary = BrandOrange,
     onSecondary = Color.White,
+    secondaryContainer = Color(0xFFE65100),
+    onSecondaryContainer = Color.White,
+
+    tertiary = BrandPurple,
+    onTertiary = Color.White,
+    background = BackgroundDark,
     onBackground = TextPrimaryDark,
+
+    surface = SurfaceDark,
     onSurface = TextPrimaryDark,
 
-    // Errores
-    error = BrandRedDeep,
+    surfaceVariant = SurfaceVariantDark,
+    onSurfaceVariant = TextSecondaryDark,
+
+    outline = DividerDark,
+    error = ErrorDark,
     onError = Color.White
 )
 

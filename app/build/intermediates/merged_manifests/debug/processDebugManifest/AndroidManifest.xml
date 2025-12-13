@@ -43,8 +43,21 @@
         <activity
             android:name="com.example.daypilot.login.ResetPasswordActivity"
             android:exported="false" />
-        <activity android:name="com.example.daypilot.login.RegisterActivity" />
-        <activity android:name="com.example.daypilot.MainActivity" />
+        <activity
+            android:name="com.example.daypilot.login.RegisterActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.example.daypilot.main.MainActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.example.daypilot.profile.MainProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.example.daypilot.profile.SettingsActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.example.daypilot.main.AddFriendActivity"
+            android:exported="false" />
         <activity
             android:name="com.google.firebase.auth.internal.GenericIdpActivity"
             android:excludeFromRecents="true"

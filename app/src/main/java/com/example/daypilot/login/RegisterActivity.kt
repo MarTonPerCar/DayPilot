@@ -25,11 +25,18 @@ class RegisterActivity : ComponentActivity() {
 
             DayPilotTheme {
                 RegisterScreen(
-                    onRegisterClick = { name, email, password ->
+                    onRegisterClick = { name, username, email, password, regionZoneId ->
                         isLoading = true
 
                         lifecycleScope.launch {
                             try {
+                                val available = authRepo.isUsernameAvailable(username)
+                                if (!available) {
+                                    isLoading = false
+                                    showError("El nombre de usuario ya está en uso.")
+                                    return@launch
+                                }
+
                                 val result = authRepo.register(email, password)
 
                                 if (result.isSuccess) {
@@ -37,11 +44,18 @@ class RegisterActivity : ComponentActivity() {
 
                                     if (user != null) {
                                         try {
-                                            authRepo.saveUserProfile(user.uid, name, email)
+                                            authRepo.saveUserProfile(
+                                                uid = user.uid,
+                                                name = name,
+                                                email = email,
+                                                username = username,
+                                                region = regionZoneId   // 👈 guardamos el ID real
+                                            )
                                             finish()
                                         } catch (e: Exception) {
                                             showError(
-                                                e.localizedMessage ?: "Error guardando el perfil."
+                                                e.localizedMessage
+                                                    ?: "Error guardando el perfil."
                                             )
                                         }
                                     } else {
@@ -50,7 +64,8 @@ class RegisterActivity : ComponentActivity() {
                                 } else {
                                     val error = result.exceptionOrNull()
                                     showError(
-                                        error?.localizedMessage ?: "Ocurrió un error inesperado."
+                                        error?.localizedMessage
+                                            ?: "Ocurrió un error inesperado."
                                     )
                                 }
                             } catch (e: Exception) {
