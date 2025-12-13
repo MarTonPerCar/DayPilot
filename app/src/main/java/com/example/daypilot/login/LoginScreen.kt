@@ -14,6 +14,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.rotate
 import com.example.daypilot.R
 
 // ---------------------------
@@ -52,14 +54,14 @@ fun mapFirebaseErrorToFieldErrors(errorCode: String): LoginFieldErrors {
 }
 
 // ---------------------------
-// LOGIN SCREEN SIN POP-UP
+// LOGIN SCREEN
 // ---------------------------
 
 @Composable
 fun LoginScreen(
     onLoginClick: (String, String) -> Unit,
     onRegisterClick: () -> Unit,
-    onForgotPasswordClick: (String) -> Unit,   // 👈 NUEVO
+    onForgotPasswordClick: (String) -> Unit,
     firebaseErrorCode: String?,
     isLoading: Boolean
 ) {
@@ -77,152 +79,201 @@ fun LoginScreen(
     }
 
     val emailError = localEmailError ?: firebaseFieldErrors?.emailError
-    val passError  = localPassError  ?: firebaseFieldErrors?.passError
+    val passError = localPassError ?: firebaseFieldErrors?.passError
 
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
+        Box(modifier = Modifier.fillMaxSize()) {
 
+            // === AGENDA 1: esquina superior izquierda ===
             Image(
-                painter = painterResource(id = R.drawable.mi_logo),
-                contentDescription = "Logo",
+                painter = painterResource(id = R.drawable.agenda),
+                contentDescription = null,
                 modifier = Modifier
-                    .size(120.dp)
-                    .padding(bottom = 16.dp)
+                    .size(220.dp)
+                    .align(Alignment.TopStart)
+                    .offset(x = (-70).dp, y = (-40).dp)
+                    .rotate(-18f)
+                    .alpha(0.10f)
             )
 
-            Card(
+            // === AGENDA 2: esquina superior derecha ===
+            Image(
+                painter = painterResource(id = R.drawable.agenda),
+                contentDescription = null,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(24.dp),
-                shape = RoundedCornerShape(16.dp),
-                elevation = CardDefaults.cardElevation(8.dp)
+                    .size(180.dp)
+                    .align(Alignment.TopEnd)
+                    .offset(x = 40.dp, y = (-20).dp)
+                    .rotate(15f)
+                    .alpha(0.08f)
+            )
+
+            // === AGENDA 3: esquina inferior izquierda ===
+            Image(
+                painter = painterResource(id = R.drawable.agenda),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(200.dp)
+                    .align(Alignment.BottomStart)
+                    .offset(x = (-60).dp, y = 40.dp)
+                    .rotate(12f)
+                    .alpha(0.06f)
+            )
+
+            // === AGENDA 4: esquina inferior derecha ===
+            Image(
+                painter = painterResource(id = R.drawable.agenda),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(210.dp)
+                    .align(Alignment.BottomEnd)
+                    .offset(x = 30.dp, y = 60.dp)
+                    .rotate(-10f)
+                    .alpha(0.08f)
+            )
+
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
-                Column(
-                    modifier = Modifier.padding(24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+
+                Image(
+                    painter = painterResource(id = R.drawable.mi_logo),
+                    contentDescription = "Logo",
+                    modifier = Modifier
+                        .size(120.dp)
+                        .padding(bottom = 16.dp)
+                )
+
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    elevation = CardDefaults.cardElevation(8.dp)
                 ) {
-
-                    Text("Iniciar sesión", style = MaterialTheme.typography.headlineMedium)
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // -------- EMAIL ----------
-                    OutlinedTextField(
-                        value = email,
-                        onValueChange = {
-                            email = it
-                            localEmailError = null
-                        },
-                        label = { Text("Email") },   // 👈 CAMBIADO
-                        modifier = Modifier.fillMaxWidth(),
-                        isError = emailError != null,
-                        singleLine = true
-                    )
-                    if (emailError != null) {
-                        Text(
-                            text = emailError,
-                            color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    // -------- PASSWORD ----------
-                    OutlinedTextField(
-                        value = pass,
-                        onValueChange = {
-                            pass = it
-                            localPassError = null
-                        },
-                        label = { Text("Contraseña") },
-                        visualTransformation = if (showPassword)
-                            VisualTransformation.None
-                        else
-                            PasswordVisualTransformation(),
-                        trailingIcon = {
-                            IconButton(onClick = { showPassword = !showPassword }) {
-                                Icon(
-                                    imageVector = if (showPassword)
-                                        Icons.Filled.VisibilityOff
-                                    else
-                                        Icons.Filled.Visibility,
-                                    contentDescription = "Mostrar contraseña"
-                                )
-                            }
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        isError = passError != null,
-                        singleLine = true
-                    )
-                    if (passError != null) {
-                        Text(
-                            text = passError,
-                            color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    // -------- ¿OLVIDASTE LA CONTRASEÑA? ----------
-                    TextButton(
-                        onClick = { onForgotPasswordClick(email) },
-                        modifier = Modifier.align(Alignment.End)
+                    Column(
+                        modifier = Modifier.padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text("¿Has olvidado tu contraseña?")
-                    }
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                        Text("Iniciar sesión", style = MaterialTheme.typography.headlineMedium)
 
-                    Button(
-                        onClick = {
-                            localEmailError = null
-                            localPassError = null
+                        Spacer(modifier = Modifier.height(16.dp))
 
-                            var hasError = false
-
-                            if (email.isBlank()) {
-                                localEmailError = "Introduce tu email."
-                                hasError = true
-                            }
-
-                            if (pass.isBlank()) {
-                                localPassError = "Introduce tu contraseña."
-                                hasError = true
-                            }
-
-                            if (!hasError) {
-                                onLoginClick(email, pass)
-                            }
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        enabled = !isLoading
-                    ) {
-                        if (isLoading) {
-                            CircularProgressIndicator(
-                                strokeWidth = 2.dp,
-                                modifier = Modifier.size(20.dp)
+                        // EMAIL
+                        OutlinedTextField(
+                            value = email,
+                            onValueChange = {
+                                email = it
+                                localEmailError = null
+                            },
+                            label = { Text("Email") },
+                            modifier = Modifier.fillMaxWidth(),
+                            isError = emailError != null,
+                            singleLine = true
+                        )
+                        if (emailError != null) {
+                            Text(
+                                text = emailError,
+                                color = MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.bodySmall
                             )
-                        } else {
-                            Text("Entrar")
                         }
-                    }
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
 
-                    TextButton(onClick = onRegisterClick) {
-                        Text("Crear cuenta")
+                        // PASSWORD
+                        OutlinedTextField(
+                            value = pass,
+                            onValueChange = {
+                                pass = it
+                                localPassError = null
+                            },
+                            label = { Text("Contraseña") },
+                            visualTransformation = if (showPassword)
+                                VisualTransformation.None
+                            else
+                                PasswordVisualTransformation(),
+                            trailingIcon = {
+                                IconButton(onClick = { showPassword = !showPassword }) {
+                                    Icon(
+                                        imageVector = if (showPassword)
+                                            Icons.Filled.VisibilityOff
+                                        else
+                                            Icons.Filled.Visibility,
+                                        contentDescription = "Mostrar contraseña"
+                                    )
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            isError = passError != null,
+                            singleLine = true
+                        )
+                        if (passError != null) {
+                            Text(
+                                text = passError,
+                                color = MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        TextButton(
+                            onClick = { onForgotPasswordClick(email) },
+                            modifier = Modifier.align(Alignment.End)
+                        ) {
+                            Text("¿Has olvidado tu contraseña?")
+                        }
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        Button(
+                            onClick = {
+                                localEmailError = null
+                                localPassError = null
+
+                                var hasError = false
+
+                                if (email.isBlank()) {
+                                    localEmailError = "Introduce tu email."
+                                    hasError = true
+                                }
+                                if (pass.isBlank()) {
+                                    localPassError = "Introduce tu contraseña."
+                                    hasError = true
+                                }
+
+                                if (!hasError) {
+                                    onLoginClick(email, pass)
+                                }
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(50.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            enabled = !isLoading
+                        ) {
+                            if (isLoading) {
+                                CircularProgressIndicator(
+                                    strokeWidth = 2.dp,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            } else {
+                                Text("Entrar")
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        TextButton(onClick = onRegisterClick) {
+                            Text("Crear cuenta")
+                        }
                     }
                 }
             }
