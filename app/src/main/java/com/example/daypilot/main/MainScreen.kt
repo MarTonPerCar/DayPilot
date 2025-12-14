@@ -17,7 +17,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.example.daypilot.MainDatabase.SessionManager
+import com.example.daypilot.mainDatabase.SessionManager
 import com.example.daypilot.authLogic.AuthRepository
 import com.example.daypilot.profile.ProfileScreen
 import com.example.daypilot.profile.SettingsActivity

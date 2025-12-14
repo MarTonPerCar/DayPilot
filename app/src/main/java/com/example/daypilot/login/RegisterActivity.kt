@@ -11,19 +11,22 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.lifecycleScope
 import com.example.daypilot.authLogic.AuthRepository
 import com.example.daypilot.ui.theme.DayPilotTheme
+import com.example.daypilot.mainDatabase.SessionManager
 import kotlinx.coroutines.launch
 
 class RegisterActivity : ComponentActivity() {
 
     private val authRepo = AuthRepository()
+    private lateinit var sessionManager: SessionManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
             var isLoading by remember { mutableStateOf(false) }
+            val darkTheme = sessionManager.isDarkModeEnabled()
 
-            DayPilotTheme {
+            DayPilotTheme (darkTheme = darkTheme) {
                 RegisterScreen(
                     onRegisterClick = { name, username, email, password, regionZoneId ->
                         isLoading = true

@@ -40,5 +40,5 @@
             android:name=".main.AddFriendActivity"
             android:exported="false" />
     </application>
-
+    <uses-permission android:name="android.permission.INTERNET" />
 </manifest>

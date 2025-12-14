@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.daypilot.app-mergeDebugResources-54:/values-ko/values-ko.xml",
+            "outputFile": "com.example.daypilot.app-mergeDebugResources-56:/values-ko/values-ko.xml",
             "map": [
                 {
                     "source": "/home/mario/.gradle/caches/8.13/transforms/d7ad9656e530be813a407211cd939452/transformed/browser-1.4.0/res/values-ko/values-ko.xml",

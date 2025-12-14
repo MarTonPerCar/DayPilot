@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.daypilot.app-mergeDebugResources-54:/values-nl/values-nl.xml",
+            "outputFile": "com.example.daypilot.app-mergeDebugResources-56:/values-nl/values-nl.xml",
             "map": [
                 {
                     "source": "/home/mario/.gradle/caches/8.13/transforms/d23de935f55fb39caf4f6ad2efbe2196/transformed/play-services-basement-18.8.0/res/values-nl/values.xml",
