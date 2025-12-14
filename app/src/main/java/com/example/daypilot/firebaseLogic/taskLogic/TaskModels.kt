@@ -1,5 +1,7 @@
 package com.example.daypilot.firebaseLogic.taskLogic
 
+import com.google.firebase.Timestamp
+
 enum class TaskDifficulty {
     EASY,
     MEDIUM,
@@ -16,7 +18,7 @@ data class Task(
     val category: String = "General",
     val reminderEnabled: Boolean = false,
 
-    val createdAt: Long = System.currentTimeMillis(),
+    val createdAt: Long = 0L,
     val isCompleted: Boolean = false,
-    val completedAt: Long? = null
+    val completedAt: Timestamp? = null
 )

@@ -11,6 +11,8 @@ val BrandPurple    = Color(0xFF4527A0)
 val BrandRed       = Color(0xFFD32F2F)
 val BrandRedDeep   = Color(0xFFB71C1C)
 val BrandGreen     = Color(0xFF2E7D32)
+val BrandGreenDark = Color(0xFF2E7D32)
+val StrongRed = Color(0xA84C4C)
 
 // ===============================================================
 //  NEUTRALES (CLARO)

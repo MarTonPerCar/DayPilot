@@ -4,7 +4,12 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import com.example.daypilot.mainDatabase.SessionManager
 import com.example.daypilot.firebaseLogic.authLogic.AuthRepository
 import com.example.daypilot.login.LoginActivity
@@ -27,7 +32,6 @@ class SettingsActivity : ComponentActivity() {
             return
         }
 
-        // 👇 AHORA sí podemos leer de SessionManager
         val notificationsInitial = sessionManager.areNotificationsEnabled()
         val languageInitial = sessionManager.getLanguage()
 
@@ -35,7 +39,25 @@ class SettingsActivity : ComponentActivity() {
 
         setContent {
             val darkPref = sessionManager.isDarkModeEnabled()
+
             DayPilotTheme(darkTheme = darkPref) {
+                val colorScheme = MaterialTheme.colorScheme
+                val view = LocalView.current
+
+                if (!view.isInEditMode) {
+                    SideEffect {
+                        // Colores de barras según el tema
+                        window.statusBarColor = colorScheme.background.toArgb()
+                        window.navigationBarColor = colorScheme.background.toArgb()
+
+                        WindowInsetsControllerCompat(window, window.decorView).apply {
+                            // Iconos oscuros en tema claro, claros en tema oscuro
+                            isAppearanceLightStatusBars = !darkPref
+                            isAppearanceLightNavigationBars = !darkPref
+                        }
+                    }
+                }
+
                 SettingsScreen(
                     authRepo = authRepo,
                     uid = user.uid,
