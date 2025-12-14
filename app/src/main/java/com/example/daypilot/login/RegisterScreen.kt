@@ -17,7 +17,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.rotate
 import com.example.daypilot.R
-import com.example.daypilot.mainDatabase.SessionManager
 
 data class TimeZoneDisplay(
     val id: String,
@@ -214,7 +213,7 @@ fun RegisterScreen(
                                     ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
                                 },
                                 modifier = Modifier
-                                    .menuAnchor()   // el warning es solo deprecado, pero funciona
+                                    .menuAnchor()
                                     .fillMaxWidth(),
                                 isError = regionError != null,
                                 singleLine = true

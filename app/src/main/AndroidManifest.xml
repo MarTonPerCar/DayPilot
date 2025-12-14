@@ -28,16 +28,19 @@
             android:name=".login.RegisterActivity"
             android:exported="false" />
         <activity
-            android:name=".main.MainActivity"
+            android:name=".main.mainZone.MainActivity"
             android:exported="false" />
         <activity
-            android:name=".profile.MainProfileActivity"
+            android:name=".main.mainZone.task.TaskActivity"
             android:exported="false" />
         <activity
-            android:name=".profile.SettingsActivity"
+            android:name=".main.profile.MainProfileActivity"
             android:exported="false" />
         <activity
-            android:name=".main.AddFriendActivity"
+            android:name=".main.profile.SettingsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".main.addFriend.AddFriendActivity"
             android:exported="false" />
     </application>
     <uses-permission android:name="android.permission.INTERNET" />

@@ -5,10 +5,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.*
 import androidx.lifecycle.lifecycleScope
-import com.example.daypilot.authLogic.AuthRepository
+import com.example.daypilot.firebaseLogic.authLogic.AuthRepository
 import com.example.daypilot.mainDatabase.SessionManager
 import com.example.daypilot.ui.theme.DayPilotTheme
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
 

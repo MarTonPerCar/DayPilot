@@ -47,16 +47,19 @@
             android:name="com.example.daypilot.login.RegisterActivity"
             android:exported="false" />
         <activity
-            android:name="com.example.daypilot.main.MainActivity"
+            android:name="com.example.daypilot.main.mainZone.MainActivity"
             android:exported="false" />
         <activity
-            android:name="com.example.daypilot.profile.MainProfileActivity"
+            android:name="com.example.daypilot.main.mainZone.task.TaskActivity"
             android:exported="false" />
         <activity
-            android:name="com.example.daypilot.profile.SettingsActivity"
+            android:name="com.example.daypilot.main.profile.MainProfileActivity"
             android:exported="false" />
         <activity
-            android:name="com.example.daypilot.main.AddFriendActivity"
+            android:name="com.example.daypilot.main.profile.SettingsActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.example.daypilot.main.addFriend.AddFriendActivity"
             android:exported="false" />
         <activity
             android:name="com.google.firebase.auth.internal.GenericIdpActivity"
