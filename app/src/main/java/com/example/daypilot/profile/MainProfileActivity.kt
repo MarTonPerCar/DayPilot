@@ -5,7 +5,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import com.example.daypilot.authLogic.AuthRepository
-import com.example.daypilot.MainDatabase.SessionManager
+import com.example.daypilot.mainDatabase.SessionManager
 import com.example.daypilot.login.LoginActivity
 import com.example.daypilot.ui.theme.DayPilotTheme
 
@@ -35,7 +35,8 @@ class MainProfileActivity : ComponentActivity() {
         val creationTs = firebaseUser.metadata?.creationTimestamp
 
         setContent {
-            DayPilotTheme {
+            val darkTheme = sessionManager.isDarkModeEnabled()
+            DayPilotTheme (darkTheme = darkTheme) {
                 ProfileScreen(
                     authRepo = authRepo,
                     uid = uid,

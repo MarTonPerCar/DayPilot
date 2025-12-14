@@ -23,6 +23,7 @@ import com.example.daypilot.authLogic.SearchUserResult
 import com.example.daypilot.authLogic.UserProfile
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import com.example.daypilot.mainDatabase.SessionManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -97,14 +98,6 @@ fun AddFriendScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Amigos") },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver"
-                        )
-                    }
-                }
             )
         }
     ) { innerPadding ->

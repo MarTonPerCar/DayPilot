@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.rotate
 import com.example.daypilot.R
+import com.example.daypilot.mainDatabase.SessionManager
 
 // ---------------------------
 // MAPEADOR DE ERRORES DE FIREBASE

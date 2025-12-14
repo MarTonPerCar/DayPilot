@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.daypilot.app-mergeDebugResources-54:/values-en-rGB/values-en-rGB.xml",
+            "outputFile": "com.example.daypilot.app-mergeDebugResources-56:/values-en-rGB/values-en-rGB.xml",
             "map": [
                 {
                     "source": "/home/mario/.gradle/caches/8.13/transforms/1348bec305dcd5c4626db80c71232012/transformed/credentials-1.2.0-rc01/res/values-en-rGB/values-en-rGB.xml",

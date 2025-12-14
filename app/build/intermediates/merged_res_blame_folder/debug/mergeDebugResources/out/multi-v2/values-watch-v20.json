@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.daypilot.app-mergeDebugResources-54:/values-watch-v20/values-watch-v20.xml",
+            "outputFile": "com.example.daypilot.app-mergeDebugResources-56:/values-watch-v20/values-watch-v20.xml",
             "map": [
                 {
                     "source": "/home/mario/.gradle/caches/8.13/transforms/29408a52d667fe41031f2b85ffcd7d33/transformed/play-services-auth-20.7.0/res/values-watch-v20/values.xml",

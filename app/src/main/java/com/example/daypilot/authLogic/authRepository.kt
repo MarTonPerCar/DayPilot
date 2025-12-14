@@ -10,11 +10,15 @@ import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import android.graphics.Bitmap
+import android.net.Uri
+import com.google.firebase.storage.FirebaseStorage
 
 class AuthRepository {
 
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
+    private val storage: FirebaseStorage = FirebaseStorage.getInstance()
 
     val currentUser: FirebaseUser?
         get() = auth.currentUser
@@ -254,14 +258,26 @@ class AuthRepository {
             .get()
             .await()
 
-        return snap.documents.mapNotNull { doc ->
+        val basicFriends = snap.documents.mapNotNull { doc ->
             val friendUid = doc.getString("friendUid") ?: return@mapNotNull null
+            val username = doc.getString("friendUsername") ?: ""
+            val name = doc.getString("friendName") ?: ""
+
             FriendInfo(
                 uid = friendUid,
-                username = doc.getString("friendUsername") ?: "",
-                name = doc.getString("friendName") ?: ""
+                username = username,
+                name = name
+                // SIN photoUrl aquí todavía
             )
         }
+
+        val result = mutableListOf<FriendInfo>()
+        for (friend in basicFriends) {
+            val profile = getUserProfile(friend.uid)
+            result += friend.copy(photoUrl = profile?.photoUrl)
+        }
+
+        return result
     }
 
     // ========== SOLICITUDES DE AMISTAD ==========
@@ -342,6 +358,64 @@ class AuthRepository {
             .document(fromUid)
 
         requestRef.delete().await()
+    }
+
+    // ========== PREFERENCIAS DE USUARIO ==========
+
+    suspend fun updateUserRegion(uid: String, regionId: String) {
+        firestore.collection("users")
+            .document(uid)
+            .update("region", regionId)
+            .await()
+    }
+
+    suspend fun uploadProfilePhotoFromUri(uid: String, uri: Uri): String {
+        val ref = storage.reference.child("profilePhotos/$uid.jpg")
+
+        return try {
+            ref.putFile(uri).await()
+            val downloadUrl = ref.downloadUrl.await().toString()
+
+            firestore.collection("users")
+                .document(uid)
+                .set(
+                    mapOf("photoUrl" to downloadUrl),
+                    SetOptions.merge()
+                )
+                .await()
+
+            downloadUrl
+        } catch (e: Exception) {
+            Log.e("AuthRepo", "Error subiendo foto desde Uri", e)
+            throw e
+        }
+    }
+
+    suspend fun uploadProfilePhotoFromBitmap(uid: String, bitmap: Bitmap): String {
+        val ref = storage.reference.child("profilePhotos/$uid.jpg")
+
+        val baos = java.io.ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 90, baos)
+        val data = baos.toByteArray()
+
+        return try {
+            ref.putBytes(data).await()
+
+            val downloadUrl = ref.downloadUrl.await().toString()
+
+            firestore.collection("users")
+                .document(uid)
+                .set(
+                    mapOf("photoUrl" to downloadUrl),
+                    SetOptions.merge()
+                )
+                .await()
+
+            downloadUrl
+        } catch (e: Exception) {
+            Log.e("AuthRepo", "Error subiendo foto desde Bitmap", e)
+            throw e
+        }
     }
 
     // ========== RESET / LOGOUT ==========

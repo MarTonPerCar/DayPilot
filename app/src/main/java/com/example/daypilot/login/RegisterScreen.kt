@@ -17,8 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.rotate
 import com.example.daypilot.R
-import java.util.TimeZone
-import kotlin.math.abs
+import com.example.daypilot.mainDatabase.SessionManager
 
 data class TimeZoneDisplay(
     val id: String,
