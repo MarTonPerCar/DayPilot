@@ -11,6 +11,7 @@ drawable agenda
 drawable ic_launcher_background
 drawable ic_launcher_foreground
 drawable mi_logo
+drawable tarea
 mipmap ic_launcher
 mipmap ic_launcher_round
 string app_name

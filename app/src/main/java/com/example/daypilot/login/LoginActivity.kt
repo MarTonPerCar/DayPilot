@@ -9,8 +9,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.lifecycleScope
-import com.example.daypilot.main.MainActivity
-import com.example.daypilot.authLogic.AuthRepository
+import com.example.daypilot.main.mainZone.MainActivity
+import com.example.daypilot.firebaseLogic.authLogic.AuthRepository
 import com.example.daypilot.mainDatabase.SessionManager
 import com.example.daypilot.ui.theme.DayPilotTheme
 import com.google.firebase.auth.FirebaseAuthException

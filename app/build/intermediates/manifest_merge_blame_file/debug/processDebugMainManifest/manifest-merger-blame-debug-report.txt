@@ -9,8 +9,8 @@
 9        android:targetSdkVersion="36" />
 10
 11    <uses-permission android:name="android.permission.INTERNET" />
-11-->/home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:43:5-67
-11-->/home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:43:22-64
+11-->/home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:46:5-67
+11-->/home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:46:22-64
 12    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 12-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:26:5-79
 12-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:26:22-76
@@ -30,7 +30,7 @@
 19-->[androidx.core:core:1.16.0] /home/mario/.gradle/caches/8.13/transforms/2e619266833b106540768d8ae786a779/transformed/core-1.16.0/AndroidManifest.xml:26:22-94
 20
 21    <application
-21-->/home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:5:5-42:19
+21-->/home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:5:5-45:19
 22        android:allowBackup="true"
 22-->/home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:6:9-35
 23        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
@@ -83,356 +83,362 @@
 48-->/home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:29:13-37
 49        <activity
 49-->/home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:30:9-32:40
-50            android:name="com.example.daypilot.main.MainActivity"
-50-->/home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:31:13-46
+50            android:name="com.example.daypilot.main.mainZone.MainActivity"
+50-->/home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:31:13-55
 51            android:exported="false" />
 51-->/home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:32:13-37
 52        <activity
 52-->/home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:33:9-35:40
-53            android:name="com.example.daypilot.profile.MainProfileActivity"
-53-->/home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:34:13-56
+53            android:name="com.example.daypilot.main.mainZone.task.TaskActivity"
+53-->/home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:34:13-60
 54            android:exported="false" />
 54-->/home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:35:13-37
 55        <activity
 55-->/home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:36:9-38:40
-56            android:name="com.example.daypilot.profile.SettingsActivity"
-56-->/home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:37:13-53
+56            android:name="com.example.daypilot.main.profile.MainProfileActivity"
+56-->/home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:37:13-61
 57            android:exported="false" />
 57-->/home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:38:13-37
 58        <activity
 58-->/home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:39:9-41:40
-59            android:name="com.example.daypilot.main.AddFriendActivity"
-59-->/home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:40:13-51
+59            android:name="com.example.daypilot.main.profile.SettingsActivity"
+59-->/home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:40:13-58
 60            android:exported="false" />
 60-->/home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:41:13-37
 61        <activity
-61-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:29:9-46:20
-62            android:name="com.google.firebase.auth.internal.GenericIdpActivity"
-62-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:30:13-80
-63            android:excludeFromRecents="true"
-63-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:31:13-46
-64            android:exported="true"
-64-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:32:13-36
-65            android:launchMode="singleTask"
-65-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:33:13-44
-66            android:theme="@android:style/Theme.Translucent.NoTitleBar" >
-66-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:34:13-72
-67            <intent-filter>
-67-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:35:13-45:29
-68                <action android:name="android.intent.action.VIEW" />
-68-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:36:17-69
-68-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:36:25-66
-69
-70                <category android:name="android.intent.category.DEFAULT" />
-70-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:38:17-76
-70-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:38:27-73
-71                <category android:name="android.intent.category.BROWSABLE" />
-71-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:39:17-78
-71-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:39:27-75
+61-->/home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:42:9-44:40
+62            android:name="com.example.daypilot.main.addFriend.AddFriendActivity"
+62-->/home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:43:13-61
+63            android:exported="false" />
+63-->/home/mario/AndroidStudioProjects/DayPilot/app/src/main/AndroidManifest.xml:44:13-37
+64        <activity
+64-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:29:9-46:20
+65            android:name="com.google.firebase.auth.internal.GenericIdpActivity"
+65-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:30:13-80
+66            android:excludeFromRecents="true"
+66-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:31:13-46
+67            android:exported="true"
+67-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:32:13-36
+68            android:launchMode="singleTask"
+68-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:33:13-44
+69            android:theme="@android:style/Theme.Translucent.NoTitleBar" >
+69-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:34:13-72
+70            <intent-filter>
+70-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:35:13-45:29
+71                <action android:name="android.intent.action.VIEW" />
+71-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:36:17-69
+71-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:36:25-66
 72
-73                <data
-73-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:41:17-44:51
-74                    android:host="firebase.auth"
-74-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:42:21-49
-75                    android:path="/"
-75-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:43:21-37
-76                    android:scheme="genericidp" />
-76-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:44:21-48
-77            </intent-filter>
-78        </activity>
-79        <activity
-79-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:47:9-64:20
-80            android:name="com.google.firebase.auth.internal.RecaptchaActivity"
-80-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:48:13-79
-81            android:excludeFromRecents="true"
-81-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:49:13-46
-82            android:exported="true"
-82-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:50:13-36
-83            android:launchMode="singleTask"
-83-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:51:13-44
-84            android:theme="@android:style/Theme.Translucent.NoTitleBar" >
-84-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:52:13-72
-85            <intent-filter>
-85-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:53:13-63:29
-86                <action android:name="android.intent.action.VIEW" />
-86-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:36:17-69
-86-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:36:25-66
-87
-88                <category android:name="android.intent.category.DEFAULT" />
-88-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:38:17-76
-88-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:38:27-73
-89                <category android:name="android.intent.category.BROWSABLE" />
-89-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:39:17-78
-89-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:39:27-75
+73                <category android:name="android.intent.category.DEFAULT" />
+73-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:38:17-76
+73-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:38:27-73
+74                <category android:name="android.intent.category.BROWSABLE" />
+74-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:39:17-78
+74-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:39:27-75
+75
+76                <data
+76-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:41:17-44:51
+77                    android:host="firebase.auth"
+77-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:42:21-49
+78                    android:path="/"
+78-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:43:21-37
+79                    android:scheme="genericidp" />
+79-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:44:21-48
+80            </intent-filter>
+81        </activity>
+82        <activity
+82-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:47:9-64:20
+83            android:name="com.google.firebase.auth.internal.RecaptchaActivity"
+83-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:48:13-79
+84            android:excludeFromRecents="true"
+84-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:49:13-46
+85            android:exported="true"
+85-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:50:13-36
+86            android:launchMode="singleTask"
+86-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:51:13-44
+87            android:theme="@android:style/Theme.Translucent.NoTitleBar" >
+87-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:52:13-72
+88            <intent-filter>
+88-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:53:13-63:29
+89                <action android:name="android.intent.action.VIEW" />
+89-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:36:17-69
+89-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:36:25-66
 90
-91                <data
-91-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:41:17-44:51
-92                    android:host="firebase.auth"
-92-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:42:21-49
-93                    android:path="/"
-93-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:43:21-37
-94                    android:scheme="recaptcha" />
-94-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:44:21-48
-95            </intent-filter>
-96        </activity>
-97
-98        <service
-98-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:66:9-72:19
-99            android:name="com.google.firebase.components.ComponentDiscoveryService"
-99-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:67:13-84
-100            android:directBootAware="true"
-100-->[com.google.firebase:firebase-common:22.0.1] /home/mario/.gradle/caches/8.13/transforms/73025ec9a7e2e690fc83aa54307e4a51/transformed/firebase-common-22.0.1/AndroidManifest.xml:32:13-43
-101            android:exported="false" >
-101-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:68:13-37
-102            <meta-data
-102-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:69:13-71:85
-103                android:name="com.google.firebase.components:com.google.firebase.auth.FirebaseAuthRegistrar"
-103-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:70:17-109
-104                android:value="com.google.firebase.components.ComponentRegistrar" />
-104-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:71:17-82
+91                <category android:name="android.intent.category.DEFAULT" />
+91-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:38:17-76
+91-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:38:27-73
+92                <category android:name="android.intent.category.BROWSABLE" />
+92-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:39:17-78
+92-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:39:27-75
+93
+94                <data
+94-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:41:17-44:51
+95                    android:host="firebase.auth"
+95-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:42:21-49
+96                    android:path="/"
+96-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:43:21-37
+97                    android:scheme="recaptcha" />
+97-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:44:21-48
+98            </intent-filter>
+99        </activity>
+100
+101        <service
+101-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:66:9-72:19
+102            android:name="com.google.firebase.components.ComponentDiscoveryService"
+102-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:67:13-84
+103            android:directBootAware="true"
+103-->[com.google.firebase:firebase-common:22.0.1] /home/mario/.gradle/caches/8.13/transforms/73025ec9a7e2e690fc83aa54307e4a51/transformed/firebase-common-22.0.1/AndroidManifest.xml:32:13-43
+104            android:exported="false" >
+104-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:68:13-37
 105            <meta-data
-105-->[com.google.firebase:firebase-firestore:26.0.2] /home/mario/.gradle/caches/8.13/transforms/4c2782b7d408e01bf513291f94313098/transformed/firebase-firestore-26.0.2/AndroidManifest.xml:17:13-19:85
-106                android:name="com.google.firebase.components:com.google.firebase.firestore.FirebaseFirestoreKtxRegistrar"
-106-->[com.google.firebase:firebase-firestore:26.0.2] /home/mario/.gradle/caches/8.13/transforms/4c2782b7d408e01bf513291f94313098/transformed/firebase-firestore-26.0.2/AndroidManifest.xml:18:17-122
+105-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:69:13-71:85
+106                android:name="com.google.firebase.components:com.google.firebase.auth.FirebaseAuthRegistrar"
+106-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:70:17-109
 107                android:value="com.google.firebase.components.ComponentRegistrar" />
-107-->[com.google.firebase:firebase-firestore:26.0.2] /home/mario/.gradle/caches/8.13/transforms/4c2782b7d408e01bf513291f94313098/transformed/firebase-firestore-26.0.2/AndroidManifest.xml:19:17-82
+107-->[com.google.firebase:firebase-auth:24.0.1] /home/mario/.gradle/caches/8.13/transforms/dde2e2da720ca7128436d8c003653242/transformed/firebase-auth-24.0.1/AndroidManifest.xml:71:17-82
 108            <meta-data
-108-->[com.google.firebase:firebase-firestore:26.0.2] /home/mario/.gradle/caches/8.13/transforms/4c2782b7d408e01bf513291f94313098/transformed/firebase-firestore-26.0.2/AndroidManifest.xml:20:13-22:85
-109                android:name="com.google.firebase.components:com.google.firebase.firestore.FirestoreRegistrar"
-109-->[com.google.firebase:firebase-firestore:26.0.2] /home/mario/.gradle/caches/8.13/transforms/4c2782b7d408e01bf513291f94313098/transformed/firebase-firestore-26.0.2/AndroidManifest.xml:21:17-111
+108-->[com.google.firebase:firebase-firestore:26.0.2] /home/mario/.gradle/caches/8.13/transforms/4c2782b7d408e01bf513291f94313098/transformed/firebase-firestore-26.0.2/AndroidManifest.xml:17:13-19:85
+109                android:name="com.google.firebase.components:com.google.firebase.firestore.FirebaseFirestoreKtxRegistrar"
+109-->[com.google.firebase:firebase-firestore:26.0.2] /home/mario/.gradle/caches/8.13/transforms/4c2782b7d408e01bf513291f94313098/transformed/firebase-firestore-26.0.2/AndroidManifest.xml:18:17-122
 110                android:value="com.google.firebase.components.ComponentRegistrar" />
-110-->[com.google.firebase:firebase-firestore:26.0.2] /home/mario/.gradle/caches/8.13/transforms/4c2782b7d408e01bf513291f94313098/transformed/firebase-firestore-26.0.2/AndroidManifest.xml:22:17-82
+110-->[com.google.firebase:firebase-firestore:26.0.2] /home/mario/.gradle/caches/8.13/transforms/4c2782b7d408e01bf513291f94313098/transformed/firebase-firestore-26.0.2/AndroidManifest.xml:19:17-82
 111            <meta-data
-111-->[com.google.firebase:firebase-storage-ktx:20.3.0] /home/mario/.gradle/caches/8.13/transforms/d0f20cd12aee2b2d5396071cea017414/transformed/firebase-storage-ktx-20.3.0/AndroidManifest.xml:12:13-14:85
-112                android:name="com.google.firebase.components:com.google.firebase.storage.ktx.FirebaseStorageLegacyRegistrar"
-112-->[com.google.firebase:firebase-storage-ktx:20.3.0] /home/mario/.gradle/caches/8.13/transforms/d0f20cd12aee2b2d5396071cea017414/transformed/firebase-storage-ktx-20.3.0/AndroidManifest.xml:13:17-125
+111-->[com.google.firebase:firebase-firestore:26.0.2] /home/mario/.gradle/caches/8.13/transforms/4c2782b7d408e01bf513291f94313098/transformed/firebase-firestore-26.0.2/AndroidManifest.xml:20:13-22:85
+112                android:name="com.google.firebase.components:com.google.firebase.firestore.FirestoreRegistrar"
+112-->[com.google.firebase:firebase-firestore:26.0.2] /home/mario/.gradle/caches/8.13/transforms/4c2782b7d408e01bf513291f94313098/transformed/firebase-firestore-26.0.2/AndroidManifest.xml:21:17-111
 113                android:value="com.google.firebase.components.ComponentRegistrar" />
-113-->[com.google.firebase:firebase-storage-ktx:20.3.0] /home/mario/.gradle/caches/8.13/transforms/d0f20cd12aee2b2d5396071cea017414/transformed/firebase-storage-ktx-20.3.0/AndroidManifest.xml:14:17-82
+113-->[com.google.firebase:firebase-firestore:26.0.2] /home/mario/.gradle/caches/8.13/transforms/4c2782b7d408e01bf513291f94313098/transformed/firebase-firestore-26.0.2/AndroidManifest.xml:22:17-82
 114            <meta-data
-114-->[com.google.firebase:firebase-storage:22.0.1] /home/mario/.gradle/caches/8.13/transforms/1331cc3b5725c43a95ab6de47057bbdd/transformed/firebase-storage-22.0.1/AndroidManifest.xml:30:13-32:85
-115                android:name="com.google.firebase.components:com.google.firebase.storage.FirebaseStorageKtxRegistrar"
-115-->[com.google.firebase:firebase-storage:22.0.1] /home/mario/.gradle/caches/8.13/transforms/1331cc3b5725c43a95ab6de47057bbdd/transformed/firebase-storage-22.0.1/AndroidManifest.xml:31:17-118
+114-->[com.google.firebase:firebase-storage-ktx:20.3.0] /home/mario/.gradle/caches/8.13/transforms/d0f20cd12aee2b2d5396071cea017414/transformed/firebase-storage-ktx-20.3.0/AndroidManifest.xml:12:13-14:85
+115                android:name="com.google.firebase.components:com.google.firebase.storage.ktx.FirebaseStorageLegacyRegistrar"
+115-->[com.google.firebase:firebase-storage-ktx:20.3.0] /home/mario/.gradle/caches/8.13/transforms/d0f20cd12aee2b2d5396071cea017414/transformed/firebase-storage-ktx-20.3.0/AndroidManifest.xml:13:17-125
 116                android:value="com.google.firebase.components.ComponentRegistrar" />
-116-->[com.google.firebase:firebase-storage:22.0.1] /home/mario/.gradle/caches/8.13/transforms/1331cc3b5725c43a95ab6de47057bbdd/transformed/firebase-storage-22.0.1/AndroidManifest.xml:32:17-82
+116-->[com.google.firebase:firebase-storage-ktx:20.3.0] /home/mario/.gradle/caches/8.13/transforms/d0f20cd12aee2b2d5396071cea017414/transformed/firebase-storage-ktx-20.3.0/AndroidManifest.xml:14:17-82
 117            <meta-data
-117-->[com.google.firebase:firebase-storage:22.0.1] /home/mario/.gradle/caches/8.13/transforms/1331cc3b5725c43a95ab6de47057bbdd/transformed/firebase-storage-22.0.1/AndroidManifest.xml:33:13-35:85
-118                android:name="com.google.firebase.components:com.google.firebase.storage.StorageRegistrar"
-118-->[com.google.firebase:firebase-storage:22.0.1] /home/mario/.gradle/caches/8.13/transforms/1331cc3b5725c43a95ab6de47057bbdd/transformed/firebase-storage-22.0.1/AndroidManifest.xml:34:17-107
+117-->[com.google.firebase:firebase-storage:22.0.1] /home/mario/.gradle/caches/8.13/transforms/1331cc3b5725c43a95ab6de47057bbdd/transformed/firebase-storage-22.0.1/AndroidManifest.xml:30:13-32:85
+118                android:name="com.google.firebase.components:com.google.firebase.storage.FirebaseStorageKtxRegistrar"
+118-->[com.google.firebase:firebase-storage:22.0.1] /home/mario/.gradle/caches/8.13/transforms/1331cc3b5725c43a95ab6de47057bbdd/transformed/firebase-storage-22.0.1/AndroidManifest.xml:31:17-118
 119                android:value="com.google.firebase.components.ComponentRegistrar" />
-119-->[com.google.firebase:firebase-storage:22.0.1] /home/mario/.gradle/caches/8.13/transforms/1331cc3b5725c43a95ab6de47057bbdd/transformed/firebase-storage-22.0.1/AndroidManifest.xml:35:17-82
+119-->[com.google.firebase:firebase-storage:22.0.1] /home/mario/.gradle/caches/8.13/transforms/1331cc3b5725c43a95ab6de47057bbdd/transformed/firebase-storage-22.0.1/AndroidManifest.xml:32:17-82
 120            <meta-data
-120-->[com.google.firebase:firebase-common-ktx:20.4.2] /home/mario/.gradle/caches/8.13/transforms/79a0375180b8ef231cb947c7acc80d62/transformed/firebase-common-ktx-20.4.2/AndroidManifest.xml:12:13-14:85
-121                android:name="com.google.firebase.components:com.google.firebase.ktx.FirebaseCommonLegacyRegistrar"
-121-->[com.google.firebase:firebase-common-ktx:20.4.2] /home/mario/.gradle/caches/8.13/transforms/79a0375180b8ef231cb947c7acc80d62/transformed/firebase-common-ktx-20.4.2/AndroidManifest.xml:13:17-116
+120-->[com.google.firebase:firebase-storage:22.0.1] /home/mario/.gradle/caches/8.13/transforms/1331cc3b5725c43a95ab6de47057bbdd/transformed/firebase-storage-22.0.1/AndroidManifest.xml:33:13-35:85
+121                android:name="com.google.firebase.components:com.google.firebase.storage.StorageRegistrar"
+121-->[com.google.firebase:firebase-storage:22.0.1] /home/mario/.gradle/caches/8.13/transforms/1331cc3b5725c43a95ab6de47057bbdd/transformed/firebase-storage-22.0.1/AndroidManifest.xml:34:17-107
 122                android:value="com.google.firebase.components.ComponentRegistrar" />
-122-->[com.google.firebase:firebase-common-ktx:20.4.2] /home/mario/.gradle/caches/8.13/transforms/79a0375180b8ef231cb947c7acc80d62/transformed/firebase-common-ktx-20.4.2/AndroidManifest.xml:14:17-82
+122-->[com.google.firebase:firebase-storage:22.0.1] /home/mario/.gradle/caches/8.13/transforms/1331cc3b5725c43a95ab6de47057bbdd/transformed/firebase-storage-22.0.1/AndroidManifest.xml:35:17-82
 123            <meta-data
-123-->[com.google.firebase:firebase-common:22.0.1] /home/mario/.gradle/caches/8.13/transforms/73025ec9a7e2e690fc83aa54307e4a51/transformed/firebase-common-22.0.1/AndroidManifest.xml:35:13-37:85
-124                android:name="com.google.firebase.components:com.google.firebase.FirebaseCommonKtxRegistrar"
-124-->[com.google.firebase:firebase-common:22.0.1] /home/mario/.gradle/caches/8.13/transforms/73025ec9a7e2e690fc83aa54307e4a51/transformed/firebase-common-22.0.1/AndroidManifest.xml:36:17-109
+123-->[com.google.firebase:firebase-common-ktx:20.4.2] /home/mario/.gradle/caches/8.13/transforms/79a0375180b8ef231cb947c7acc80d62/transformed/firebase-common-ktx-20.4.2/AndroidManifest.xml:12:13-14:85
+124                android:name="com.google.firebase.components:com.google.firebase.ktx.FirebaseCommonLegacyRegistrar"
+124-->[com.google.firebase:firebase-common-ktx:20.4.2] /home/mario/.gradle/caches/8.13/transforms/79a0375180b8ef231cb947c7acc80d62/transformed/firebase-common-ktx-20.4.2/AndroidManifest.xml:13:17-116
 125                android:value="com.google.firebase.components.ComponentRegistrar" />
-125-->[com.google.firebase:firebase-common:22.0.1] /home/mario/.gradle/caches/8.13/transforms/73025ec9a7e2e690fc83aa54307e4a51/transformed/firebase-common-22.0.1/AndroidManifest.xml:37:17-82
+125-->[com.google.firebase:firebase-common-ktx:20.4.2] /home/mario/.gradle/caches/8.13/transforms/79a0375180b8ef231cb947c7acc80d62/transformed/firebase-common-ktx-20.4.2/AndroidManifest.xml:14:17-82
 126            <meta-data
-126-->[com.google.firebase:firebase-appcheck:18.0.0] /home/mario/.gradle/caches/8.13/transforms/f6e88d416ca99cd5b7b5daad4106704e/transformed/firebase-appcheck-18.0.0/AndroidManifest.xml:25:13-27:85
-127                android:name="com.google.firebase.components:com.google.firebase.appcheck.FirebaseAppCheckKtxRegistrar"
-127-->[com.google.firebase:firebase-appcheck:18.0.0] /home/mario/.gradle/caches/8.13/transforms/f6e88d416ca99cd5b7b5daad4106704e/transformed/firebase-appcheck-18.0.0/AndroidManifest.xml:26:17-120
+126-->[com.google.firebase:firebase-common:22.0.1] /home/mario/.gradle/caches/8.13/transforms/73025ec9a7e2e690fc83aa54307e4a51/transformed/firebase-common-22.0.1/AndroidManifest.xml:35:13-37:85
+127                android:name="com.google.firebase.components:com.google.firebase.FirebaseCommonKtxRegistrar"
+127-->[com.google.firebase:firebase-common:22.0.1] /home/mario/.gradle/caches/8.13/transforms/73025ec9a7e2e690fc83aa54307e4a51/transformed/firebase-common-22.0.1/AndroidManifest.xml:36:17-109
 128                android:value="com.google.firebase.components.ComponentRegistrar" />
-128-->[com.google.firebase:firebase-appcheck:18.0.0] /home/mario/.gradle/caches/8.13/transforms/f6e88d416ca99cd5b7b5daad4106704e/transformed/firebase-appcheck-18.0.0/AndroidManifest.xml:27:17-82
+128-->[com.google.firebase:firebase-common:22.0.1] /home/mario/.gradle/caches/8.13/transforms/73025ec9a7e2e690fc83aa54307e4a51/transformed/firebase-common-22.0.1/AndroidManifest.xml:37:17-82
 129            <meta-data
-129-->[com.google.firebase:firebase-appcheck:18.0.0] /home/mario/.gradle/caches/8.13/transforms/f6e88d416ca99cd5b7b5daad4106704e/transformed/firebase-appcheck-18.0.0/AndroidManifest.xml:28:13-30:85
-130                android:name="com.google.firebase.components:com.google.firebase.appcheck.FirebaseAppCheckRegistrar"
-130-->[com.google.firebase:firebase-appcheck:18.0.0] /home/mario/.gradle/caches/8.13/transforms/f6e88d416ca99cd5b7b5daad4106704e/transformed/firebase-appcheck-18.0.0/AndroidManifest.xml:29:17-117
+129-->[com.google.firebase:firebase-appcheck:18.0.0] /home/mario/.gradle/caches/8.13/transforms/f6e88d416ca99cd5b7b5daad4106704e/transformed/firebase-appcheck-18.0.0/AndroidManifest.xml:25:13-27:85
+130                android:name="com.google.firebase.components:com.google.firebase.appcheck.FirebaseAppCheckKtxRegistrar"
+130-->[com.google.firebase:firebase-appcheck:18.0.0] /home/mario/.gradle/caches/8.13/transforms/f6e88d416ca99cd5b7b5daad4106704e/transformed/firebase-appcheck-18.0.0/AndroidManifest.xml:26:17-120
 131                android:value="com.google.firebase.components.ComponentRegistrar" />
-131-->[com.google.firebase:firebase-appcheck:18.0.0] /home/mario/.gradle/caches/8.13/transforms/f6e88d416ca99cd5b7b5daad4106704e/transformed/firebase-appcheck-18.0.0/AndroidManifest.xml:30:17-82
-132        </service>
-133        <service
-133-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/72bbc5f7d815ffe53e85e26b7d784cde/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:24:9-32:19
-134            android:name="androidx.credentials.playservices.CredentialProviderMetadataHolder"
-134-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/72bbc5f7d815ffe53e85e26b7d784cde/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:25:13-94
-135            android:enabled="true"
-135-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/72bbc5f7d815ffe53e85e26b7d784cde/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:26:13-35
-136            android:exported="false" >
-136-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/72bbc5f7d815ffe53e85e26b7d784cde/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:27:13-37
-137            <meta-data
-137-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/72bbc5f7d815ffe53e85e26b7d784cde/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:29:13-31:104
-138                android:name="androidx.credentials.CREDENTIAL_PROVIDER_KEY"
-138-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/72bbc5f7d815ffe53e85e26b7d784cde/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:30:17-76
-139                android:value="androidx.credentials.playservices.CredentialProviderPlayServicesImpl" />
-139-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/72bbc5f7d815ffe53e85e26b7d784cde/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:31:17-101
-140        </service>
-141
-142        <activity
-142-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/72bbc5f7d815ffe53e85e26b7d784cde/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:34:9-41:20
-143            android:name="androidx.credentials.playservices.HiddenActivity"
-143-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/72bbc5f7d815ffe53e85e26b7d784cde/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:35:13-76
-144            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
-144-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/72bbc5f7d815ffe53e85e26b7d784cde/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:36:13-87
-145            android:enabled="true"
-145-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/72bbc5f7d815ffe53e85e26b7d784cde/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:37:13-35
-146            android:exported="false"
-146-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/72bbc5f7d815ffe53e85e26b7d784cde/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:38:13-37
-147            android:fitsSystemWindows="true"
-147-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/72bbc5f7d815ffe53e85e26b7d784cde/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:39:13-45
-148            android:theme="@style/Theme.Hidden" >
-148-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/72bbc5f7d815ffe53e85e26b7d784cde/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:40:13-48
-149        </activity>
-150        <activity
-150-->[com.google.android.gms:play-services-auth:20.7.0] /home/mario/.gradle/caches/8.13/transforms/29408a52d667fe41031f2b85ffcd7d33/transformed/play-services-auth-20.7.0/AndroidManifest.xml:23:9-27:75
-151            android:name="com.google.android.gms.auth.api.signin.internal.SignInHubActivity"
-151-->[com.google.android.gms:play-services-auth:20.7.0] /home/mario/.gradle/caches/8.13/transforms/29408a52d667fe41031f2b85ffcd7d33/transformed/play-services-auth-20.7.0/AndroidManifest.xml:24:13-93
-152            android:excludeFromRecents="true"
-152-->[com.google.android.gms:play-services-auth:20.7.0] /home/mario/.gradle/caches/8.13/transforms/29408a52d667fe41031f2b85ffcd7d33/transformed/play-services-auth-20.7.0/AndroidManifest.xml:25:13-46
-153            android:exported="false"
-153-->[com.google.android.gms:play-services-auth:20.7.0] /home/mario/.gradle/caches/8.13/transforms/29408a52d667fe41031f2b85ffcd7d33/transformed/play-services-auth-20.7.0/AndroidManifest.xml:26:13-37
-154            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-154-->[com.google.android.gms:play-services-auth:20.7.0] /home/mario/.gradle/caches/8.13/transforms/29408a52d667fe41031f2b85ffcd7d33/transformed/play-services-auth-20.7.0/AndroidManifest.xml:27:13-72
-155        <!--
-156            Service handling Google Sign-In user revocation. For apps that do not integrate with
-157            Google Sign-In, this service will never be started.
-158        -->
-159        <service
-159-->[com.google.android.gms:play-services-auth:20.7.0] /home/mario/.gradle/caches/8.13/transforms/29408a52d667fe41031f2b85ffcd7d33/transformed/play-services-auth-20.7.0/AndroidManifest.xml:33:9-37:51
-160            android:name="com.google.android.gms.auth.api.signin.RevocationBoundService"
-160-->[com.google.android.gms:play-services-auth:20.7.0] /home/mario/.gradle/caches/8.13/transforms/29408a52d667fe41031f2b85ffcd7d33/transformed/play-services-auth-20.7.0/AndroidManifest.xml:34:13-89
-161            android:exported="true"
-161-->[com.google.android.gms:play-services-auth:20.7.0] /home/mario/.gradle/caches/8.13/transforms/29408a52d667fe41031f2b85ffcd7d33/transformed/play-services-auth-20.7.0/AndroidManifest.xml:35:13-36
-162            android:permission="com.google.android.gms.auth.api.signin.permission.REVOCATION_NOTIFICATION"
-162-->[com.google.android.gms:play-services-auth:20.7.0] /home/mario/.gradle/caches/8.13/transforms/29408a52d667fe41031f2b85ffcd7d33/transformed/play-services-auth-20.7.0/AndroidManifest.xml:36:13-107
-163            android:visibleToInstantApps="true" />
-163-->[com.google.android.gms:play-services-auth:20.7.0] /home/mario/.gradle/caches/8.13/transforms/29408a52d667fe41031f2b85ffcd7d33/transformed/play-services-auth-20.7.0/AndroidManifest.xml:37:13-48
-164
-165        <provider
-165-->[com.google.firebase:firebase-common:22.0.1] /home/mario/.gradle/caches/8.13/transforms/73025ec9a7e2e690fc83aa54307e4a51/transformed/firebase-common-22.0.1/AndroidManifest.xml:23:9-28:39
-166            android:name="com.google.firebase.provider.FirebaseInitProvider"
-166-->[com.google.firebase:firebase-common:22.0.1] /home/mario/.gradle/caches/8.13/transforms/73025ec9a7e2e690fc83aa54307e4a51/transformed/firebase-common-22.0.1/AndroidManifest.xml:24:13-77
-167            android:authorities="com.example.daypilot.firebaseinitprovider"
-167-->[com.google.firebase:firebase-common:22.0.1] /home/mario/.gradle/caches/8.13/transforms/73025ec9a7e2e690fc83aa54307e4a51/transformed/firebase-common-22.0.1/AndroidManifest.xml:25:13-72
-168            android:directBootAware="true"
-168-->[com.google.firebase:firebase-common:22.0.1] /home/mario/.gradle/caches/8.13/transforms/73025ec9a7e2e690fc83aa54307e4a51/transformed/firebase-common-22.0.1/AndroidManifest.xml:26:13-43
-169            android:exported="false"
-169-->[com.google.firebase:firebase-common:22.0.1] /home/mario/.gradle/caches/8.13/transforms/73025ec9a7e2e690fc83aa54307e4a51/transformed/firebase-common-22.0.1/AndroidManifest.xml:27:13-37
-170            android:initOrder="100" />
-170-->[com.google.firebase:firebase-common:22.0.1] /home/mario/.gradle/caches/8.13/transforms/73025ec9a7e2e690fc83aa54307e4a51/transformed/firebase-common-22.0.1/AndroidManifest.xml:28:13-36
-171
-172        <activity
-172-->[com.google.android.gms:play-services-base:18.1.0] /home/mario/.gradle/caches/8.13/transforms/3dd4afef777021b6c4e94116e7c0bb61/transformed/play-services-base-18.1.0/AndroidManifest.xml:20:9-22:45
-173            android:name="com.google.android.gms.common.api.GoogleApiActivity"
-173-->[com.google.android.gms:play-services-base:18.1.0] /home/mario/.gradle/caches/8.13/transforms/3dd4afef777021b6c4e94116e7c0bb61/transformed/play-services-base-18.1.0/AndroidManifest.xml:20:19-85
-174            android:exported="false"
-174-->[com.google.android.gms:play-services-base:18.1.0] /home/mario/.gradle/caches/8.13/transforms/3dd4afef777021b6c4e94116e7c0bb61/transformed/play-services-base-18.1.0/AndroidManifest.xml:22:19-43
-175            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-175-->[com.google.android.gms:play-services-base:18.1.0] /home/mario/.gradle/caches/8.13/transforms/3dd4afef777021b6c4e94116e7c0bb61/transformed/play-services-base-18.1.0/AndroidManifest.xml:21:19-78
-176        <activity
-176-->[androidx.compose.ui:ui-test-manifest:1.10.0] /home/mario/.gradle/caches/8.13/transforms/1e1b2d4a349d23f6f7f9b8d7128dec75/transformed/ui-test-manifest-1.10.0/AndroidManifest.xml:23:9-26:79
-177            android:name="androidx.activity.ComponentActivity"
-177-->[androidx.compose.ui:ui-test-manifest:1.10.0] /home/mario/.gradle/caches/8.13/transforms/1e1b2d4a349d23f6f7f9b8d7128dec75/transformed/ui-test-manifest-1.10.0/AndroidManifest.xml:24:13-63
-178            android:exported="true"
-178-->[androidx.compose.ui:ui-test-manifest:1.10.0] /home/mario/.gradle/caches/8.13/transforms/1e1b2d4a349d23f6f7f9b8d7128dec75/transformed/ui-test-manifest-1.10.0/AndroidManifest.xml:25:13-36
-179            android:theme="@android:style/Theme.Material.Light.NoActionBar" />
-179-->[androidx.compose.ui:ui-test-manifest:1.10.0] /home/mario/.gradle/caches/8.13/transforms/1e1b2d4a349d23f6f7f9b8d7128dec75/transformed/ui-test-manifest-1.10.0/AndroidManifest.xml:26:13-76
-180
-181        <provider
-181-->[androidx.emoji2:emoji2:1.4.0] /home/mario/.gradle/caches/8.13/transforms/590747b935e41c009731aa6102883d11/transformed/emoji2-1.4.0/AndroidManifest.xml:24:9-32:20
-182            android:name="androidx.startup.InitializationProvider"
-182-->[androidx.emoji2:emoji2:1.4.0] /home/mario/.gradle/caches/8.13/transforms/590747b935e41c009731aa6102883d11/transformed/emoji2-1.4.0/AndroidManifest.xml:25:13-67
-183            android:authorities="com.example.daypilot.androidx-startup"
-183-->[androidx.emoji2:emoji2:1.4.0] /home/mario/.gradle/caches/8.13/transforms/590747b935e41c009731aa6102883d11/transformed/emoji2-1.4.0/AndroidManifest.xml:26:13-68
-184            android:exported="false" >
-184-->[androidx.emoji2:emoji2:1.4.0] /home/mario/.gradle/caches/8.13/transforms/590747b935e41c009731aa6102883d11/transformed/emoji2-1.4.0/AndroidManifest.xml:27:13-37
-185            <meta-data
-185-->[androidx.emoji2:emoji2:1.4.0] /home/mario/.gradle/caches/8.13/transforms/590747b935e41c009731aa6102883d11/transformed/emoji2-1.4.0/AndroidManifest.xml:29:13-31:52
-186                android:name="androidx.emoji2.text.EmojiCompatInitializer"
-186-->[androidx.emoji2:emoji2:1.4.0] /home/mario/.gradle/caches/8.13/transforms/590747b935e41c009731aa6102883d11/transformed/emoji2-1.4.0/AndroidManifest.xml:30:17-75
-187                android:value="androidx.startup" />
-187-->[androidx.emoji2:emoji2:1.4.0] /home/mario/.gradle/caches/8.13/transforms/590747b935e41c009731aa6102883d11/transformed/emoji2-1.4.0/AndroidManifest.xml:31:17-49
+131-->[com.google.firebase:firebase-appcheck:18.0.0] /home/mario/.gradle/caches/8.13/transforms/f6e88d416ca99cd5b7b5daad4106704e/transformed/firebase-appcheck-18.0.0/AndroidManifest.xml:27:17-82
+132            <meta-data
+132-->[com.google.firebase:firebase-appcheck:18.0.0] /home/mario/.gradle/caches/8.13/transforms/f6e88d416ca99cd5b7b5daad4106704e/transformed/firebase-appcheck-18.0.0/AndroidManifest.xml:28:13-30:85
+133                android:name="com.google.firebase.components:com.google.firebase.appcheck.FirebaseAppCheckRegistrar"
+133-->[com.google.firebase:firebase-appcheck:18.0.0] /home/mario/.gradle/caches/8.13/transforms/f6e88d416ca99cd5b7b5daad4106704e/transformed/firebase-appcheck-18.0.0/AndroidManifest.xml:29:17-117
+134                android:value="com.google.firebase.components.ComponentRegistrar" />
+134-->[com.google.firebase:firebase-appcheck:18.0.0] /home/mario/.gradle/caches/8.13/transforms/f6e88d416ca99cd5b7b5daad4106704e/transformed/firebase-appcheck-18.0.0/AndroidManifest.xml:30:17-82
+135        </service>
+136        <service
+136-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/72bbc5f7d815ffe53e85e26b7d784cde/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:24:9-32:19
+137            android:name="androidx.credentials.playservices.CredentialProviderMetadataHolder"
+137-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/72bbc5f7d815ffe53e85e26b7d784cde/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:25:13-94
+138            android:enabled="true"
+138-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/72bbc5f7d815ffe53e85e26b7d784cde/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:26:13-35
+139            android:exported="false" >
+139-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/72bbc5f7d815ffe53e85e26b7d784cde/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:27:13-37
+140            <meta-data
+140-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/72bbc5f7d815ffe53e85e26b7d784cde/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:29:13-31:104
+141                android:name="androidx.credentials.CREDENTIAL_PROVIDER_KEY"
+141-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/72bbc5f7d815ffe53e85e26b7d784cde/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:30:17-76
+142                android:value="androidx.credentials.playservices.CredentialProviderPlayServicesImpl" />
+142-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/72bbc5f7d815ffe53e85e26b7d784cde/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:31:17-101
+143        </service>
+144
+145        <activity
+145-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/72bbc5f7d815ffe53e85e26b7d784cde/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:34:9-41:20
+146            android:name="androidx.credentials.playservices.HiddenActivity"
+146-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/72bbc5f7d815ffe53e85e26b7d784cde/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:35:13-76
+147            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
+147-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/72bbc5f7d815ffe53e85e26b7d784cde/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:36:13-87
+148            android:enabled="true"
+148-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/72bbc5f7d815ffe53e85e26b7d784cde/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:37:13-35
+149            android:exported="false"
+149-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/72bbc5f7d815ffe53e85e26b7d784cde/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:38:13-37
+150            android:fitsSystemWindows="true"
+150-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/72bbc5f7d815ffe53e85e26b7d784cde/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:39:13-45
+151            android:theme="@style/Theme.Hidden" >
+151-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/mario/.gradle/caches/8.13/transforms/72bbc5f7d815ffe53e85e26b7d784cde/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:40:13-48
+152        </activity>
+153        <activity
+153-->[com.google.android.gms:play-services-auth:20.7.0] /home/mario/.gradle/caches/8.13/transforms/29408a52d667fe41031f2b85ffcd7d33/transformed/play-services-auth-20.7.0/AndroidManifest.xml:23:9-27:75
+154            android:name="com.google.android.gms.auth.api.signin.internal.SignInHubActivity"
+154-->[com.google.android.gms:play-services-auth:20.7.0] /home/mario/.gradle/caches/8.13/transforms/29408a52d667fe41031f2b85ffcd7d33/transformed/play-services-auth-20.7.0/AndroidManifest.xml:24:13-93
+155            android:excludeFromRecents="true"
+155-->[com.google.android.gms:play-services-auth:20.7.0] /home/mario/.gradle/caches/8.13/transforms/29408a52d667fe41031f2b85ffcd7d33/transformed/play-services-auth-20.7.0/AndroidManifest.xml:25:13-46
+156            android:exported="false"
+156-->[com.google.android.gms:play-services-auth:20.7.0] /home/mario/.gradle/caches/8.13/transforms/29408a52d667fe41031f2b85ffcd7d33/transformed/play-services-auth-20.7.0/AndroidManifest.xml:26:13-37
+157            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+157-->[com.google.android.gms:play-services-auth:20.7.0] /home/mario/.gradle/caches/8.13/transforms/29408a52d667fe41031f2b85ffcd7d33/transformed/play-services-auth-20.7.0/AndroidManifest.xml:27:13-72
+158        <!--
+159            Service handling Google Sign-In user revocation. For apps that do not integrate with
+160            Google Sign-In, this service will never be started.
+161        -->
+162        <service
+162-->[com.google.android.gms:play-services-auth:20.7.0] /home/mario/.gradle/caches/8.13/transforms/29408a52d667fe41031f2b85ffcd7d33/transformed/play-services-auth-20.7.0/AndroidManifest.xml:33:9-37:51
+163            android:name="com.google.android.gms.auth.api.signin.RevocationBoundService"
+163-->[com.google.android.gms:play-services-auth:20.7.0] /home/mario/.gradle/caches/8.13/transforms/29408a52d667fe41031f2b85ffcd7d33/transformed/play-services-auth-20.7.0/AndroidManifest.xml:34:13-89
+164            android:exported="true"
+164-->[com.google.android.gms:play-services-auth:20.7.0] /home/mario/.gradle/caches/8.13/transforms/29408a52d667fe41031f2b85ffcd7d33/transformed/play-services-auth-20.7.0/AndroidManifest.xml:35:13-36
+165            android:permission="com.google.android.gms.auth.api.signin.permission.REVOCATION_NOTIFICATION"
+165-->[com.google.android.gms:play-services-auth:20.7.0] /home/mario/.gradle/caches/8.13/transforms/29408a52d667fe41031f2b85ffcd7d33/transformed/play-services-auth-20.7.0/AndroidManifest.xml:36:13-107
+166            android:visibleToInstantApps="true" />
+166-->[com.google.android.gms:play-services-auth:20.7.0] /home/mario/.gradle/caches/8.13/transforms/29408a52d667fe41031f2b85ffcd7d33/transformed/play-services-auth-20.7.0/AndroidManifest.xml:37:13-48
+167
+168        <provider
+168-->[com.google.firebase:firebase-common:22.0.1] /home/mario/.gradle/caches/8.13/transforms/73025ec9a7e2e690fc83aa54307e4a51/transformed/firebase-common-22.0.1/AndroidManifest.xml:23:9-28:39
+169            android:name="com.google.firebase.provider.FirebaseInitProvider"
+169-->[com.google.firebase:firebase-common:22.0.1] /home/mario/.gradle/caches/8.13/transforms/73025ec9a7e2e690fc83aa54307e4a51/transformed/firebase-common-22.0.1/AndroidManifest.xml:24:13-77
+170            android:authorities="com.example.daypilot.firebaseinitprovider"
+170-->[com.google.firebase:firebase-common:22.0.1] /home/mario/.gradle/caches/8.13/transforms/73025ec9a7e2e690fc83aa54307e4a51/transformed/firebase-common-22.0.1/AndroidManifest.xml:25:13-72
+171            android:directBootAware="true"
+171-->[com.google.firebase:firebase-common:22.0.1] /home/mario/.gradle/caches/8.13/transforms/73025ec9a7e2e690fc83aa54307e4a51/transformed/firebase-common-22.0.1/AndroidManifest.xml:26:13-43
+172            android:exported="false"
+172-->[com.google.firebase:firebase-common:22.0.1] /home/mario/.gradle/caches/8.13/transforms/73025ec9a7e2e690fc83aa54307e4a51/transformed/firebase-common-22.0.1/AndroidManifest.xml:27:13-37
+173            android:initOrder="100" />
+173-->[com.google.firebase:firebase-common:22.0.1] /home/mario/.gradle/caches/8.13/transforms/73025ec9a7e2e690fc83aa54307e4a51/transformed/firebase-common-22.0.1/AndroidManifest.xml:28:13-36
+174
+175        <activity
+175-->[com.google.android.gms:play-services-base:18.1.0] /home/mario/.gradle/caches/8.13/transforms/3dd4afef777021b6c4e94116e7c0bb61/transformed/play-services-base-18.1.0/AndroidManifest.xml:20:9-22:45
+176            android:name="com.google.android.gms.common.api.GoogleApiActivity"
+176-->[com.google.android.gms:play-services-base:18.1.0] /home/mario/.gradle/caches/8.13/transforms/3dd4afef777021b6c4e94116e7c0bb61/transformed/play-services-base-18.1.0/AndroidManifest.xml:20:19-85
+177            android:exported="false"
+177-->[com.google.android.gms:play-services-base:18.1.0] /home/mario/.gradle/caches/8.13/transforms/3dd4afef777021b6c4e94116e7c0bb61/transformed/play-services-base-18.1.0/AndroidManifest.xml:22:19-43
+178            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+178-->[com.google.android.gms:play-services-base:18.1.0] /home/mario/.gradle/caches/8.13/transforms/3dd4afef777021b6c4e94116e7c0bb61/transformed/play-services-base-18.1.0/AndroidManifest.xml:21:19-78
+179        <activity
+179-->[androidx.compose.ui:ui-test-manifest:1.10.0] /home/mario/.gradle/caches/8.13/transforms/1e1b2d4a349d23f6f7f9b8d7128dec75/transformed/ui-test-manifest-1.10.0/AndroidManifest.xml:23:9-26:79
+180            android:name="androidx.activity.ComponentActivity"
+180-->[androidx.compose.ui:ui-test-manifest:1.10.0] /home/mario/.gradle/caches/8.13/transforms/1e1b2d4a349d23f6f7f9b8d7128dec75/transformed/ui-test-manifest-1.10.0/AndroidManifest.xml:24:13-63
+181            android:exported="true"
+181-->[androidx.compose.ui:ui-test-manifest:1.10.0] /home/mario/.gradle/caches/8.13/transforms/1e1b2d4a349d23f6f7f9b8d7128dec75/transformed/ui-test-manifest-1.10.0/AndroidManifest.xml:25:13-36
+182            android:theme="@android:style/Theme.Material.Light.NoActionBar" />
+182-->[androidx.compose.ui:ui-test-manifest:1.10.0] /home/mario/.gradle/caches/8.13/transforms/1e1b2d4a349d23f6f7f9b8d7128dec75/transformed/ui-test-manifest-1.10.0/AndroidManifest.xml:26:13-76
+183
+184        <provider
+184-->[androidx.emoji2:emoji2:1.4.0] /home/mario/.gradle/caches/8.13/transforms/590747b935e41c009731aa6102883d11/transformed/emoji2-1.4.0/AndroidManifest.xml:24:9-32:20
+185            android:name="androidx.startup.InitializationProvider"
+185-->[androidx.emoji2:emoji2:1.4.0] /home/mario/.gradle/caches/8.13/transforms/590747b935e41c009731aa6102883d11/transformed/emoji2-1.4.0/AndroidManifest.xml:25:13-67
+186            android:authorities="com.example.daypilot.androidx-startup"
+186-->[androidx.emoji2:emoji2:1.4.0] /home/mario/.gradle/caches/8.13/transforms/590747b935e41c009731aa6102883d11/transformed/emoji2-1.4.0/AndroidManifest.xml:26:13-68
+187            android:exported="false" >
+187-->[androidx.emoji2:emoji2:1.4.0] /home/mario/.gradle/caches/8.13/transforms/590747b935e41c009731aa6102883d11/transformed/emoji2-1.4.0/AndroidManifest.xml:27:13-37
 188            <meta-data
-188-->[androidx.lifecycle:lifecycle-process:2.9.4] /home/mario/.gradle/caches/8.13/transforms/0da32728e8981d82274bf9a01b7851c3/transformed/lifecycle-process-2.9.4/AndroidManifest.xml:29:13-31:52
-189                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
-189-->[androidx.lifecycle:lifecycle-process:2.9.4] /home/mario/.gradle/caches/8.13/transforms/0da32728e8981d82274bf9a01b7851c3/transformed/lifecycle-process-2.9.4/AndroidManifest.xml:30:17-78
+188-->[androidx.emoji2:emoji2:1.4.0] /home/mario/.gradle/caches/8.13/transforms/590747b935e41c009731aa6102883d11/transformed/emoji2-1.4.0/AndroidManifest.xml:29:13-31:52
+189                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+189-->[androidx.emoji2:emoji2:1.4.0] /home/mario/.gradle/caches/8.13/transforms/590747b935e41c009731aa6102883d11/transformed/emoji2-1.4.0/AndroidManifest.xml:30:17-75
 190                android:value="androidx.startup" />
-190-->[androidx.lifecycle:lifecycle-process:2.9.4] /home/mario/.gradle/caches/8.13/transforms/0da32728e8981d82274bf9a01b7851c3/transformed/lifecycle-process-2.9.4/AndroidManifest.xml:31:17-49
+190-->[androidx.emoji2:emoji2:1.4.0] /home/mario/.gradle/caches/8.13/transforms/590747b935e41c009731aa6102883d11/transformed/emoji2-1.4.0/AndroidManifest.xml:31:17-49
 191            <meta-data
-191-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:29:13-31:52
-192                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
-192-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:30:17-85
+191-->[androidx.lifecycle:lifecycle-process:2.9.4] /home/mario/.gradle/caches/8.13/transforms/0da32728e8981d82274bf9a01b7851c3/transformed/lifecycle-process-2.9.4/AndroidManifest.xml:29:13-31:52
+192                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+192-->[androidx.lifecycle:lifecycle-process:2.9.4] /home/mario/.gradle/caches/8.13/transforms/0da32728e8981d82274bf9a01b7851c3/transformed/lifecycle-process-2.9.4/AndroidManifest.xml:30:17-78
 193                android:value="androidx.startup" />
-193-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:31:17-49
-194        </provider>
-195
-196        <uses-library
-196-->[androidx.window:window:1.5.0] /home/mario/.gradle/caches/8.13/transforms/1d537e2cba050728e7149d360ab5104e/transformed/window-1.5.0/AndroidManifest.xml:23:9-25:40
-197            android:name="androidx.window.extensions"
-197-->[androidx.window:window:1.5.0] /home/mario/.gradle/caches/8.13/transforms/1d537e2cba050728e7149d360ab5104e/transformed/window-1.5.0/AndroidManifest.xml:24:13-54
-198            android:required="false" />
-198-->[androidx.window:window:1.5.0] /home/mario/.gradle/caches/8.13/transforms/1d537e2cba050728e7149d360ab5104e/transformed/window-1.5.0/AndroidManifest.xml:25:13-37
+193-->[androidx.lifecycle:lifecycle-process:2.9.4] /home/mario/.gradle/caches/8.13/transforms/0da32728e8981d82274bf9a01b7851c3/transformed/lifecycle-process-2.9.4/AndroidManifest.xml:31:17-49
+194            <meta-data
+194-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:29:13-31:52
+195                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+195-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:30:17-85
+196                android:value="androidx.startup" />
+196-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:31:17-49
+197        </provider>
+198
 199        <uses-library
-199-->[androidx.window:window:1.5.0] /home/mario/.gradle/caches/8.13/transforms/1d537e2cba050728e7149d360ab5104e/transformed/window-1.5.0/AndroidManifest.xml:26:9-28:40
-200            android:name="androidx.window.sidecar"
-200-->[androidx.window:window:1.5.0] /home/mario/.gradle/caches/8.13/transforms/1d537e2cba050728e7149d360ab5104e/transformed/window-1.5.0/AndroidManifest.xml:27:13-51
+199-->[androidx.window:window:1.5.0] /home/mario/.gradle/caches/8.13/transforms/1d537e2cba050728e7149d360ab5104e/transformed/window-1.5.0/AndroidManifest.xml:23:9-25:40
+200            android:name="androidx.window.extensions"
+200-->[androidx.window:window:1.5.0] /home/mario/.gradle/caches/8.13/transforms/1d537e2cba050728e7149d360ab5104e/transformed/window-1.5.0/AndroidManifest.xml:24:13-54
 201            android:required="false" />
-201-->[androidx.window:window:1.5.0] /home/mario/.gradle/caches/8.13/transforms/1d537e2cba050728e7149d360ab5104e/transformed/window-1.5.0/AndroidManifest.xml:28:13-37
-202
-203        <meta-data
-203-->[com.google.android.gms:play-services-basement:18.8.0] /home/mario/.gradle/caches/8.13/transforms/d23de935f55fb39caf4f6ad2efbe2196/transformed/play-services-basement-18.8.0/AndroidManifest.xml:21:9-23:69
-204            android:name="com.google.android.gms.version"
-204-->[com.google.android.gms:play-services-basement:18.8.0] /home/mario/.gradle/caches/8.13/transforms/d23de935f55fb39caf4f6ad2efbe2196/transformed/play-services-basement-18.8.0/AndroidManifest.xml:22:13-58
-205            android:value="@integer/google_play_services_version" />
-205-->[com.google.android.gms:play-services-basement:18.8.0] /home/mario/.gradle/caches/8.13/transforms/d23de935f55fb39caf4f6ad2efbe2196/transformed/play-services-basement-18.8.0/AndroidManifest.xml:23:13-66
-206
-207        <activity
-207-->[androidx.compose.ui:ui-tooling-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/35df5be08809421405f832aebcf770f2/transformed/ui-tooling/AndroidManifest.xml:23:9-25:39
-208            android:name="androidx.compose.ui.tooling.PreviewActivity"
-208-->[androidx.compose.ui:ui-tooling-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/35df5be08809421405f832aebcf770f2/transformed/ui-tooling/AndroidManifest.xml:24:13-71
-209            android:exported="true" />
-209-->[androidx.compose.ui:ui-tooling-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/35df5be08809421405f832aebcf770f2/transformed/ui-tooling/AndroidManifest.xml:25:13-36
-210
-211        <receiver
-211-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:34:9-52:20
-212            android:name="androidx.profileinstaller.ProfileInstallReceiver"
-212-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:35:13-76
-213            android:directBootAware="false"
-213-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:36:13-44
-214            android:enabled="true"
-214-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:37:13-35
-215            android:exported="true"
-215-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:38:13-36
-216            android:permission="android.permission.DUMP" >
-216-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:39:13-57
-217            <intent-filter>
-217-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:40:13-42:29
-218                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
-218-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:41:17-91
-218-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:41:25-88
-219            </intent-filter>
+201-->[androidx.window:window:1.5.0] /home/mario/.gradle/caches/8.13/transforms/1d537e2cba050728e7149d360ab5104e/transformed/window-1.5.0/AndroidManifest.xml:25:13-37
+202        <uses-library
+202-->[androidx.window:window:1.5.0] /home/mario/.gradle/caches/8.13/transforms/1d537e2cba050728e7149d360ab5104e/transformed/window-1.5.0/AndroidManifest.xml:26:9-28:40
+203            android:name="androidx.window.sidecar"
+203-->[androidx.window:window:1.5.0] /home/mario/.gradle/caches/8.13/transforms/1d537e2cba050728e7149d360ab5104e/transformed/window-1.5.0/AndroidManifest.xml:27:13-51
+204            android:required="false" />
+204-->[androidx.window:window:1.5.0] /home/mario/.gradle/caches/8.13/transforms/1d537e2cba050728e7149d360ab5104e/transformed/window-1.5.0/AndroidManifest.xml:28:13-37
+205
+206        <meta-data
+206-->[com.google.android.gms:play-services-basement:18.8.0] /home/mario/.gradle/caches/8.13/transforms/d23de935f55fb39caf4f6ad2efbe2196/transformed/play-services-basement-18.8.0/AndroidManifest.xml:21:9-23:69
+207            android:name="com.google.android.gms.version"
+207-->[com.google.android.gms:play-services-basement:18.8.0] /home/mario/.gradle/caches/8.13/transforms/d23de935f55fb39caf4f6ad2efbe2196/transformed/play-services-basement-18.8.0/AndroidManifest.xml:22:13-58
+208            android:value="@integer/google_play_services_version" />
+208-->[com.google.android.gms:play-services-basement:18.8.0] /home/mario/.gradle/caches/8.13/transforms/d23de935f55fb39caf4f6ad2efbe2196/transformed/play-services-basement-18.8.0/AndroidManifest.xml:23:13-66
+209
+210        <activity
+210-->[androidx.compose.ui:ui-tooling-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/35df5be08809421405f832aebcf770f2/transformed/ui-tooling/AndroidManifest.xml:23:9-25:39
+211            android:name="androidx.compose.ui.tooling.PreviewActivity"
+211-->[androidx.compose.ui:ui-tooling-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/35df5be08809421405f832aebcf770f2/transformed/ui-tooling/AndroidManifest.xml:24:13-71
+212            android:exported="true" />
+212-->[androidx.compose.ui:ui-tooling-android:1.10.0] /home/mario/.gradle/caches/8.13/transforms/35df5be08809421405f832aebcf770f2/transformed/ui-tooling/AndroidManifest.xml:25:13-36
+213
+214        <receiver
+214-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:34:9-52:20
+215            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+215-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:35:13-76
+216            android:directBootAware="false"
+216-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:36:13-44
+217            android:enabled="true"
+217-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:37:13-35
+218            android:exported="true"
+218-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:38:13-36
+219            android:permission="android.permission.DUMP" >
+219-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:39:13-57
 220            <intent-filter>
-220-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:43:13-45:29
-221                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
-221-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:44:17-85
-221-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:44:25-82
+220-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:40:13-42:29
+221                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+221-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:41:17-91
+221-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:41:25-88
 222            </intent-filter>
 223            <intent-filter>
-223-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:46:13-48:29
-224                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
-224-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:47:17-88
-224-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:47:25-85
+223-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:43:13-45:29
+224                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+224-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:44:17-85
+224-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:44:25-82
 225            </intent-filter>
 226            <intent-filter>
-226-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:49:13-51:29
-227                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
-227-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:50:17-95
-227-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:50:25-92
+226-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:46:13-48:29
+227                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+227-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:47:17-88
+227-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:47:25-85
 228            </intent-filter>
-229        </receiver> <!-- The activities will be merged into the manifest of the hosting app. -->
-230        <activity
-230-->[com.google.android.play:core-common:2.0.3] /home/mario/.gradle/caches/8.13/transforms/849975fc6a4fc57498ae02a3541b4e80/transformed/core-common-2.0.3/AndroidManifest.xml:14:9-18:65
-231            android:name="com.google.android.play.core.common.PlayCoreDialogWrapperActivity"
-231-->[com.google.android.play:core-common:2.0.3] /home/mario/.gradle/caches/8.13/transforms/849975fc6a4fc57498ae02a3541b4e80/transformed/core-common-2.0.3/AndroidManifest.xml:15:13-93
-232            android:exported="false"
-232-->[com.google.android.play:core-common:2.0.3] /home/mario/.gradle/caches/8.13/transforms/849975fc6a4fc57498ae02a3541b4e80/transformed/core-common-2.0.3/AndroidManifest.xml:16:13-37
-233            android:stateNotNeeded="true"
-233-->[com.google.android.play:core-common:2.0.3] /home/mario/.gradle/caches/8.13/transforms/849975fc6a4fc57498ae02a3541b4e80/transformed/core-common-2.0.3/AndroidManifest.xml:17:13-42
-234            android:theme="@style/Theme.PlayCore.Transparent" />
-234-->[com.google.android.play:core-common:2.0.3] /home/mario/.gradle/caches/8.13/transforms/849975fc6a4fc57498ae02a3541b4e80/transformed/core-common-2.0.3/AndroidManifest.xml:18:13-62
-235    </application>
-236
-237</manifest>
+229            <intent-filter>
+229-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:49:13-51:29
+230                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+230-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:50:17-95
+230-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/mario/.gradle/caches/8.13/transforms/9285955ac6e08077dbc08cd82e45f3b3/transformed/profileinstaller-1.4.0/AndroidManifest.xml:50:25-92
+231            </intent-filter>
+232        </receiver> <!-- The activities will be merged into the manifest of the hosting app. -->
+233        <activity
+233-->[com.google.android.play:core-common:2.0.3] /home/mario/.gradle/caches/8.13/transforms/849975fc6a4fc57498ae02a3541b4e80/transformed/core-common-2.0.3/AndroidManifest.xml:14:9-18:65
+234            android:name="com.google.android.play.core.common.PlayCoreDialogWrapperActivity"
+234-->[com.google.android.play:core-common:2.0.3] /home/mario/.gradle/caches/8.13/transforms/849975fc6a4fc57498ae02a3541b4e80/transformed/core-common-2.0.3/AndroidManifest.xml:15:13-93
+235            android:exported="false"
+235-->[com.google.android.play:core-common:2.0.3] /home/mario/.gradle/caches/8.13/transforms/849975fc6a4fc57498ae02a3541b4e80/transformed/core-common-2.0.3/AndroidManifest.xml:16:13-37
+236            android:stateNotNeeded="true"
+236-->[com.google.android.play:core-common:2.0.3] /home/mario/.gradle/caches/8.13/transforms/849975fc6a4fc57498ae02a3541b4e80/transformed/core-common-2.0.3/AndroidManifest.xml:17:13-42
+237            android:theme="@style/Theme.PlayCore.Transparent" />
+237-->[com.google.android.play:core-common:2.0.3] /home/mario/.gradle/caches/8.13/transforms/849975fc6a4fc57498ae02a3541b4e80/transformed/core-common-2.0.3/AndroidManifest.xml:18:13-62
+238    </application>
+239
+240</manifest>
