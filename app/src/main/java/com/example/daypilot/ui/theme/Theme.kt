@@ -23,6 +23,10 @@ private val LightColors = lightColorScheme(
 
     tertiary = BrandPurple,
     onTertiary = Color.White,
+
+    tertiaryContainer = BrandGreen.copy(alpha = 0.15f),
+    onTertiaryContainer = BrandGreenDark,
+
     background = BackgroundLight,
     onBackground = TextPrimaryLight,
 
@@ -34,8 +38,9 @@ private val LightColors = lightColorScheme(
 
     outline = DividerLight,
     error = ErrorLight,
-    onError = Color.White
+    onError = Color.White,
 )
+
 
 // ===============================================================
 //  DARK THEME
@@ -54,6 +59,10 @@ private val DarkColors = darkColorScheme(
 
     tertiary = BrandPurple,
     onTertiary = Color.White,
+
+    tertiaryContainer = BrandGreenDark.copy(alpha = 0.35f),
+    onTertiaryContainer = Color.White,
+
     background = BackgroundDark,
     onBackground = TextPrimaryDark,
 
@@ -67,6 +76,7 @@ private val DarkColors = darkColorScheme(
     error = ErrorDark,
     onError = Color.White
 )
+
 
 // ===============================================================
 //  APLICACIÓN DEL TEMA

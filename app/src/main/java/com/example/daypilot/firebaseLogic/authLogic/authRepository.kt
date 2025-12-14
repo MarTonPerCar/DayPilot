@@ -132,79 +132,37 @@ class AuthRepository {
         val userRef = firestore.collection("users").document(uid)
         val logRef = userRef.collection("pointsLog").document()
 
-        // clave de día para historial (YYYY-MM-DD)
-        val todayKey = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-            .format(Date())
-        val dailyRef = userRef.collection("dailyStats").document(todayKey)
+        // Construimos los updates con increments atómicos
+        val updates = mutableMapOf<String, Any>(
+            "totalPoints" to FieldValue.increment(points)
+        )
 
-        firestore.runTransaction { tx ->
-            val snap = tx.get(userRef)
-
-            val currentTotal = snap.getLong("totalPoints") ?: 0L
-            val currentSteps = snap.getLong("pointsSteps") ?: 0L
-            val currentWellness = snap.getLong("pointsWellness") ?: 0L
-            val currentTasks = snap.getLong("pointsTasks") ?: 0L
-            val storedDate = snap.getString("todayStepsDate")
-            val currentTodaySteps = snap.getLong("todaySteps") ?: 0L
-
-            val effectiveTodaySteps =
-                if (storedDate == todayKey) currentTodaySteps else 0L
-
-            val updates = mutableMapOf<String, Any>(
-                "totalPoints" to (currentTotal + points)
-            )
-
-            when (source) {
-                PointSource.STEPS -> {
-                    updates["pointsSteps"] = currentSteps + points
-                    updates["todaySteps"] = effectiveTodaySteps + points
-                    updates["todayStepsDate"] = todayKey
-                }
-                PointSource.WELLNESS ->
-                    updates["pointsWellness"] = currentWellness + points
-                PointSource.TASKS ->
-                    updates["pointsTasks"] = currentTasks + points
+        when (source) {
+            PointSource.STEPS -> {
+                updates["pointsSteps"] = FieldValue.increment(points)
+                updates["todaySteps"] = FieldValue.increment(points)
             }
-
-            tx.set(userRef, updates, SetOptions.merge())
-
-            val logData = mutableMapOf<String, Any>(
-                "points" to points,
-                "source" to source.name,
-                "createdAt" to FieldValue.serverTimestamp()
-            )
-
-            if (metadata.isNotEmpty()) {
-                logData["metadata"] = metadata
+            PointSource.WELLNESS -> {
+                updates["pointsWellness"] = FieldValue.increment(points)
             }
-
-            tx.set(logRef, logData)
-
-            // === HISTORIAL DIARIO (dailyStats) ===
-            val dailySnap = tx.get(dailyRef)
-            val dailyTotalPoints = dailySnap.getLong("totalPoints") ?: 0L
-            val dailySteps = dailySnap.getLong("steps") ?: 0L
-            val dailyStepsPoints = dailySnap.getLong("pointsSteps") ?: 0L
-            val dailyWellnessPoints = dailySnap.getLong("pointsWellness") ?: 0L
-            val dailyTasksPoints = dailySnap.getLong("pointsTasks") ?: 0L
-
-            val dailyUpdates = mutableMapOf<String, Any>(
-                "date" to todayKey,
-                "totalPoints" to (dailyTotalPoints + points)
-            )
-
-            when (source) {
-                PointSource.STEPS -> {
-                    dailyUpdates["steps"] = dailySteps + points
-                    dailyUpdates["pointsSteps"] = dailyStepsPoints + points
-                }
-                PointSource.WELLNESS ->
-                    dailyUpdates["pointsWellness"] = dailyWellnessPoints + points
-                PointSource.TASKS ->
-                    dailyUpdates["pointsTasks"] = dailyTasksPoints + points
+            PointSource.TASKS -> {
+                updates["pointsTasks"] = FieldValue.increment(points)
             }
+        }
 
-            tx.set(dailyRef, dailyUpdates, SetOptions.merge())
+        val logData = mutableMapOf<String, Any>(
+            "points" to points,
+            "source" to source.name,
+            "createdAt" to FieldValue.serverTimestamp()
+        )
+        if (metadata.isNotEmpty()) {
+            logData["metadata"] = metadata
+        }
+
+        // Batch = varias escrituras atómicas, sin restricciones de lectura/escritura
+        firestore.runBatch { batch ->
+            batch.update(userRef, updates)
+            batch.set(logRef, logData)
         }.await()
     }
 
