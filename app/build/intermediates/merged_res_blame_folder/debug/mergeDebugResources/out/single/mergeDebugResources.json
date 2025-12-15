@@ -40,12 +40,12 @@
         "source": "/home/mario/.gradle/daemon/8.13/com.example.daypilot.app-main-60:/mipmap-xxxhdpi/ic_launcher_round.webp"
     },
     {
-        "merged": "/home/mario/.gradle/daemon/8.13/com.example.daypilot.app-debug-58:/mipmap-xxhdpi_ic_launcher.webp.flat",
-        "source": "/home/mario/.gradle/daemon/8.13/com.example.daypilot.app-main-60:/mipmap-xxhdpi/ic_launcher.webp"
-    },
-    {
         "merged": "/home/mario/.gradle/daemon/8.13/com.example.daypilot.app-debug-58:/mipmap-hdpi_ic_launcher_round.webp.flat",
         "source": "/home/mario/.gradle/daemon/8.13/com.example.daypilot.app-main-60:/mipmap-hdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "/home/mario/.gradle/daemon/8.13/com.example.daypilot.app-debug-58:/mipmap-xxhdpi_ic_launcher.webp.flat",
+        "source": "/home/mario/.gradle/daemon/8.13/com.example.daypilot.app-main-60:/mipmap-xxhdpi/ic_launcher.webp"
     },
     {
         "merged": "/home/mario/.gradle/daemon/8.13/com.example.daypilot.app-debug-58:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
@@ -56,12 +56,16 @@
         "source": "/home/mario/.gradle/daemon/8.13/com.example.daypilot.app-main-60:/mipmap-hdpi/ic_launcher.webp"
     },
     {
-        "merged": "com.example.daypilot.app-debug-58:/drawable_tarea.png.flat",
-        "source": "com.example.daypilot.app-main-60:/drawable/tarea.png"
-    },
-    {
         "merged": "/home/mario/.gradle/daemon/8.13/com.example.daypilot.app-debug-58:/mipmap-anydpi-v26_ic_launcher.xml.flat",
         "source": "/home/mario/.gradle/daemon/8.13/com.example.daypilot.app-main-60:/mipmap-anydpi-v26/ic_launcher.xml"
+    },
+    {
+        "merged": "/home/mario/.gradle/daemon/8.13/com.example.daypilot.app-debug-58:/drawable_calendario.png.flat",
+        "source": "/home/mario/.gradle/daemon/8.13/com.example.daypilot.app-main-60:/drawable/calendario.png"
+    },
+    {
+        "merged": "com.example.daypilot.app-debug-58:/drawable_calificacion.png.flat",
+        "source": "com.example.daypilot.app-main-60:/drawable/calificacion.png"
     },
     {
         "merged": "/home/mario/.gradle/daemon/8.13/com.example.daypilot.app-debug-58:/drawable_agenda.png.flat",
@@ -70,6 +74,10 @@
     {
         "merged": "/home/mario/.gradle/daemon/8.13/com.example.daypilot.app-debug-58:/mipmap-xxhdpi_ic_launcher_round.webp.flat",
         "source": "/home/mario/.gradle/daemon/8.13/com.example.daypilot.app-main-60:/mipmap-xxhdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "/home/mario/.gradle/daemon/8.13/com.example.daypilot.app-debug-58:/drawable_tarea.png.flat",
+        "source": "/home/mario/.gradle/daemon/8.13/com.example.daypilot.app-main-60:/drawable/tarea.png"
     },
     {
         "merged": "/home/mario/.gradle/daemon/8.13/com.example.daypilot.app-debug-58:/drawable_mi_logo.png.flat",

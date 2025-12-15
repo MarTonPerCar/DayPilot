@@ -123,48 +123,20 @@ class AuthRepository {
 
     // ========== PUNTOS + HISTORIAL DIARIO ==========
 
+// ========== PUNTOS (DELEGADO A POINTS LOGIC v2) ==========
+
+    @Deprecated("Usa PointsRepository (firebaseLogic/pointsLogic). Se mantiene por compatibilidad.")
     suspend fun addPoints(
         uid: String,
         points: Long,
-        source: PointSource,
+        pointSource: PointSource,
         metadata: Map<String, Any?> = emptyMap()
     ) {
-        val userRef = firestore.collection("users").document(uid)
-        val logRef = userRef.collection("pointsLog").document()
-
-        // Construimos los updates con increments atómicos
-        val updates = mutableMapOf<String, Any>(
-            "totalPoints" to FieldValue.increment(points)
-        )
-
-        when (source) {
-            PointSource.STEPS -> {
-                updates["pointsSteps"] = FieldValue.increment(points)
-                updates["todaySteps"] = FieldValue.increment(points)
-            }
-            PointSource.WELLNESS -> {
-                updates["pointsWellness"] = FieldValue.increment(points)
-            }
-            PointSource.TASKS -> {
-                updates["pointsTasks"] = FieldValue.increment(points)
-            }
-        }
-
-        val logData = mutableMapOf<String, Any>(
-            "points" to points,
-            "source" to source.name,
-            "createdAt" to FieldValue.serverTimestamp()
-        )
-        if (metadata.isNotEmpty()) {
-            logData["metadata"] = metadata
-        }
-
-        // Batch = varias escrituras atómicas, sin restricciones de lectura/escritura
-        firestore.runBatch { batch ->
-            batch.update(userRef, updates)
-            batch.set(logRef, logData)
-        }.await()
+        // Wrapper para no romper código existente
+        com.example.daypilot.firebaseLogic.pointsLogic.PointsRepository(firestore)
+            .addPoints(uid, points, pointSource, metadata)
     }
+
 
     // ========== AMIGOS ==========
 

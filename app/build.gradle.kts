@@ -53,6 +53,7 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.ui)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -66,4 +67,5 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended")
     implementation("io.coil-kt:coil-compose:2.6.0")
     implementation("com.google.firebase:firebase-storage-ktx:20.3.0")
+    implementation("com.kizitonwose.calendar:compose:2.6.0")
 }

@@ -24,6 +24,7 @@ fun TaskScreen(
     uid: String,
     taskRepo: TaskRepository,
     authRepo: AuthRepository,
+    openTaskId: String? = null,
     onBack: () -> Unit
 ) {
     var tasks by remember { mutableStateOf<List<Task>>(emptyList()) }
@@ -43,6 +44,8 @@ fun TaskScreen(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()
 
+    var openedFromIntent by remember { mutableStateOf(false) }
+
     fun reloadTasks() {
         scope.launch {
             isLoading = true
@@ -59,6 +62,17 @@ fun TaskScreen(
 
     LaunchedEffect(uid) {
         reloadTasks()
+    }
+
+    LaunchedEffect(tasks, openTaskId) {
+        if (!openedFromIntent && !openTaskId.isNullOrBlank()) {
+            val t = tasks.firstOrNull { it.id == openTaskId }
+            if (t != null) {
+                editingTask = t
+                isSheetOpen = true
+                openedFromIntent = true
+            }
+        }
     }
 
     val filteredSortedTasks = remember(tasks, sortOption, difficultyFilter, statusFilter) {
@@ -170,7 +184,7 @@ fun TaskScreen(
                                 authRepo.addPoints(
                                     uid = uid,
                                     points = 2L,
-                                    source = PointSource.TASKS,
+                                    pointSource = PointSource.TASKS,
                                     metadata = mapOf(
                                         "taskId" to t.id,
                                         "title" to t.title

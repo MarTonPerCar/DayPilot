@@ -140,20 +140,59 @@ fun BlockRow(
 @Composable
 fun BigBlock(
     text: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    iconResId: Int? = null,
+    subtitle: String? = null,
+    onClick: (() -> Unit)? = null
 ) {
-    Box(
-        modifier = modifier
+    val clickableModifier = if (onClick != null) {
+        modifier
             .clip(RoundedCornerShape(24.dp))
+            .clickable { onClick() }
+    } else {
+        modifier.clip(RoundedCornerShape(24.dp))
+    }
+
+    Box(
+        modifier = clickableModifier
             .background(MaterialTheme.colorScheme.secondary),
         contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = text,
-            color = MaterialTheme.colorScheme.onSecondary,
-            style = MaterialTheme.typography.titleMedium,
-            textAlign = TextAlign.Center
-        )
+        // Marca de agua
+        if (iconResId != null) {
+            androidx.compose.foundation.Image(
+                painter = painterResource(id = iconResId),
+                contentDescription = null,
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .padding(end = 18.dp)
+                    .size(140.dp),
+                contentScale = androidx.compose.ui.layout.ContentScale.Fit,
+                alpha = 0.18f
+            )
+        }
+
+        Column(
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(18.dp)
+        ) {
+            Text(
+                text = text,
+                color = MaterialTheme.colorScheme.onSecondary,
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold
+            )
+            if (subtitle != null) {
+                Text(
+                    text = subtitle,
+                    color = MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.85f),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        }
     }
 }
 
@@ -162,6 +201,7 @@ fun SmallBlock(
     text: String,
     modifier: Modifier = Modifier,
     iconResId: Int? = null,
+    watermarkResId: Int? = null,
     onClick: (() -> Unit)? = null
 ) {
     val clickableModifier = if (onClick != null) {
@@ -169,8 +209,7 @@ fun SmallBlock(
             .clip(RoundedCornerShape(24.dp))
             .clickable { onClick() }
     } else {
-        modifier
-            .clip(RoundedCornerShape(24.dp))
+        modifier.clip(RoundedCornerShape(24.dp))
     }
 
     Box(
@@ -178,16 +217,32 @@ fun SmallBlock(
             .background(MaterialTheme.colorScheme.tertiary),
         contentAlignment = Alignment.Center
     ) {
+        if (watermarkResId != null) {
+            androidx.compose.foundation.Image(
+                painter = painterResource(id = watermarkResId),
+                contentDescription = null,
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .padding(end = 12.dp)
+                    .size(72.dp),
+                contentScale = androidx.compose.ui.layout.ContentScale.Fit,
+                alpha = 0.20f
+            )
+        }
+
+        // Contenido principal
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.padding(12.dp)
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.spacedBy(6.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp)
         ) {
             if (iconResId != null) {
                 Icon(
                     painter = painterResource(id = iconResId),
                     contentDescription = null,
-                    modifier = Modifier.size(32.dp),
+                    modifier = Modifier.size(28.dp),
                     tint = MaterialTheme.colorScheme.onTertiary
                 )
             }
@@ -195,8 +250,7 @@ fun SmallBlock(
             Text(
                 text = text,
                 color = MaterialTheme.colorScheme.onTertiary,
-                style = MaterialTheme.typography.titleSmall,
-                textAlign = TextAlign.Center
+                style = MaterialTheme.typography.titleSmall
             )
         }
     }
@@ -220,12 +274,17 @@ fun HomeTab() {
                 .weight(1f),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // Grande ≈ 45% del alto útil
             BigBlock(
-                text = "Grande",
+                text = "Calendario",
+                subtitle = "Visualiza tus tareas por días",
+                iconResId = R.drawable.calendario,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(0.45f)
+                    .weight(0.45f),
+                onClick = {
+                    val intent = Intent(context, com.example.daypilot.main.mainZone.calendar.CalendarActivity::class.java)
+                    context.startActivity(intent)
+                }
             )
 
             // Fila media: Tareas + D
@@ -241,7 +300,7 @@ fun HomeTab() {
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
-                    iconResId = R.drawable.tarea,   // 👈 tu icono tarea.png en drawable
+                    iconResId = R.drawable.tarea,
                     onClick = {
                         val intent = Intent(context, TaskActivity::class.java)
                         context.startActivity(intent)
@@ -258,13 +317,32 @@ fun HomeTab() {
             }
 
             // Fila inferior ≈ 27.5%
-            BlockRow(
-                leftText = "Otro 1",
-                rightText = "Otro 2",
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(0.275f)
-            )
+                    .weight(0.275f),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                SmallBlock(
+                    text = "Rivalidad",
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
+                    watermarkResId = R.drawable.calificacion,
+                    onClick = {
+                        val intent = Intent(context, com.example.daypilot.main.mainZone.rivalry.RivalryActivity::class.java)
+                        context.startActivity(intent)
+                    }
+                )
+
+                SmallBlock(
+                    text = "Otro 2",
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                )
+            }
         }
     }
 }

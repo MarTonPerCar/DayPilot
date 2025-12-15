@@ -44,10 +44,16 @@
             android:name="com.example.daypilot.login.ResetPasswordActivity"
             android:exported="false" />
         <activity
+            android:name="com.example.daypilot.main.mainZone.calendar.CalendarActivity"
+            android:exported="false" />
+        <activity
             android:name="com.example.daypilot.login.RegisterActivity"
             android:exported="false" />
         <activity
             android:name="com.example.daypilot.main.mainZone.MainActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.example.daypilot.main.mainZone.rivalry.RivalryActivity"
             android:exported="false" />
         <activity
             android:name="com.example.daypilot.main.mainZone.task.TaskActivity"
@@ -133,6 +139,15 @@
                 android:name="com.google.firebase.components:com.google.firebase.appcheck.FirebaseAppCheckRegistrar"
                 android:value="com.google.firebase.components.ComponentRegistrar" />
         </service>
+
+        <activity
+            android:name="androidx.activity.ComponentActivity"
+            android:exported="true"
+            android:theme="@android:style/Theme.Material.Light.NoActionBar" />
+        <activity
+            android:name="androidx.compose.ui.tooling.PreviewActivity"
+            android:exported="true" />
+
         <service
             android:name="androidx.credentials.playservices.CredentialProviderMetadataHolder"
             android:enabled="true"
@@ -176,10 +191,13 @@
             android:name="com.google.android.gms.common.api.GoogleApiActivity"
             android:exported="false"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-        <activity
-            android:name="androidx.activity.ComponentActivity"
-            android:exported="true"
-            android:theme="@android:style/Theme.Material.Light.NoActionBar" />
+
+        <uses-library
+            android:name="androidx.window.extensions"
+            android:required="false" />
+        <uses-library
+            android:name="androidx.window.sidecar"
+            android:required="false" />
 
         <provider
             android:name="androidx.startup.InitializationProvider"
@@ -196,20 +214,9 @@
                 android:value="androidx.startup" />
         </provider>
 
-        <uses-library
-            android:name="androidx.window.extensions"
-            android:required="false" />
-        <uses-library
-            android:name="androidx.window.sidecar"
-            android:required="false" />
-
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
-
-        <activity
-            android:name="androidx.compose.ui.tooling.PreviewActivity"
-            android:exported="true" />
 
         <receiver
             android:name="androidx.profileinstaller.ProfileInstallReceiver"
