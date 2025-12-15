@@ -33,6 +33,7 @@ class TaskActivity : ComponentActivity() {
 
         setContent {
             val darkTheme = sessionManager.isDarkModeEnabled()
+            val openTaskId = intent.getStringExtra("openTaskId")
 
             DayPilotTheme(darkTheme = darkTheme) {
                 val colorScheme = MaterialTheme.colorScheme
@@ -56,6 +57,7 @@ class TaskActivity : ComponentActivity() {
                     uid = user.uid,
                     taskRepo = taskRepo,
                     authRepo = authRepo,
+                    openTaskId = openTaskId,
                     onBack = { finish() }
                 )
             }

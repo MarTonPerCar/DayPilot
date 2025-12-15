@@ -25,10 +25,16 @@
             android:name=".login.ResetPasswordActivity"
             android:exported="false" />
         <activity
+            android:name=".main.mainZone.calendar.CalendarActivity"
+            android:exported="false" />
+        <activity
             android:name=".login.RegisterActivity"
             android:exported="false" />
         <activity
             android:name=".main.mainZone.MainActivity"
+            android:exported="false" />
+        <activity
+            android:name=".main.mainZone.rivalry.RivalryActivity"
             android:exported="false" />
         <activity
             android:name=".main.mainZone.task.TaskActivity"
