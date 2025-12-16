@@ -32,7 +32,7 @@ import java.util.Locale
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 
-// --------- ESTADO DE UI ---------
+// ========= ESTADO DE UI =========
 
 private sealed class ProfileUiState {
     object Loading : ProfileUiState()
@@ -44,7 +44,7 @@ private sealed class ProfileUiState {
     data class Error(val message: String) : ProfileUiState()
 }
 
-// --------- PROFILE SCREEN ---------
+// ========= PROFILE SCREEN =========
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,16 +52,14 @@ fun ProfileScreen(
     authRepo: AuthRepository,
     uid: String,
     accountCreationTimestamp: Long?,
-    onOpenSettings: () -> Unit,
-    onBack: () -> Unit
+    onOpenSettings: () -> Unit
 ) {
     var uiState by remember { mutableStateOf<ProfileUiState>(ProfileUiState.Loading) }
     var showFriendsSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()
     val lifecycleOwner = LocalLifecycleOwner.current
-
-    // estado del miniperfil de amigo
+    
     var selectedFriend by remember { mutableStateOf<FriendInfo?>(null) }
     var selectedFriendProfile by remember { mutableStateOf<UserProfile?>(null) }
     var selectedFriendFriendsCount by remember { mutableStateOf(0) }
@@ -84,12 +82,9 @@ fun ProfileScreen(
         }
     }
 
-    // Carga inicial
     LaunchedEffect(uid) {
         reloadProfile()
     }
-
-    // Recargar al volver de Settings (ON_RESUME)
     DisposableEffect(lifecycleOwner, uid) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
@@ -222,7 +217,7 @@ fun ProfileScreen(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
-                        // --------- AVATAR ---------
+                        // ========= AVATAR =========
                         Box(
                             modifier = Modifier
                                 .size(96.dp)
@@ -250,14 +245,14 @@ fun ProfileScreen(
                             }
                         }
 
-                        // --------- NOMBRE ---------
+                        // ========= NOMBRE =========
                         Text(
                             text = profile.name.ifBlank { "Usuario" },
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold
                         )
 
-                        // --------- USERNAME ---------
+                        // ========= USERNAME =========
                         if (profile.username.isNotBlank()) {
                             Text(
                                 text = "@${profile.username}",
@@ -266,14 +261,14 @@ fun ProfileScreen(
                             )
                         }
 
-                        // --------- EMAIL ---------
+                        // ========= EMAIL =========
                         Text(
                             text = profile.email,
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
 
-                        // --------- DÍA DE CREACIÓN ---------
+                        // ========= DÍA DE CREACIÓN =========
                         val createdText = remember(profile.createdAt, accountCreationTimestamp) {
                             val millis = when {
                                 profile.createdAt != 0L -> profile.createdAt
@@ -291,7 +286,7 @@ fun ProfileScreen(
                             )
                         }
 
-                        // --------- TARJETA STATS ---------
+                        // ========= TARJETA STATS =========
                         ProfileStatsCard(
                             totalPoints = profile.totalPoints,
                             todayPoints = profile.todayPoints,
@@ -305,10 +300,9 @@ fun ProfileScreen(
 
                         Spacer(modifier = Modifier.height(2.dp))
 
-                        // --------- SECCIÓN AMIGOS (card que abre el sheet) ---------
+                        // ========= SECCIÓN AMIGOS =========
                         FriendsSection(
                             friendsCount = friendsCount,
-                            friendsPreview = friends,
                             onOpenFriends = { showFriendsSheet = true }
                         )
 
@@ -319,7 +313,7 @@ fun ProfileScreen(
     }
 }
 
-// --------- TARJETA DE STATS (REUTILIZABLE) ---------
+// ========= TARJETA DE STATS (REUTILIZABLE) =========
 
 @Composable
 private fun ProfileStatsCard(
@@ -343,7 +337,6 @@ private fun ProfileStatsCard(
             modifier = Modifier.padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            // Título
             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 Text(
                     text = "Puntos",
@@ -357,7 +350,6 @@ private fun ProfileStatsCard(
                 )
             }
 
-            // Total vs Hoy
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -374,7 +366,6 @@ private fun ProfileStatsCard(
                 )
             }
 
-            // Zona horaria (si la pasas)
             if (!zoneId.isNullOrBlank()) {
                 Text(
                     text = "Zona horaria: $zoneId",
@@ -385,7 +376,6 @@ private fun ProfileStatsCard(
 
             Divider(color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.25f))
 
-            // Breakdown en 2 filas (más legible)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -451,31 +441,11 @@ private fun StatMini(title: String, value: String, alignEnd: Boolean = false) {
     }
 }
 
-@Composable
-private fun StatItem(title: String, value: String) {
-    Column(
-        horizontalAlignment = Alignment.Start,
-        verticalArrangement = Arrangement.spacedBy(2.dp)
-    ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Text(
-            text = value,
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold
-        )
-    }
-}
-
-// --------- CARD DE SECCIÓN AMIGOS ---------
+// ========= CARD DE SECCIÓN AMIGOS =========
 
 @Composable
 private fun FriendsSection(
     friendsCount: Int,
-    friendsPreview: List<FriendInfo>,
     onOpenFriends: () -> Unit
 ) {
     Card(
@@ -523,35 +493,7 @@ private fun FriendsSection(
     }
 }
 
-@Composable
-private fun FriendAvatarMini(friend: FriendInfo) {
-    Box(
-        modifier = Modifier
-            .size(34.dp)
-            .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)),
-        contentAlignment = Alignment.Center
-    ) {
-        if (!friend.photoUrl.isNullOrBlank()) {
-            AsyncImage(
-                model = friend.photoUrl,
-                contentDescription = null,
-                modifier = Modifier.fillMaxSize()
-            )
-        } else {
-            val letter = (friend.name.takeIf { it.isNotBlank() } ?: friend.username)
-                .firstOrNull()?.uppercase() ?: "?"
-            Text(
-                text = letter,
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
-            )
-        }
-    }
-}
-
-// --------- LISTA AMIGOS EN EL SHEET ---------
+// ========= LISTA AMIGOS EN EL SHEET =========
 
 @Composable
 private fun FriendsSheetList(
@@ -607,7 +549,7 @@ private fun FriendsSheetList(
     }
 }
 
-// --------- ROW DE UN AMIGO (CON FOTO) ---------
+// ========= ROW DE UN AMIGO =========
 
 @Composable
 private fun FriendRow(
@@ -665,7 +607,7 @@ private fun FriendRow(
     }
 }
 
-// --------- MINIPERFIL DE AMIGO EN EL SHEET ---------
+// ========= MINIPERFIL DE AMIGO EN EL SHEET =========
 
 @Composable
 private fun FriendMiniProfileSheet(
@@ -682,7 +624,6 @@ private fun FriendMiniProfileSheet(
     ) {
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Avatar
         Box(
             modifier = Modifier
                 .size(80.dp)
@@ -710,7 +651,6 @@ private fun FriendMiniProfileSheet(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Nombre / username / email
         Text(
             text = friendProfile.name.ifBlank { "Usuario" },
             style = MaterialTheme.typography.titleMedium,
@@ -732,8 +672,6 @@ private fun FriendMiniProfileSheet(
         )
 
         Spacer(modifier = Modifier.height(12.dp))
-
-        // Tarjeta de stats reutilizada
         ProfileStatsCard(
             totalPoints = friendProfile.totalPoints,
             todayPoints = friendProfile.todayPoints,
@@ -761,7 +699,7 @@ private fun FriendMiniProfileSheet(
     }
 }
 
-// --------- EXTENSIÓN FECHA ---------
+// ========= EXTENSIÓN FECHA =========
 
 private fun Long.toDateString(): String {
     val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())

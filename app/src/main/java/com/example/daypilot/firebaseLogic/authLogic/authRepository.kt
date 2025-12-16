@@ -1,21 +1,16 @@
 package com.example.daypilot.firebaseLogic.authLogic
 
+import android.graphics.Bitmap
+import android.net.Uri
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
-import kotlinx.coroutines.tasks.await
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
-import android.graphics.Bitmap
-import android.net.Uri
-import android.os.Build
-import androidx.annotation.RequiresApi
 import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.tasks.await
 import java.io.ByteArrayOutputStream
+import java.util.Locale
 
 class AuthRepository {
 
@@ -61,20 +56,6 @@ class AuthRepository {
         return snap.isEmpty
     }
 
-    suspend fun findUserByUsername(username: String): UserProfile? {
-        val clean = username.trim().lowercase(Locale.getDefault())
-        if (clean.isBlank()) return null
-
-        val snap = firestore.collection("users")
-            .whereEqualTo("usernameLower", clean)
-            .limit(1)
-            .get()
-            .await()
-
-        val doc = snap.documents.firstOrNull() ?: return null
-        return doc.toObject(UserProfile::class.java)
-    }
-
     // ========== PERFIL DE USUARIO ==========
 
     suspend fun saveUserProfile(
@@ -102,7 +83,6 @@ class AuthRepository {
                 .await()
 
             Log.d("AuthRepo", "Perfil guardado correctamente para $uid")
-
         } catch (e: Exception) {
             Log.e("AuthRepo", "Error guardando perfil", e)
             throw e
@@ -129,7 +109,7 @@ class AuthRepository {
         query: String,
         limit: Long = 20
     ): List<SearchUserResult> {
-        val clean = query.trim().lowercase()
+        val clean = query.trim().lowercase(Locale.getDefault())
         if (clean.isBlank()) return emptyList()
 
         val end = clean + '\uf8ff'
@@ -183,7 +163,6 @@ class AuthRepository {
                 uid = friendUid,
                 username = username,
                 name = name
-                // SIN photoUrl aquí todavía
             )
         }
 
@@ -285,21 +264,22 @@ class AuthRepository {
             .await()
     }
 
+    // ========== FOTO DE PERFIL ==========
+
+    private suspend fun setUserPhotoUrl(uid: String, downloadUrl: String) {
+        firestore.collection("users")
+            .document(uid)
+            .set(mapOf("photoUrl" to downloadUrl), SetOptions.merge())
+            .await()
+    }
+
     suspend fun uploadProfilePhotoFromUri(uid: String, uri: Uri): String {
         val ref = storage.reference.child("profilePhotos/$uid.jpg")
 
         return try {
             ref.putFile(uri).await()
             val downloadUrl = ref.downloadUrl.await().toString()
-
-            firestore.collection("users")
-                .document(uid)
-                .set(
-                    mapOf("photoUrl" to downloadUrl),
-                    SetOptions.merge()
-                )
-                .await()
-
+            setUserPhotoUrl(uid, downloadUrl)
             downloadUrl
         } catch (e: Exception) {
             Log.e("AuthRepo", "Error subiendo foto desde Uri", e)
@@ -316,17 +296,8 @@ class AuthRepository {
 
         return try {
             ref.putBytes(data).await()
-
             val downloadUrl = ref.downloadUrl.await().toString()
-
-            firestore.collection("users")
-                .document(uid)
-                .set(
-                    mapOf("photoUrl" to downloadUrl),
-                    SetOptions.merge()
-                )
-                .await()
-
+            setUserPhotoUrl(uid, downloadUrl)
             downloadUrl
         } catch (e: Exception) {
             Log.e("AuthRepo", "Error subiendo foto desde Bitmap", e)
@@ -339,36 +310,6 @@ class AuthRepository {
     suspend fun sendPasswordReset(email: String): Result<Unit> {
         return try {
             auth.sendPasswordResetEmail(email).await()
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
-    private fun todayKey(): String =
-        SimpleDateFormat("yyyy-MM-dd", Locale.US).format(System.currentTimeMillis())
-
-    suspend fun uploadTodayStepsToFirestore(stepsToday: Int, goalSteps: Int? = null): Result<Unit> {
-        val uid = auth.currentUser?.uid ?: return Result.failure(IllegalStateException("No hay usuario logueado"))
-
-        return try {
-            val day = todayKey()
-
-            val data = mutableMapOf<String, Any>(
-                "dayKey" to day,
-                "steps" to stepsToday,
-                "updatedAt" to FieldValue.serverTimestamp()
-            )
-            if (goalSteps != null) data["goalSteps"] = goalSteps
-
-            firestore
-                .collection("users")
-                .document(uid)
-                .collection("daily_steps")
-                .document(day)
-                .set(data, SetOptions.merge())
-                .await()
-
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)

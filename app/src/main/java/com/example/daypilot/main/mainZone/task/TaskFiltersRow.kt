@@ -31,12 +31,10 @@ fun TaskFiltersRow(
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        // Orden + dificultad en una línea
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            // Ordenar por
             var sortExpanded by remember { mutableStateOf(false) }
             ExposedDropdownMenuBox(
                 expanded = sortExpanded,
@@ -106,7 +104,6 @@ fun TaskFiltersRow(
                 }
             }
 
-            // Dificultad
             var diffExpanded by remember { mutableStateOf(false) }
             ExposedDropdownMenuBox(
                 expanded = diffExpanded,
@@ -169,7 +166,6 @@ fun TaskFiltersRow(
             }
         }
 
-        // Filtro por estado
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)

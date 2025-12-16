@@ -30,35 +30,35 @@ fun AddFriendScreen(
     currentUid: String,
     onBack: () -> Unit
 ) {
+
+    // ========== State ==========
+
     val scope = rememberCoroutineScope()
 
     var currentProfile by remember { mutableStateOf<UserProfile?>(null) }
     var selectedTabIndex by remember { mutableStateOf(0) }
 
-    // --- Estado de búsqueda ---
     var query by remember { mutableStateOf("") }
     var isSearching by remember { mutableStateOf(false) }
     var searchResults by remember { mutableStateOf<List<SearchUserResult>>(emptyList()) }
-    var friendsSet by remember { mutableStateOf<Set<String>>(emptySet()) } // uids de amigos
+    var friendsSet by remember { mutableStateOf<Set<String>>(emptySet()) }
 
-    // --- Estado de invitaciones ---
     var incomingRequests by remember { mutableStateOf<List<FriendRequest>>(emptyList()) }
     var isLoadingInvites by remember { mutableStateOf(false) }
 
-    // Mensajes
     var infoMessage by remember { mutableStateOf<String?>(null) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+
+    // ========== Effects ==========
 
     LaunchedEffect(currentUid) {
         try {
             currentProfile = authRepo.getUserProfile(currentUid)
-
-            val friends = authRepo.getFriends(currentUid)
-            friendsSet = friends.map { it.uid }.toSet()
+            friendsSet = authRepo.getFriends(currentUid).map { it.uid }.toSet()
 
             isLoadingInvites = true
             incomingRequests = authRepo.getIncomingFriendRequests(currentUid)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             errorMessage = "Error cargando datos de amigos."
         } finally {
             isLoadingInvites = false
@@ -69,7 +69,8 @@ fun AddFriendScreen(
         errorMessage = null
         infoMessage = null
 
-        if (query.isBlank()) {
+        val clean = query.trim()
+        if (clean.isBlank()) {
             searchResults = emptyList()
             isSearching = false
             return@LaunchedEffect
@@ -79,23 +80,24 @@ fun AddFriendScreen(
         delay(350)
 
         try {
-            val results = authRepo.searchUsersByUsernamePrefix(query)
+            val results = authRepo.searchUsersByUsernamePrefix(clean)
                 .filter { it.uid != currentUid }
+
             searchResults = results
-            if (results.isEmpty()) {
-                infoMessage = "No se han encontrado usuarios."
-            }
-        } catch (e: Exception) {
+            if (results.isEmpty()) infoMessage = "No se han encontrado usuarios."
+        } catch (_: Exception) {
             errorMessage = "Error al buscar usuarios."
         } finally {
             isSearching = false
         }
     }
 
+    // ========== UI ==========
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Amigos") },
+                title = { Text("Amigos") }
             )
         }
     ) { innerPadding ->
@@ -105,9 +107,7 @@ fun AddFriendScreen(
                 .padding(innerPadding)
         ) {
 
-            TabRow(
-                selectedTabIndex = selectedTabIndex
-            ) {
+            TabRow(selectedTabIndex = selectedTabIndex) {
                 Tab(
                     selected = selectedTabIndex == 0,
                     onClick = { selectedTabIndex = 0 },
@@ -121,164 +121,186 @@ fun AddFriendScreen(
             }
 
             when (selectedTabIndex) {
-                0 -> { // --- TAB: Buscar amigos ---
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp)
-                    ) {
-
-                        OutlinedTextField(
-                            value = query,
-                            onValueChange = { query = it },
-                            label = { Text("Buscar por username") },
-                            singleLine = true,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        if (isSearching) {
-                            LinearProgressIndicator(
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
+                0 -> SearchTab(
+                    query = query,
+                    onQueryChange = { query = it },
+                    isSearching = isSearching,
+                    searchResults = searchResults,
+                    friendsSet = friendsSet,
+                    currentUid = currentUid,
+                    errorMessage = errorMessage,
+                    infoMessage = infoMessage,
+                    onSendRequest = { toUid, toUsername ->
+                        val me = currentProfile
+                        if (me == null) {
+                            errorMessage = "Error: no se ha podido cargar tu perfil."
+                            return@SearchTab
                         }
 
-                        if (errorMessage != null) {
-                            Text(
-                                text = errorMessage!!,
-                                color = MaterialTheme.colorScheme.error,
-                                style = MaterialTheme.typography.bodySmall
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                        }
-
-                        infoMessage?.let {
-                            Text(
-                                text = it,
-                                color = MaterialTheme.colorScheme.primary,
-                                style = MaterialTheme.typography.bodySmall
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                        }
-
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize(),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            items(searchResults) { result ->
-                                val profile = result.profile
-                                val isAlreadyFriend = friendsSet.contains(result.uid)
-
-                                AddFriendResultItem(
-                                    username = profile.username,
-                                    name = profile.name,
-                                    region = profile.region,
-                                    isAlreadyFriend = isAlreadyFriend,
-                                    isRequestMode = true,
-                                    onAction = {
-                                        if (isAlreadyFriend) return@AddFriendResultItem
-
-                                        val me = currentProfile
-                                        if (me == null) {
-                                            errorMessage = "Error: no se ha podido cargar tu perfil."
-                                            return@AddFriendResultItem
-                                        }
-
-                                        scope.launch {
-                                            try {
-                                                authRepo.sendFriendRequest(
-                                                    fromUid = currentUid,
-                                                    toUid = result.uid,
-                                                    fromUsername = me.username,
-                                                    fromName = me.name
-                                                )
-                                                infoMessage =
-                                                    "Solicitud enviada a @${profile.username}."
-                                            } catch (e: Exception) {
-                                                errorMessage = "Error al enviar la solicitud."
-                                            }
-                                        }
-                                    }
+                        scope.launch {
+                            try {
+                                authRepo.sendFriendRequest(
+                                    fromUid = currentUid,
+                                    toUid = toUid,
+                                    fromUsername = me.username,
+                                    fromName = me.name
                                 )
+                                infoMessage = "Solicitud enviada a @$toUsername."
+                            } catch (_: Exception) {
+                                errorMessage = "Error al enviar la solicitud."
                             }
                         }
                     }
-                }
+                )
 
-                1 -> { // --- TAB: Invitaciones ---
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp)
-                    ) {
-
-                        if (isLoadingInvites) {
-                            Box(
-                                modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                CircularProgressIndicator()
-                            }
-                        } else if (incomingRequests.isEmpty()) {
-                            Box(
-                                modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text("No tienes invitaciones pendientes.")
-                            }
-                        } else {
-                            LazyColumn(
-                                modifier = Modifier.fillMaxSize(),
-                                verticalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                items(incomingRequests) { request ->
-                                    InvitationItem(
-                                        request = request,
-                                        onAccept = {
-                                            scope.launch {
-                                                try {
-                                                    authRepo.acceptFriendRequest(
-                                                        currentUid,
-                                                        request
-                                                    )
-                                                    // actualizar listas
-                                                    incomingRequests =
-                                                        incomingRequests.filterNot {
-                                                            it.fromUid == request.fromUid
-                                                        }
-                                                    // recargar amigos
-                                                    val friends =
-                                                        authRepo.getFriends(currentUid)
-                                                    friendsSet = friends.map { it.uid }.toSet()
-                                                } catch (e: Exception) {
-                                                    errorMessage =
-                                                        "Error al aceptar la invitación."
-                                                }
-                                            }
-                                        },
-                                        onDecline = {
-                                            scope.launch {
-                                                try {
-                                                    authRepo.declineFriendRequest(
-                                                        currentUid,
-                                                        request.fromUid
-                                                    )
-                                                    incomingRequests =
-                                                        incomingRequests.filterNot {
-                                                            it.fromUid == request.fromUid
-                                                        }
-                                                } catch (e: Exception) {
-                                                    errorMessage =
-                                                        "Error al rechazar la invitación."
-                                                }
-                                            }
-                                        }
-                                    )
-                                }
+                1 -> InvitationsTab(
+                    isLoading = isLoadingInvites,
+                    incomingRequests = incomingRequests,
+                    onAccept = { request ->
+                        scope.launch {
+                            try {
+                                authRepo.acceptFriendRequest(currentUid, request)
+                                incomingRequests = incomingRequests.filterNot { it.fromUid == request.fromUid }
+                                friendsSet = authRepo.getFriends(currentUid).map { it.uid }.toSet()
+                            } catch (_: Exception) {
+                                errorMessage = "Error al aceptar la invitación."
                             }
                         }
+                    },
+                    onDecline = { request ->
+                        scope.launch {
+                            try {
+                                authRepo.declineFriendRequest(currentUid, request.fromUid)
+                                incomingRequests = incomingRequests.filterNot { it.fromUid == request.fromUid }
+                            } catch (_: Exception) {
+                                errorMessage = "Error al rechazar la invitación."
+                            }
+                        }
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun SearchTab(
+    query: String,
+    onQueryChange: (String) -> Unit,
+    isSearching: Boolean,
+    searchResults: List<SearchUserResult>,
+    friendsSet: Set<String>,
+    currentUid: String,
+    errorMessage: String?,
+    infoMessage: String?,
+    onSendRequest: (toUid: String, toUsername: String) -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+
+        OutlinedTextField(
+            value = query,
+            onValueChange = onQueryChange,
+            label = { Text("Buscar por username") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        if (isSearching) {
+            LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+
+        if (errorMessage != null) {
+            Text(
+                text = errorMessage,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+
+        if (infoMessage != null) {
+            Text(
+                text = infoMessage,
+                color = MaterialTheme.colorScheme.primary,
+                style = MaterialTheme.typography.bodySmall
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(searchResults) { result ->
+                val profile = result.profile
+                val isAlreadyFriend = friendsSet.contains(result.uid)
+
+                AddFriendResultItem(
+                    username = profile.username,
+                    name = profile.name,
+                    region = profile.region,
+                    isAlreadyFriend = isAlreadyFriend,
+                    isRequestMode = true,
+                    onAction = {
+                        if (isAlreadyFriend || result.uid == currentUid) return@AddFriendResultItem
+                        onSendRequest(result.uid, profile.username)
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun InvitationsTab(
+    isLoading: Boolean,
+    incomingRequests: List<FriendRequest>,
+    onAccept: (FriendRequest) -> Unit,
+    onDecline: (FriendRequest) -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+
+        when {
+            isLoading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+
+            incomingRequests.isEmpty() -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("No tienes invitaciones pendientes.")
+                }
+            }
+
+            else -> {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(incomingRequests) { request ->
+                        InvitationItem(
+                            request = request,
+                            onAccept = { onAccept(request) },
+                            onDecline = { onDecline(request) }
+                        )
                     }
                 }
             }
@@ -302,8 +324,7 @@ private fun AddFriendResultItem(
         shape = RoundedCornerShape(12.dp)
     ) {
         Row(
-            modifier = Modifier
-                .padding(12.dp),
+            modifier = Modifier.padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
@@ -325,9 +346,7 @@ private fun AddFriendResultItem(
 
             Spacer(modifier = Modifier.width(12.dp))
 
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = name.ifBlank { "Usuario" },
                     style = MaterialTheme.typography.bodyLarge,
@@ -347,18 +366,22 @@ private fun AddFriendResultItem(
                 }
             }
 
-            if (isAlreadyFriend) {
-                Text(
-                    text = "Amigos",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            } else if (isRequestMode) {
-                IconButton(onClick = onAction) {
-                    Icon(
-                        imageVector = Icons.Filled.PersonAdd,
-                        contentDescription = "Enviar solicitud"
+            when {
+                isAlreadyFriend -> {
+                    Text(
+                        text = "Amigos",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.primary
                     )
+                }
+
+                isRequestMode -> {
+                    IconButton(onClick = onAction) {
+                        Icon(
+                            imageVector = Icons.Filled.PersonAdd,
+                            contentDescription = "Enviar solicitud"
+                        )
+                    }
                 }
             }
         }
@@ -375,9 +398,7 @@ private fun InvitationItem(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(12.dp)
-        ) {
+        Column(modifier = Modifier.padding(12.dp)) {
             Text(
                 text = request.fromName.ifBlank { "Usuario" },
                 style = MaterialTheme.typography.bodyLarge,
@@ -391,9 +412,7 @@ private fun InvitationItem(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(
                     onClick = onAccept,
                     modifier = Modifier.weight(1f)

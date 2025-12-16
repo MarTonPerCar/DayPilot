@@ -63,13 +63,6 @@ fun nextDateMillis(task: Task): Long? {
     }
 }
 
-/**
- * Devuelve:
- *   < 0  -> fecha en el pasado
- *   = 0  -> hoy
- *   = 1  -> mañana
- *   > 1  -> días en el futuro
- */
 fun daysBetweenToday(isoDate: String): Int? {
     return try {
         val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())

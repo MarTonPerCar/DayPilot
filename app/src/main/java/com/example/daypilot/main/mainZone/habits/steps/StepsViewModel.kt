@@ -54,7 +54,6 @@ class StepsViewModel(
         if (started) return
         started = true
 
-        // 1) Local store stream
         viewModelScope.launch {
             local.flow.collect { ls ->
                 val todayKey = PointsTime.todayKey(zoneId)
@@ -73,7 +72,6 @@ class StepsViewModel(
             }
         }
 
-        // 2) Sensor stream
         viewModelScope.launch {
             sensor.counterFlow()
                 .catch { e ->
@@ -159,34 +157,6 @@ class StepsViewModel(
                     goalToday = value,
                     goalNext = value
                 )
-            }
-        }
-    }
-
-    fun uploadStepsToFirebaseNow() {
-        viewModelScope.launch {
-            try {
-                val dayKey = ui.value.dayKey.ifBlank { PointsTime.todayKey(zoneId) }
-                val steps = ui.value.stepsToday
-                val goal = ui.value.goalToday
-
-                val data = mapOf(
-                    "dayKey" to dayKey,
-                    "steps" to steps,
-                    "goal" to goal,
-                    "updatedAt" to FieldValue.serverTimestamp()
-                )
-
-                firestore
-                    .collection("users")
-                    .document(uid)
-                    .collection("daily_steps")
-                    .document(dayKey)
-                    .set(data, SetOptions.merge())
-
-                _ui.update { it.copy(uploadMessage = "Subido a Firebase: $steps pasos ($dayKey)") }
-            } catch (e: Exception) {
-                _ui.update { it.copy(uploadMessage = "Error subiendo: ${e.message ?: e::class.java.simpleName}") }
             }
         }
     }

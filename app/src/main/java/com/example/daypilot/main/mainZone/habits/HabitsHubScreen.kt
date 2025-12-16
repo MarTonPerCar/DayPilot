@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -43,8 +42,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -64,7 +61,7 @@ fun HabitsHubScreen(
     hasStepsPermission: Boolean,
     onRequestStepsPermission: () -> Unit,
     onChangeStepsGoal: (Int) -> Unit,
-    onOpenSteps: () -> Unit, // opcional: pantalla detalle
+    onOpenSteps: () -> Unit,
     onOpenTechHealth: () -> Unit,
     onOpenReminders: () -> Unit
 ) {
@@ -98,8 +95,7 @@ fun HabitsHubScreen(
                 ui = stepsUi,
                 hasPermission = hasStepsPermission,
                 onRequestPermission = onRequestStepsPermission,
-                onChangeGoal = onChangeStepsGoal,
-                onOpenSteps = onOpenSteps
+                onChangeGoal = onChangeStepsGoal
             )
 
             HabitTile(
@@ -141,8 +137,7 @@ private fun StepsDashboard(
     ui: StepsUiState?,
     hasPermission: Boolean,
     onRequestPermission: () -> Unit,
-    onChangeGoal: (Int) -> Unit,
-    onOpenSteps: () -> Unit
+    onChangeGoal: (Int) -> Unit
 ) {
     var showGoalSheet by remember { mutableStateOf(false) }
 
@@ -174,8 +169,6 @@ private fun StepsDashboard(
             val goal = (ui?.goalToday ?: 1).coerceAtLeast(1)
             val progress = (ui?.progress ?: 0f).coerceIn(0f, 1f)
             val remainingSteps = (goal - steps).coerceAtLeast(0)
-
-            // 50% = 1, 75% = 1, 100% = 1 + bonus(3) => 4
             val ptsLeft =
                 (if (ui?.m50Sent == true) 0 else 1) +
                         (if (ui?.m75Sent == true) 0 else 1) +
@@ -192,11 +185,10 @@ private fun StepsDashboard(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(IntrinsicSize.Min), // ✅ no deja que el bloque crezca infinito
+                    .height(IntrinsicSize.Min),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Círculo (izquierda)
                 Box(contentAlignment = Alignment.Center) {
                     CircularProgressIndicator(
                         progress = { progress },
@@ -210,11 +202,10 @@ private fun StepsDashboard(
                     }
                 }
 
-                // Panel derecho
                 ElevatedCard(
                     modifier = Modifier
                         .weight(1f)
-                        .fillMaxHeight(), // ✅ ahora solo llena la altura del Row
+                        .fillMaxHeight(),
                     shape = MaterialTheme.shapes.large
                 ) {
                     Column(
@@ -225,7 +216,6 @@ private fun StepsDashboard(
                     ) {
                         Text("Resumen", fontWeight = FontWeight.SemiBold)
 
-                        // ✅ chips que se adaptan a la fila (no vertical)
                         FlowRow(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -257,7 +247,7 @@ private fun StepsDashboard(
                             AssistChip(onClick = { }, label = { Text("Meta $next (mañana)") })
                         }
 
-                        Spacer(Modifier.weight(1f)) // ✅ empuja el botón abajo SIN estirar toda la pantalla
+                        Spacer(Modifier.weight(1f))
 
                         OutlinedButton(
                             onClick = {

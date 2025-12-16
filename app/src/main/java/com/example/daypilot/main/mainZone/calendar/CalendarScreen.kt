@@ -42,7 +42,9 @@ fun CalendarScreen(
     onOpenTask: (taskId: String) -> Unit,
     onOpenTasks: () -> Unit
 ) {
-    // -------- state / loading --------
+
+    // ========== State ==========
+
     var tasks by remember { mutableStateOf<List<Task>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
@@ -50,17 +52,15 @@ fun CalendarScreen(
     val isoFormatter = remember { DateTimeFormatter.ISO_LOCAL_DATE }
     val today = remember { LocalDate.now() }
 
-    val tasksByDate = remember(tasks) {
-        buildTasksByDate(tasks, isoFormatter)
-    }
+    val tasksByDate = remember(tasks) { buildTasksByDate(tasks, isoFormatter) }
 
     var selectedDate by remember { mutableStateOf(today) }
-    val selectedTasks = remember(selectedDate, tasksByDate) {
-        tasksByDate[selectedDate].orEmpty()
-    }
+    val selectedTasks = remember(selectedDate, tasksByDate) { tasksByDate[selectedDate].orEmpty() }
 
     val scope = rememberCoroutineScope()
     var detailTask by remember { mutableStateOf<Task?>(null) }
+
+    // ========== Data ==========
 
     fun reloadTasks() {
         scope.launch {
@@ -78,7 +78,8 @@ fun CalendarScreen(
 
     LaunchedEffect(uid) { reloadTasks() }
 
-    // -------- calendar config --------
+    // ========== Calendar Config ==========
+
     val currentMonth = remember { YearMonth.now() }
     val startMonth = remember { currentMonth.minusMonths(24) }
     val endMonth = remember { currentMonth.plusMonths(24) }
@@ -91,11 +92,10 @@ fun CalendarScreen(
         firstDayOfWeek = daysOfWeek.first()
     )
 
-    val visibleMonth = remember {
-        derivedStateOf { calendarState.firstVisibleMonth.yearMonth }
-    }
+    val visibleMonth = remember { derivedStateOf { calendarState.firstVisibleMonth.yearMonth } }
 
-    // -------- UI --------
+    // ========== UI ==========
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -124,15 +124,14 @@ fun CalendarScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
 
-            if (errorMessage != null) {
+            errorMessage?.let {
                 Text(
-                    text = errorMessage!!,
+                    text = it,
                     color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.bodySmall
                 )
             }
 
-            // Header del mes + navegación
             MonthHeader(
                 yearMonth = visibleMonth.value,
                 onPrev = {
@@ -149,7 +148,6 @@ fun CalendarScreen(
 
             DaysOfWeekRow(daysOfWeek = daysOfWeek)
 
-            // Calendario
             Card(
                 shape = RoundedCornerShape(20.dp),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -184,32 +182,37 @@ fun CalendarScreen(
                 }
             }
 
-            // Resumen inferior
             SummaryHeader(selectedDate = selectedDate, today = today)
 
-            if (isLoading) {
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+            when {
+                isLoading -> {
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                    }
                 }
-            } else if (selectedTasks.isEmpty()) {
-                Text(
-                    text = "No hay tareas para este día.",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(selectedTasks, key = { it.id }) { task ->
-                        CalendarTaskSummaryRow(
-                            task = task,
-                            onClick = { detailTask = task }
-                        )
+
+                selectedTasks.isEmpty() -> {
+                    Text(
+                        text = "No hay tareas para este día.",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+
+                else -> {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(selectedTasks, key = { it.id }) { task ->
+                            CalendarTaskSummaryRow(
+                                task = task,
+                                onClick = { detailTask = task }
+                            )
+                        }
                     }
                 }
             }
@@ -226,11 +229,8 @@ fun CalendarScreen(
                 }
             )
         }
-
     }
 }
-
-// ---------------- helpers ----------------
 
 private fun buildTasksByDate(
     tasks: List<Task>,
@@ -246,8 +246,6 @@ private fun buildTasksByDate(
     return map
 }
 
-// ---------------- UI pieces ----------------
-
 @Composable
 private fun MonthHeader(
     yearMonth: YearMonth,
@@ -256,7 +254,9 @@ private fun MonthHeader(
 ) {
     val monthName = remember(yearMonth) {
         yearMonth.month.getDisplayName(TextStyle.FULL, Locale.getDefault())
-            .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+            .replaceFirstChar {
+                if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
+            }
     }
 
     Row(
@@ -287,8 +287,7 @@ private fun DaysOfWeekRow(daysOfWeek: List<java.time.DayOfWeek>) {
     ) {
         daysOfWeek.forEach { dow ->
             Text(
-                text = dow.getDisplayName(TextStyle.SHORT, Locale.getDefault())
-                    .replace(".", ""),
+                text = dow.getDisplayName(TextStyle.SHORT, Locale.getDefault()).replace(".", ""),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.width(44.dp),
@@ -349,7 +348,6 @@ private fun CalendarDayCell(
             style = MaterialTheme.typography.bodyMedium
         )
 
-        // pequeño indicador extra (dot) abajo
         if (isInMonth && markColor != null) {
             Box(
                 modifier = Modifier
@@ -361,7 +359,6 @@ private fun CalendarDayCell(
             )
         }
 
-        // “Hoy” con borde suave
         if (isToday && !isSelected) {
             Box(
                 modifier = Modifier
@@ -393,9 +390,9 @@ private fun CalendarTaskSummaryRow(
     onClick: () -> Unit
 ) {
     val accent = when (task.difficulty) {
-        TaskDifficulty.EASY -> MaterialTheme.colorScheme.tertiary      // morado
-        TaskDifficulty.MEDIUM -> MaterialTheme.colorScheme.secondary   // naranja
-        TaskDifficulty.HARD -> MaterialTheme.colorScheme.error         // rojo
+        TaskDifficulty.EASY -> MaterialTheme.colorScheme.tertiary
+        TaskDifficulty.MEDIUM -> MaterialTheme.colorScheme.secondary
+        TaskDifficulty.HARD -> MaterialTheme.colorScheme.error
     }
 
     Card(

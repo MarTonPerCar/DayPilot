@@ -17,7 +17,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.example.daypilot.mainDatabase.SessionManager
 import com.example.daypilot.firebaseLogic.authLogic.AuthRepository
 import com.example.daypilot.main.addFriend.AddFriendScreen
 import com.example.daypilot.main.profile.mainProfile.ProfileScreen
@@ -35,9 +34,7 @@ enum class MainTab {
 
 @Composable
 fun MainScreen(
-    authRepo: AuthRepository,
-    sessionManager: SessionManager,
-    onLogoutToLogin: () -> Unit
+    authRepo: AuthRepository
 ) {
     var selectedTab by remember { mutableStateOf(MainTab.HOME) }
     val user = authRepo.currentUser
@@ -99,8 +96,7 @@ fun MainScreen(
                             onOpenSettings = {
                                 val intent = Intent(context, SettingsActivity::class.java)
                                 context.startActivity(intent)
-                            },
-                            onBack = { selectedTab = MainTab.HOME }
+                            }
                         )
                     } else {
                         Text("No hay usuario", modifier = Modifier.align(Alignment.Center))
@@ -108,32 +104,6 @@ fun MainScreen(
                 }
             }
         }
-    }
-}
-
-@Composable
-fun BlockRow(
-    leftText: String,
-    rightText: String,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        SmallBlock(
-            text = leftText,
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight()
-        )
-        SmallBlock(
-            text = rightText,
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight()
-        )
     }
 }
 
@@ -274,7 +244,6 @@ fun HomeTab() {
                 .weight(1f),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            // 1) Calendario (se queda arriba)
             BigBlock(
                 text = "Calendario",
                 subtitle = "Visualiza tus tareas por días",
@@ -293,7 +262,6 @@ fun HomeTab() {
                 }
             )
 
-            // 2) Hábitos (ahora grande y en medio) + otro color
             BigBlock(
                 text = "Hábitos",
                 subtitle = "Rutinas y bienestar",
@@ -301,7 +269,7 @@ fun HomeTab() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(0.32f),
-                containerColor = MaterialTheme.colorScheme.primary,      // 👈 color distinto
+                containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
                 onClick = {
                     val intent = Intent(
@@ -312,7 +280,6 @@ fun HomeTab() {
                 }
             )
 
-            // 3) Tareas + Rivalidad juntas (Gráficas eliminada)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -348,15 +315,5 @@ fun HomeTab() {
                 )
             }
         }
-    }
-}
-
-@Composable
-fun PlaceholderTab(label: String) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(text = label)
     }
 }

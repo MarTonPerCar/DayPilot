@@ -47,11 +47,9 @@ class TaskActivity : ComponentActivity() {
 
                 if (!view.isInEditMode) {
                     SideEffect {
-                        // Fondo de barras
                         window.statusBarColor = colorScheme.background.toArgb()
                         window.navigationBarColor = colorScheme.background.toArgb()
 
-                        // Iconos claros/oscursos según tema
                         WindowInsetsControllerCompat(window, window.decorView).apply {
                             isAppearanceLightStatusBars = !darkTheme
                             isAppearanceLightNavigationBars = !darkTheme

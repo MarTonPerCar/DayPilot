@@ -12,6 +12,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -27,9 +28,9 @@ import androidx.compose.ui.window.Dialog
 import com.example.daypilot.firebaseLogic.taskLogic.Task
 import com.example.daypilot.firebaseLogic.taskLogic.TaskDifficulty
 import com.google.firebase.Timestamp
+import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
@@ -41,10 +42,12 @@ fun CalendarTaskDetailDialog(
     onDismiss: () -> Unit,
     onOpenInTasks: () -> Unit
 ) {
+
+    // ========== State ==========
+
     val scroll = rememberScrollState()
     val iso = DateTimeFormatter.ISO_LOCAL_DATE
 
-    // Próxima fecha de la tarea (mínima)
     val nextDay: LocalDate? = task.days
         .mapNotNull { runCatching { LocalDate.parse(it, iso) }.getOrNull() }
         .minOrNull()
@@ -74,6 +77,8 @@ fun CalendarTaskDetailDialog(
         TaskDifficulty.HARD -> MaterialTheme.colorScheme.error
     }
 
+    // ========== UI ==========
+
     Dialog(onDismissRequest = onDismiss) {
         Card(
             shape = RoundedCornerShape(26.dp),
@@ -89,7 +94,7 @@ fun CalendarTaskDetailDialog(
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Header potente
+
                 Text(
                     text = headerTitle,
                     style = MaterialTheme.typography.headlineSmall,
@@ -108,10 +113,13 @@ fun CalendarTaskDetailDialog(
                 Text(
                     text = if (task.isCompleted) "Estado: Completada ✅" else "Estado: Pendiente ⏳",
                     style = MaterialTheme.typography.titleMedium,
-                    color = if (task.isCompleted) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.error
+                    color = if (task.isCompleted) {
+                        MaterialTheme.colorScheme.tertiary
+                    } else {
+                        MaterialTheme.colorScheme.error
+                    }
                 )
 
-                // Título + descripción
                 Text(
                     text = task.title.ifBlank { "(Sin título)" },
                     style = MaterialTheme.typography.titleLarge,
@@ -133,7 +141,6 @@ fun CalendarTaskDetailDialog(
                     )
                 }
 
-                // Info (chips)
                 Text("Información", style = MaterialTheme.typography.titleSmall)
 
                 FlowRow(
@@ -151,7 +158,7 @@ fun CalendarTaskDetailDialog(
                                 }
                             )
                         },
-                        colors = androidx.compose.material3.AssistChipDefaults.assistChipColors(
+                        colors = AssistChipDefaults.assistChipColors(
                             containerColor = diffColor.copy(alpha = 0.18f)
                         )
                     )
@@ -159,7 +166,7 @@ fun CalendarTaskDetailDialog(
                     AssistChip(
                         onClick = {},
                         label = { Text("Categoría: ${task.category.ifBlank { "General" }}") },
-                        colors = androidx.compose.material3.AssistChipDefaults.assistChipColors(
+                        colors = AssistChipDefaults.assistChipColors(
                             containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
                         )
                     )
@@ -167,7 +174,7 @@ fun CalendarTaskDetailDialog(
                     AssistChip(
                         onClick = {},
                         label = { Text("Duración: ${formatDuration(task.estimatedMinutes)}") },
-                        colors = androidx.compose.material3.AssistChipDefaults.assistChipColors(
+                        colors = AssistChipDefaults.assistChipColors(
                             containerColor = MaterialTheme.colorScheme.surfaceVariant
                         )
                     )
@@ -175,7 +182,7 @@ fun CalendarTaskDetailDialog(
                     AssistChip(
                         onClick = {},
                         label = { Text("Recordatorio: ${if (task.reminderEnabled) "Sí" else "No"}") },
-                        colors = androidx.compose.material3.AssistChipDefaults.assistChipColors(
+                        colors = AssistChipDefaults.assistChipColors(
                             containerColor = MaterialTheme.colorScheme.surfaceVariant
                         )
                     )
@@ -183,7 +190,7 @@ fun CalendarTaskDetailDialog(
                     AssistChip(
                         onClick = {},
                         label = { Text("Creada: ${formatMillisDateTime(task.createdAt)}") },
-                        colors = androidx.compose.material3.AssistChipDefaults.assistChipColors(
+                        colors = AssistChipDefaults.assistChipColors(
                             containerColor = MaterialTheme.colorScheme.surfaceVariant
                         )
                     )
@@ -192,15 +199,15 @@ fun CalendarTaskDetailDialog(
                         AssistChip(
                             onClick = {},
                             label = { Text("Completada: ${formatTimestampDateTime(it)}") },
-                            colors = androidx.compose.material3.AssistChipDefaults.assistChipColors(
+                            colors = AssistChipDefaults.assistChipColors(
                                 containerColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.18f)
                             )
                         )
                     }
                 }
 
-                // Días programados
                 Text("Días programados", style = MaterialTheme.typography.titleSmall)
+
                 if (task.days.isEmpty()) {
                     Text(
                         text = "No hay días asignados.",
@@ -220,7 +227,6 @@ fun CalendarTaskDetailDialog(
 
                 Spacer(modifier = Modifier.padding(top = 4.dp))
 
-                // Botones
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(10.dp)

@@ -33,7 +33,6 @@ class MainProfileActivity : ComponentActivity() {
 
         val firebaseUser = authRepo.currentUser
         if (firebaseUser == null) {
-            // Si por lo que sea no hay usuario, te mando al login
             startActivity(
                 Intent(this, LoginActivity::class.java).apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -56,8 +55,7 @@ class MainProfileActivity : ComponentActivity() {
                     onOpenSettings = {
                         val intent = Intent(this, SettingsActivity::class.java)
                         startActivity(intent)
-                    },
-                    onBack = { finish() }
+                    }
                 )
             }
         }

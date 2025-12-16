@@ -13,8 +13,6 @@ private val Context.remindersDataStore by preferencesDataStore("reminders_prefs"
 class RemindersLocalStore(private val context: Context) {
 
     private val KEY = stringSetPreferencesKey("reminders_set")
-
-    // id|trigger|title|repeat|enabled|hour|minute|pre|lastPreSentForTriggerAt
     private fun encode(r: Reminder): String {
         val safeTitle = r.title.replace("|", " ")
         val h = r.hour?.toString() ?: ""

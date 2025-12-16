@@ -28,9 +28,6 @@ internal object PointsTime {
 
     fun parseKey(key: String): LocalDate = LocalDate.parse(key, ISO)
 
-    fun keyFromInstant(instant: Instant, zoneId: ZoneId): String =
-        instant.atZone(zoneId).toLocalDate().format(ISO)
-
     fun outKey(zoneId: ZoneId): String {
         val today = Instant.now().atZone(zoneId).toLocalDate()
         return today.minusDays(30).format(ISO)

@@ -1,7 +1,6 @@
 package com.example.daypilot.login
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -19,10 +18,6 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.example.daypilot.R
 
-// ---------------------------
-// MAPEADOR DE ERRORES DE FIREBASE
-// ---------------------------
-
 data class LoginFieldErrors(
     val emailError: String? = null,
     val passError: String? = null
@@ -30,33 +25,15 @@ data class LoginFieldErrors(
 
 fun mapFirebaseErrorToFieldErrors(errorCode: String): LoginFieldErrors {
     return when (errorCode.uppercase()) {
-
-        "ERROR_INVALID_EMAIL" ->
-            LoginFieldErrors(emailError = "El email no es válido.")
-
-        "ERROR_USER_NOT_FOUND" ->
-            LoginFieldErrors(emailError = "No existe ninguna cuenta con ese email.")
-
-        "ERROR_WRONG_PASSWORD" ->
-            LoginFieldErrors(passError = "La contraseña es incorrecta.")
-
-        "ERROR_USER_DISABLED" ->
-            LoginFieldErrors(emailError = "La cuenta está deshabilitada.")
-
-        "ERROR_TOO_MANY_REQUESTS" ->
-            LoginFieldErrors(passError = "Demasiados intentos. Intenta más tarde.")
-
-        "ERROR_INVALID_CREDENTIAL" ->
-            LoginFieldErrors(passError = "El usuario o contraseña no son válidos.")
-
-        else ->
-            LoginFieldErrors(emailError = errorCode)
+        "ERROR_INVALID_EMAIL" -> LoginFieldErrors(emailError = "El email no es válido.")
+        "ERROR_USER_NOT_FOUND" -> LoginFieldErrors(emailError = "No existe ninguna cuenta con ese email.")
+        "ERROR_WRONG_PASSWORD" -> LoginFieldErrors(passError = "La contraseña es incorrecta.")
+        "ERROR_USER_DISABLED" -> LoginFieldErrors(emailError = "La cuenta está deshabilitada.")
+        "ERROR_TOO_MANY_REQUESTS" -> LoginFieldErrors(passError = "Demasiados intentos. Intenta más tarde.")
+        "ERROR_INVALID_CREDENTIAL" -> LoginFieldErrors(passError = "El usuario o contraseña no son válidos.")
+        else -> LoginFieldErrors(emailError = errorCode)
     }
 }
-
-// ---------------------------
-// LOGIN SCREEN
-// ---------------------------
 
 @Composable
 fun LoginScreen(
@@ -67,17 +44,18 @@ fun LoginScreen(
     firebaseErrorCode: String?,
     isLoading: Boolean
 ) {
+
+    // ========== State ==========
+
     var email by remember { mutableStateOf("") }
     var pass by remember { mutableStateOf("") }
     var showPassword by remember { mutableStateOf(false) }
 
-    // Errores de validación local
     var localEmailError by remember { mutableStateOf<String?>(null) }
     var localPassError by remember { mutableStateOf<String?>(null) }
 
-    // Errores de Firebase mapeados
     val firebaseFieldErrors = remember(firebaseErrorCode) {
-        firebaseErrorCode?.let { mapFirebaseErrorToFieldErrors(it) }
+        firebaseErrorCode?.let(::mapFirebaseErrorToFieldErrors)
     }
 
     val emailError = localEmailError ?: firebaseFieldErrors?.emailError
@@ -85,13 +63,14 @@ fun LoginScreen(
 
     val logoRes = if (darkTheme) R.drawable.mi_logo_blanco else R.drawable.mi_logo_negro
 
+    // ========== UI ==========
+
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
 
-            // === AGENDA 1: esquina superior izquierda ===
             Image(
                 painter = painterResource(id = R.drawable.agenda),
                 contentDescription = null,
@@ -103,7 +82,6 @@ fun LoginScreen(
                     .alpha(0.10f)
             )
 
-            // === AGENDA 2: esquina superior derecha ===
             Image(
                 painter = painterResource(id = R.drawable.agenda),
                 contentDescription = null,
@@ -115,7 +93,6 @@ fun LoginScreen(
                     .alpha(0.08f)
             )
 
-            // === AGENDA 3: esquina inferior izquierda ===
             Image(
                 painter = painterResource(id = R.drawable.agenda),
                 contentDescription = null,
@@ -127,7 +104,6 @@ fun LoginScreen(
                     .alpha(0.06f)
             )
 
-            // === AGENDA 4: esquina inferior derecha ===
             Image(
                 painter = painterResource(id = R.drawable.agenda),
                 contentDescription = null,
@@ -169,7 +145,6 @@ fun LoginScreen(
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        // EMAIL
                         OutlinedTextField(
                             value = email,
                             onValueChange = {
@@ -181,6 +156,7 @@ fun LoginScreen(
                             isError = emailError != null,
                             singleLine = true
                         )
+
                         if (emailError != null) {
                             Text(
                                 text = emailError,
@@ -191,7 +167,6 @@ fun LoginScreen(
 
                         Spacer(modifier = Modifier.height(12.dp))
 
-                        // PASSWORD
                         OutlinedTextField(
                             value = pass,
                             onValueChange = {
@@ -199,17 +174,19 @@ fun LoginScreen(
                                 localPassError = null
                             },
                             label = { Text("Contraseña") },
-                            visualTransformation = if (showPassword)
+                            visualTransformation = if (showPassword) {
                                 VisualTransformation.None
-                            else
-                                PasswordVisualTransformation(),
+                            } else {
+                                PasswordVisualTransformation()
+                            },
                             trailingIcon = {
                                 IconButton(onClick = { showPassword = !showPassword }) {
                                     Icon(
-                                        imageVector = if (showPassword)
+                                        imageVector = if (showPassword) {
                                             Icons.Filled.VisibilityOff
-                                        else
-                                            Icons.Filled.Visibility,
+                                        } else {
+                                            Icons.Filled.Visibility
+                                        },
                                         contentDescription = "Mostrar contraseña"
                                     )
                                 }
@@ -218,6 +195,7 @@ fun LoginScreen(
                             isError = passError != null,
                             singleLine = true
                         )
+
                         if (passError != null) {
                             Text(
                                 text = passError,
@@ -253,9 +231,7 @@ fun LoginScreen(
                                     hasError = true
                                 }
 
-                                if (!hasError) {
-                                    onLoginClick(email, pass)
-                                }
+                                if (!hasError) onLoginClick(email, pass)
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
