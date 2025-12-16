@@ -123,13 +123,13 @@
                     }
                 },
                 {
-                    "source": "/home/mario/.gradle/caches/8.13/transforms/939349caddabc8a884475b03837d1bf3/transformed/play-services-basement-18.8.0/res/values-ta/values.xml",
+                    "source": "/home/mario/.gradle/caches/8.13/transforms/8e8cf7f78cb744de04aa3b004f5e13e6/transformed/play-services-basement-18.4.0/res/values-ta/values.xml",
                     "from": {
                         "startLines": "4",
                         "startColumns": "0",
-                        "startOffsets": "218",
+                        "startOffsets": "195",
                         "endColumns": "156",
-                        "endOffsets": "374"
+                        "endOffsets": "351"
                     },
                     "to": {
                         "startLines": "23",

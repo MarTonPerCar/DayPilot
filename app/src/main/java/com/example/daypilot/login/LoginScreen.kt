@@ -1,6 +1,7 @@
 package com.example.daypilot.login
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -10,12 +11,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.rotate
 import com.example.daypilot.R
 
 // ---------------------------
@@ -59,6 +60,7 @@ fun mapFirebaseErrorToFieldErrors(errorCode: String): LoginFieldErrors {
 
 @Composable
 fun LoginScreen(
+    darkTheme: Boolean,
     onLoginClick: (String, String) -> Unit,
     onRegisterClick: () -> Unit,
     onForgotPasswordClick: (String) -> Unit,
@@ -80,6 +82,8 @@ fun LoginScreen(
 
     val emailError = localEmailError ?: firebaseFieldErrors?.emailError
     val passError = localPassError ?: firebaseFieldErrors?.passError
+
+    val logoRes = if (darkTheme) R.drawable.mi_logo_blanco else R.drawable.mi_logo_negro
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -142,11 +146,11 @@ fun LoginScreen(
             ) {
 
                 Image(
-                    painter = painterResource(id = R.drawable.mi_logo),
+                    painter = painterResource(id = logoRes),
                     contentDescription = "Logo",
                     modifier = Modifier
-                        .size(120.dp)
-                        .padding(bottom = 16.dp)
+                        .size(200.dp)
+                        .padding(bottom = 8.dp)
                 )
 
                 Card(

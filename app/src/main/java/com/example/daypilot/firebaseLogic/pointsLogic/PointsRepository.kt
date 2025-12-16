@@ -9,6 +9,9 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.tasks.await
 import java.time.Instant
+import com.google.firebase.firestore.Query
+import java.time.ZoneId
+import com.google.firebase.firestore.FieldPath
 
 @RequiresApi(Build.VERSION_CODES.O)
 class PointsRepository(
@@ -18,12 +21,6 @@ class PointsRepository(
     private fun logRef(uid: String) = userRef(uid).collection("pointsLog").document()
     private fun dailyRef(uid: String, dayKey: String) = userRef(uid).collection("pointsDaily").document(dayKey)
 
-    /**
-     * Sistema v2:
-     * - Ledger: users/{uid}/pointsLog/{event}
-     * - Diario: users/{uid}/pointsDaily/{yyyy-MM-dd}
-     * - Rolling 30d cacheado en users/{uid}.totalPoints (+ pointsTasks/pointsSteps/pointsWellness)
-     */
     suspend fun addPoints(
         uid: String,
         points: Long,
@@ -32,10 +29,8 @@ class PointsRepository(
     ) {
         if (points == 0L) return
 
-        // 1) Asegura migración/initialization v2 (para arreglar lo que ya existe)
         ensureInitializedV2(uid)
 
-        // 2) Transacción: escribe evento + diario + actualiza rolling (con pruning por días antiguos)
         firestore.runTransaction { tx ->
             val uRef = userRef(uid)
             val uSnap = tx.get(uRef)
@@ -44,14 +39,12 @@ class PointsRepository(
             val zoneId = PointsTime.zoneIdFromRegion(region)
             val todayKey = PointsTime.todayKey(zoneId)
 
-            val lastPrunedKey = uSnap.getString("rollingLastPruneKey") // key del último día ya expulsado
+            val lastPrunedKey = uSnap.getString("rollingLastPruneKey")
             val targetOutKey = PointsTime.outKey(zoneId)
 
-            // --- LECTURAS (todas antes de escribir) ---
             val pruneKeys = computePruneKeys(lastPrunedKey, targetOutKey)
             val pruneSnaps = pruneKeys.map { k -> tx.get(dailyRef(uid, k)) }
 
-            // sumas a restar (días que salen de la ventana)
             var subTotal = 0L
             var subTasks = 0L
             var subSteps = 0L
@@ -66,8 +59,22 @@ class PointsRepository(
                 }
             }
 
+            pruneKeys.forEach { k ->
+                tx.delete(dailyRef(uid, k))
+            }
+
+            // --------- NUEVO: contadores (tareas/pasos) ---------
+            val tasksCountDelta: Long =
+                if (source == PointSource.TASKS)
+                    (metadata["tasksCountDelta"] as? Number)?.toLong() ?: 1L
+                else 0L
+
+            val stepsCountDelta: Long =
+                if (source == PointSource.STEPS)
+                    (metadata["stepsCountDelta"] as? Number)?.toLong() ?: 0L
+                else 0L
+
             // --- ESCRITURAS ---
-            // Evento (ledger)
             val eRef = logRef(uid)
             val logData = mutableMapOf<String, Any?>(
                 "points" to points,
@@ -79,7 +86,6 @@ class PointsRepository(
             if (metadata.isNotEmpty()) logData["metadata"] = metadata
             tx.set(eRef, logData)
 
-            // Diario
             val dRef = dailyRef(uid, todayKey)
             val dailyUpdate = mutableMapOf<String, Any?>(
                 "date" to todayKey,
@@ -88,24 +94,31 @@ class PointsRepository(
                 "total" to FieldValue.increment(points)
             )
             dailyUpdate[sourceField(source)] = FieldValue.increment(points)
+
+            // ✅ guardamos contadores para la gráfica
+            if (tasksCountDelta != 0L) {
+                dailyUpdate["tasksCount"] = FieldValue.increment(tasksCountDelta)
+            }
+            if (stepsCountDelta != 0L) {
+                dailyUpdate["stepsCount"] = FieldValue.increment(stepsCountDelta)
+            }
+
             tx.set(dRef, dailyUpdate, SetOptions.merge())
 
-            // User rolling totals (cache)
-            // Ventana = hoy-29 .. hoy. Por eso restamos el día(s) "outKey(s)" si toca.
+            // --- rolling points (igual que ya tenías) ---
             val deltaTotal = points - subTotal
             val deltaTasks = (if (source == PointSource.TASKS) points else 0L) - subTasks
             val deltaSteps = (if (source == PointSource.STEPS) points else 0L) - subSteps
-            val deltaWell = (if (source == PointSource.WELLNESS) points else 0L) - subWell
+            val deltaWell  = (if (source == PointSource.WELLNESS) points else 0L) - subWell
 
             val userUpdates = mutableMapOf<String, Any?>(
-                // rolling (lo que la app considera "total actual")
                 "totalPoints" to FieldValue.increment(deltaTotal),
                 "pointsTasks" to FieldValue.increment(deltaTasks),
                 "pointsSteps" to FieldValue.increment(deltaSteps),
                 "pointsWellness" to FieldValue.increment(deltaWell),
             )
 
-            // “Hoy” (cache rápido, opcional pero útil)
+            // todayPoints (puntos del día)
             val storedTodayKey = uSnap.getString("todayPointsDate")
             if (storedTodayKey != todayKey) {
                 userUpdates["todayPointsDate"] = todayKey
@@ -114,24 +127,20 @@ class PointsRepository(
                 userUpdates["todayPoints"] = FieldValue.increment(points)
             }
 
-            // Mantén compatibilidad con tu campo todaySteps/todayStepsDate (solo para STEPS)
-            if (source == PointSource.STEPS) {
+            if (source == PointSource.STEPS && stepsCountDelta != 0L) {
                 val storedStepsKey = uSnap.getString("todayStepsDate")
                 if (storedStepsKey != todayKey) {
                     userUpdates["todayStepsDate"] = todayKey
-                    userUpdates["todaySteps"] = points
+                    userUpdates["todaySteps"] = stepsCountDelta
                 } else {
-                    userUpdates["todaySteps"] = FieldValue.increment(points)
+                    userUpdates["todaySteps"] = FieldValue.increment(stepsCountDelta)
                 }
             }
 
             if (pruneKeys.isNotEmpty()) {
                 userUpdates["rollingLastPruneKey"] = targetOutKey
-            } else {
-                // si no existía, lo fijamos igual para que quede consistente
-                if (lastPrunedKey.isNullOrBlank()) {
-                    userUpdates["rollingLastPruneKey"] = targetOutKey
-                }
+            } else if (lastPrunedKey.isNullOrBlank()) {
+                userUpdates["rollingLastPruneKey"] = targetOutKey
             }
 
             userUpdates["pointsSystemVersion"] = 2L
@@ -139,16 +148,10 @@ class PointsRepository(
             userUpdates["pointsUpdatedAt"] = FieldValue.serverTimestamp()
 
             tx.update(uRef, userUpdates)
-
             null
         }.await()
     }
 
-    /**
-     * “Arregla lo que ya existe”:
-     * Si el usuario no está en v2, crea pointsDaily desde pointsLog (últimos 30 días por region-zone),
-     * y convierte totalPoints/pointsTasks/... a rolling 30 días.
-     */
     suspend fun ensureInitializedV2(uid: String) {
         val uRef = userRef(uid)
         val uSnap = uRef.get().await()
@@ -159,13 +162,6 @@ class PointsRepository(
         val region = uSnap.getString("region")
         val zoneId = PointsTime.zoneIdFromRegion(region)
 
-        // Guarda all-time con lo que tengas ahora (para no perderlo)
-        val existingTotal = (uSnap.getLong("totalPoints") ?: 0L)
-        val existingTasks = (uSnap.getLong("pointsTasks") ?: 0L)
-        val existingSteps = (uSnap.getLong("pointsSteps") ?: 0L)
-        val existingWell = (uSnap.getLong("pointsWellness") ?: 0L)
-
-        // Calcula ventana (últimos 30 días) leyendo pointsLog
         val startInstant = Instant.now().atZone(zoneId).toLocalDate().minusDays(29)
             .atStartOfDay(zoneId).toInstant()
         val startTs = Timestamp(startInstant.epochSecond, 0)
@@ -225,7 +221,6 @@ class PointsRepository(
 
         val outKey = PointsTime.outKey(zoneId)
 
-        // User: guarda all-time (si no existía) y setea rolling
         val userUpdate = mutableMapOf<String, Any?>(
             "pointsSystemVersion" to 2L,
             "pointsZoneId" to zoneId.id,
@@ -246,7 +241,6 @@ class PointsRepository(
         batch.commit().await()
     }
 
-    /** Puntos de hoy (según region/zone) leyendo pointsDaily */
     suspend fun getTodayPoints(uid: String): Long {
         val uSnap = userRef(uid).get().await()
         val zoneId = PointsTime.zoneIdFromRegion(uSnap.getString("region"))
@@ -255,7 +249,6 @@ class PointsRepository(
         return dSnap.getLong("total") ?: 0L
     }
 
-    /** Rolling total cacheado en el user (ya es 30 días) */
     suspend fun getRollingTotal(uid: String): Long {
         val uSnap = userRef(uid).get().await()
         return uSnap.getLong("totalPoints") ?: 0L
@@ -281,5 +274,126 @@ class PointsRepository(
         } catch (_: Exception) {
             listOf(targetOutKey)
         }
+    }
+
+    suspend fun refreshRollingTotals(uid: String) {
+        ensureInitializedV2(uid)
+
+        firestore.runTransaction { tx ->
+            val uRef = userRef(uid)
+            val uSnap = tx.get(uRef)
+
+            val region = uSnap.getString("region")
+            val zoneId = PointsTime.zoneIdFromRegion(region)
+
+            val lastPrunedKey = uSnap.getString("rollingLastPruneKey")
+            val targetOutKey = PointsTime.outKey(zoneId) // hoy-30 (fuera ventana)
+
+            val pruneKeys = computePruneKeys(lastPrunedKey, targetOutKey)
+
+            if (pruneKeys.isEmpty()) return@runTransaction null
+            val snaps = pruneKeys.map { k -> tx.get(dailyRef(uid, k)) }
+
+            var subTotal = 0L
+            var subTasks = 0L
+            var subSteps = 0L
+            var subWell = 0L
+
+            snaps.forEach { s ->
+                if (s.exists()) {
+                    subTotal += (s.getLong("total") ?: 0L)
+                    subTasks += (s.getLong("tasks") ?: 0L)
+                    subSteps += (s.getLong("steps") ?: 0L)
+                    subWell += (s.getLong("wellness") ?: 0L)
+                }
+            }
+
+            // ---- updates rolling totals ----
+            val userUpdates = mutableMapOf<String, Any?>(
+                "totalPoints" to FieldValue.increment(-subTotal),
+                "pointsTasks" to FieldValue.increment(-subTasks),
+                "pointsSteps" to FieldValue.increment(-subSteps),
+                "pointsWellness" to FieldValue.increment(-subWell),
+                "rollingLastPruneKey" to targetOutKey,
+                "pointsZoneId" to zoneId.id,
+                "pointsUpdatedAt" to FieldValue.serverTimestamp()
+            )
+            tx.update(uRef, userUpdates)
+
+            pruneKeys.forEach { k ->
+                tx.delete(dailyRef(uid, k))
+            }
+
+            null
+        }.await()
+    }
+
+    private fun cutoffTimestampForLog(zoneId: ZoneId): Timestamp {
+        val cutoffInstant = java.time.Instant.now()
+            .atZone(zoneId)
+            .toLocalDate()
+            .minusDays(29)
+            .atStartOfDay(zoneId)
+            .toInstant()
+
+        return Timestamp(cutoffInstant.epochSecond, 0)
+    }
+
+    suspend fun purgePointsLogOlderThan30Days(uid: String) {
+        ensureInitializedV2(uid)
+
+        val uSnap = userRef(uid).get().await()
+        val zoneId = PointsTime.zoneIdFromRegion(uSnap.getString("region"))
+        val cutoffTs = cutoffTimestampForLog(zoneId)
+
+        val col = userRef(uid).collection("pointsLog")
+
+        while (true) {
+            val snap = col
+                .whereLessThan("createdAt", cutoffTs)
+                .orderBy("createdAt", Query.Direction.ASCENDING)
+                .limit(450)
+                .get()
+                .await()
+
+            if (snap.isEmpty) break
+
+            val batch = firestore.batch()
+            for (doc in snap.documents) {
+                batch.delete(doc.reference)
+            }
+            batch.commit().await()
+        }
+    }
+
+    suspend fun sweepPointsDailyOlderThan30Days(uid: String) {
+        ensureInitializedV2(uid)
+
+        val uSnap = userRef(uid).get().await()
+        val zoneId = PointsTime.zoneIdFromRegion(uSnap.getString("region"))
+        val minKey = PointsTime.minKey(zoneId)
+
+        val col = userRef(uid).collection("pointsDaily")
+
+        while (true) {
+            val snap = col
+                .orderBy(FieldPath.documentId(), Query.Direction.ASCENDING)
+                .whereLessThan(FieldPath.documentId(), minKey)
+                .limit(450)
+                .get()
+                .await()
+
+            if (snap.isEmpty) break
+
+            val batch = firestore.batch()
+            snap.documents.forEach { batch.delete(it.reference) }
+            batch.commit().await()
+        }
+    }
+
+    suspend fun refreshAndPurge(uid: String) {
+        refreshRollingTotals(uid)
+        sweepPointsDailyOlderThan30Days(uid)
+        purgePointsLogOlderThan30Days(uid)
     }
 }

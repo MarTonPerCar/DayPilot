@@ -111,6 +111,7 @@ drawable abc_vector_test
 drawable agenda
 drawable calendario
 drawable calificacion
+drawable caminar
 drawable common_full_open_on_phone
 drawable common_google_signin_btn_icon_dark
 drawable common_google_signin_btn_icon_dark_focused
@@ -143,7 +144,9 @@ drawable ic_launcher_foreground
 drawable ic_other_sign_in
 drawable ic_passkey
 drawable ic_password
-drawable mi_logo
+drawable icono_aplicacion
+drawable mi_logo_blanco
+drawable mi_logo_negro
 drawable notification_action_background
 drawable notification_bg
 drawable notification_bg_low
@@ -309,6 +312,7 @@ layout notification_template_icon_group
 layout notification_template_part_chronometer
 layout notification_template_part_time
 mipmap ic_launcher
+mipmap ic_launcher_foreground
 mipmap ic_launcher_round
 raw firebase_common_keep
 string android_credentials_TYPE_PASSWORD_CREDENTIAL

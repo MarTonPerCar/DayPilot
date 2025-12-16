@@ -1,10 +1,13 @@
 package com.example.daypilot.main.mainZone.task
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowInsetsControllerCompat
@@ -19,6 +22,7 @@ class TaskActivity : ComponentActivity() {
     private lateinit var taskRepo: TaskRepository
     private lateinit var sessionManager: SessionManager
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -34,6 +38,8 @@ class TaskActivity : ComponentActivity() {
         setContent {
             val darkTheme = sessionManager.isDarkModeEnabled()
             val openTaskId = intent.getStringExtra("openTaskId")
+
+            val pointsRepo = remember { com.example.daypilot.firebaseLogic.pointsLogic.PointsRepository() }
 
             DayPilotTheme(darkTheme = darkTheme) {
                 val colorScheme = MaterialTheme.colorScheme
@@ -56,7 +62,7 @@ class TaskActivity : ComponentActivity() {
                 TaskScreen(
                     uid = user.uid,
                     taskRepo = taskRepo,
-                    authRepo = authRepo,
+                    pointsRepo = pointsRepo,
                     openTaskId = openTaskId,
                     onBack = { finish() }
                 )

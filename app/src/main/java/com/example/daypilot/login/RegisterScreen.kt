@@ -10,12 +10,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.rotate
 import com.example.daypilot.R
 
 data class TimeZoneDisplay(
@@ -47,6 +47,7 @@ private val regionOptions = listOf(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(
+    darkTheme: Boolean,
     onRegisterClick: (String, String, String, String, String) -> Unit,
     // name, username, email, pass, regionZoneId
     onBackToLogin: () -> Unit,
@@ -70,6 +71,8 @@ fun RegisterScreen(
     var emailError by remember { mutableStateOf<String?>(null) }
     var passError by remember { mutableStateOf<String?>(null) }
     var regionError by remember { mutableStateOf<String?>(null) }
+
+    val logoRes = if (darkTheme) R.drawable.mi_logo_blanco else R.drawable.mi_logo_negro
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -132,11 +135,11 @@ fun RegisterScreen(
             ) {
 
                 Image(
-                    painter = painterResource(id = R.drawable.mi_logo),
+                    painter = painterResource(id = logoRes),
                     contentDescription = "Logo",
                     modifier = Modifier
-                        .size(120.dp)
-                        .padding(bottom = 16.dp)
+                        .size(200.dp)
+                        .padding(bottom = 8.dp)
                 )
 
                 Card(
@@ -340,20 +343,15 @@ fun RegisterScreen(
 
                                 when {
                                     pass.length < 8 -> {
-                                        passError =
-                                            "La contraseña debe tener al menos 8 caracteres"
+                                        passError = "La contraseña debe tener al menos 8 caracteres"
                                         hasError = true
                                     }
-
                                     !pass.any { it.isUpperCase() } -> {
-                                        passError =
-                                            "La contraseña debe incluir al menos una mayúscula"
+                                        passError = "La contraseña debe incluir al menos una mayúscula"
                                         hasError = true
                                     }
-
                                     !pass.any { it.isDigit() } -> {
-                                        passError =
-                                            "La contraseña debe incluir al menos un número"
+                                        passError = "La contraseña debe incluir al menos un número"
                                         hasError = true
                                     }
                                 }
