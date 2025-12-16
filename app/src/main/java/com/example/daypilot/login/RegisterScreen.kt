@@ -18,17 +18,11 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.example.daypilot.R
 
-data class TimeZoneDisplay(
+data class RegionOption(
     val id: String,
     val label: String
 )
 
-data class RegionOption(
-    val id: String,    // ej: "Europe/Madrid"
-    val label: String  // ej: "Europe/Madrid (UTC+01:00)"
-)
-
-// Lista fija de regiones habituales
 private val regionOptions = listOf(
     RegionOption("Europe/Madrid", "Europe/Madrid (UTC+01:00)"),
     RegionOption("Atlantic/Canary", "Atlantic/Canary (UTC+00:00)"),
@@ -49,23 +43,23 @@ private val regionOptions = listOf(
 fun RegisterScreen(
     darkTheme: Boolean,
     onRegisterClick: (String, String, String, String, String) -> Unit,
-    // name, username, email, pass, regionZoneId
     onBackToLogin: () -> Unit,
     isLoading: Boolean
 ) {
+
+    // ========== State ==========
+
     var name by remember { mutableStateOf("") }
     var username by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var pass by remember { mutableStateOf("") }
 
-    // Región seleccionada
     var expanded by remember { mutableStateOf(false) }
     var selectedRegionId by remember { mutableStateOf<String?>(null) }
     var regionDisplay by remember { mutableStateOf("") }
 
     var showPassword by remember { mutableStateOf(false) }
 
-    // Errores por campo
     var nameError by remember { mutableStateOf<String?>(null) }
     var usernameError by remember { mutableStateOf<String?>(null) }
     var emailError by remember { mutableStateOf<String?>(null) }
@@ -74,13 +68,14 @@ fun RegisterScreen(
 
     val logoRes = if (darkTheme) R.drawable.mi_logo_blanco else R.drawable.mi_logo_negro
 
+    // ========== UI ==========
+
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
 
-            // AGENDA 1: arriba derecha
             Image(
                 painter = painterResource(id = R.drawable.agenda),
                 contentDescription = null,
@@ -92,7 +87,6 @@ fun RegisterScreen(
                     .alpha(0.12f)
             )
 
-            // AGENDA 2: arriba izquierda
             Image(
                 painter = painterResource(id = R.drawable.agenda),
                 contentDescription = null,
@@ -104,7 +98,6 @@ fun RegisterScreen(
                     .alpha(0.08f)
             )
 
-            // AGENDA 3: abajo izquierda
             Image(
                 painter = painterResource(id = R.drawable.agenda),
                 contentDescription = null,
@@ -116,7 +109,6 @@ fun RegisterScreen(
                     .alpha(0.06f)
             )
 
-            // AGENDA 4: abajo derecha
             Image(
                 painter = painterResource(id = R.drawable.agenda),
                 contentDescription = null,
@@ -158,7 +150,6 @@ fun RegisterScreen(
                         Text("Crear cuenta", style = MaterialTheme.typography.headlineMedium)
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        // ---- NOMBRE ----
                         OutlinedTextField(
                             value = name,
                             onValueChange = {
@@ -170,9 +161,10 @@ fun RegisterScreen(
                             isError = nameError != null,
                             singleLine = true
                         )
-                        if (nameError != null) {
+
+                        nameError?.let {
                             Text(
-                                text = nameError!!,
+                                text = it,
                                 color = MaterialTheme.colorScheme.error,
                                 style = MaterialTheme.typography.bodySmall
                             )
@@ -180,7 +172,6 @@ fun RegisterScreen(
 
                         Spacer(modifier = Modifier.height(12.dp))
 
-                        // ---- USERNAME ----
                         OutlinedTextField(
                             value = username,
                             onValueChange = {
@@ -192,9 +183,10 @@ fun RegisterScreen(
                             isError = usernameError != null,
                             singleLine = true
                         )
-                        if (usernameError != null) {
+
+                        usernameError?.let {
                             Text(
-                                text = usernameError!!,
+                                text = it,
                                 color = MaterialTheme.colorScheme.error,
                                 style = MaterialTheme.typography.bodySmall
                             )
@@ -202,14 +194,13 @@ fun RegisterScreen(
 
                         Spacer(modifier = Modifier.height(12.dp))
 
-                        // ---- REGIÓN / ZONA HORARIA (COMBOBOX) ----
                         ExposedDropdownMenuBox(
                             expanded = expanded,
                             onExpandedChange = { expanded = !expanded }
                         ) {
                             OutlinedTextField(
                                 value = regionDisplay,
-                                onValueChange = { /* readOnly */ },
+                                onValueChange = {},
                                 readOnly = true,
                                 label = { Text("Región / zona horaria") },
                                 trailingIcon = {
@@ -239,9 +230,10 @@ fun RegisterScreen(
                                 }
                             }
                         }
-                        if (regionError != null) {
+
+                        regionError?.let {
                             Text(
-                                text = regionError!!,
+                                text = it,
                                 color = MaterialTheme.colorScheme.error,
                                 style = MaterialTheme.typography.bodySmall
                             )
@@ -249,7 +241,6 @@ fun RegisterScreen(
 
                         Spacer(modifier = Modifier.height(12.dp))
 
-                        // ---- EMAIL ----
                         OutlinedTextField(
                             value = email,
                             onValueChange = {
@@ -261,9 +252,10 @@ fun RegisterScreen(
                             isError = emailError != null,
                             singleLine = true
                         )
-                        if (emailError != null) {
+
+                        emailError?.let {
                             Text(
-                                text = emailError!!,
+                                text = it,
                                 color = MaterialTheme.colorScheme.error,
                                 style = MaterialTheme.typography.bodySmall
                             )
@@ -271,7 +263,6 @@ fun RegisterScreen(
 
                         Spacer(modifier = Modifier.height(12.dp))
 
-                        // ---- CONTRASEÑA ----
                         OutlinedTextField(
                             value = pass,
                             onValueChange = {
@@ -279,17 +270,19 @@ fun RegisterScreen(
                                 passError = null
                             },
                             label = { Text("Contraseña") },
-                            visualTransformation = if (showPassword)
+                            visualTransformation = if (showPassword) {
                                 VisualTransformation.None
-                            else
-                                PasswordVisualTransformation(),
+                            } else {
+                                PasswordVisualTransformation()
+                            },
                             trailingIcon = {
                                 IconButton(onClick = { showPassword = !showPassword }) {
                                     Icon(
-                                        imageVector = if (showPassword)
+                                        imageVector = if (showPassword) {
                                             Icons.Filled.VisibilityOff
-                                        else
-                                            Icons.Filled.Visibility,
+                                        } else {
+                                            Icons.Filled.Visibility
+                                        },
                                         contentDescription = "Mostrar contraseña"
                                     )
                                 }
@@ -298,9 +291,10 @@ fun RegisterScreen(
                             isError = passError != null,
                             singleLine = true
                         )
-                        if (passError != null) {
+
+                        passError?.let {
                             Text(
-                                text = passError!!,
+                                text = it,
                                 color = MaterialTheme.colorScheme.error,
                                 style = MaterialTheme.typography.bodySmall
                             )
@@ -356,7 +350,7 @@ fun RegisterScreen(
                                     }
                                 }
 
-                                if (!hasError && selectedRegionId != null) {
+                                if (!hasError) {
                                     onRegisterClick(
                                         name,
                                         username,

@@ -61,7 +61,7 @@ class TechHealthViewModel(private val appContext: Context) : ViewModel() {
         }
     }
 
-    // ---------- Groups ----------
+    // ========= Groups =========
     fun createGroup(name: String): String {
         val id = UUID.randomUUID().toString()
         viewModelScope.launch { store.createGroup(id, name) }
@@ -71,7 +71,7 @@ class TechHealthViewModel(private val appContext: Context) : ViewModel() {
     fun updateGroupApps(id: String, pkgs: Set<String>) =
         viewModelScope.launch { store.setGroupApps(id, pkgs) }
 
-    // ---------- Restrictions ----------
+    // ========= Restrictions =========
     fun createRestriction(r: Restriction) = viewModelScope.launch { store.addRestriction(r) }
 
     fun setRestrictionPending(

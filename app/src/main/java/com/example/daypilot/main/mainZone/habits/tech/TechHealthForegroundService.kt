@@ -26,13 +26,6 @@ class TechHealthForegroundService : Service() {
                 context.startService(i)
             }
         }
-
-        fun stop(context: Context) {
-            val i = Intent(context, TechHealthForegroundService::class.java).apply {
-                action = ACTION_STOP
-            }
-            context.startService(i)
-        }
     }
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
@@ -67,10 +60,9 @@ class TechHealthForegroundService : Service() {
                     val hasWork = runCatching { monitor.tick() }.getOrDefault(false)
                     android.util.Log.d("TechHealth", "tick() ok, hasWork=$hasWork")
 
-                    // Si no hay permisos/restricciones activas, nos paramos solos para no molestar
                     if (!hasWork) {
                         noWorkTicks++
-                        if (noWorkTicks >= 12) { // ~1 min si tick=5s
+                        if (noWorkTicks >= 12) {
                             stopSelf()
                             break
                         }

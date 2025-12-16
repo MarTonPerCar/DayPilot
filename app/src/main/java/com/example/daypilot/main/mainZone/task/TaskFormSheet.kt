@@ -106,7 +106,6 @@ fun TaskFormSheet(
             modifier = Modifier.fillMaxWidth()
         )
 
-        // Dificultad
         Column(
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
@@ -136,7 +135,6 @@ fun TaskFormSheet(
             }
         }
 
-        // Duración
         Column(
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
@@ -180,7 +178,6 @@ fun TaskFormSheet(
             }
         }
 
-        // Días
         Column(
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
@@ -216,7 +213,6 @@ fun TaskFormSheet(
             }
         }
 
-        // Categoría
         Column(
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
@@ -268,7 +264,6 @@ fun TaskFormSheet(
             }
         }
 
-        // Recordatorio
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
@@ -289,7 +284,6 @@ fun TaskFormSheet(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Botones inferiores
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween

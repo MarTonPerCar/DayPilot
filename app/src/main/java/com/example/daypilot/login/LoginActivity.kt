@@ -40,7 +40,7 @@ class LoginActivity : ComponentActivity() {
 
             DayPilotTheme(darkTheme = darkTheme) {
                 LoginScreen(
-                    darkTheme = darkTheme, // ✅ IMPORTANTE
+                    darkTheme = darkTheme,
                     onLoginClick = { email, password ->
                         firebaseErrorCode = null
                         isLoading = true

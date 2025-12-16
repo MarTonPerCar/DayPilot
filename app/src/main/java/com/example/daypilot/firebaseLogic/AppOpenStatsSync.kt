@@ -40,12 +40,11 @@ object AppOpenStatsSync {
 
         val tz = safeTimeZone(userSnap.getString("region"))
         val todayKey = dayKeyNow(tz)
-        val keepMinKey = dayKeyMinusDays(tz, 29) // hoy + 29 previos => 30 días
+        val keepMinKey = dayKeyMinusDays(tz, 29)
 
         val currentStepsDate = userSnap.getString("todayStepsDate")
         val currentPointsDate = userSnap.getString("todayPointsDate")
 
-        // 1) Roll-over del día (persistido)
         val rollover = mutableMapOf<String, Any>()
         if (currentStepsDate != todayKey) {
             rollover["todaySteps"] = 0L
@@ -56,7 +55,6 @@ object AppOpenStatsSync {
             rollover["todayPointsDate"] = todayKey
         }
 
-        // Guardamos el id de zona “usado” (en string)
         rollover["pointsZoneId"] = tz.id
         rollover["pointsUpdatedAt"] = FieldValue.serverTimestamp()
 
@@ -64,7 +62,6 @@ object AppOpenStatsSync {
             userRef.set(rollover, SetOptions.merge()).await()
         }
 
-        // 2) Asegurar pointsDaily de hoy (campos para gráfica)
         val todayDailyRef = userRef.collection("pointsDaily").document(todayKey)
         todayDailyRef.set(
             mapOf(
@@ -81,11 +78,8 @@ object AppOpenStatsSync {
             SetOptions.merge()
         ).await()
 
-        // 3) Podar pointsDaily y pointsLog > 30 días
         sweepPointsDailyOlderThan(userRef = userRef, minKeyExclusive = keepMinKey)
         sweepPointsLogOlderThan(userRef = userRef, minKeyExclusive = keepMinKey)
-
-        // 4) Recalcular rolling totals desde pointsDaily (máx 30 lecturas)
         recomputeRollingTotals(userRef = userRef, todayKey = todayKey)
     }
 

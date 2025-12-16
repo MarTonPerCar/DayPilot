@@ -6,13 +6,6 @@ import com.example.daypilot.firebaseLogic.authLogic.AuthRepository
 import com.example.daypilot.login.LoginActivity
 
 object SessionGuard {
-
-    /**
-     * Si SharedPrefs dice "logged_in" pero Firebase no tiene user,
-     * forzamos logout para evitar softlock y redirigimos a Login.
-     *
-     * Devuelve true si la sesión es válida, false si se ha forzado logout.
-     */
     fun ensureValidSessionOrLogout(
         context: Context,
         sessionManager: SessionManager,
@@ -22,7 +15,6 @@ object SessionGuard {
         val firebaseUser = authRepo.currentUser
 
         if (localLogged && firebaseUser == null) {
-            // Estado inconsistente -> hard logout
             sessionManager.logout()
             authRepo.logout()
 

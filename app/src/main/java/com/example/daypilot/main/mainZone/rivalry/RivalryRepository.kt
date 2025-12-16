@@ -1,5 +1,7 @@
 package com.example.daypilot.main.mainZone.rivalry
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.example.daypilot.firebaseLogic.authLogic.AuthRepository
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
@@ -35,6 +37,7 @@ class RivalryRepository(
         return (snap.get("totalPoints") as? Number)?.toLong() ?: 0L
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private suspend fun getTodayPoints(uid: String): Long {
         val zone = ZoneId.systemDefault()
         val start = LocalDate.now().atStartOfDay(zone).toInstant()

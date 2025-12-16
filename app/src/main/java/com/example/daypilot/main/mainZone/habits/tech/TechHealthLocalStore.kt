@@ -7,15 +7,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
-private val Context.techStore by preferencesDataStore("tech_health_v2") // si quieres reset automático: cambia a tech_health_v3
+private val Context.techStore by preferencesDataStore("tech_health_v2")
 
 class TechHealthLocalStore(private val context: Context) {
 
     private object Keys {
         val GROUP_IDS = stringSetPreferencesKey("group_ids")
         val RESTRICTIONS = stringSetPreferencesKey("restrictions")
-
-        // ✅ Uso “real” (tu contador)
         val USAGE_DAY = stringPreferencesKey("usage_day_key")
         val USAGE_SET = stringSetPreferencesKey("usage_ms_set")
     }
@@ -51,7 +49,7 @@ class TechHealthLocalStore(private val context: Context) {
 
     private fun dec(s: String): Restriction? {
         val p = s.split("|", limit = 15)
-        if (p.size < 11) return null // tolera viejos, pero mínimos
+        if (p.size < 11) return null
 
         val id = p[0]
         val type = runCatching { RestrictionType.valueOf(p[1]) }.getOrNull() ?: return null
@@ -61,7 +59,6 @@ class TechHealthLocalStore(private val context: Context) {
         val activeEnabled = p[4].toBooleanStrictOrNull() ?: true
         val activeLimit = p[5].toIntOrNull() ?: return null
 
-        // Defaults si viene de data vieja
         val activeNotifyEnabled = p.getOrNull(6)?.toBooleanStrictOrNull() ?: true
         val activeNotifyEverySec = p.getOrNull(7)?.toIntOrNull()?.coerceIn(5, 60) ?: 60
 
@@ -131,21 +128,6 @@ class TechHealthLocalStore(private val context: Context) {
         }
     }
 
-    suspend fun renameGroup(id: String, name: String) {
-        context.techStore.edit { p ->
-            p[kGroupName(id)] = name.trim().ifBlank { "Grupo" }
-        }
-    }
-
-    suspend fun deleteGroup(id: String) {
-        context.techStore.edit { p ->
-            val cur = p[Keys.GROUP_IDS] ?: emptySet()
-            p[Keys.GROUP_IDS] = cur - id
-            p.remove(kGroupName(id))
-            p.remove(kGroupApps(id))
-        }
-    }
-
     // ---------- Restrictions ----------
     suspend fun addRestriction(r: Restriction) {
         context.techStore.edit { p ->
@@ -159,13 +141,6 @@ class TechHealthLocalStore(private val context: Context) {
             val cur = p[Keys.RESTRICTIONS] ?: emptySet()
             val filtered = cur.filterNot { it.startsWith("${r.id}|") }.toSet()
             p[Keys.RESTRICTIONS] = filtered + enc(r.copy(updatedAt = System.currentTimeMillis()))
-        }
-    }
-
-    suspend fun deleteRestrictionHard(id: String) {
-        context.techStore.edit { p ->
-            val cur = p[Keys.RESTRICTIONS] ?: emptySet()
-            p[Keys.RESTRICTIONS] = cur.filterNot { it.startsWith("$id|") }.toSet()
         }
     }
 
@@ -202,7 +177,6 @@ class TechHealthLocalStore(private val context: Context) {
         }
     }
 
-    // ---------- Usage (tu contador) ----------
     val usageTodayFlow: Flow<Map<String, Long>> =
         context.techStore.data.map { prefs ->
             val set = prefs[Keys.USAGE_SET] ?: emptySet()

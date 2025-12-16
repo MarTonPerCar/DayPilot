@@ -57,12 +57,10 @@ class SettingsActivity : ComponentActivity() {
 
                 if (!view.isInEditMode) {
                     SideEffect {
-                        // Colores de barras según el tema
                         window.statusBarColor = colorScheme.background.toArgb()
                         window.navigationBarColor = colorScheme.background.toArgb()
 
                         WindowInsetsControllerCompat(window, window.decorView).apply {
-                            // Iconos oscuros en tema claro, claros en tema oscuro
                             isAppearanceLightStatusBars = !darkPref
                             isAppearanceLightNavigationBars = !darkPref
                         }

@@ -36,18 +36,16 @@ class TechHealthMonitor(private val context: Context) {
         val (groups, restrictions) = store.flow.first()
         if (restrictions.none { it.activeEnabled }) return false
 
-        // 1) Suma SIEMPRE el delta al último paquete conocido
         if (lastTickAt != 0L && lastTopPkg != null) {
             val delta = (now - lastTickAt).coerceIn(0L, 60_000L)
             store.addUsageDelta(key, lastTopPkg!!, delta)
         }
         lastTickAt = now
 
-        // 2) Intenta leer top actual (si es null, mantenemos el anterior)
         val topNow = UsageReader.currentTopPackage(context)
         if (topNow != null) lastTopPkg = topNow
 
-        val currentPkg = lastTopPkg ?: return true  // si aún no sabemos nada, no hacemos notifs
+        val currentPkg = lastTopPkg ?: return true
         android.util.Log.d("TechHealth", "top=$currentPkg")
 
         val usageMs = store.usageTodayFlow.first()
@@ -58,8 +56,6 @@ class TechHealthMonitor(private val context: Context) {
         }
 
         val now2 = System.currentTimeMillis()
-
-        // usa currentPkg en vez de "top"
         restrictions.filter { it.activeEnabled }.forEach { r ->
             val isCurrentlyUsingTarget = when (r.type) {
                 RestrictionType.APP -> (currentPkg == r.targetId)

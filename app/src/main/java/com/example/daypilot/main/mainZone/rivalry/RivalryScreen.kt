@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -137,11 +136,7 @@ fun RivalryScreen(
                 )
             }
 
-
-            // --- Cabecera compacta (tipo “cartilla pequeña”) ---
             SmallHeaderCard()
-
-            // --- Tabla de clasificación ---
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -171,7 +166,6 @@ private fun BigMeCard(entry: RivalryEntry) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             ProfileAvatar(photoUrl = entry.photoUrl, size = 64.dp)
-
             Spacer(Modifier.width(14.dp))
 
             Column(modifier = Modifier.weight(1f)) {
@@ -382,12 +376,6 @@ private fun ProfileAvatar(photoUrl: String?, size: androidx.compose.ui.unit.Dp) 
                 modifier = Modifier
                     .size(size)
                     .clip(CircleShape)
-            )
-        } else {
-            // placeholder simple
-            Text(
-                text = "🙂",
-                style = MaterialTheme.typography.titleMedium
             )
         }
     }

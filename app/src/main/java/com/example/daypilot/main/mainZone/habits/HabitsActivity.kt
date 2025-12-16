@@ -30,7 +30,7 @@ class HabitsActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val sessionManager = SessionManager(this)
-        val uid = authRepo.currentUser?.uid // si es null, Steps se verá “desactivado”
+        val uid = authRepo.currentUser?.uid
         val zoneId = ZoneId.systemDefault()
 
         val stepsVm: StepsViewModel? = uid?.let {
@@ -54,7 +54,6 @@ class HabitsActivity : ComponentActivity() {
                     }
                 }
 
-                // Permiso steps
                 var hasStepsPermission by remember { mutableStateOf(Build.VERSION.SDK_INT < 29) }
                 val launcher = rememberLauncherForActivityResult(
                     ActivityResultContracts.RequestPermission()
@@ -82,7 +81,6 @@ class HabitsActivity : ComponentActivity() {
                         startActivity(Intent(this, com.example.daypilot.main.mainZone.habits.steps.StepsActivity::class.java))
                     },
                     onChangeStepsGoal = { newGoal -> stepsVm?.setGoal(newGoal) },
-
                     onOpenTechHealth = {
                         startActivity(Intent(this, com.example.daypilot.main.mainZone.habits.tech.TechHealthActivity::class.java))
                     },

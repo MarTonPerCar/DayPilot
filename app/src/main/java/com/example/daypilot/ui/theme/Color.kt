@@ -12,7 +12,6 @@ val BrandRed       = Color(0xFFD32F2F)
 val BrandRedDeep   = Color(0xFFB71C1C)
 val BrandGreen     = Color(0xFF2E7D32)
 val BrandGreenDark = Color(0xFF2E7D32)
-val StrongRed = Color(0xA84C4C)
 
 // ===============================================================
 //  NEUTRALES (CLARO)
@@ -41,9 +40,3 @@ val TextSecondaryDark    = Color(0xFFBDBDBD)
 // ===============================================================
 val ErrorLight           = BrandRed
 val ErrorDark            = BrandRedDeep
-
-val SuccessLight         = BrandGreen
-val SuccessDark          = Color(0xFF66BB6A)   // un verde algo más claro
-
-val WarningLight         = Color(0xFFFFC107)   // ámbar
-val WarningDark          = Color(0xFFFFD54F)

@@ -2,14 +2,13 @@ package com.example.daypilot.main.mainZone.habits.steps
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -26,9 +25,7 @@ fun StepsScreen(
     var showGoalSheet by remember { mutableStateOf(false) }
 
     val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
 
-    // Mostrar snack cuando hay mensaje de subida
     LaunchedEffect(ui.uploadMessage) {
         ui.uploadMessage?.let { msg ->
             snackbarHostState.showSnackbar(msg)
@@ -36,7 +33,6 @@ fun StepsScreen(
         }
     }
 
-    // Draft goal
     var goalText by remember(ui.goalToday, ui.pendingGoalNextDay) {
         mutableStateOf((ui.pendingGoalNextDay ?: ui.goalToday).toString())
     }
@@ -47,7 +43,7 @@ fun StepsScreen(
             CenterAlignedTopAppBar(
                 title = { Text("Pasos") },
                 navigationIcon = {
-                    IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, "Atrás") }
+                    IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Atrás") }
                 },
                 actions = {
                     IconButton(onClick = { showInfo = true }) { Icon(Icons.Default.Info, "Info") }
@@ -89,7 +85,7 @@ fun StepsScreen(
 
             ui.pendingGoalNextDay?.let { next ->
                 AssistChip(
-                    onClick = { /* nada */ },
+                    onClick = { },
                     label = { Text("Meta nueva ($next) aplicada mañana") }
                 )
             }

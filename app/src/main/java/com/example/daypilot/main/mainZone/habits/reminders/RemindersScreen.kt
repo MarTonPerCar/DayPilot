@@ -1,5 +1,4 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
-
 package com.example.daypilot.main.mainZone.habits.reminders
 
 import android.app.DatePickerDialog
@@ -12,6 +11,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Info
@@ -35,6 +35,9 @@ fun RemindersScreen(
     onRequestNotif: () -> Unit,
     onBack: () -> Unit
 ) {
+
+    // ========== State ==========
+
     val context = LocalContext.current
     val ui by vm.ui.collectAsState()
 
@@ -45,23 +48,27 @@ fun RemindersScreen(
     val sdf = remember { SimpleDateFormat("dd/MM HH:mm", Locale.getDefault()) }
     val exactOk = ReminderScheduler.canScheduleExact(context)
 
+    // ========== UI ==========
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text("Recordatorios") },
                 navigationIcon = {
-                    IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, "Atrás") }
+                    IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Atrás") }
                 },
                 actions = {
-                    IconButton(onClick = { showInfo = true }) { Icon(Icons.Default.Info, "Info") }
+                    IconButton(onClick = { showInfo = true }) { Icon(Icons.Default.Info, contentDescription = "Info") }
                 }
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = {
-                editing = null
-                showSheet = true
-            }) { Text("+") }
+            FloatingActionButton(
+                onClick = {
+                    editing = null
+                    showSheet = true
+                }
+            ) { Text("+") }
         }
     ) { padding ->
         Box(
@@ -69,7 +76,7 @@ fun RemindersScreen(
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            val needsExactAccess = (Build.VERSION.SDK_INT >= 31 && !exactOk)
+            val needsExactAccess = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !exactOk
 
             if (!hasNotifPermission || needsExactAccess) {
                 PermissionCenteredCard(
@@ -81,85 +88,16 @@ fun RemindersScreen(
                     }
                 )
             } else {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Text("Activos", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-
-                    if (ui.reminders.isEmpty()) {
-                        EmptyStateCentered(
-                            title = "No hay recordatorios",
-                            subtitle = "Pulsa + para crear uno nuevo."
-                        )
-                    } else {
-                        LazyColumn(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalArrangement = Arrangement.spacedBy(10.dp)
-                        ) {
-                            items(ui.reminders) { r ->
-                                ElevatedCard(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clickable {
-                                            editing = r
-                                            showSheet = true
-                                        },
-                                    shape = MaterialTheme.shapes.large
-                                ) {
-                                    Column(
-                                        modifier = Modifier.padding(14.dp),
-                                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                                    ) {
-                                        Row(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            horizontalArrangement = Arrangement.SpaceBetween,
-                                            verticalAlignment = Alignment.CenterVertically
-                                        ) {
-                                            Column(Modifier.weight(1f)) {
-                                                Text(r.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-                                                Text(
-                                                    text = if (r.repeat == RepeatType.DAILY) "Diario" else "Una vez",
-                                                    style = MaterialTheme.typography.bodySmall,
-                                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                                )
-                                            }
-                                            if (r.repeat == RepeatType.DAILY) {
-                                                Switch(
-                                                    checked = r.enabled,
-                                                    onCheckedChange = { vm.setEnabled(r, it) }
-                                                )
-                                            }
-                                        }
-
-                                        Text(
-                                            "Suena: ${sdf.format(Date(r.triggerAtMillis))}",
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-
-                                        if (r.preAlertMin > 0) {
-                                            Text(
-                                                "Aviso previo: ${r.preAlertMin} min",
-                                                style = MaterialTheme.typography.bodySmall,
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                                            )
-                                        }
-
-                                        Row(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            horizontalArrangement = Arrangement.End
-                                        ) {
-                                            TextButton(onClick = { vm.delete(r) }) { Text("Eliminar") }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+                RemindersList(
+                    ui = ui,
+                    sdf = sdf,
+                    onEdit = {
+                        editing = it
+                        showSheet = true
+                    },
+                    onDelete = { vm.delete(it) },
+                    onToggleDaily = { r, enabled -> vm.setEnabled(r, enabled) }
+                )
             }
         }
     }
@@ -193,6 +131,100 @@ fun RemindersScreen(
 }
 
 @Composable
+private fun RemindersList(
+    ui: RemindersUiState,
+    sdf: SimpleDateFormat,
+    onEdit: (Reminder) -> Unit,
+    onDelete: (Reminder) -> Unit,
+    onToggleDaily: (Reminder, Boolean) -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Text(
+            "Activos",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold
+        )
+
+        if (ui.reminders.isEmpty()) {
+            EmptyStateCentered(
+                title = "No hay recordatorios",
+                subtitle = "Pulsa + para crear uno nuevo."
+            )
+        } else {
+            LazyColumn(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                items(ui.reminders) { r ->
+                    ElevatedCard(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onEdit(r) },
+                        shape = MaterialTheme.shapes.large
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(14.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(Modifier.weight(1f)) {
+                                    Text(
+                                        r.title,
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                    Text(
+                                        text = if (r.repeat == RepeatType.DAILY) "Diario" else "Una vez",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                                if (r.repeat == RepeatType.DAILY) {
+                                    Switch(
+                                        checked = r.enabled,
+                                        onCheckedChange = { onToggleDaily(r, it) }
+                                    )
+                                }
+                            }
+
+                            Text(
+                                "Suena: ${sdf.format(Date(r.triggerAtMillis))}",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+
+                            if (r.preAlertMin > 0) {
+                                Text(
+                                    "Aviso previo: ${r.preAlertMin} min",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.End
+                            ) {
+                                TextButton(onClick = { onDelete(r) }) { Text("Eliminar") }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
 private fun PermissionCenteredCard(
     hasNotifPermission: Boolean,
     needsExactAccess: Boolean,
@@ -201,17 +233,26 @@ private fun PermissionCenteredCard(
 ) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         ElevatedCard(
-            modifier = Modifier.padding(16.dp).fillMaxWidth(),
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
             shape = MaterialTheme.shapes.extraLarge
         ) {
             Column(
                 modifier = Modifier.padding(18.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Text("Permisos necesarios", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                Text(
+                    "Permisos necesarios",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
 
                 if (!hasNotifPermission) {
-                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
                         Icon(Icons.Default.Notifications, contentDescription = null)
                         Text("Activa notificaciones para ver los avisos.")
                     }
@@ -221,7 +262,10 @@ private fun PermissionCenteredCard(
                 }
 
                 if (needsExactAccess) {
-                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
                         Icon(Icons.Default.Alarm, contentDescription = null)
                         Text("Activa alarmas exactas para que suene a la hora exacta.")
                     }
@@ -257,6 +301,9 @@ private fun CreateOrEditReminderSheet(
     initial: Reminder?,
     onDismiss: () -> Unit
 ) {
+
+    // ========== State ==========
+
     val context = LocalContext.current
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
@@ -265,19 +312,24 @@ private fun CreateOrEditReminderSheet(
     var title by remember { mutableStateOf(initial?.title ?: "") }
     var mode by remember { mutableStateOf(initial?.repeat ?: RepeatType.ONCE) }
     var preAlert by remember { mutableStateOf((initial?.preAlertMin ?: 0) > 0) }
-
     var enabledDaily by remember { mutableStateOf(initial?.enabled ?: true) }
 
-    var chosenOnceAt by remember { mutableStateOf<Long?>(initial?.takeIf { it.repeat == RepeatType.ONCE }?.triggerAtMillis) }
-    var chosenDailyHour by remember { mutableStateOf<Int?>(initial?.hour) }
-    var chosenDailyMin by remember { mutableStateOf<Int?>(initial?.minute) }
+    var chosenOnceAt by remember {
+        mutableStateOf(initial?.takeIf { it.repeat == RepeatType.ONCE }?.triggerAtMillis)
+    }
+    var chosenDailyHour by remember { mutableStateOf(initial?.hour) }
+    var chosenDailyMin by remember { mutableStateOf(initial?.minute) }
 
     val preMin = if (preAlert) 10 else 0
     val fmt = remember { SimpleDateFormat("dd/MM HH:mm", Locale.getDefault()) }
 
+    // ========== UI ==========
+
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
         Column(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 10.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
@@ -294,25 +346,26 @@ private fun CreateOrEditReminderSheet(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // Presets (solo ONCE)
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
                 listOf(5, 10, 15, 30).forEach { mins ->
                     OutlinedButton(
                         modifier = Modifier.weight(1f),
-                        enabled = (mode == RepeatType.ONCE),
+                        enabled = mode == RepeatType.ONCE,
                         onClick = { chosenOnceAt = System.currentTimeMillis() + mins * 60_000L }
                     ) { Text("${mins}m") }
                 }
             }
 
-            // Modo
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
                 FilterChip(
                     selected = mode == RepeatType.ONCE,
-                    onClick = {
-                        mode = RepeatType.ONCE
-                        // si venías de DAILY, no pierdas el once si ya había
-                    },
+                    onClick = { mode = RepeatType.ONCE },
                     label = { Text("Una vez") }
                 )
                 FilterChip(
@@ -322,7 +375,6 @@ private fun CreateOrEditReminderSheet(
                 )
             }
 
-            // Aviso previo
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -330,12 +382,15 @@ private fun CreateOrEditReminderSheet(
             ) {
                 Column {
                     Text("Aviso previo", fontWeight = FontWeight.SemiBold)
-                    Text("Notifica 10 min antes", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(
+                        "Notifica 10 min antes",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
                 Switch(checked = preAlert, onCheckedChange = { preAlert = it })
             }
 
-            // Daily enabled en el sheet
             if (mode == RepeatType.DAILY) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -354,10 +409,11 @@ private fun CreateOrEditReminderSheet(
                         DatePickerDialog(
                             context,
                             { _, y, m, d ->
-                                val cal2 = Calendar.getInstance()
-                                cal2.set(Calendar.YEAR, y)
-                                cal2.set(Calendar.MONTH, m)
-                                cal2.set(Calendar.DAY_OF_MONTH, d)
+                                val cal2 = Calendar.getInstance().apply {
+                                    set(Calendar.YEAR, y)
+                                    set(Calendar.MONTH, m)
+                                    set(Calendar.DAY_OF_MONTH, d)
+                                }
 
                                 TimePickerDialog(
                                     context,
@@ -422,7 +478,6 @@ private fun CreateOrEditReminderSheet(
                 onClick = {
                     val finalTitle = title
                     val updated: Reminder = if (!isEdit) {
-                        // CREATE
                         if (mode == RepeatType.ONCE) {
                             vm.buildOnce(finalTitle, chosenOnceAt!!, preMin)
                         } else {
@@ -430,14 +485,13 @@ private fun CreateOrEditReminderSheet(
                                 .copy(enabled = enabledDaily)
                         }
                     } else {
-                        // EDIT (mantener id)
-                        val id = initial!!.id
+                        val id = initial.id
                         if (mode == RepeatType.ONCE) {
                             Reminder(
                                 id = id,
                                 title = finalTitle.trim().ifBlank { "Recordatorio" },
                                 repeat = RepeatType.ONCE,
-                                enabled = true, // ONCE siempre “activo” hasta que suene
+                                enabled = true,
                                 triggerAtMillis = chosenOnceAt!!,
                                 preAlertMin = preMin,
                                 lastPreSentForTriggerAt = 0L

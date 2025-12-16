@@ -44,7 +44,6 @@ fun TaskRow(
     onClick: () -> Unit,
     onCompleteClick: () -> Unit
 ) {
-    // 🎨 Colores de fondo para cada estado
     val completedBg =
         MaterialTheme.colorScheme.tertiaryContainer
     val pendingBg =
@@ -62,7 +61,6 @@ fun TaskRow(
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(20.dp),
         colors = cardColors,
-        // 👇 Quitamos la sombra para que no parezca un borde oscuro
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column(
@@ -70,7 +68,6 @@ fun TaskRow(
                 .padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            // Fila título + botón completar
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -124,12 +121,10 @@ fun TaskRow(
                 }
             }
 
-            // Fila inferior: dificultad + categoría + duración + fecha
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // --- Dificultad ---
                 val difficultyText = when (task.difficulty) {
                     TaskDifficulty.EASY -> "Fácil"
                     TaskDifficulty.MEDIUM -> "Media"
@@ -149,7 +144,6 @@ fun TaskRow(
                     )
                 )
 
-                // --- Categoría ---
                 AssistChip(
                     onClick = {},
                     label = { Text(task.category) },
@@ -165,7 +159,6 @@ fun TaskRow(
                     )
                 )
 
-                // --- Duración ---
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -181,7 +174,6 @@ fun TaskRow(
                     )
 
 
-                    // --- Día más próximo ---
                     val nextDay = task.days.minOrNull()
                     if (nextDay != null) {
                         val diff = daysBetweenToday(nextDay)

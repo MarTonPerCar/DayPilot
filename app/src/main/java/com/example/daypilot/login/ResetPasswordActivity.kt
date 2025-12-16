@@ -44,8 +44,6 @@ class ResetPasswordActivity : ComponentActivity() {
                             if (result.isSuccess) {
                                 isLoading = false
                                 success = true
-
-                                // 👇 Espera 2 segundos y cierra la Activity
                                 delay(2000)
                                 finish()
 

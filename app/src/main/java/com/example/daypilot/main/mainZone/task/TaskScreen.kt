@@ -14,10 +14,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.daypilot.firebaseLogic.authLogic.PointSource
+import com.example.daypilot.firebaseLogic.pointsLogic.PointsRepository
 import com.example.daypilot.firebaseLogic.taskLogic.Task
 import com.example.daypilot.firebaseLogic.taskLogic.TaskDifficulty
 import com.example.daypilot.firebaseLogic.taskLogic.TaskRepository
-import com.example.daypilot.firebaseLogic.pointsLogic.PointsRepository
 import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -30,6 +30,9 @@ fun TaskScreen(
     openTaskId: String? = null,
     onBack: () -> Unit
 ) {
+
+    // ========== State ==========
+
     var tasks by remember { mutableStateOf<List<Task>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
@@ -41,7 +44,6 @@ fun TaskScreen(
     var isSheetOpen by remember { mutableStateOf(false) }
     var editingTask by remember { mutableStateOf<Task?>(null) }
 
-    // Diálogo para confirmar completar
     var taskToConfirm by remember { mutableStateOf<Task?>(null) }
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -63,19 +65,16 @@ fun TaskScreen(
         }
     }
 
-    LaunchedEffect(uid) {
-        reloadTasks()
-    }
+    // ========== Effects ==========
+
+    LaunchedEffect(uid) { reloadTasks() }
 
     LaunchedEffect(tasks, openTaskId) {
-        if (!openedFromIntent && !openTaskId.isNullOrBlank()) {
-            val t = tasks.firstOrNull { it.id == openTaskId }
-            if (t != null) {
-                editingTask = t
-                isSheetOpen = true
-                openedFromIntent = true
-            }
-        }
+        if (openedFromIntent || openTaskId.isNullOrBlank()) return@LaunchedEffect
+        val t = tasks.firstOrNull { it.id == openTaskId } ?: return@LaunchedEffect
+        editingTask = t
+        isSheetOpen = true
+        openedFromIntent = true
     }
 
     val filteredSortedTasks = remember(tasks, sortOption, difficultyFilter, statusFilter) {
@@ -91,27 +90,17 @@ fun TaskScreen(
             }
             .sortedWith(
                 when (sortOption) {
-                    TaskSortOption.DATE ->
-                        compareBy<Task> { it.createdAt }
-
-                    TaskSortOption.NAME ->
-                        compareBy { it.title.lowercase() }
-
-                    TaskSortOption.DURATION ->
-                        compareBy { it.estimatedMinutes }
-
-                    TaskSortOption.DIFFICULTY ->
-                        compareBy { it.difficulty.ordinal }
-
-                    TaskSortOption.NEXT_DATE ->
-                        compareBy { task ->
-                            nextDateMillis(task) ?: Long.MAX_VALUE
-                        }
+                    TaskSortOption.DATE -> compareBy<Task> { it.createdAt }
+                    TaskSortOption.NAME -> compareBy { it.title.lowercase() }
+                    TaskSortOption.DURATION -> compareBy { it.estimatedMinutes }
+                    TaskSortOption.DIFFICULTY -> compareBy { it.difficulty.ordinal }
+                    TaskSortOption.NEXT_DATE -> compareBy { task -> nextDateMillis(task) ?: Long.MAX_VALUE }
                 }
             )
     }
 
-    // Sheet crear/editar
+    // ========== Sheet ==========
+
     if (isSheetOpen) {
         ModalBottomSheet(
             onDismissRequest = {
@@ -128,11 +117,8 @@ fun TaskScreen(
                 onSave = { taskToSave ->
                     scope.launch {
                         try {
-                            if (taskToSave.id.isBlank()) {
-                                taskRepo.createTask(uid, taskToSave)
-                            } else {
-                                taskRepo.updateTask(uid, taskToSave)
-                            }
+                            if (taskToSave.id.isBlank()) taskRepo.createTask(uid, taskToSave)
+                            else taskRepo.updateTask(uid, taskToSave)
                             reloadTasks()
                         } catch (e: Exception) {
                             errorMessage = e.localizedMessage ?: "Error guardando la tarea."
@@ -144,18 +130,17 @@ fun TaskScreen(
                     }
                 },
                 onDelete = { taskToDelete ->
-                    if (taskToDelete != null && taskToDelete.id.isNotBlank()) {
-                        scope.launch {
-                            try {
-                                taskRepo.deleteTask(uid, taskToDelete.id)
-                                reloadTasks()
-                            } catch (e: Exception) {
-                                errorMessage = e.localizedMessage ?: "Error eliminando tarea."
-                            } finally {
-                                sheetState.hide()
-                                isSheetOpen = false
-                                editingTask = null
-                            }
+                    if (taskToDelete?.id.isNullOrBlank()) return@TaskFormSheet
+                    scope.launch {
+                        try {
+                            taskRepo.deleteTask(uid, taskToDelete!!.id)
+                            reloadTasks()
+                        } catch (e: Exception) {
+                            errorMessage = e.localizedMessage ?: "Error eliminando tarea."
+                        } finally {
+                            sheetState.hide()
+                            isSheetOpen = false
+                            editingTask = null
                         }
                     }
                 },
@@ -170,7 +155,8 @@ fun TaskScreen(
         }
     }
 
-    // Diálogo de confirmar completar
+    // ========== Confirm Dialog ==========
+
     taskToConfirm?.let { task ->
         AlertDialog(
             onDismissRequest = { taskToConfirm = null },
@@ -179,18 +165,17 @@ fun TaskScreen(
             confirmButton = {
                 TextButton(
                     onClick = {
-                        val t = task
                         taskToConfirm = null
                         scope.launch {
                             try {
-                                taskRepo.completeTask(uid, t)
+                                taskRepo.completeTask(uid, task)
                                 pointsRepo.addPoints(
                                     uid = uid,
                                     points = 2L,
                                     source = PointSource.TASKS,
                                     metadata = mapOf(
-                                        "taskId" to t.id,
-                                        "title" to t.title,
+                                        "taskId" to task.id,
+                                        "title" to task.title,
                                         "tasksCountDelta" to 1
                                     )
                                 )
@@ -200,19 +185,16 @@ fun TaskScreen(
                             }
                         }
                     }
-                ) {
-                    Text("Sí, completar")
-                }
+                ) { Text("Sí, completar") }
             },
             dismissButton = {
-                TextButton(onClick = { taskToConfirm = null }) {
-                    Text("Cancelar")
-                }
+                TextButton(onClick = { taskToConfirm = null }) { Text("Cancelar") }
             }
         )
     }
 
-    // 🔹 AQUÍ el Scaffold con el content lambda final
+    // ========== UI ==========
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -233,20 +215,18 @@ fun TaskScreen(
                     editingTask = null
                     isSheetOpen = true
                 }
-            ) {
-                Icon(Icons.Default.Add, contentDescription = "Añadir tarea")
-            }
+            ) { Icon(Icons.Default.Add, contentDescription = "Añadir tarea") }
         }
-    ) { innerPadding ->   // 👈 ESTE es el content del Scaffold
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
                 .padding(16.dp)
         ) {
-            if (errorMessage != null) {
+            errorMessage?.let {
                 Text(
-                    text = errorMessage!!,
+                    text = it,
                     color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.bodySmall
                 )
@@ -264,38 +244,32 @@ fun TaskScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            if (isLoading) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
+            when {
+                isLoading -> {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
                 }
-            } else if (filteredSortedTasks.isEmpty()) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("No tienes tareas. ¡Pulsa + para crear una!")
+                filteredSortedTasks.isEmpty() -> {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text("No tienes tareas. ¡Pulsa + para crear una!")
+                    }
                 }
-            } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(filteredSortedTasks) { task ->
-                        TaskRow(
-                            task = task,
-                            onClick = {
-                                editingTask = task
-                                isSheetOpen = true
-                            },
-                            onCompleteClick = {
-                                if (!task.isCompleted) {
-                                    taskToConfirm = task
+                else -> {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(filteredSortedTasks) { task ->
+                            TaskRow(
+                                task = task,
+                                onClick = {
+                                    editingTask = task
+                                    isSheetOpen = true
+                                },
+                                onCompleteClick = {
+                                    if (!task.isCompleted) taskToConfirm = task
                                 }
-                            }
-                        )
+                            )
+                        }
                     }
                 }
             }

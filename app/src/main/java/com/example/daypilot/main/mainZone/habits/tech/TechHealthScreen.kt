@@ -9,8 +9,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Security
@@ -50,8 +50,16 @@ fun TechHealthScreen(
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text("Salud tecnológica") },
-                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, "Atrás") } },
-                actions = { IconButton(onClick = { showInfo = true }) { Icon(Icons.Default.Info, "Info") } }
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Atrás")
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { showInfo = true }) {
+                        Icon(Icons.Default.Info, contentDescription = "Info")
+                    }
+                }
             )
         },
         floatingActionButton = {
@@ -62,7 +70,11 @@ fun TechHealthScreen(
             }
         }
     ) { padding ->
-        Box(Modifier.fillMaxSize().padding(padding)) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+        ) {
             when (s.hasUsageAccess) {
                 null -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
                 false -> {
@@ -79,8 +91,7 @@ fun TechHealthScreen(
                     TechHealthMainContent(
                         state = s,
                         vm = vm,
-                        onEdit = { editing = it },
-                        onCreate = { showCreateSheet = true }
+                        onEdit = { editing = it }
                     )
                 }
             }
@@ -108,8 +119,8 @@ fun TechHealthScreen(
         RestrictionEditorSheet(vm = vm, initial = null, onDismiss = { showCreateSheet = false })
     }
 
-    if (editing != null) {
-        RestrictionEditorSheet(vm = vm, initial = editing, onDismiss = { editing = null })
+    editing?.let {
+        RestrictionEditorSheet(vm = vm, initial = it, onDismiss = { editing = null })
     }
 }
 
@@ -122,7 +133,9 @@ private fun PermissionCenteredCard(
 ) {
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         ElevatedCard(
-            modifier = Modifier.padding(16.dp).fillMaxWidth(),
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
             shape = MaterialTheme.shapes.extraLarge
         ) {
             Column(
@@ -131,28 +144,39 @@ private fun PermissionCenteredCard(
             ) {
                 Text("Permisos necesarios", fontWeight = FontWeight.SemiBold)
 
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
                     Icon(Icons.Default.Security, contentDescription = null)
                     Text("Activa “Acceso al uso” para poder medir el tiempo.")
                 }
+
                 Button(onClick = onOpenUsageSettings, modifier = Modifier.fillMaxWidth()) {
                     Text("Abrir ajustes de uso")
                 }
+
                 OutlinedButton(onClick = onRefresh, modifier = Modifier.fillMaxWidth()) {
                     Text("Ya lo activé, refrescar")
                 }
 
-                Divider()
+                HorizontalDivider()
 
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
                     Icon(Icons.Default.Notifications, contentDescription = null)
                     Text("Recomendado: permite notificaciones para avisos.")
                 }
+
                 Button(
                     onClick = onRequestNotif,
                     enabled = !hasNotifPermission,
                     modifier = Modifier.fillMaxWidth()
-                ) { Text(if (hasNotifPermission) "Notificaciones activadas" else "Permitir notificaciones") }
+                ) {
+                    Text(if (hasNotifPermission) "Notificaciones activadas" else "Permitir notificaciones")
+                }
             }
         }
     }
@@ -162,11 +186,12 @@ private fun PermissionCenteredCard(
 private fun TechHealthMainContent(
     state: TechHealthState,
     vm: TechHealthViewModel,
-    onEdit: (Restriction) -> Unit,
-    onCreate: () -> Unit
+    onEdit: (Restriction) -> Unit
 ) {
     Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Row(
@@ -176,7 +201,11 @@ private fun TechHealthMainContent(
         ) {
             Column {
                 Text("Restricciones", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-                Text("${state.restrictions.size} en total", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(
+                    "${state.restrictions.size} en total",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         }
 
@@ -184,7 +213,9 @@ private fun TechHealthMainContent(
             EmptyState(title = "No hay restricciones", subtitle = "Pulsa + para crear una.")
         } else {
             LazyColumn(
-                modifier = Modifier.fillMaxWidth().weight(1f),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 items(state.restrictions) { r ->
@@ -216,7 +247,10 @@ private fun RestrictionCard(
 
     ElevatedCard(modifier = Modifier.fillMaxWidth(), shape = MaterialTheme.shapes.large) {
         Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
                 if (r.type == RestrictionType.APP) {
                     val icon = vm.appIcon(r.targetId)
                     if (icon != null) {
@@ -225,7 +259,9 @@ private fun RestrictionCard(
                             contentDescription = null,
                             modifier = Modifier.size(36.dp)
                         )
-                    } else Box(Modifier.size(36.dp))
+                    } else {
+                        Box(Modifier.size(36.dp))
+                    }
                 } else {
                     Icon(Icons.Default.Info, contentDescription = null, modifier = Modifier.size(28.dp))
                 }
@@ -263,8 +299,12 @@ private fun RestrictionCard(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
-            if (r.pendingSinceDayKey != null &&
-                (r.pendingLimitMin != null || r.pendingEnabled != null || r.pendingNotifyEnabled != null || r.pendingNotifyEverySec != null)
+            if (
+                r.pendingSinceDayKey != null &&
+                (r.pendingLimitMin != null ||
+                        r.pendingEnabled != null ||
+                        r.pendingNotifyEnabled != null ||
+                        r.pendingNotifyEverySec != null)
             ) {
                 val pendParts = buildList {
                     r.pendingLimitMin?.let { add("límite ${it} min") }
@@ -293,7 +333,12 @@ private fun RestrictionCard(
 
 @Composable
 private fun EmptyState(title: String, subtitle: String) {
-    Box(Modifier.fillMaxWidth().padding(vertical = 24.dp), contentAlignment = Alignment.Center) {
+    Box(
+        Modifier
+            .fillMaxWidth()
+            .padding(vertical = 24.dp),
+        contentAlignment = Alignment.Center
+    ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(title, fontWeight = FontWeight.SemiBold)
             Spacer(Modifier.height(6.dp))
@@ -301,8 +346,6 @@ private fun EmptyState(title: String, subtitle: String) {
         }
     }
 }
-
-/* -------------------- SHEET: Crear/Editar Restricción -------------------- */
 
 @Composable
 private fun RestrictionEditorSheet(
@@ -317,7 +360,6 @@ private fun RestrictionEditorSheet(
 
     var type by remember { mutableStateOf(initial?.type ?: RestrictionType.APP) }
 
-    // App target
     var selectedPkg by remember {
         mutableStateOf(if (initial?.type == RestrictionType.APP) initial.targetId else "")
     }
@@ -325,14 +367,12 @@ private fun RestrictionEditorSheet(
         mutableStateOf(if (initial?.type == RestrictionType.APP) initial.displayName else "")
     }
 
-    // Group target
     var selectedGroupId by remember {
         mutableStateOf(if (initial?.type == RestrictionType.GROUP) initial.targetId else "")
     }
     var groupName by remember { mutableStateOf("") }
     var groupApps by remember { mutableStateOf(setOf<String>()) }
 
-    // limit sliders
     val appMin = 30
     val appMax = 360
     val groupMin = 60
@@ -343,12 +383,9 @@ private fun RestrictionEditorSheet(
     }
 
     LaunchedEffect(type) {
-        if (!isEdit) {
-            limitMin = if (type == RestrictionType.APP) 60 else 120
-        }
+        if (!isEdit) limitMin = if (type == RestrictionType.APP) 60 else 120
     }
 
-    // Notifs config
     var notifyEnabled by remember {
         mutableStateOf(initial?.activeNotifyEnabled ?: true)
     }
@@ -356,9 +393,7 @@ private fun RestrictionEditorSheet(
         mutableStateOf((initial?.activeNotifyEverySec ?: 60).coerceIn(5, 60))
     }
 
-    // app picker
     var showAppPicker by remember { mutableStateOf(false) }
-    // group builder
     var showGroupPickerApps by remember { mutableStateOf(false) }
     var showCreateGroup by remember { mutableStateOf(false) }
 
@@ -369,7 +404,9 @@ private fun RestrictionEditorSheet(
         sheetState = sheetState
     ) {
         Column(
-            Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 10.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(if (isEdit) "Editar restricción" else "Nueva restricción", fontWeight = FontWeight.SemiBold)
@@ -397,7 +434,6 @@ private fun RestrictionEditorSheet(
                 )
             }
 
-            // Notificaciones / Solo contar
             ElevatedCard(Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     Row(
@@ -408,16 +444,12 @@ private fun RestrictionEditorSheet(
                         Column(Modifier.weight(1f)) {
                             Text("Notificaciones", fontWeight = FontWeight.SemiBold)
                             Text(
-                                if (notifyEnabled) "Avisar cuando supere el límite"
-                                else "Solo contar, sin notificar",
+                                if (notifyEnabled) "Avisar cuando supere el límite" else "Solo contar, sin notificar",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
-                        Switch(
-                            checked = notifyEnabled,
-                            onCheckedChange = { notifyEnabled = it }
-                        )
+                        Switch(checked = notifyEnabled, onCheckedChange = { notifyEnabled = it })
                     }
 
                     if (notifyEnabled) {
@@ -492,7 +524,7 @@ private fun RestrictionEditorSheet(
                                 ) { Text("Crear grupo") }
 
                                 OutlinedButton(
-                                    onClick = { /* seleccionar existente */ },
+                                    onClick = {},
                                     modifier = Modifier.weight(1f),
                                     enabled = s.groups.isNotEmpty()
                                 ) { Text("Usar existente") }
@@ -557,7 +589,7 @@ private fun RestrictionEditorSheet(
                     if (!isEdit) {
                         val id = UUID.randomUUID().toString()
                         val name = when (type) {
-                            RestrictionType.APP -> (selectedAppName.ifBlank { vm.appLabel(selectedPkg) })
+                            RestrictionType.APP -> selectedAppName.ifBlank { vm.appLabel(selectedPkg) }
                             RestrictionType.GROUP -> groupName.ifBlank { vm.groupName(selectedGroupId) }
                         }
                         val target = if (type == RestrictionType.APP) selectedPkg else selectedGroupId
@@ -579,18 +611,19 @@ private fun RestrictionEditorSheet(
                             )
                         )
                     } else {
-                        val base = initial!!
-                        if (base.type == RestrictionType.GROUP) {
-                            vm.updateGroupApps(base.targetId, groupApps.ifEmpty { vm.groupApps(base.targetId) })
+                        if (initial.type == RestrictionType.GROUP) {
+                            vm.updateGroupApps(initial.targetId, groupApps.ifEmpty { vm.groupApps(
+                                initial.targetId) })
                         }
 
                         vm.setRestrictionPending(
-                            base,
+                            initial,
                             newLimitMin = limitMin,
                             newNotifyEnabled = notifyEnabled,
                             newNotifyEverySec = safeRepeat
                         )
                     }
+
                     onDismiss()
                 },
                 enabled = canSave,
@@ -642,8 +675,6 @@ private fun RestrictionEditorSheet(
         )
     }
 }
-
-/* -------------------- UI Helpers -------------------- */
 
 @Composable
 private fun IntervalSliderSeconds(
@@ -730,8 +761,6 @@ private fun fmtMinutes(min: Int): String {
     }
 }
 
-/* -------------------- App Picker (single) -------------------- */
-
 @Composable
 private fun AppPickerSheet(
     apps: List<AppEntry>,
@@ -746,8 +775,16 @@ private fun AppPickerSheet(
         else apps.filter { it.label.lowercase().contains(q) || it.packageName.contains(q) }
     }
 
-    ModalBottomSheet(onDismissRequest = onClose, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)) {
-        Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+    ModalBottomSheet(
+        onDismissRequest = onClose,
+        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    ) {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
             Text("Elegir app", fontWeight = FontWeight.SemiBold)
 
             OutlinedTextField(
@@ -774,18 +811,24 @@ private fun AppPickerSheet(
                                 contentDescription = null,
                                 modifier = Modifier.size(36.dp)
                             )
-                        } else Box(Modifier.size(36.dp))
+                        } else {
+                            Box(Modifier.size(36.dp))
+                        }
 
                         Column(Modifier.weight(1f)) {
                             Text(app.label, fontWeight = FontWeight.SemiBold)
-                            Text(app.packageName, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(
+                                app.packageName,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
                         }
 
                         if (app.packageName == initiallySelected) {
                             Text("✓", fontWeight = FontWeight.Bold)
                         }
                     }
-                    Divider()
+                    HorizontalDivider()
                 }
             }
 
@@ -793,8 +836,6 @@ private fun AppPickerSheet(
         }
     }
 }
-
-/* -------------------- App Picker (multi) -------------------- */
 
 @Composable
 private fun MultiAppPickerSheet(
@@ -813,10 +854,22 @@ private fun MultiAppPickerSheet(
         else apps.filter { it.label.lowercase().contains(q) || it.packageName.contains(q) }
     }
 
-    ModalBottomSheet(onDismissRequest = onClose, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)) {
-        Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+    ModalBottomSheet(
+        onDismissRequest = onClose,
+        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    ) {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
             Text(title, fontWeight = FontWeight.SemiBold)
-            Text("${sel.size} seleccionadas", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(
+                "${sel.size} seleccionadas",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
 
             OutlinedTextField(
                 value = query,
@@ -845,18 +898,27 @@ private fun MultiAppPickerSheet(
                                 contentDescription = null,
                                 modifier = Modifier.size(34.dp)
                             )
-                        } else Box(Modifier.size(34.dp))
+                        } else {
+                            Box(Modifier.size(34.dp))
+                        }
 
                         Column(Modifier.weight(1f)) {
                             Text(app.label, fontWeight = FontWeight.SemiBold)
-                            Text(app.packageName, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(
+                                app.packageName,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
                         }
 
-                        Checkbox(checked = checked, onCheckedChange = {
-                            sel = if (it) sel + app.packageName else sel - app.packageName
-                        })
+                        Checkbox(
+                            checked = checked,
+                            onCheckedChange = {
+                                sel = if (it) sel + app.packageName else sel - app.packageName
+                            }
+                        )
                     }
-                    Divider()
+                    HorizontalDivider()
                 }
             }
 
@@ -868,8 +930,6 @@ private fun MultiAppPickerSheet(
         }
     }
 }
-
-/* -------------------- Create Group Dialog -------------------- */
 
 @Composable
 private fun CreateGroupDialog(
