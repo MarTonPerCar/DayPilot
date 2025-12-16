@@ -1,5 +1,7 @@
 package com.example.daypilot.main.mainZone.task
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -11,19 +13,20 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.daypilot.firebaseLogic.authLogic.PointSource
 import com.example.daypilot.firebaseLogic.taskLogic.Task
 import com.example.daypilot.firebaseLogic.taskLogic.TaskDifficulty
 import com.example.daypilot.firebaseLogic.taskLogic.TaskRepository
-import com.example.daypilot.firebaseLogic.authLogic.AuthRepository
-import com.example.daypilot.firebaseLogic.authLogic.PointSource
+import com.example.daypilot.firebaseLogic.pointsLogic.PointsRepository
 import kotlinx.coroutines.launch
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskScreen(
     uid: String,
     taskRepo: TaskRepository,
-    authRepo: AuthRepository,
+    pointsRepo: PointsRepository,
     openTaskId: String? = null,
     onBack: () -> Unit
 ) {
@@ -181,13 +184,14 @@ fun TaskScreen(
                         scope.launch {
                             try {
                                 taskRepo.completeTask(uid, t)
-                                authRepo.addPoints(
+                                pointsRepo.addPoints(
                                     uid = uid,
                                     points = 2L,
-                                    pointSource = PointSource.TASKS,
+                                    source = PointSource.TASKS,
                                     metadata = mapOf(
                                         "taskId" to t.id,
-                                        "title" to t.title
+                                        "title" to t.title,
+                                        "tasksCountDelta" to 1
                                     )
                                 )
                                 reloadTasks()

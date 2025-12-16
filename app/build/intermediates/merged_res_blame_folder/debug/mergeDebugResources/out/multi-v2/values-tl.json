@@ -72,23 +72,6 @@
                     }
                 },
                 {
-                    "source": "/home/mario/.gradle/caches/8.13/transforms/939349caddabc8a884475b03837d1bf3/transformed/play-services-basement-18.8.0/res/values-tl/values.xml",
-                    "from": {
-                        "startLines": "4",
-                        "startColumns": "0",
-                        "startOffsets": "218",
-                        "endColumns": "140",
-                        "endOffsets": "358"
-                    },
-                    "to": {
-                        "startLines": "23",
-                        "startColumns": "4",
-                        "startOffsets": "2509",
-                        "endColumns": "144",
-                        "endOffsets": "2649"
-                    }
-                },
-                {
                     "source": "/home/mario/.gradle/caches/8.13/transforms/ea1344c5ad081d9d4ca0e8234a25ca50/transformed/foundation/res/values-tl/values-tl.xml",
                     "from": {
                         "startLines": "2,3,4",
@@ -137,6 +120,23 @@
                         "startOffsets": "105,217",
                         "endColumns": "111,113",
                         "endOffsets": "212,326"
+                    }
+                },
+                {
+                    "source": "/home/mario/.gradle/caches/8.13/transforms/8e8cf7f78cb744de04aa3b004f5e13e6/transformed/play-services-basement-18.4.0/res/values-tl/values.xml",
+                    "from": {
+                        "startLines": "4",
+                        "startColumns": "0",
+                        "startOffsets": "195",
+                        "endColumns": "140",
+                        "endOffsets": "335"
+                    },
+                    "to": {
+                        "startLines": "23",
+                        "startColumns": "4",
+                        "startOffsets": "2509",
+                        "endColumns": "144",
+                        "endOffsets": "2649"
                     }
                 }
             ]

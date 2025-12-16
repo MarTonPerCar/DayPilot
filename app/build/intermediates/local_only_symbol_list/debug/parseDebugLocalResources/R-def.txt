@@ -10,11 +10,15 @@ color white
 drawable agenda
 drawable calendario
 drawable calificacion
+drawable caminar
 drawable ic_launcher_background
 drawable ic_launcher_foreground
-drawable mi_logo
+drawable icono_aplicacion
+drawable mi_logo_blanco
+drawable mi_logo_negro
 drawable tarea
 mipmap ic_launcher
+mipmap ic_launcher_foreground
 mipmap ic_launcher_round
 string app_name
 string gcm_defaultSenderId

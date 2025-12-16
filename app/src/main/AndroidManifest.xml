@@ -2,6 +2,20 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Permisos (mejor arriba, pero no es obligatorio) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission
+        android:name="android.permission.PACKAGE_USAGE_STATS"
+        tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -11,6 +25,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.DayPilot">
+
 
         <activity
             android:name=".login.LoginActivity"
@@ -40,14 +55,44 @@
             android:name=".main.mainZone.task.TaskActivity"
             android:exported="false" />
         <activity
-            android:name=".main.profile.MainProfileActivity"
+            android:name=".main.profile.mainProfile.MainProfileActivity"
             android:exported="false" />
         <activity
-            android:name=".main.profile.SettingsActivity"
+            android:name=".main.profile.settings.SettingsActivity"
             android:exported="false" />
         <activity
             android:name=".main.addFriend.AddFriendActivity"
             android:exported="false" />
+
+        <activity android:name=".main.mainZone.habits.HabitsActivity" />
+        <activity android:name=".main.mainZone.habits.steps.StepsActivity" />
+        <activity android:name=".main.mainZone.habits.tech.TechHealthActivity" />
+        <activity android:name=".main.mainZone.habits.reminders.RemindersActivity" />
+
+        <receiver
+            android:name=".main.mainZone.habits.reminders.ReminderReceiver"
+            android:exported="false" />
+
+        <service
+            android:name=".main.mainZone.habits.tech.TechHealthForegroundService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
+
+        <receiver
+            android:name=".main.mainZone.habits.tech.TechHealthBootReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
     </application>
-    <uses-permission android:name="android.permission.INTERNET" />
+
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+    </queries>
+
 </manifest>

@@ -12,6 +12,8 @@ import java.util.Date
 import java.util.Locale
 import android.graphics.Bitmap
 import android.net.Uri
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.google.firebase.storage.FirebaseStorage
 import java.io.ByteArrayOutputStream
 
@@ -120,23 +122,6 @@ class AuthRepository {
             null
         }
     }
-
-    // ========== PUNTOS + HISTORIAL DIARIO ==========
-
-// ========== PUNTOS (DELEGADO A POINTS LOGIC v2) ==========
-
-    @Deprecated("Usa PointsRepository (firebaseLogic/pointsLogic). Se mantiene por compatibilidad.")
-    suspend fun addPoints(
-        uid: String,
-        points: Long,
-        pointSource: PointSource,
-        metadata: Map<String, Any?> = emptyMap()
-    ) {
-        // Wrapper para no romper código existente
-        com.example.daypilot.firebaseLogic.pointsLogic.PointsRepository(firestore)
-            .addPoints(uid, points, pointSource, metadata)
-    }
-
 
     // ========== AMIGOS ==========
 
@@ -354,6 +339,36 @@ class AuthRepository {
     suspend fun sendPasswordReset(email: String): Result<Unit> {
         return try {
             auth.sendPasswordResetEmail(email).await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    private fun todayKey(): String =
+        SimpleDateFormat("yyyy-MM-dd", Locale.US).format(System.currentTimeMillis())
+
+    suspend fun uploadTodayStepsToFirestore(stepsToday: Int, goalSteps: Int? = null): Result<Unit> {
+        val uid = auth.currentUser?.uid ?: return Result.failure(IllegalStateException("No hay usuario logueado"))
+
+        return try {
+            val day = todayKey()
+
+            val data = mutableMapOf<String, Any>(
+                "dayKey" to day,
+                "steps" to stepsToday,
+                "updatedAt" to FieldValue.serverTimestamp()
+            )
+            if (goalSteps != null) data["goalSteps"] = goalSteps
+
+            firestore
+                .collection("users")
+                .document(uid)
+                .collection("daily_steps")
+                .document(day)
+                .set(data, SetOptions.merge())
+                .await()
+
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)

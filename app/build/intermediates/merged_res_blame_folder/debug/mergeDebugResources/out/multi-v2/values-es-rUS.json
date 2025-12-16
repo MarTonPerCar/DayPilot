@@ -4,6 +4,23 @@
             "outputFile": "com.example.daypilot.app-mergeDebugResources-56:/values-es-rUS/values-es-rUS.xml",
             "map": [
                 {
+                    "source": "/home/mario/.gradle/caches/8.13/transforms/8e8cf7f78cb744de04aa3b004f5e13e6/transformed/play-services-basement-18.4.0/res/values-es-rUS/values.xml",
+                    "from": {
+                        "startLines": "4",
+                        "startColumns": "0",
+                        "startOffsets": "199",
+                        "endColumns": "141",
+                        "endOffsets": "340"
+                    },
+                    "to": {
+                        "startLines": "23",
+                        "startColumns": "4",
+                        "startOffsets": "2499",
+                        "endColumns": "145",
+                        "endOffsets": "2640"
+                    }
+                },
+                {
                     "source": "/home/mario/.gradle/caches/8.13/transforms/ea1344c5ad081d9d4ca0e8234a25ca50/transformed/foundation/res/values-es-rUS/values-es-rUS.xml",
                     "from": {
                         "startLines": "2,3,4",
@@ -120,23 +137,6 @@
                         "startOffsets": "551,650,752,852,950,1057,1163,12838",
                         "endColumns": "98,101,99,97,106,105,119,100",
                         "endOffsets": "645,747,847,945,1052,1158,1278,12934"
-                    }
-                },
-                {
-                    "source": "/home/mario/.gradle/caches/8.13/transforms/939349caddabc8a884475b03837d1bf3/transformed/play-services-basement-18.8.0/res/values-es-rUS/values.xml",
-                    "from": {
-                        "startLines": "4",
-                        "startColumns": "0",
-                        "startOffsets": "222",
-                        "endColumns": "141",
-                        "endOffsets": "363"
-                    },
-                    "to": {
-                        "startLines": "23",
-                        "startColumns": "4",
-                        "startOffsets": "2499",
-                        "endColumns": "145",
-                        "endOffsets": "2640"
                     }
                 }
             ]

@@ -72,23 +72,6 @@
                     }
                 },
                 {
-                    "source": "/home/mario/.gradle/caches/8.13/transforms/939349caddabc8a884475b03837d1bf3/transformed/play-services-basement-18.8.0/res/values-zh-rHK/values.xml",
-                    "from": {
-                        "startLines": "4",
-                        "startColumns": "0",
-                        "startOffsets": "222",
-                        "endColumns": "103",
-                        "endOffsets": "325"
-                    },
-                    "to": {
-                        "startLines": "23",
-                        "startColumns": "4",
-                        "startOffsets": "2187",
-                        "endColumns": "107",
-                        "endOffsets": "2290"
-                    }
-                },
-                {
                     "source": "/home/mario/.gradle/caches/8.13/transforms/998381dd8cd0c5884feb494d9a86d172/transformed/play-services-base-18.1.0/res/values-zh-rHK/values.xml",
                     "from": {
                         "startLines": "4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20",
@@ -137,6 +120,23 @@
                         "startOffsets": "105,211",
                         "endColumns": "105,108",
                         "endOffsets": "206,315"
+                    }
+                },
+                {
+                    "source": "/home/mario/.gradle/caches/8.13/transforms/8e8cf7f78cb744de04aa3b004f5e13e6/transformed/play-services-basement-18.4.0/res/values-zh-rHK/values.xml",
+                    "from": {
+                        "startLines": "4",
+                        "startColumns": "0",
+                        "startOffsets": "199",
+                        "endColumns": "103",
+                        "endOffsets": "302"
+                    },
+                    "to": {
+                        "startLines": "23",
+                        "startColumns": "4",
+                        "startOffsets": "2187",
+                        "endColumns": "107",
+                        "endOffsets": "2290"
                     }
                 }
             ]

@@ -5,12 +5,12 @@ import androidx.annotation.RequiresApi
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 @RequiresApi(Build.VERSION_CODES.O)
 internal object PointsTime {
 
     private val ISO: DateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE
-
 
     fun zoneIdFromRegion(region: String?): ZoneId {
         val clean = region?.trim().orEmpty()
@@ -31,9 +31,11 @@ internal object PointsTime {
     fun keyFromInstant(instant: Instant, zoneId: ZoneId): String =
         instant.atZone(zoneId).toLocalDate().format(ISO)
 
-    /** Ventana rolling: incluye hoy y los 29 anteriores => 30 días */
     fun outKey(zoneId: ZoneId): String {
         val today = Instant.now().atZone(zoneId).toLocalDate()
-        return today.minusDays(30).format(ISO) // este día queda fuera de la ventana
+        return today.minusDays(30).format(ISO)
     }
+
+    fun minKey(zoneId: ZoneId): String =
+        ZonedDateTime.now(zoneId).minusDays(29).format(ISO)
 }

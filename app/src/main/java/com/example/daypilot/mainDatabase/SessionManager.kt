@@ -1,6 +1,7 @@
 package com.example.daypilot.mainDatabase
 
 import android.content.Context
+import androidx.core.content.edit
 
 class SessionManager(context: Context) {
 
@@ -14,9 +15,9 @@ class SessionManager(context: Context) {
     }
 
     fun setLoggedIn(loggedIn: Boolean) {
-        prefs.edit()
-            .putBoolean(KEY_LOGGED_IN, loggedIn)
-            .apply()
+        prefs.edit {
+            putBoolean(KEY_LOGGED_IN, loggedIn)
+        }
     }
 
     fun isLoggedIn(): Boolean {
@@ -24,7 +25,9 @@ class SessionManager(context: Context) {
     }
 
     fun logout() {
-        setLoggedIn(false)
+        prefs.edit {
+            putBoolean(KEY_LOGGED_IN, false)
+        }
     }
 
     // ===== Modo Oscuro =======
@@ -34,7 +37,7 @@ class SessionManager(context: Context) {
     }
 
     fun setDarkModeEnabled(enabled: Boolean) {
-        prefs.edit().putBoolean(keyDarkMode, enabled).apply()
+        prefs.edit { putBoolean(keyDarkMode, enabled) }
     }
 
     // ===== Idiomas =======
@@ -44,7 +47,7 @@ class SessionManager(context: Context) {
     }
 
     fun setLanguage(lang: String) {
-        prefs.edit().putString(keyLanguage, lang).apply()
+        prefs.edit { putString(keyLanguage, lang) }
     }
 
     // ===== Notificaciones =======
@@ -54,6 +57,6 @@ class SessionManager(context: Context) {
     }
 
     fun setNotificationsEnabled(enabled: Boolean) {
-        prefs.edit().putBoolean(keyNotifications, enabled).apply()
+        prefs.edit { putBoolean(keyNotifications, enabled) }
     }
 }

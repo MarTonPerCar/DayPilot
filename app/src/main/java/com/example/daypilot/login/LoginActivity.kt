@@ -9,8 +9,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.lifecycleScope
-import com.example.daypilot.main.mainZone.MainActivity
 import com.example.daypilot.firebaseLogic.authLogic.AuthRepository
+import com.example.daypilot.main.mainZone.MainActivity
 import com.example.daypilot.mainDatabase.SessionManager
 import com.example.daypilot.ui.theme.DayPilotTheme
 import com.google.firebase.auth.FirebaseAuthException
@@ -35,10 +35,12 @@ class LoginActivity : ComponentActivity() {
         setContent {
             var firebaseErrorCode by remember { mutableStateOf<String?>(null) }
             var isLoading by remember { mutableStateOf(false) }
+
             val darkTheme = sessionManager.isDarkModeEnabled()
 
-            DayPilotTheme (darkTheme = darkTheme) {
+            DayPilotTheme(darkTheme = darkTheme) {
                 LoginScreen(
+                    darkTheme = darkTheme, // ✅ IMPORTANTE
                     onLoginClick = { email, password ->
                         firebaseErrorCode = null
                         isLoading = true

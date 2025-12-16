@@ -10,8 +10,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.lifecycleScope
 import com.example.daypilot.firebaseLogic.authLogic.AuthRepository
-import com.example.daypilot.ui.theme.DayPilotTheme
 import com.example.daypilot.mainDatabase.SessionManager
+import com.example.daypilot.ui.theme.DayPilotTheme
 import kotlinx.coroutines.launch
 
 class RegisterActivity : ComponentActivity() {
@@ -22,59 +22,45 @@ class RegisterActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        sessionManager = SessionManager(this)
+
         setContent {
             var isLoading by remember { mutableStateOf(false) }
             val darkTheme = sessionManager.isDarkModeEnabled()
 
-            DayPilotTheme (darkTheme = darkTheme) {
+            DayPilotTheme(darkTheme = darkTheme) {
                 RegisterScreen(
+                    darkTheme = darkTheme,
                     onRegisterClick = { name, username, email, password, regionZoneId ->
                         isLoading = true
-
                         lifecycleScope.launch {
                             try {
                                 val available = authRepo.isUsernameAvailable(username)
                                 if (!available) {
-                                    isLoading = false
                                     showError("El nombre de usuario ya está en uso.")
                                     return@launch
                                 }
 
                                 val result = authRepo.register(email, password)
+                                val user = result.getOrNull()
 
-                                if (result.isSuccess) {
-                                    val user = result.getOrNull()
-
-                                    if (user != null) {
-                                        try {
-                                            authRepo.saveUserProfile(
-                                                uid = user.uid,
-                                                name = name,
-                                                email = email,
-                                                username = username,
-                                                region = regionZoneId   // 👈 guardamos el ID real
-                                            )
-                                            finish()
-                                        } catch (e: Exception) {
-                                            showError(
-                                                e.localizedMessage
-                                                    ?: "Error guardando el perfil."
-                                            )
-                                        }
-                                    } else {
-                                        showError("No se pudo crear el usuario.")
-                                    }
+                                if (result.isSuccess && user != null) {
+                                    authRepo.saveUserProfile(
+                                        uid = user.uid,
+                                        name = name,
+                                        email = email,
+                                        username = username,
+                                        region = regionZoneId
+                                    )
+                                    finish()
                                 } else {
-                                    val error = result.exceptionOrNull()
                                     showError(
-                                        error?.localizedMessage
-                                            ?: "Ocurrió un error inesperado."
+                                        result.exceptionOrNull()?.localizedMessage
+                                            ?: "No se pudo crear el usuario."
                                     )
                                 }
                             } catch (e: Exception) {
-                                showError(
-                                    e.localizedMessage ?: "Error durante el registro."
-                                )
+                                showError(e.localizedMessage ?: "Error durante el registro.")
                             } finally {
                                 isLoading = false
                             }
