@@ -9,6 +9,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 jobs:
   build:
@@ -19,13 +20,13 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "17"
 
-      - name: Set up Gradle cache
-        uses: gradle/actions/setup-gradle@v3
+      - name: Setup Gradle (with cache)
+        uses: gradle/actions/setup-gradle@v4
 
       - name: Restore google-services.json from secret
         run: |
@@ -35,14 +36,22 @@ jobs:
       - name: Build Debug APK
         run: ./gradlew assembleDebug
 
+      - name: Rename APK to DayPilot.apk
+        shell: bash
+        run: |
+          set -e
+          APK_PATH="$(ls app/build/outputs/apk/debug/*.apk | head -n 1)"
+          cp "$APK_PATH" DayPilot.apk
+          ls -lah DayPilot.apk
+
       - name: Upload APK as Artifact (push/PR)
         uses: actions/upload-artifact@v4
         with:
-          name: app-debug-apk
-          path: app/build/outputs/apk/debug/*.apk
+          name: DayPilot-apk
+          path: DayPilot.apk
 
       - name: Create GitHub Release (tags only)
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          files: app/build/outputs/apk/debug/*.apk
+          files: DayPilot.apk
