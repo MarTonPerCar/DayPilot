@@ -1,25 +1,21 @@
-package com.daypilot.app
+package com.example.daypilot_test_desing
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import com.example.daypilot_test_desing.ui.screens.AuthScreen
+import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setTheme(R.style.Theme_DayPilotTestDesing)
         enableEdgeToEdge()
         setContent {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black)
-            )
+            DayPilotTheme(theme = DayPilotTheme.SAGE_GREEN, darkMode = false) {
+                AuthScreen()
+            }
         }
     }
 }

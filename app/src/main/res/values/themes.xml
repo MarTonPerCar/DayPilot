@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <style name="Theme.DayPilotTestDesing" parent="android:Theme.Black.NoTitleBar" />
 
-    <style name="Theme.DayPilotTestDesing" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.DayPilotTestDesing.Splash" parent="Theme.DayPilotTestDesing">
+        <item name="android:windowBackground">@color/splash_bg</item>
+    </style>
 </resources>
