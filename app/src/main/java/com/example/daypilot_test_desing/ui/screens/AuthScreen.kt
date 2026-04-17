@@ -2,32 +2,46 @@ package com.example.daypilot_test_desing.ui.screens
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import com.example.daypilot_test_desing.ui.components.basic.DayPilotButtonPrimary
+import com.example.daypilot_test_desing.R
+import com.example.daypilot_test_desing.ui.components.basic.*
 
 @Composable
-fun AuthScreen() {
+fun AuthScreen(
+    onLoginSuccess: () -> Unit,
+    isLoginLoading: Boolean = false,
+    isRegisterLoading: Boolean = false,
+    loginError: String = "",
+    registerError: String = "",
+    onLoginClick: (email: String, password: String) -> Unit = { _, _ -> },
+    onRegisterClick: (name: String, username: String, email: String, password: String, region: String) -> Unit = { _, _, _, _, _ -> }
+) {
     var isLogin by remember { mutableStateOf(true) }
 
     val rotation by animateFloatAsState(
-        targetValue = if (isLogin) 0f else 180f,
+        targetValue   = if (isLogin) 0f else 180f,
         animationSpec = tween(durationMillis = 600),
-        label = "card_flip"
+        label         = "card_flip"
     )
+
+    val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
 
     Box(
         modifier = Modifier
@@ -37,41 +51,58 @@ fun AuthScreen() {
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(32.dp)
+            verticalArrangement = Arrangement.spacedBy(32.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 24.dp, vertical = 48.dp)
         ) {
+            // ── Logo ─────────────────────────────────────────────
+            Image(
+                painter = painterResource(
+                    id = if (isDark) R.drawable.mi_logo_blanco
+                    else R.drawable.mi_logo_negro
+                ),
+                contentDescription = "DayPilot Logo",
+                modifier = Modifier.height(60.dp)
+            )
+
+            // ── Toggle ───────────────────────────────────────────
             AuthToggle(isLogin = isLogin, onToggle = { isLogin = it })
 
-            // ── Ambas cards siempre en el árbol ──────────────────
+            // ── Cards ────────────────────────────────────────────
             Box(
                 modifier = Modifier
-                    .width(320.dp)
-                    .height(380.dp)
+                    .fillMaxWidth()
                     .graphicsLayer {
-                        rotationY = rotation
+                        rotationY      = rotation
                         cameraDistance = 12f * density
                     }
             ) {
-                // Front — Login (visible cuando rotation < 90)
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .graphicsLayer {
-                            alpha = if (rotation <= 90f) 1f else 0f
-                        }
-                ) {
-                    LoginCard()
+                if (rotation <= 90f) {
+                    LoginCard(
+                        isLoading    = isLoginLoading,
+                        errorMessage = loginError,
+                        onLogin      = onLoginClick
+                    )
                 }
 
-                // Back — Register (visible cuando rotation > 90, girada 180)
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .graphicsLayer {
-                            rotationY = 180f
-                            alpha = if (rotation > 90f) 1f else 0f
-                        }
-                ) {
-                    RegisterCard()
+                if (rotation > 90f) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .graphicsLayer { rotationY = 180f }
+                    ) {
+                        RegisterCard(
+                            isLoading    = isRegisterLoading,
+                            errorMessage = registerError,
+                            onRegister   = { name, username, email, password, region ->
+                                onRegisterClick(name, username, email, password, region)
+                                isLogin = true
+                            },
+                            onSuccess = { isLogin = true }
+                        )
+                    }
                 }
             }
         }
@@ -88,8 +119,16 @@ fun AuthToggle(isLogin: Boolean, onToggle: (Boolean) -> Unit) {
             .padding(4.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        ToggleOption(text = "Log in",  selected = isLogin,  onClick = { onToggle(true) })
-        ToggleOption(text = "Sign up", selected = !isLogin, onClick = { onToggle(false) })
+        ToggleOption(
+            text     = "Iniciar sesión",
+            selected = isLogin,
+            onClick  = { onToggle(true) }
+        )
+        ToggleOption(
+            text     = "Crear cuenta",
+            selected = !isLogin,
+            onClick  = { onToggle(false) }
+        )
     }
 }
 
@@ -103,11 +142,11 @@ fun ToggleOption(text: String, selected: Boolean, onClick: () -> Unit) {
                 else MaterialTheme.colorScheme.surfaceVariant
             )
             .clickable { onClick() }
-            .padding(horizontal = 24.dp, vertical = 10.dp),
+            .padding(horizontal = 20.dp, vertical = 10.dp),
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = text,
+            text  = text,
             style = MaterialTheme.typography.labelLarge,
             color = if (selected) MaterialTheme.colorScheme.onPrimary
             else MaterialTheme.colorScheme.onSurfaceVariant
@@ -117,100 +156,151 @@ fun ToggleOption(text: String, selected: Boolean, onClick: () -> Unit) {
 
 // ── Login Card ───────────────────────────────────────────────────
 @Composable
-fun LoginCard() {
+fun LoginCard(
+    isLoading: Boolean = false,
+    errorMessage: String = "",
+    onLogin: (email: String, password: String) -> Unit
+) {
     var email    by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
     AuthCard {
-        Text("Log in", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.onSurface)
+        Text(
+            text       = "Iniciar sesión",
+            style      = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold,
+            color      = MaterialTheme.colorScheme.onSurface
+        )
+
         Spacer(Modifier.height(4.dp))
-        AuthTextField(value = email,    onValueChange = { email = it },    placeholder = "Email",    keyboardType = KeyboardType.Email)
-        AuthTextField(value = password, onValueChange = { password = it }, placeholder = "Password", isPassword = true)
-        Spacer(Modifier.height(4.dp))
+
+        DayPilotTextField(
+            value         = email,
+            onValueChange = { email = it },
+            label         = "Email",
+            keyboardType  = KeyboardType.Email,
+            isError       = errorMessage.isNotEmpty(),
+        )
+
+        DayPilotPasswordField(
+            value         = password,
+            onValueChange = { password = it },
+            isError       = errorMessage.isNotEmpty(),
+            errorMessage  = errorMessage
+        )
+
+        DayPilotButtonText(
+            text     = "¿Has olvidado tu contraseña?",
+            onClick  = {},
+            modifier = Modifier.align(Alignment.End)
+        )
+
         DayPilotButtonPrimary(
-            text = "Let's go!",
-            onClick = {},
-            isLoading = false,
-            hasError = false
+            text      = "Entrar",
+            onClick   = { onLogin(email, password) },
+            isLoading = isLoading,
+            hasError  = errorMessage.isNotEmpty()
         )
     }
 }
 
 // ── Register Card ────────────────────────────────────────────────
 @Composable
-fun RegisterCard() {
+fun RegisterCard(
+    isLoading: Boolean = false,
+    errorMessage: String = "",
+    onRegister: (name: String, username: String, email: String, password: String, region: String) -> Unit,
+    onSuccess: () -> Unit
+) {
     var name     by remember { mutableStateOf("") }
+    var username by remember { mutableStateOf("") }
     var email    by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var region   by remember { mutableStateOf("Europe/Madrid") }
+
+    val regions = listOf(
+        "Europe/Madrid",
+        "Atlantic/Canary",
+        "America/New_York",
+        "America/Los_Angeles",
+        "America/Mexico_City",
+        "America/Sao_Paulo",
+        "Asia/Tokyo",
+        "Asia/Shanghai",
+        "Australia/Sydney"
+    )
 
     AuthCard {
-        Text("Sign up", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.onSurface)
+        Text(
+            text       = "Crear cuenta",
+            style      = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold,
+            color      = MaterialTheme.colorScheme.onSurface
+        )
+
         Spacer(Modifier.height(4.dp))
-        AuthTextField(value = name,     onValueChange = { name = it },     placeholder = "Name")
-        AuthTextField(value = email,    onValueChange = { email = it },    placeholder = "Email",    keyboardType = KeyboardType.Email)
-        AuthTextField(value = password, onValueChange = { password = it }, placeholder = "Password", isPassword = true)
-        Spacer(Modifier.height(4.dp))
-        AuthButton(text = "Confirm!", onClick = {})
+
+        DayPilotTextField(
+            value         = name,
+            onValueChange = { name = it },
+            label         = "Nombre"
+        )
+
+        DayPilotTextField(
+            value         = username,
+            onValueChange = { username = it },
+            label         = "Nombre de usuario"
+        )
+
+        DayPilotDropdownField(
+            value       = region,
+            options     = regions,
+            onSelect    = { region = it },
+            label       = "Región / zona horaria",
+            displayText = { it }
+        )
+
+        DayPilotTextField(
+            value         = email,
+            onValueChange = { email = it },
+            label         = "Email",
+            keyboardType  = KeyboardType.Email,
+            isError       = errorMessage.isNotEmpty()
+        )
+
+        DayPilotPasswordField(
+            value         = password,
+            onValueChange = { password = it },
+            isError       = errorMessage.isNotEmpty(),
+            errorMessage  = errorMessage
+        )
+
+        DayPilotButtonPrimary(
+            text      = "Registrar",
+            onClick   = { onRegister(name, username, email, password, region) },
+            isLoading = isLoading
+        )
     }
 }
 
-// ── Componentes base ─────────────────────────────────────────────
+// ── AuthCard base ────────────────────────────────────────────────
 @Composable
 fun AuthCard(content: @Composable ColumnScope.() -> Unit) {
     Card(
-        modifier = Modifier.fillMaxSize(),
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        modifier  = Modifier.fillMaxWidth(),
+        shape     = RoundedCornerShape(24.dp),
+        colors    = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(
-            modifier = Modifier.fillMaxSize().padding(28.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
+            verticalArrangement = Arrangement.spacedBy(12.dp),
             content = content
         )
-    }
-}
-
-@Composable
-fun AuthTextField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    placeholder: String,
-    isPassword: Boolean = false,
-    keyboardType: KeyboardType = KeyboardType.Text
-) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        placeholder = { Text(placeholder, color = MaterialTheme.colorScheme.onSurfaceVariant) },
-        singleLine = true,
-        visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
-        keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
-        shape = RoundedCornerShape(12.dp),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor      = MaterialTheme.colorScheme.primary,
-            unfocusedBorderColor    = MaterialTheme.colorScheme.outline,
-            focusedContainerColor   = MaterialTheme.colorScheme.background,
-            unfocusedContainerColor = MaterialTheme.colorScheme.background,
-            focusedTextColor        = MaterialTheme.colorScheme.onBackground,
-            unfocusedTextColor      = MaterialTheme.colorScheme.onBackground,
-        ),
-        modifier = Modifier.fillMaxWidth()
-    )
-}
-
-@Composable
-fun AuthButton(text: String, onClick: () -> Unit) {
-    Button(
-        onClick = onClick,
-        modifier = Modifier.fillMaxWidth().height(50.dp),
-        shape = RoundedCornerShape(12.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor   = MaterialTheme.colorScheme.onPrimary
-        )
-    ) {
-        Text(text, style = MaterialTheme.typography.labelLarge)
     }
 }
