@@ -3,7 +3,6 @@ package com.example.daypilot_test_desing.ui.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -13,53 +12,33 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.ui.components.basic.*
-import com.example.daypilot_test_desing.ui.components.cards.ProfileStatsCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     name: String,
-    avatarUrl: String? = null,
     isDarkMode: Boolean,
     selectedThemeId: String,
     selectedLanguage: String,
-    selectedRegion: String,
     notificationsEnabled: Boolean,
     onToggleDarkMode: (Boolean) -> Unit,
     onThemeSelect: (String) -> Unit,
     onLanguageSelect: (String) -> Unit,
-    onRegionSelect: (String) -> Unit,
     onToggleNotifications: (Boolean) -> Unit,
-    onChangePhoto: () -> Unit,
+    onNavigateToEditProfile: () -> Unit,
     onLogout: () -> Unit,
     onBack: () -> Unit
 ) {
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Opciones",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Volver",
-                            tint = MaterialTheme.colorScheme.onBackground
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
-                )
+            DayPilotTopBar(
+                title  = stringResource(R.string.settings_title),
+                onBack = onBack
             )
         },
         containerColor = MaterialTheme.colorScheme.background
@@ -73,56 +52,69 @@ fun SettingsScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // ── Avatar editable ──────────────────────────────────
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                DayPilotAvatar(
-                    name      = name,
-                    avatarUrl = avatarUrl,
-                    size      = 80
-                )
-                TextButton(onClick = onChangePhoto) {
-                    Text(
-                        text  = "Cambiar foto",
-                        style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
-            }
+            Spacer(Modifier.height(8.dp))
 
-            // ── Tema de color ────────────────────────────────────
+            // ── Apariencia ───────────────────────────────────────
             DayPilotThemeSelector(
                 selectedThemeId = selectedThemeId,
                 onThemeSelect   = onThemeSelect
             )
 
-            // ── Modo oscuro ──────────────────────────────────────
-            DayPilotDarkModeSelector(
-                isDarkMode = isDarkMode,
-                onToggle   = onToggleDarkMode
-            )
-
-            // ── Notificaciones ───────────────────────────────────
             Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(
+                modifier  = Modifier.fillMaxWidth(),
+                shape     = RoundedCornerShape(16.dp),
+                colors    = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surface
                 ),
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                DayPilotSwitchRow(
+                    title           = stringResource(R.string.settings_dark_mode),
+                    description     = stringResource(R.string.settings_dark_mode_description),
+                    icon            = Icons.Default.DarkMode,
+                    checked         = isDarkMode,
+                    onCheckedChange = onToggleDarkMode
+                )
+            }
+
+            // ── Notificaciones ───────────────────────────────────
+            Card(
+                modifier  = Modifier.fillMaxWidth(),
+                shape     = RoundedCornerShape(16.dp),
+                colors    = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                DayPilotSwitchRow(
+                    title           = stringResource(R.string.settings_notifications),
+                    description     = stringResource(R.string.settings_notifications_description),
+                    icon            = Icons.Default.Notifications,
+                    checked         = notificationsEnabled,
+                    onCheckedChange = onToggleNotifications
+                )
+            }
+
+            // ── Perfil ───────────────────────────────────────────
+            Card(
+                modifier  = Modifier.fillMaxWidth(),
+                shape     = RoundedCornerShape(16.dp),
+                colors    = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                onClick   = onNavigateToEditProfile
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 14.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment     = Alignment.CenterVertically
                 ) {
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment     = Alignment.CenterVertically
                     ) {
                         Box(
                             modifier = Modifier
@@ -134,89 +126,63 @@ fun SettingsScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
-                                imageVector = Icons.Default.Notifications,
+                                imageVector        = Icons.Default.Person,
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(20.dp)
+                                tint               = MaterialTheme.colorScheme.primary,
+                                modifier           = Modifier.size(20.dp)
                             )
                         }
                         Column {
                             Text(
-                                text = "Notificaciones",
-                                style = MaterialTheme.typography.bodyMedium,
+                                text       = stringResource(R.string.settings_edit_profile),
+                                style      = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.SemiBold,
-                                color = MaterialTheme.colorScheme.onSurface
+                                color      = MaterialTheme.colorScheme.onSurface
                             )
                             Text(
-                                text = "Activar o desactivar notificaciones",
+                                text  = stringResource(R.string.settings_edit_profile_description),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
-                    Switch(
-                        checked = notificationsEnabled,
-                        onCheckedChange = onToggleNotifications,
-                        colors = SwitchDefaults.colors(
-                            checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
-                            checkedTrackColor = MaterialTheme.colorScheme.primary
-                        )
+                    Icon(
+                        imageVector        = Icons.Default.ChevronRight,
+                        contentDescription = null,
+                        tint               = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier           = Modifier.size(20.dp)
                     )
                 }
             }
 
             // ── Idioma ───────────────────────────────────────────
-            DayPilotOptionSelector(
-                title          = "Idioma",
-                subtitle       = selectedLanguage,
-                icon           = Icons.Default.Language,
-                selectedOption = selectedLanguage,
-                options        = listOf("Español", "English", "Deutsch"),
-                onSelect       = onLanguageSelect
-            )
-
-            // ── Región ───────────────────────────────────────────
-            DayPilotOptionSelector(
-                title          = "Región",
-                subtitle       = selectedRegion,
-                icon           = Icons.Default.Public,
-                selectedOption = selectedRegion,
-                options        = listOf(
-                    "Europe/Madrid",
-                    "Atlantic/Canary",
-                    "America/New_York",
-                    "America/Los_Angeles",
-                    "Asia/Tokyo"
+            Card(
+                modifier  = Modifier.fillMaxWidth(),
+                shape     = RoundedCornerShape(16.dp),
+                colors    = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface
                 ),
-                onSelect = onRegionSelect
-            )
-
-            // ── Cerrar sesión ────────────────────────────────────
-            Spacer(Modifier.height(8.dp))
-            Button(
-                onClick = onLogout,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp),
-                shape = RoundedCornerShape(16.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.error,
-                    contentColor   = MaterialTheme.colorScheme.onError
-                )
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Default.Logout,
-                    contentDescription = null,
-                    modifier = Modifier.size(18.dp)
-                )
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    text  = "Cerrar sesión",
-                    style = MaterialTheme.typography.labelLarge
+                DayPilotOptionSelector(
+                    title          = stringResource(R.string.settings_language),
+                    subtitle       = selectedLanguage,
+                    icon           = Icons.Default.Language,
+                    selectedOption = selectedLanguage,
+                    options        = listOf("Español", "English", "Deutsch"),
+                    onSelect       = onLanguageSelect
                 )
             }
 
+            // ── Cerrar sesión ────────────────────────────────────
             Spacer(Modifier.height(8.dp))
+
+            DayPilotButtonError(
+                text    = stringResource(R.string.settings_logout),
+                onClick = onLogout
+            )
+
+            Spacer(Modifier.height(16.dp))
         }
     }
 }

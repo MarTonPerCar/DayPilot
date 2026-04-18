@@ -97,7 +97,31 @@ fun DayPilotNavGraph(
                     onRejectRequest    = {},
                     onAddFriend        = {},
                     onTapFriend        = {},
-                    onNavigateToSearch = {}
+                    onNavigateToSearch = {
+                        navController.navigate(DayPilotDestinations.SEARCH_FRIENDS)
+                    }
+                )
+            }
+
+            composable(DayPilotDestinations.SEARCH_FRIENDS) {
+                var results by remember { mutableStateOf<List<SearchUserData>>(emptyList()) }
+                var isLoading by remember { mutableStateOf(false) }
+
+                SearchFriendsScreen(
+                    searchResults = results,
+                    isLoading     = isLoading,
+                    onSearch      = { query ->
+                        results = listOf(
+                            SearchUserData("5", "Mario Pérez",  "mario@test.com",  180, 3),
+                            SearchUserData("6", "Sara Gómez",   "sara@test.com",   240, 5),
+                            SearchUserData("7", "Juan Martín",  "juan@test.com",   95,  1)
+                        ).filter {
+                            it.name.contains(query, ignoreCase = true) ||
+                                    it.email.contains(query, ignoreCase = true)
+                        }
+                    },
+                    onAddFriend = {},
+                    onBack      = { navController.popBackStack() }
                 )
             }
 
@@ -119,20 +143,21 @@ fun DayPilotNavGraph(
             // ── Profile ───────────────────────────────────────────
             composable(DayPilotDestinations.PROFILE) {
                 ProfileScreen(
-                    name            = "Mario García",
-                    username        = "mariogarcia",
-                    email           = "mario@example.com",
-                    memberSince     = "06/04/2026",
-                    level           = 7,
-                    totalPoints     = 340,
-                    currentStreak   = 7,
-                    longestStreak   = 14,
-                    rankingPosition = 2,
-                    pointsToday     = 8,
-                    pointsTotal     = 340,
-                    friendsCount    = 3,
-                    onNavigateToSettings = { navController.navigate(DayPilotDestinations.SETTINGS) },
-                    onNavigateToFriends  = { navController.navigate(DayPilotDestinations.FRIENDS) }
+                    name             = "Mario García",
+                    username         = "mariogarcia",
+                    email            = "mario@example.com",
+                    memberSince      = "06/04/2026",
+                    level            = 7,
+                    totalPoints      = 340,
+                    currentStreak    = 7,
+                    longestStreak    = 14,
+                    rankingPosition  = 2,
+                    pointsToday      = 8,
+                    pointsFromTasks  = 4,
+                    pointsFromSteps  = 2,
+                    pointsFromHabits = 1,
+                    pointsFromTimers = 1,
+                    onNavigateToSettings    = { navController.navigate(DayPilotDestinations.SETTINGS) }
                 )
             }
 
@@ -141,7 +166,6 @@ fun DayPilotNavGraph(
                 var isDarkMode           by remember { mutableStateOf(true) }
                 var selectedTheme        by remember { mutableStateOf("sage_green") }
                 var selectedLanguage     by remember { mutableStateOf("Español") }
-                var selectedRegion       by remember { mutableStateOf("Europe/Madrid") }
                 var notificationsEnabled by remember { mutableStateOf(true) }
 
                 SettingsScreen(
@@ -149,20 +173,40 @@ fun DayPilotNavGraph(
                     isDarkMode            = isDarkMode,
                     selectedThemeId       = selectedTheme,
                     selectedLanguage      = selectedLanguage,
-                    selectedRegion        = selectedRegion,
                     notificationsEnabled  = notificationsEnabled,
                     onToggleDarkMode      = { isDarkMode = it },
                     onThemeSelect         = { selectedTheme = it },
                     onLanguageSelect      = { selectedLanguage = it },
-                    onRegionSelect        = { selectedRegion = it },
                     onToggleNotifications = { notificationsEnabled = it },
-                    onChangePhoto         = {},
+                    onNavigateToEditProfile = { navController.navigate(DayPilotDestinations.EDIT_PROFILE) },
                     onLogout              = {
                         navController.navigate(DayPilotDestinations.AUTH) {
                             popUpTo(0) { inclusive = true }
                         }
                     },
                     onBack = { navController.popBackStack() }
+                )
+            }
+
+            composable(DayPilotDestinations.EDIT_PROFILE) {
+                EditProfileScreen(
+                    currentName     = "Mario García",
+                    currentUsername = "mariogarcia",
+                    currentRegion   = "Europe/Madrid",
+                    onSave          = { _, _, _ -> navController.popBackStack() },
+                    onNavigateToResetPassword = {
+                        navController.navigate(DayPilotDestinations.RESET_PASSWORD)
+                    },
+                    onPickFromCamera  = {},
+                    onPickFromGallery = {},
+                    onBack            = { navController.popBackStack() }
+                )
+            }
+
+            composable(DayPilotDestinations.RESET_PASSWORD) {
+                ResetPasswordScreen(
+                    onSendResetEmail = { _ -> },
+                    onBack           = { navController.popBackStack() }
                 )
             }
 
@@ -212,7 +256,10 @@ fun DayPilotNavGraph(
                     ),
                     rankingPosition = 2,
                     pointsToday     = 8,
-                    pointsTotal     = 340,
+                    pointsFromTasks  = 4,
+                    pointsFromSteps  = 2,
+                    pointsFromHabits = 1,
+                    pointsFromTimers = 1,
                     onBack          = { navController.popBackStack() }
                 )
             }

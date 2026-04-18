@@ -43,9 +43,9 @@ fun FriendsScreen(
                 actions = {
                     IconButton(onClick = onNavigateToSearch) {
                         Icon(
-                            imageVector = Icons.Default.PersonAdd,
+                            imageVector        = Icons.Default.PersonAdd,
                             contentDescription = "Buscar amigos",
-                            tint = MaterialTheme.colorScheme.onBackground
+                            tint               = MaterialTheme.colorScheme.onBackground
                         )
                     }
                 },

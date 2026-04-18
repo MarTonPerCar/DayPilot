@@ -1,3 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">DayPilot-Test-Desing</string>
+    <!-- App -->
+    <string name="app_name">DayPilot</string>
+
+    <!-- Auth -->
+    <string name="login_title">Iniciar sesión</string>
+    <string name="register_title">Crear cuenta</string>
+    <string name="email">Email</string>
+    <string name="password">Contraseña</string>
+    <string name="username">Nombre de usuario</string>
+    <string name="name">Nombre</string>
+    <string name="region">Región / zona horaria</string>
+    <string name="enter">Entrar</string>
+    <string name="register">Registrar</string>
+    <string name="forgot_password">¿Has olvidado tu contraseña?</string>
+    <string name="back_to_login">Volver al inicio de sesión</string>
+
+    <!-- Reset Password -->
+    <string name="reset_password_title">Recuperar contraseña</string>
+    <string name="reset_password_description">Introduce tu email y te enviaremos un enlace para restablecer tu contraseña</string>
+    <string name="reset_password_send">Enviar enlace</string>
+    <string name="reset_password_success">✅ Email enviado. Revisa tu bandeja de entrada.</string>
+
+    <!-- Home -->
+    <string name="home_title">DayPilot</string>
+    <string name="home_sections">Secciones</string>
+
+    <!-- Friends -->
+    <string name="search_friends_title">Buscar amigos</string>
+    <string name="search_friends_placeholder">Buscar por nombre o username...</string>
+    <string name="search_friends_empty_query">Escribe al menos una letra\npara buscar usuarios</string>
+    <string name="search_friends_no_results">No se encontraron usuarios\npara \"%1$s\"</string>
+    <string name="search_friends_clear">Limpiar</string>
+
+    <!-- Profile -->
+    <string name="profile_title">Perfil</string>
+    <string name="profile_email">Email</string>
+    <string name="profile_since">Desde</string>
+    <string name="profile_username">Username</string>
+    <string name="profile_points_today">Puntos hoy</string>
+    <string name="profile_points_tasks">Tareas</string>
+    <string name="profile_points_steps">Pasos</string>
+    <string name="profile_points_habits">Hábitos</string>
+    <string name="profile_points_timers">Cronómetros</string>
+    <string name="profile_ranking">Ranking</string>
+    <string name="profile_account">Cuenta</string>
+    <string name="profile_edit">Editar perfil</string>
+
+    <!-- Edit Profile -->
+    <string name="edit_profile_title">Editar perfil</string>
+    <string name="edit_profile_change_photo">Cambiar foto</string>
+    <string name="edit_profile_personal_info">Información personal</string>
+    <string name="edit_profile_security">Seguridad</string>
+    <string name="edit_profile_change_password">Cambiar contraseña</string>
+    <string name="edit_profile_save">Guardar cambios</string>
+
+    <!-- Photo Picker -->
+    <string name="photo_picker_title">Cambiar foto</string>
+    <string name="photo_picker_description">¿Desde dónde quieres elegir la foto?</string>
+    <string name="photo_picker_camera">Cámara</string>
+    <string name="photo_picker_gallery">Galería</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Configuración</string>
+    <string name="settings_profile_section">Perfil</string>
+    <string name="settings_edit_profile">Editar perfil</string>
+    <string name="settings_edit_profile_description">Nombre, usuario, región y contraseña</string>
+    <string name="settings_appearance">Apariencia</string>
+    <string name="settings_dark_mode">Modo oscuro</string>
+    <string name="settings_dark_mode_description">Activa el tema oscuro de la app</string>
+    <string name="settings_notifications">Notificaciones</string>
+    <string name="settings_notifications_description">Activar o desactivar notificaciones</string>
+    <string name="settings_language">Idioma</string>
+    <string name="settings_logout">Cerrar sesión</string>
+
+    <!-- Calendar -->
+    <string name="calendar_title">Calendario</string>
+    <string name="calendar_day_tasks">Tareas del día %1$d</string>
+    <string name="calendar_no_tasks">No hay tareas para este día</string>
+    <string name="calendar_add_task">Añadir tarea</string>
+
+    <!-- Habits -->
+    <string name="habits_title">Hábitos</string>
+    <string name="habits_timers">Cronómetros</string>
+    <string name="habits_other">Otros hábitos</string>
+    <string name="habits_tech_health_title">Salud tecnológica</string>
+    <string name="habits_tech_health_description">Límites por app / grupo + avisos</string>
+    <string name="habits_reminders_title">Recordatorios</string>
+    <string name="habits_reminders_description">Avisos, timers y rutinas</string>
+
+    <!-- Steps -->
+    <string name="steps_title">Pasos</string>
+
+    <!-- Timer -->
+    <string name="timer_completed">¡Completado! 🎉</string>
+    <string name="timer_point_earned">Punto del día conseguido</string>
+    <string name="timer_restart">Reiniciar</string>
+
+    <!-- Progress -->
+    <string name="progress_title">Progreso</string>
+
+    <!-- Rivalry -->
+    <string name="rivalry_title">Rivalidad</string>
+    <string name="rivalry_your_position">Tu posición</string>
+    <string name="rivalry_ranking">Ranking</string>
+
+    <!-- Friends -->
+    <string name="friends_title">Amigos</string>
+    <string name="friends_tab_friends">Amigos</string>
+    <string name="friends_tab_requests">Solicitudes</string>
+    <string name="friends_empty">Aún no tienes amigos.\n¡Busca y añade amigos!</string>
+    <string name="friends_requests_empty">No tienes solicitudes pendientes</string>
+
+    <!-- Notifications -->
+    <string name="notifications_title">Notificaciones</string>
+    <string name="notifications_empty">No tienes notificaciones</string>
+
+    <!-- Reminders -->
+    <string name="reminders_title">Recordatorios</string>
+    <string name="reminders_empty">No tienes recordatorios.\n¡Añade uno!</string>
+    <string name="reminders_add">Añadir recordatorio</string>
+
+    <!-- Tech Health -->
+    <string name="tech_health_title">Salud Tecnológica</string>
+    <string name="tech_health_screen_usage">Uso de pantalla hoy</string>
+    <string name="tech_health_used_minutes">%1$d min usados</string>
+    <string name="tech_health_limit_minutes">límite %1$d min</string>
+    <string name="tech_health_point_earned">Punto del día conseguido</string>
+    <string name="tech_health_daily_limit">Límite diario</string>
+    <string name="tech_health_app_limits">Límites por aplicación</string>
+
+    <!-- Common -->
+    <string name="common_back">Volver</string>
+    <string name="common_save">Guardar</string>
+    <string name="common_cancel">Cancelar</string>
+    <string name="common_confirm">Confirmar</string>
+    <string name="common_delete">Eliminar</string>
+    <string name="common_loading">Cargando...</string>
+    <string name="common_error">Ha ocurrido un error</string>
+    <string name="common_retry">Reintentar</string>
+    <string name="common_settings">Configuración</string>
+    <string name="common_points">pts</string>
+    <string name="common_minutes">min</string>
+    <string name="common_days">días</string>
+    <string name="common_streak">🔥 racha</string>
 </resources>

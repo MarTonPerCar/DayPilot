@@ -10,6 +10,8 @@ object DayPilotDestinations {
     const val NOTIFICATIONS = "notifications"
     const val PROFILE       = "profile"
 
+    const val SEARCH_FRIENDS = "search_friends"
+
     // Desde Home
     const val CALENDAR   = "calendar"
     const val HABITS     = "habits"
@@ -25,4 +27,6 @@ object DayPilotDestinations {
 
     // Desde Perfil
     const val SETTINGS = "settings"
+    const val EDIT_PROFILE    = "edit_profile"
+    const val RESET_PASSWORD  = "reset_password"
 }

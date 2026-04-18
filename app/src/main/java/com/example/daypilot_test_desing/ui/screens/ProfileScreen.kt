@@ -1,18 +1,20 @@
 package com.example.daypilot_test_desing.ui.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.daypilot_test_desing.ui.components.cards.ProfileStatsCard
-import com.example.daypilot_test_desing.ui.components.cards.StatsCard
+import com.example.daypilot_test_desing.R
+import com.example.daypilot_test_desing.ui.components.basic.*
+import com.example.daypilot_test_desing.ui.components.cards.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,35 +29,20 @@ fun ProfileScreen(
     longestStreak: Int,
     rankingPosition: Int,
     pointsToday: Int,
-    pointsTotal: Int,
-    friendsCount: Int,
+    pointsFromTasks: Int,
+    pointsFromSteps: Int,
+    pointsFromHabits: Int,
+    pointsFromTimers: Int,
     avatarUrl: String? = null,
-    onNavigateToSettings: () -> Unit,
-    onNavigateToFriends: () -> Unit
+    onNavigateToSettings: () -> Unit
 ) {
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Perfil",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-                },
-                actions = {
-                    IconButton(onClick = onNavigateToSettings) {
-                        Icon(
-                            imageVector = Icons.Default.Settings,
-                            contentDescription = "Configuración",
-                            tint = MaterialTheme.colorScheme.onBackground
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
-                )
+            DayPilotTopBarWithAction(
+                title             = stringResource(R.string.profile_title),
+                actionIcon        = Icons.Default.Settings,
+                actionDescription = stringResource(R.string.common_settings),
+                onAction          = onNavigateToSettings
             )
         },
         containerColor = MaterialTheme.colorScheme.background
@@ -68,7 +55,6 @@ fun ProfileScreen(
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // ── Perfil + nivel + stats ───────────────────────────
             ProfileStatsCard(
                 name          = name,
                 username      = username,
@@ -79,11 +65,11 @@ fun ProfileScreen(
                 avatarUrl     = avatarUrl
             )
 
-            // ── Email y fecha ────────────────────────────────────
+            // ── Info básica ──────────────────────────────────────
             Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(
+                modifier  = Modifier.fillMaxWidth(),
+                shape     = RoundedCornerShape(20.dp),
+                colors    = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surface
                 ),
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -94,68 +80,32 @@ fun ProfileScreen(
                         .padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    ProfileInfoRow(label = "Email",  value = email)
-                    HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant)
-                    ProfileInfoRow(label = "Desde",  value = memberSince)
-                }
-            }
-
-            // ── Resumen de puntos ────────────────────────────────
-            StatsCard(
-                rankingPosition = rankingPosition,
-                pointsToday     = pointsToday,
-                pointsTotal     = pointsTotal
-            )
-
-            // ── Amigos ───────────────────────────────────────────
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                onClick = onNavigateToFriends
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
-                ) {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Settings,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(22.dp)
-                        )
-                        Column {
-                            Text(
-                                text = "Amigos",
-                                style = MaterialTheme.typography.titleSmall,
-                                fontWeight = FontWeight.SemiBold,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                            Text(
-                                text = "$friendsCount amigos",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    }
-                    Text(
-                        text = "Ver",
-                        style = MaterialTheme.typography.labelMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.primary
+                    ProfileInfoRow(
+                        label = stringResource(R.string.profile_email),
+                        value = email
+                    )
+                    DayPilotDivider()
+                    ProfileInfoRow(
+                        label = stringResource(R.string.profile_since),
+                        value = memberSince
+                    )
+                    DayPilotDivider()
+                    ProfileInfoRow(
+                        label = stringResource(R.string.profile_username),
+                        value = "@$username"
                     )
                 }
             }
+
+            // ── Ranking ──────────────────────────────────────────
+            StatsCard(
+                rankingPosition  = rankingPosition,
+                pointsToday      = pointsToday,
+                pointsFromTasks  = pointsFromTasks,
+                pointsFromSteps  = pointsFromSteps,
+                pointsFromHabits = pointsFromHabits,
+                pointsFromTimers = pointsFromTimers
+            )
 
             Spacer(Modifier.height(8.dp))
         }
@@ -165,19 +115,19 @@ fun ProfileScreen(
 @Composable
 fun ProfileInfoRow(label: String, value: String) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier              = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            text = label,
+            text  = label,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Text(
-            text = value,
-            style = MaterialTheme.typography.bodyMedium,
+            text       = value,
+            style      = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.onSurface
+            color      = MaterialTheme.colorScheme.onSurface
         )
     }
 }

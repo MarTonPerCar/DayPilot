@@ -129,15 +129,11 @@ fun DayPilotThemeSelector(
                 ) {
                     dayPilotThemes.forEach { theme ->
                         val isSelected = theme.id == selectedThemeId
-                        val weight by animateDpAsState(
-                            targetValue = if (isSelected) 80.dp else 40.dp,
-                            animationSpec = tween(300),
-                            label = "theme_weight_${theme.id}"
-                        )
+                        val flex = if (isSelected) 2f else 1f
 
                         Box(
                             modifier = Modifier
-                                .width(weight)
+                                .weight(flex)
                                 .fillMaxHeight()
                                 .background(theme.colors.first())
                                 .clickable { onThemeSelect(theme.id) },
