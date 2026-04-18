@@ -1,14 +1,20 @@
 package com.example.daypilot_test_desing.ui.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.daypilot_test_desing.R
+import com.example.daypilot_test_desing.ui.components.basic.*
 import com.example.daypilot_test_desing.ui.components.cards.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -17,43 +23,112 @@ fun NotificationsScreen(
     notifications: List<NotificationData>,
     onTapNotification: (String) -> Unit
 ) {
+    var selectedFilter by remember { mutableStateOf<NotificationType?>(null) }
+
+    val filters = listOf(
+        null                      to stringResource(R.string.notifications_filter_all),
+        NotificationType.TASK        to stringResource(R.string.notifications_filter_tasks),
+        NotificationType.SOCIAL      to stringResource(R.string.notifications_filter_social),
+        NotificationType.STEPS       to stringResource(R.string.notifications_filter_steps),
+        NotificationType.STREAK      to stringResource(R.string.notifications_filter_streak),
+        NotificationType.REMINDER    to stringResource(R.string.notifications_filter_reminders),
+        NotificationType.ACHIEVEMENT to stringResource(R.string.notifications_filter_achievements)
+    )
+
+    val filtered = if (selectedFilter == null) notifications
+    else notifications.filter { it.type == selectedFilter }
+
+    val unreadCount = notifications.count { !it.isRead }
+
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Notificaciones",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
-                )
+            DayPilotTopBar(
+                title = stringResource(R.string.notifications_title)
             )
         },
         containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
-        if (notifications.isEmpty()) {
-            EmptyState(message = "No tienes notificaciones")
-        } else {
-            LazyColumn(
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            // ── Subtítulo ────────────────────────────────────────
+            Row(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                items(notifications) { notification ->
-                    NotificationCard(
-                        title   = notification.title,
-                        message = notification.message,
-                        timeAgo = notification.timeAgo,
-                        type    = notification.type,
-                        isRead  = notification.isRead,
-                        onClick = { onTapNotification(notification.id) }
+                Text(
+                    text  = stringResource(R.string.notifications_title),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                if (unreadCount > 0) {
+                    Text(
+                        text  = "$unreadCount ${stringResource(R.string.notifications_unread)}",
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.primary
                     )
+                }
+            }
+
+            // ── Filtros ──────────────────────────────────────────
+            LazyRow(
+                contentPadding        = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(filters) { (type, label) ->
+                    val isSelected = selectedFilter == type
+                    FilterChip(
+                        selected = isSelected,
+                        onClick  = { selectedFilter = type },
+                        label    = { Text(label, style = MaterialTheme.typography.labelMedium) },
+                        leadingIcon = if (type != null) ({
+                            Icon(
+                                imageVector        = type.icon,
+                                contentDescription = null,
+                                modifier           = Modifier.size(14.dp),
+                                tint               = if (isSelected)
+                                    MaterialTheme.colorScheme.onSecondaryContainer
+                                else
+                                    type.color
+                            )
+                        }) else null,
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor    = MaterialTheme.colorScheme.primary,
+                            selectedLabelColor        = MaterialTheme.colorScheme.onPrimary,
+                            selectedLeadingIconColor  = MaterialTheme.colorScheme.onPrimary
+                        )
+                    )
+                }
+            }
+
+            // ── Lista ────────────────────────────────────────────
+            if (filtered.isEmpty()) {
+                DayPilotEmptyState(
+                    message = stringResource(R.string.notifications_empty),
+                    icon    = Icons.Default.Notifications
+                )
+            } else {
+                LazyColumn(
+                    modifier            = Modifier.fillMaxSize(),
+                    contentPadding      = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(filtered) { notification ->
+                        NotificationCard(
+                            title   = notification.title,
+                            message = notification.message,
+                            timeAgo = notification.timeAgo,
+                            type    = notification.type,
+                            isRead  = notification.isRead,
+                            onClick = { onTapNotification(notification.id) }
+                        )
+                    }
                 }
             }
         }

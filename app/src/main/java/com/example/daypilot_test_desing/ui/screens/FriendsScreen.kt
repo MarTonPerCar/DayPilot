@@ -1,17 +1,22 @@
 package com.example.daypilot_test_desing.ui.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.daypilot_test_desing.R
+import com.example.daypilot_test_desing.ui.components.basic.*
 import com.example.daypilot_test_desing.ui.components.cards.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -19,39 +24,25 @@ import com.example.daypilot_test_desing.ui.components.cards.*
 fun FriendsScreen(
     friends: List<FriendData>,
     friendRequests: List<FriendData>,
-    searchResults: List<FriendData>,
     onAcceptRequest: (String) -> Unit,
     onRejectRequest: (String) -> Unit,
-    onAddFriend: (String) -> Unit,
     onTapFriend: (String) -> Unit,
-    onNavigateToSearch: () -> Unit
+    onNavigateToSearch: () -> Unit,
+    onReactToFriend: (userId: String, reaction: ReactionType) -> Unit = { _, _ -> }
 ) {
-    var selectedTab by remember { mutableStateOf(0) }
-    val tabs = listOf("Amigos", "Solicitudes")
+    var selectedTab by remember { mutableIntStateOf(0) }
+    val tabs = listOf(
+        stringResource(R.string.friends_tab_friends),
+        stringResource(R.string.friends_tab_requests)
+    )
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Amigos",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-                },
-                actions = {
-                    IconButton(onClick = onNavigateToSearch) {
-                        Icon(
-                            imageVector        = Icons.Default.PersonAdd,
-                            contentDescription = "Buscar amigos",
-                            tint               = MaterialTheme.colorScheme.onBackground
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
-                )
+            DayPilotTopBarWithAction(
+                title             = stringResource(R.string.friends_title),
+                actionIcon        = Icons.Default.PersonAdd,
+                actionDescription = stringResource(R.string.search_friends_title),
+                onAction          = onNavigateToSearch
             )
         },
         containerColor = MaterialTheme.colorScheme.background
@@ -61,7 +52,6 @@ fun FriendsScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            // ── Tabs ─────────────────────────────────────────────
             TabRow(
                 selectedTabIndex = selectedTab,
                 containerColor   = MaterialTheme.colorScheme.background,
@@ -76,8 +66,10 @@ fun FriendsScreen(
                                 text = if (index == 1 && friendRequests.isNotEmpty())
                                     "$title (${friendRequests.size})"
                                 else title,
-                                fontWeight = if (selectedTab == index) FontWeight.SemiBold
-                                else FontWeight.Normal
+                                fontWeight = if (selectedTab == index)
+                                    FontWeight.SemiBold
+                                else
+                                    FontWeight.Normal
                             )
                         }
                     )
@@ -85,25 +77,32 @@ fun FriendsScreen(
             }
 
             when (selectedTab) {
-                // ── Lista de amigos ───────────────────────────────
+                // ── Amigos ────────────────────────────────────────
                 0 -> {
                     if (friends.isEmpty()) {
-                        EmptyState(
-                            message = "Aún no tienes amigos.\n¡Busca y añade amigos!"
+                        DayPilotEmptyState(
+                            message = stringResource(R.string.friends_empty),
+                            icon    = Icons.Default.PersonAdd
                         )
                     } else {
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(16.dp),
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .verticalScroll(rememberScrollState())
+                                .padding(16.dp),
                             verticalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
-                            items(friends) { friend ->
+                            friends.forEach { friend ->
                                 FriendCard(
-                                    name   = friend.name,
-                                    email  = friend.email,
-                                    points = friend.points,
-                                    streak = friend.streak,
-                                    onTap  = { onTapFriend(friend.id) }
+                                    name          = friend.name,
+                                    email         = friend.email,
+                                    points        = friend.points,
+                                    streak        = friend.streak,
+                                    avatarUrl     = friend.avatarUrl,
+                                    weeklySummary = friend.weeklySummary,
+                                    onReact       = { reaction ->
+                                        onReactToFriend(friend.id, reaction)
+                                    }
                                 )
                             }
                         }
@@ -113,11 +112,13 @@ fun FriendsScreen(
                 // ── Solicitudes ───────────────────────────────────
                 1 -> {
                     if (friendRequests.isEmpty()) {
-                        EmptyState(message = "No tienes solicitudes pendientes")
+                        DayPilotEmptyState(
+                            message = stringResource(R.string.friends_requests_empty)
+                        )
                     } else {
                         LazyColumn(
-                            modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(16.dp),
+                            modifier        = Modifier.fillMaxSize(),
+                            contentPadding  = PaddingValues(16.dp),
                             verticalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
                             items(friendRequests) { request ->
@@ -138,28 +139,12 @@ fun FriendsScreen(
     }
 }
 
-// ── Modelo de datos ──────────────────────────────────────────────
 data class FriendData(
     val id: String,
     val name: String,
     val email: String,
     val points: Int,
     val streak: Int,
-    val avatarUrl: String? = null
+    val avatarUrl: String? = null,
+    val weeklySummary: FriendWeeklySummary? = null
 )
-
-// ── Estado vacío ─────────────────────────────────────────────────
-@Composable
-fun EmptyState(message: String) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = message,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center
-        )
-    }
-}

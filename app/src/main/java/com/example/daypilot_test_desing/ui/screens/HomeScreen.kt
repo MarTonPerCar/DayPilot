@@ -8,10 +8,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.daypilot_test_desing.R
+import com.example.daypilot_test_desing.ui.components.basic.DayPilotSectionHeader
+import com.example.daypilot_test_desing.ui.components.basic.DayPilotTopBarWithAction
 import com.example.daypilot_test_desing.ui.components.cards.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -25,6 +28,7 @@ fun HomeScreen(
     tasksTotal: Int,
     pointsToday: Int,
     rankingPosition: Int,
+    weeklySummary: WeeklySummaryData,
     onNavigateToCalendar: () -> Unit,
     onNavigateToHabits: () -> Unit,
     onNavigateToProgress: () -> Unit,
@@ -33,27 +37,11 @@ fun HomeScreen(
 ) {
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "DayPilot",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-                },
-                actions = {
-                    IconButton(onClick = onNavigateToSettings) {
-                        Icon(
-                            imageVector = Icons.Default.Settings,
-                            contentDescription = "Configuración",
-                            tint = MaterialTheme.colorScheme.onBackground
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
-                )
+            DayPilotTopBarWithAction(
+                title             = stringResource(R.string.home_title),
+                actionIcon        = Icons.Default.Settings,
+                actionDescription = stringResource(R.string.common_settings),
+                onAction          = onNavigateToSettings
             )
         },
         containerColor = MaterialTheme.colorScheme.background
@@ -68,26 +56,23 @@ fun HomeScreen(
         ) {
             // ── Resumen diario ───────────────────────────────────
             DailySummaryCard(
-                userName       = userName,
-                streak         = streak,
-                stepsToday     = stepsToday,
-                stepsGoal      = stepsGoal,
-                tasksCompleted = tasksCompleted,
-                tasksTotal     = tasksTotal,
-                pointsToday    = pointsToday,
+                userName        = userName,
+                streak          = streak,
+                stepsToday      = stepsToday,
+                stepsGoal       = stepsGoal,
+                tasksCompleted  = tasksCompleted,
+                tasksTotal      = tasksTotal,
+                pointsToday     = pointsToday,
                 rankingPosition = rankingPosition
             )
 
             // ── Grid 2x2 ─────────────────────────────────────────
-            Text(
-                text = "Secciones",
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+            DayPilotSectionHeader(
+                title = stringResource(R.string.home_sections)
             )
 
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier              = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 HomeMenuCard(
@@ -111,7 +96,7 @@ fun HomeScreen(
             }
 
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier              = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 HomeMenuCard(
@@ -126,8 +111,8 @@ fun HomeScreen(
                 HomeMenuCard(
                     section  = HomeSection.RIVALRY,
                     data     = HomeSectionData.Rivalry(
-                        position      = rankingPosition,
-                        totalFriends  = 5
+                        position     = rankingPosition,
+                        totalFriends = 5
                     ),
                     onClick  = onNavigateToRivalry,
                     modifier = Modifier.weight(1f)

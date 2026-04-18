@@ -34,6 +34,7 @@ fun ProfileScreen(
     pointsFromHabits: Int,
     pointsFromTimers: Int,
     avatarUrl: String? = null,
+    weeklySummary: WeeklySummaryData,
     onNavigateToSettings: () -> Unit
 ) {
     Scaffold(
@@ -108,6 +109,8 @@ fun ProfileScreen(
             )
 
             Spacer(Modifier.height(8.dp))
+
+            WeeklyReactionCard(summary = weeklySummary)
         }
     }
 }

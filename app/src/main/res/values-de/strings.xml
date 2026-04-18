@@ -33,6 +33,18 @@
     <string name="search_friends_no_results">No se encontraron usuarios\npara \"%1$s\"</string>
     <string name="search_friends_clear">Limpiar</string>
 
+    <!-- Weekly Summary -->
+    <string name="weekly_summary_title">Deine letzte Woche</string>
+    <string name="weekly_summary_points">Pkt. diese Woche</string>
+    <string name="weekly_summary_tasks">Aufgaben</string>
+    <string name="weekly_summary_steps">Schritte</string>
+    <string name="weekly_summary_streak">beste Serie</string>
+    <string name="weekly_summary_reactions">Reaktionen deiner Freunde</string>
+    <string name="weekly_summary_no_reactions">Noch keine Reaktionen</string>
+    <string name="weekly_friend_summary">Wochenzusammenfassung</string>
+    <string name="weekly_friend_react">Reagieren</string>
+    <string name="weekly_friend_reacted">Bereits reagiert</string>
+
     <!-- Profile -->
     <string name="profile_title">Profil</string>
     <string name="profile_email">E-Mail</string>
@@ -115,6 +127,14 @@
     <!-- Notifications -->
     <string name="notifications_title">Benachrichtigungen</string>
     <string name="notifications_empty">Keine Benachrichtigungen</string>
+    <string name="notifications_filter_all">Alle</string>
+    <string name="notifications_filter_tasks">Aufgaben</string>
+    <string name="notifications_filter_social">Sozial</string>
+    <string name="notifications_filter_steps">Schritte</string>
+    <string name="notifications_filter_streak">Serie</string>
+    <string name="notifications_filter_reminders">Erinnerungen</string>
+    <string name="notifications_filter_achievements">Erfolge</string>
+    <string name="notifications_unread">ungelesen</string>
 
     <!-- Reminders -->
     <string name="reminders_title">Erinnerungen</string>

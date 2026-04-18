@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.daypilot_test_desing.ui.components.basic.DayPilotEmptyState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,7 +64,7 @@ fun RemindersScreen(
         containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         if (reminders.isEmpty()) {
-            EmptyState(message = "No tienes recordatorios.\n¡Añade uno!")
+            DayPilotEmptyState(message = "No tienes recordatorios.\n¡Añade uno!")
         } else {
             LazyColumn(
                 modifier = Modifier

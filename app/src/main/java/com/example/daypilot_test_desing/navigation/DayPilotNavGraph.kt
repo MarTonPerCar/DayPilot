@@ -73,6 +73,16 @@ fun DayPilotNavGraph(
                     tasksTotal      = 5,
                     pointsToday     = 8,
                     rankingPosition = 2,
+                    weeklySummary   = WeeklySummaryData(
+                        totalPoints    = 45,
+                        tasksCompleted = 12,
+                        totalSteps     = 42000,
+                        bestStreak     = 7,
+                        reactions      = listOf(
+                            ReceivedReaction("Ana López",   ReactionType.CLAP),
+                            ReceivedReaction("Carlos Ruiz", ReactionType.FIRE)
+                        )
+                    ),
                     onNavigateToCalendar  = { navController.navigate(DayPilotDestinations.CALENDAR) },
                     onNavigateToHabits    = { navController.navigate(DayPilotDestinations.HABITS) },
                     onNavigateToProgress  = { navController.navigate(DayPilotDestinations.PROGRESS) },
@@ -85,18 +95,53 @@ fun DayPilotNavGraph(
             composable(DayPilotDestinations.FRIENDS) {
                 FriendsScreen(
                     friends = listOf(
-                        FriendData("1", "Ana López",     "ana@example.com",    520, 14),
-                        FriendData("2", "Carlos Ruiz",   "carlos@example.com", 480, 9),
-                        FriendData("3", "Laura Sánchez", "laura@example.com",  430, 6)
+                        FriendData(
+                            id    = "1",
+                            name  = "Ana López",
+                            email = "ana@example.com",
+                            points = 520,
+                            streak = 14,
+                            weeklySummary = FriendWeeklySummary(
+                                totalPoints    = 45,
+                                tasksCompleted = 12,
+                                totalSteps     = 42000,
+                                bestStreak     = 7
+                            )
+                        ),
+                        FriendData(
+                            id    = "2",
+                            name  = "Carlos Ruiz",
+                            email = "carlos@example.com",
+                            points = 480,
+                            streak = 9,
+                            weeklySummary = FriendWeeklySummary(
+                                totalPoints    = 38,
+                                tasksCompleted = 9,
+                                totalSteps     = 35000,
+                                bestStreak     = 5
+                            )
+                        ),
+                        FriendData(
+                            id    = "3",
+                            name  = "Laura Sánchez",
+                            email = "laura@example.com",
+                            points = 430,
+                            streak = 6,
+                            weeklySummary = FriendWeeklySummary(
+                                totalPoints    = 30,
+                                tasksCompleted = 7,
+                                totalSteps     = 28000,
+                                bestStreak     = 4
+                            )
+                        )
                     ),
-                    friendRequests = listOf(
+                    friendRequests  = listOf(
                         FriendData("4", "Pedro Martín", "pedro@example.com", 290, 3)
                     ),
-                    searchResults      = emptyList(),
-                    onAcceptRequest    = {},
-                    onRejectRequest    = {},
-                    onAddFriend        = {},
-                    onTapFriend        = {},
+                    onAcceptRequest = {},
+                    onRejectRequest = {},
+                    onTapFriend     = {},
+                    onReactToFriend = { _, _ -> },
                     onNavigateToSearch = {
                         navController.navigate(DayPilotDestinations.SEARCH_FRIENDS)
                     }
@@ -157,6 +202,16 @@ fun DayPilotNavGraph(
                     pointsFromSteps  = 2,
                     pointsFromHabits = 1,
                     pointsFromTimers = 1,
+                    weeklySummary = WeeklySummaryData(
+                        totalPoints    = 45,
+                        tasksCompleted = 12,
+                        totalSteps     = 42000,
+                        bestStreak     = 7,
+                        reactions      = listOf(
+                            ReceivedReaction("Ana López",   ReactionType.CLAP),
+                            ReceivedReaction("Carlos Ruiz", ReactionType.FIRE)
+                        )
+                    ),
                     onNavigateToSettings    = { navController.navigate(DayPilotDestinations.SETTINGS) }
                 )
             }

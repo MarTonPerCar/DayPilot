@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.daypilot_test_desing.ui.components.basic.DayPilotEmptyState
 import com.example.daypilot_test_desing.ui.components.basic.TaskCategory
 import com.example.daypilot_test_desing.ui.components.basic.TaskDifficulty
 import com.example.daypilot_test_desing.ui.components.cards.*
@@ -184,7 +185,7 @@ fun CalendarScreen(
             Spacer(Modifier.height(8.dp))
 
             if (selectedTasks.isEmpty()) {
-                EmptyState(message = "No hay tareas para este día")
+                DayPilotEmptyState(message = "No hay tareas para este día")
             } else {
                 LazyColumn(
                     contentPadding = PaddingValues(horizontal = 16.dp),
