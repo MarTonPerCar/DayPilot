@@ -11,11 +11,13 @@ import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.ui.components.basic.DayPilotTopBar
 import com.example.daypilot_test_desing.ui.components.cards.*
+import com.example.daypilot_test_desing.ui.model.DayProgress
+import com.example.daypilot_test_desing.ui.model.ProgressFilter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProgressScreen(
-    chartData: List<Pair<String, Int>>,
+    progressData: List<DayProgress>,
     rankingPosition: Int,
     pointsToday: Int,
     pointsFromTasks: Int,
@@ -39,7 +41,7 @@ fun ProgressScreen(
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             StatsCard(
                 rankingPosition  = rankingPosition,
@@ -49,7 +51,22 @@ fun ProgressScreen(
                 pointsFromHabits = pointsFromHabits,
                 pointsFromTimers = pointsFromTimers
             )
-            ProgressChartCard(data = chartData)
+
+            ProgressChartCard(
+                data   = progressData,
+                filter = ProgressFilter.POINTS
+            )
+
+            ProgressChartCard(
+                data   = progressData,
+                filter = ProgressFilter.STEPS
+            )
+
+            ProgressChartCard(
+                data   = progressData,
+                filter = ProgressFilter.TASKS
+            )
+
             Spacer(Modifier.height(8.dp))
         }
     }

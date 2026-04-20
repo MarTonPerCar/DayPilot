@@ -3,15 +3,17 @@ package com.example.daypilot_test_desing.ui.screens
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.daypilot_test_desing.R
+import com.example.daypilot_test_desing.ui.components.basic.*
 import com.example.daypilot_test_desing.ui.components.cards.*
+import kotlin.collections.drop
+import com.example.daypilot_test_desing.ui.model.RankingData
+import com.example.daypilot_test_desing.ui.components.cards.PodiumEntry
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -25,91 +27,80 @@ fun RivalryScreen(
 ) {
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Rivalidad",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Volver",
-                            tint = MaterialTheme.colorScheme.onBackground
-                        )
-                    }
-                },
-                actions = {
-                    IconButton(onClick = {}) {
-                        Icon(
-                            imageVector = Icons.Default.Info,
-                            contentDescription = "Info",
-                            tint = MaterialTheme.colorScheme.onBackground
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
-                )
+            DayPilotTopBar(
+                title  = stringResource(R.string.rivalry_title),
+                onBack = onBack
             )
         },
         containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         LazyColumn(
-            modifier = Modifier
+            modifier       = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),
             contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             // ── Tu posición ──────────────────────────────────────
             item {
-                Text(
-                    text = "Tu posición",
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Spacer(Modifier.height(8.dp))
                 CurrentUserRankingCard(
                     name     = currentUserName,
                     position = currentUserPosition,
                     points   = currentUserPoints,
                     streak   = currentUserStreak
                 )
-                Spacer(Modifier.height(16.dp))
-                Text(
-                    text = "Ranking",
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Spacer(Modifier.height(8.dp))
             }
 
-            // ── Ranking ──────────────────────────────────────────
-            itemsIndexed(ranking) { index, entry ->
-                RankingCard(
-                    name     = entry.name,
-                    position = index + 1,
-                    points   = entry.points,
-                    streak   = entry.streak
-                )
+            // ── Podio ────────────────────────────────────────────
+            if (ranking.size >= 3) {
+                item {
+                    DayPilotSectionHeader(
+                        title = stringResource(R.string.rivalry_ranking)
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    PodiumCard(
+                        first  = PodiumEntry(
+                            name          = ranking[0].name,
+                            points        = ranking[0].points,
+                            streak        = ranking[0].streak,
+                            avatarUrl     = ranking[0].avatarUrl,
+                            isCurrentUser = ranking[0].name == currentUserName
+                        ),
+                        second = PodiumEntry(
+                            name          = ranking[1].name,
+                            points        = ranking[1].points,
+                            streak        = ranking[1].streak,
+                            avatarUrl     = ranking[1].avatarUrl,
+                            isCurrentUser = ranking[1].name == currentUserName
+                        ),
+                        third  = PodiumEntry(
+                            name          = ranking[2].name,
+                            points        = ranking[2].points,
+                            streak        = ranking[2].streak,
+                            avatarUrl     = ranking[2].avatarUrl,
+                            isCurrentUser = ranking[2].name == currentUserName
+                        )
+                    )
+                }
+            }
+
+            // ── Resto del ranking ────────────────────────────────
+            if (ranking.size > 3) {
+                item {
+                    Spacer(Modifier.height(4.dp))
+                }
+                itemsIndexed(ranking.drop(3)) { index, entry ->
+                    RankingCard(
+                        name      = entry.name,
+                        position  = index + 4,
+                        points    = entry.points,
+                        streak    = entry.streak,
+                        avatarUrl = entry.avatarUrl
+                    )
+                }
             }
 
             item { Spacer(Modifier.height(8.dp)) }
         }
     }
 }
-
-data class RankingData(
-    val id: String,
-    val name: String,
-    val points: Int,
-    val streak: Int,
-    val avatarUrl: String? = null
-)

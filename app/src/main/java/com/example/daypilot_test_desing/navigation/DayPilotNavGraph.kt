@@ -11,11 +11,15 @@ import androidx.navigation.navArgument
 import androidx.compose.material3.Scaffold
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Modifier
+import com.example.daypilot_test_desing.ui.model.TaskCategory
+import com.example.daypilot_test_desing.ui.model.TaskDifficulty
 import com.example.daypilot_test_desing.ui.components.cards.*
 import com.example.daypilot_test_desing.ui.components.basic.*
 import com.example.daypilot_test_desing.ui.screens.*
+import com.example.daypilot_test_desing.ui.model.CalendarTaskData
+import com.example.daypilot_test_desing.ui.model.DayProgress
+import com.example.daypilot_test_desing.ui.model.RankingData
 
-// Pantallas que muestran la bottom bar
 private val tabRoutes = setOf(
     DayPilotDestinations.HOME,
     DayPilotDestinations.FRIENDS,
@@ -30,6 +34,22 @@ fun DayPilotNavGraph(
     val backStackEntry = navController.currentBackStackEntryAsState()
     val currentRoute   = backStackEntry.value?.destination?.route
     val showBottomBar  = currentRoute in tabRoutes
+    val progressData = List(30) { index ->
+        DayProgress(
+            day            = index + 1,
+            points         = listOf(8, 12, 5, 15, 20, 10, 7, 18, 14, 9,
+                11, 16, 6, 22, 13, 8, 19, 11, 7, 15,
+                20, 12, 9, 17, 14, 6, 21, 10, 16, 8)[index],
+            steps          = listOf(1200, 2500, 800, 3000, 2200, 1500, 900,
+                2800, 2100, 1300, 1700, 2400, 700, 3200,
+                2000, 1100, 2900, 1600, 850, 2300, 3100,
+                1800, 1000, 2600, 2150, 750, 3300, 1400,
+                2450, 1050)[index],
+            tasksCompleted = listOf(3, 5, 2, 6, 8, 4, 2, 7, 5, 3,
+                4, 6, 1, 9, 5, 3, 7, 4, 2, 6,
+                8, 5, 3, 7, 5, 1, 8, 4, 6, 3)[index]
+        )
+    }
 
     Scaffold(
         bottomBar = {
@@ -73,21 +93,11 @@ fun DayPilotNavGraph(
                     tasksTotal      = 5,
                     pointsToday     = 8,
                     rankingPosition = 2,
-                    weeklySummary   = WeeklySummaryData(
-                        totalPoints    = 45,
-                        tasksCompleted = 12,
-                        totalSteps     = 42000,
-                        bestStreak     = 7,
-                        reactions      = listOf(
-                            ReceivedReaction("Ana López",   ReactionType.CLAP),
-                            ReceivedReaction("Carlos Ruiz", ReactionType.FIRE)
-                        )
-                    ),
-                    onNavigateToCalendar  = { navController.navigate(DayPilotDestinations.CALENDAR) },
-                    onNavigateToHabits    = { navController.navigate(DayPilotDestinations.HABITS) },
-                    onNavigateToProgress  = { navController.navigate(DayPilotDestinations.PROGRESS) },
-                    onNavigateToRivalry   = { navController.navigate(DayPilotDestinations.RIVALRY) },
-                    onNavigateToSettings  = { navController.navigate(DayPilotDestinations.SETTINGS) }
+                    progressData    = progressData.takeLast(7),
+                    onNavigateToCalendar = { navController.navigate(DayPilotDestinations.CALENDAR) },
+                    onNavigateToHabits   = { navController.navigate(DayPilotDestinations.HABITS) },
+                    onNavigateToProgress = { navController.navigate(DayPilotDestinations.PROGRESS) },
+                    onNavigateToRivalry  = { navController.navigate(DayPilotDestinations.RIVALRY) }
                 )
             }
 
@@ -267,19 +277,31 @@ fun DayPilotNavGraph(
 
             // ── Calendar ──────────────────────────────────────────
             composable(DayPilotDestinations.CALENDAR) {
+                var tasks by remember {
+                    mutableStateOf(
+                        listOf(
+                            CalendarTaskData("1", 19, "Terminar TFG",      TaskCategory.STUDY, TaskDifficulty.HARD,   120, false),
+                            CalendarTaskData("2", 19, "Salir a correr",    TaskCategory.SPORT, TaskDifficulty.EASY,   45,  true),
+                            CalendarTaskData("3", 19, "Preparar cena",     TaskCategory.HOME,  TaskDifficulty.EASY,   30,  false),
+                            CalendarTaskData("4", 15, "Reunión de equipo", TaskCategory.WORK,  TaskDifficulty.MEDIUM, 60,  false),
+                            CalendarTaskData("5", 20, "Comprar comida",    TaskCategory.HOME,  TaskDifficulty.EASY,   30,  false),
+                            CalendarTaskData("6", 22, "Presentación",      TaskCategory.STUDY, TaskDifficulty.HARD,   180, false)
+                        )
+                    )
+                }
+
                 CalendarScreen(
-                    tasks = listOf(
-                        CalendarTaskData("1", 17, "Terminar TFG",      TaskCategory.STUDY,  TaskDifficulty.HARD,   120, false),
-                        CalendarTaskData("2", 17, "Salir a correr",     TaskCategory.SPORT,  TaskDifficulty.EASY,   45,  true),
-                        CalendarTaskData("3", 17, "Preparar cena",      TaskCategory.HOME,   TaskDifficulty.EASY,   30,  false),
-                        CalendarTaskData("4", 15, "Reunión de equipo",  TaskCategory.WORK,   TaskDifficulty.MEDIUM, 60,  false),
-                        CalendarTaskData("5", 20, "Comprar comida",     TaskCategory.HOME,   TaskDifficulty.EASY,   30,  false),
-                        CalendarTaskData("6", 22, "Presentación final", TaskCategory.STUDY,  TaskDifficulty.HARD,   180, false)
-                    ),
+                    tasks        = tasks,
                     onBack       = { navController.popBackStack() },
                     onAddTask    = {},
                     onTapTask    = {},
-                    onToggleTask = { _, _ -> }
+                    onToggleTask = { id, done ->
+                        tasks = tasks.map { if (it.id == id) it.copy(isDone = done) else it }
+                    },
+                    onDeleteTask = { id ->
+                        tasks = tasks.filter { it.id != id }
+                    },
+                    onEditTask   = {}
                 )
             }
 
@@ -303,19 +325,14 @@ fun DayPilotNavGraph(
             // ── Progress ─────────────────────────────────────────
             composable(DayPilotDestinations.PROGRESS) {
                 ProgressScreen(
-                    chartData = listOf(
-                        "L" to 12, "M" to 8,  "X" to 15, "J" to 6,
-                        "V" to 20, "S" to 18, "D" to 10, "L" to 14,
-                        "M" to 9,  "X" to 17, "J" to 11, "V" to 22,
-                        "S" to 16, "D" to 7
-                    ),
-                    rankingPosition = 2,
-                    pointsToday     = 8,
+                    progressData     = progressData,
+                    rankingPosition  = 2,
+                    pointsToday      = 8,
                     pointsFromTasks  = 4,
                     pointsFromSteps  = 2,
                     pointsFromHabits = 1,
                     pointsFromTimers = 1,
-                    onBack          = { navController.popBackStack() }
+                    onBack           = { navController.popBackStack() }
                 )
             }
 
@@ -327,7 +344,7 @@ fun DayPilotNavGraph(
                     currentUserPoints   = 340,
                     currentUserStreak   = 7,
                     ranking = listOf(
-                        RankingData("1", "Ana López",     520, 14),
+                        RankingData("1", "Ana López", 520, 14),
                         RankingData("2", "Mario García",  340, 7),
                         RankingData("3", "Carlos Ruiz",   310, 9),
                         RankingData("4", "Laura Sánchez", 280, 4),

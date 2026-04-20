@@ -20,6 +20,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
+import com.example.daypilot_test_desing.ui.model.DayProgress
+import com.example.daypilot_test_desing.ui.model.ProgressFilter
 
 // ── Tipos de sección ─────────────────────────────────────────────
 enum class HomeSection(
@@ -52,7 +54,7 @@ enum class HomeSection(
 // ── Datos de preview por sección ─────────────────────────────────
 sealed class HomeSectionData {
     data class Calendar(val pendingTasks: Int, val completedTasks: Int) : HomeSectionData()
-    data class Progress(val currentPoints: Int, val goalPoints: Int) : HomeSectionData()
+    data class Progress(val data: List<DayProgress>, val currentFilter: ProgressFilter = ProgressFilter.POINTS) : HomeSectionData()
     data class Habits(val stepsProgress: Float, val timerDone: Boolean) : HomeSectionData()
     data class Rivalry(val position: Int, val totalFriends: Int) : HomeSectionData()
 }
@@ -168,33 +170,33 @@ fun HomeSectionIndicator(data: HomeSectionData, accentColor: Color) {
         }
 
         is HomeSectionData.Progress -> {
-            val progress = (data.currentPoints.toFloat() / data.goalPoints).coerceIn(0f, 1f)
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = "${data.currentPoints} pts",
-                        style = MaterialTheme.typography.labelSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = accentColor
-                    )
-                    Text(
-                        text = "meta ${data.goalPoints}",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+            val values = data.data.takeLast(7).map { day ->
+                when (data.currentFilter) {
+                    ProgressFilter.POINTS -> day.points
+                    ProgressFilter.STEPS  -> day.steps
+                    ProgressFilter.TASKS  -> day.tasksCompleted
+                }
+            }
+            val maxValue = values.maxOrNull() ?: 1
+
+            Row(
+                modifier              = Modifier
+                    .fillMaxWidth()
+                    .height(40.dp),
+                horizontalArrangement = Arrangement.spacedBy(2.dp),
+                verticalAlignment     = Alignment.Bottom
+            ) {
+                values.forEach { value ->
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight(
+                                (value.toFloat() / maxValue).coerceAtLeast(0.05f)
+                            )
+                            .clip(RoundedCornerShape(topStart = 2.dp, topEnd = 2.dp))
+                            .background(accentColor)
                     )
                 }
-                LinearProgressIndicator(
-                    progress = { progress },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(6.dp)
-                        .clip(RoundedCornerShape(3.dp)),
-                    color = accentColor,
-                    trackColor = accentColor.copy(alpha = 0.2f)
-                )
             }
         }
 
@@ -244,17 +246,18 @@ fun HomeSectionIndicator(data: HomeSectionData, accentColor: Color) {
         is HomeSectionData.Rivalry -> {
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(
-                    text = "🏆 #${data.position} de ${data.totalFriends}",
-                    style = MaterialTheme.typography.labelMedium,
+                    text       = "🏆 #${data.position} de ${data.totalFriends}",
+                    style      = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.Bold,
-                    color = accentColor
+                    color      = accentColor
                 )
-                // Mini ranking visual
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(3.dp),
-                    verticalAlignment = Alignment.Bottom
+                    verticalAlignment     = Alignment.Bottom
                 ) {
-                    repeat(data.totalFriends.coerceAtMost(5)) { index ->
+                    // Top 5
+                    val topCount = minOf(5, data.totalFriends)
+                    repeat(topCount) { index ->
                         val isCurrentUser = index == data.position - 1
                         Box(
                             modifier = Modifier
@@ -266,6 +269,28 @@ fun HomeSectionIndicator(data: HomeSectionData, accentColor: Color) {
                                     else accentColor.copy(alpha = 0.25f)
                                 )
                         )
+                    }
+
+                    if (data.position > 5) {
+                        // Separador
+                        Spacer(Modifier.width(4.dp))
+
+                        // Barra del usuario
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(20.dp)
+                                .clip(RoundedCornerShape(topStart = 3.dp, topEnd = 3.dp))
+                                .background(accentColor),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text     = "${data.position}",
+                                style    = MaterialTheme.typography.labelSmall,
+                                color    = androidx.compose.ui.graphics.Color.White,
+                                fontSize = 8.sp
+                            )
+                        }
                     }
                 }
             }
@@ -295,9 +320,18 @@ fun HomeMenuCardPreview() {
                     modifier = Modifier.weight(1f)
                 )
                 HomeMenuCard(
-                    section = HomeSection.PROGRESS,
-                    data = HomeSectionData.Progress(currentPoints = 340, goalPoints = 500),
-                    onClick = {},
+                    section  = HomeSection.PROGRESS,
+                    data     = HomeSectionData.Progress(
+                        data = List(7) { index ->
+                            DayProgress(
+                                day            = index + 1,
+                                points         = listOf(8, 12, 5, 15, 20, 10, 7)[index],
+                                steps          = listOf(1200, 2500, 800, 3000, 2200, 1500, 900)[index],
+                                tasksCompleted = listOf(3, 5, 2, 6, 8, 4, 2)[index]
+                            )
+                        }
+                    ),
+                    onClick  = {},
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -313,7 +347,7 @@ fun HomeMenuCardPreview() {
                 )
                 HomeMenuCard(
                     section = HomeSection.RIVALRY,
-                    data = HomeSectionData.Rivalry(position = 2, totalFriends = 5),
+                    data = HomeSectionData.Rivalry(position = 10, totalFriends = 15),
                     onClick = {},
                     modifier = Modifier.weight(1f)
                 )

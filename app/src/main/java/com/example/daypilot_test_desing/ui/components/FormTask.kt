@@ -52,8 +52,8 @@ fun TaskFormCard(
 ) {
     var title       by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
-    var category    by remember { mutableStateOf(TaskCategory.PERSONAL) }
-    var difficulty  by remember { mutableStateOf(TaskDifficulty.EASY) }
+    var category    by remember { mutableStateOf(com.example.daypilot_test_desing.ui.model.TaskCategory.PERSONAL) }
+    var difficulty  by remember { mutableStateOf(com.example.daypilot_test_desing.ui.model.TaskDifficulty.EASY) }
     var duration    by remember { mutableStateOf(30) }
     var reminder    by remember { mutableStateOf(false) }
     var recurring   by remember { mutableStateOf(false) }
@@ -311,14 +311,14 @@ fun FormSection(
 // ── Selector de categoría ────────────────────────────────────────
 @Composable
 fun CategorySelector(
-    selected: TaskCategory,
-    onSelect: (TaskCategory) -> Unit
+    selected: com.example.daypilot_test_desing.ui.model.TaskCategory,
+    onSelect: (com.example.daypilot_test_desing.ui.model.TaskCategory) -> Unit
 ) {
     FlowRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        TaskCategory.entries.forEach { cat ->
+        com.example.daypilot_test_desing.ui.model.TaskCategory.entries.forEach { cat ->
             val isSelected = cat == selected
             FilterChip(
                 selected = isSelected,
@@ -345,11 +345,11 @@ fun CategorySelector(
 // ── Selector de dificultad ───────────────────────────────────────
 @Composable
 fun DifficultySelector(
-    selected: TaskDifficulty,
-    onSelect: (TaskDifficulty) -> Unit
+    selected: com.example.daypilot_test_desing.ui.model.TaskDifficulty,
+    onSelect: (com.example.daypilot_test_desing.ui.model.TaskDifficulty) -> Unit
 ) {
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        TaskDifficulty.entries.forEach { diff ->
+        com.example.daypilot_test_desing.ui.model.TaskDifficulty.entries.forEach { diff ->
             val isSelected = diff == selected
             Box(
                 modifier = Modifier
