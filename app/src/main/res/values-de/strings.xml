@@ -104,6 +104,9 @@
     <!-- Steps -->
     <string name="steps_title">Schritte</string>
 
+    <string name="habits_timers_title">Timer</string>
+    <string name="habits_timers_description">Pomodoro, Training und mehr</string>
+
     <!-- Timer -->
     <string name="timer_completed">Abgeschlossen! 🎉</string>
     <string name="timer_point_earned">Tagespunkt verdient</string>

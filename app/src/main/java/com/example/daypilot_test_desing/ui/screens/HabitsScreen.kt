@@ -1,18 +1,17 @@
 package com.example.daypilot_test_desing.ui.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.PhoneAndroid
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.daypilot_test_desing.R
+import com.example.daypilot_test_desing.ui.components.basic.*
 import com.example.daypilot_test_desing.ui.components.cards.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -22,37 +21,17 @@ fun HabitsScreen(
     goalSteps: Int,
     pointsEarned: Int,
     pointsRemaining: Int,
-    timerPointEarnedToday: Boolean,
     onBack: () -> Unit,
     onNavigateToSteps: () -> Unit,
+    onNavigateToTimer: () -> Unit,
     onNavigateToReminders: () -> Unit,
-    onNavigateToTechHealth: () -> Unit,
-    onNavigateToTimer: (String) -> Unit,
-    onConfigureStepsGoal: () -> Unit
+    onNavigateToTechHealth: () -> Unit
 ) {
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Hábitos",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Volver",
-                            tint = MaterialTheme.colorScheme.onBackground
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
-                )
+            DayPilotTopBar(
+                title  = stringResource(R.string.habits_title),
+                onBack = onBack
             )
         },
         containerColor = MaterialTheme.colorScheme.background
@@ -63,50 +42,39 @@ fun HabitsScreen(
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             // ── Pasos ────────────────────────────────────────────
+            DayPilotSectionHeader(title = stringResource(R.string.steps_title))
+
             StepsCard(
                 currentSteps    = currentSteps,
                 goalSteps       = goalSteps,
                 pointsEarned    = pointsEarned,
                 pointsRemaining = pointsRemaining,
-                onConfigureGoal = onConfigureStepsGoal
+                onConfigureGoal = {}
             )
 
-            // ── Cronómetros ──────────────────────────────────────
-            Text(
-                text = "Cronómetros",
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            // ── Secciones ─────────────────────────────────────────
+            DayPilotSectionHeader(title = stringResource(R.string.habits_other))
 
-            TimerMode.entries.forEach { mode ->
-                TimerCard(
-                    mode              = mode,
-                    pointEarnedToday  = timerPointEarnedToday && mode == TimerMode.POMODORO,
-                    onStart           = { onNavigateToTimer(mode.name) }
-                )
-            }
-
-            // ── Otros hábitos ────────────────────────────────────
-            Text(
-                text = "Otros hábitos",
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+            HabitCard(
+                title       = stringResource(R.string.habits_timers_title),
+                description = stringResource(R.string.habits_timers_description),
+                icon        = Icons.Default.Timer,
+                onClick     = onNavigateToTimer
             )
 
             HabitCard(
-                title       = "Salud tecnológica",
-                description = "Límites por app / grupo + avisos",
+                title       = stringResource(R.string.habits_tech_health_title),
+                description = stringResource(R.string.habits_tech_health_description),
                 icon        = Icons.Default.PhoneAndroid,
                 onClick     = onNavigateToTechHealth
             )
+
             HabitCard(
-                title       = "Recordatorios",
-                description = "Avisos, timers y rutinas",
+                title       = stringResource(R.string.habits_reminders_title),
+                description = stringResource(R.string.habits_reminders_description),
                 icon        = Icons.Default.Notifications,
                 onClick     = onNavigateToReminders
             )

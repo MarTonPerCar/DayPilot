@@ -7,10 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -23,6 +20,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.daypilot_test_desing.ui.components.basic.DayPilotTopBar
 import com.example.daypilot_test_desing.ui.components.cards.TimerMode
 import kotlinx.coroutines.delay
 
@@ -30,13 +28,15 @@ import kotlinx.coroutines.delay
 @Composable
 fun TimerScreen(
     timerMode: String,
+    customMinutes: Int = 0,
     pointEarnedToday: Boolean = false,
     onBack: () -> Unit
 ) {
-    val mode = TimerMode.entries.find { it.name == timerMode } ?: TimerMode.POMODORO
-    val totalSeconds = mode.durationMinutes * 60
+    val mode         = TimerMode.entries.find { it.name == timerMode } ?: TimerMode.TRAINING
+    val totalSeconds = if (customMinutes > 0) customMinutes * 60 else mode.durationMinutes * 60
+    val label        = if (timerMode == "CUSTOM") "Personalizable" else mode.label
 
-    var secondsLeft by remember { mutableStateOf(totalSeconds) }
+    var secondsLeft by remember { mutableIntStateOf(totalSeconds) }
     var isRunning   by remember { mutableStateOf(false) }
     var isFinished  by remember { mutableStateOf(false) }
 
@@ -48,7 +48,6 @@ fun TimerScreen(
         label         = "timer_progress"
     )
 
-    // Ticker
     LaunchedEffect(isRunning) {
         while (isRunning && secondsLeft > 0) {
             delay(1000)
@@ -60,35 +59,16 @@ fun TimerScreen(
         }
     }
 
-    val minutes = secondsLeft / 60
-    val seconds = secondsLeft % 60
-
+    val minutes     = secondsLeft / 60
+    val seconds     = secondsLeft % 60
     val primaryColor    = MaterialTheme.colorScheme.primary
     val surfaceVarColor = MaterialTheme.colorScheme.surfaceVariant
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = mode.label,
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Volver",
-                            tint = MaterialTheme.colorScheme.onBackground
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
-                )
+            DayPilotTopBar(
+                title  = label,
+                onBack = onBack
             )
         },
         containerColor = MaterialTheme.colorScheme.background
@@ -103,7 +83,7 @@ fun TimerScreen(
         ) {
             // ── Círculo de progreso ──────────────────────────────
             Box(
-                modifier = Modifier.size(260.dp),
+                modifier         = Modifier.size(260.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Canvas(modifier = Modifier.fillMaxSize()) {
@@ -134,23 +114,24 @@ fun TimerScreen(
 
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        text = "%02d:%02d".format(minutes, seconds),
-                        fontSize = 52.sp,
+                        text       = "%02d:%02d".format(minutes, seconds),
+                        fontSize   = 52.sp,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onBackground
+                        color      = MaterialTheme.colorScheme.onBackground
                     )
                     Text(
-                        text = "${mode.durationMinutes} min",
+                        text  = if (customMinutes > 0) "$customMinutes min"
+                        else "${mode.durationMinutes} min",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     if (isFinished) {
                         Spacer(Modifier.height(4.dp))
                         Text(
-                            text = "¡Completado! 🎉",
-                            style = MaterialTheme.typography.labelMedium,
+                            text       = "¡Completado! 🎉",
+                            style      = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.primary
+                            color      = MaterialTheme.colorScheme.primary
                         )
                     }
                 }
@@ -164,14 +145,14 @@ fun TimerScreen(
                         .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f))
                         .padding(horizontal = 16.dp, vertical = 8.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment     = Alignment.CenterVertically
                 ) {
                     Text(text = "⭐", fontSize = 16.sp)
                     Text(
-                        text = "Punto del día conseguido",
-                        style = MaterialTheme.typography.labelMedium,
+                        text       = "Punto del día conseguido",
+                        style      = MaterialTheme.typography.labelMedium,
                         fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.primary
+                        color      = MaterialTheme.colorScheme.primary
                     )
                 }
             }
@@ -179,9 +160,8 @@ fun TimerScreen(
             // ── Controles ────────────────────────────────────────
             Row(
                 horizontalArrangement = Arrangement.spacedBy(20.dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment     = Alignment.CenterVertically
             ) {
-                // Reset
                 Box(
                     modifier = Modifier
                         .size(56.dp)
@@ -195,15 +175,14 @@ fun TimerScreen(
                         isFinished  = false
                     }) {
                         Icon(
-                            imageVector = Icons.Default.Refresh,
+                            imageVector        = Icons.Default.Refresh,
                             contentDescription = "Reiniciar",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(24.dp)
+                            tint               = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier           = Modifier.size(24.dp)
                         )
                     }
                 }
 
-                // Play / Pause
                 Box(
                     modifier = Modifier
                         .size(72.dp)
@@ -219,12 +198,13 @@ fun TimerScreen(
                         enabled  = !isFinished
                     ) {
                         Icon(
-                            imageVector = if (isRunning) Icons.Default.Pause
+                            imageVector        = if (isRunning) Icons.Default.Pause
                             else Icons.Default.PlayArrow,
                             contentDescription = if (isRunning) "Pausar" else "Iniciar",
-                            tint = if (isFinished) MaterialTheme.colorScheme.onSurfaceVariant
+                            tint               = if (isFinished)
+                                MaterialTheme.colorScheme.onSurfaceVariant
                             else MaterialTheme.colorScheme.onPrimary,
-                            modifier = Modifier.size(32.dp)
+                            modifier           = Modifier.size(32.dp)
                         )
                     }
                 }

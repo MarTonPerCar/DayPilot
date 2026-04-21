@@ -1,155 +1,99 @@
 package com.example.daypilot_test_desing.ui.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.example.daypilot_test_desing.ui.components.basic.DayPilotEmptyState
+import com.example.daypilot_test_desing.R
+import com.example.daypilot_test_desing.ui.components.basic.*
+import com.example.daypilot_test_desing.ui.components.cards.*
+import com.example.daypilot_test_desing.ui.model.ReminderData
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RemindersScreen(
     reminders: List<ReminderData>,
-    onAddReminder: () -> Unit,
+    onAddReminder: (ReminderFormData) -> Unit,
     onDeleteReminder: (String) -> Unit,
     onToggleReminder: (String, Boolean) -> Unit,
     onBack: () -> Unit
 ) {
+    var showAddSheet by remember { mutableStateOf(false) }
+    val sheetState   = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    if (showAddSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showAddSheet = false },
+            sheetState       = sheetState,
+            shape            = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
+            containerColor   = MaterialTheme.colorScheme.background
+        ) {
+            ReminderFormCard(
+                onSave = { data ->
+                    onAddReminder(data)
+                    showAddSheet = false
+                },
+                onCancel = { showAddSheet = false },
+                modifier = Modifier.padding(16.dp)
+            )
+            Spacer(Modifier.height(16.dp))
+        }
+    }
+
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Recordatorios",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Volver",
-                            tint = MaterialTheme.colorScheme.onBackground
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
-                )
+            DayPilotTopBar(
+                title  = stringResource(R.string.reminders_title),
+                onBack = onBack
             )
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick        = onAddReminder,
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor   = MaterialTheme.colorScheme.onPrimary
+                onClick            = { showAddSheet = true },
+                containerColor     = MaterialTheme.colorScheme.primary,
+                contentColor       = MaterialTheme.colorScheme.onPrimary,
+                shape              = RoundedCornerShape(16.dp)
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Añadir recordatorio")
+                Icon(
+                    imageVector        = Icons.Default.Add,
+                    contentDescription = stringResource(R.string.reminders_add)
+                )
             }
         },
         containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         if (reminders.isEmpty()) {
-            DayPilotEmptyState(message = "No tienes recordatorios.\n¡Añade uno!")
+            DayPilotEmptyState(
+                message = stringResource(R.string.reminders_empty),
+                icon    = Icons.Default.Add,
+                modifier = Modifier.padding(innerPadding)
+            )
         } else {
             LazyColumn(
-                modifier = Modifier
+                modifier        = Modifier
                     .fillMaxSize()
                     .padding(innerPadding),
-                contentPadding = PaddingValues(16.dp),
+                contentPadding  = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                items(reminders) { reminder ->
+                items(reminders, key = { it.id }) { reminder ->
                     ReminderCard(
-                        reminder         = reminder,
-                        onDelete         = { onDeleteReminder(reminder.id) },
-                        onToggle         = { onToggleReminder(reminder.id, it) }
+                        title     = reminder.title,
+                        time      = reminder.time,
+                        isEnabled = reminder.isEnabled,
+                        onToggle  = { onToggleReminder(reminder.id, it) },
+                        onDelete  = { onDeleteReminder(reminder.id) }
                     )
                 }
+                item { Spacer(Modifier.height(80.dp)) }
             }
         }
     }
 }
-
-@Composable
-fun ReminderCard(
-    reminder: ReminderData,
-    onDelete: () -> Unit,
-    onToggle: (Boolean) -> Unit
-) {
-    Card(
-        modifier  = Modifier.fillMaxWidth(),
-        shape     = RoundedCornerShape(16.dp),
-        colors    = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text  = reminder.title,
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Text(
-                    text  = reminder.time,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                if (reminder.description.isNotEmpty()) {
-                    Text(
-                        text  = reminder.description,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-            Switch(
-                checked         = reminder.isActive,
-                onCheckedChange = onToggle,
-                colors          = SwitchDefaults.colors(
-                    checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
-                    checkedTrackColor = MaterialTheme.colorScheme.primary
-                )
-            )
-            IconButton(onClick = onDelete) {
-                Icon(
-                    imageVector        = Icons.Default.Delete,
-                    contentDescription = "Eliminar",
-                    tint               = MaterialTheme.colorScheme.error,
-                    modifier           = Modifier.size(20.dp)
-                )
-            }
-        }
-    }
-}
-
-data class ReminderData(
-    val id: String,
-    val title: String,
-    val time: String,
-    val description: String = "",
-    val isActive: Boolean = true
-)

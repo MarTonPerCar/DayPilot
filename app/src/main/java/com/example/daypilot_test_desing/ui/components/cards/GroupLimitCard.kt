@@ -1,0 +1,269 @@
+package com.example.daypilot_test_desing.ui.components.cards
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.daypilot_test_desing.ui.model.AppRestriction
+import com.example.daypilot_test_desing.ui.model.GroupRestriction
+import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
+
+@Composable
+fun GroupLimitCard(
+    restriction: GroupRestriction,
+    onToggle: (Boolean) -> Unit,
+    onEdit: () -> Unit,
+    onDelete: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var showDeleteConfirm by remember { mutableStateOf(false) }
+    var expanded          by remember { mutableStateOf(false) }
+
+    val progress     = (restriction.usedMinutesToday.toFloat() /
+            restriction.dailyLimitMinutes).coerceIn(0f, 1f)
+    val isOverLimit  = restriction.usedMinutesToday >= restriction.dailyLimitMinutes
+
+    if (showDeleteConfirm) {
+        AlertDialog(
+            onDismissRequest = { showDeleteConfirm = false },
+            title = { Text("Eliminar grupo", fontWeight = FontWeight.Bold) },
+            text  = {
+                Text(
+                    "El grupo \"${restriction.groupName}\" se eliminará mañana. " +
+                            "Hoy seguirá activo si ya has usado las apps."
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    showDeleteConfirm = false
+                    onDelete()
+                }) { Text("Eliminar mañana", color = MaterialTheme.colorScheme.error) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteConfirm = false }) { Text("Cancelar") }
+            },
+            shape = RoundedCornerShape(20.dp)
+        )
+    }
+
+    Card(
+        modifier  = modifier.fillMaxWidth(),
+        shape     = RoundedCornerShape(16.dp),
+        colors    = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(
+            modifier            = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            // ── Cabecera ─────────────────────────────────────────
+            Row(
+                modifier              = Modifier.fillMaxWidth(),
+                verticalAlignment     = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                // Icono grupo
+                Box(
+                    modifier = Modifier
+                        .size(44.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(
+                            MaterialTheme.colorScheme.tertiary.copy(alpha = 0.15f)
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector        = Icons.Default.Folder,
+                        contentDescription = null,
+                        tint               = MaterialTheme.colorScheme.tertiary,
+                        modifier           = Modifier.size(22.dp)
+                    )
+                }
+
+                Column(modifier = Modifier.weight(1f)) {
+                    Row(
+                        verticalAlignment     = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        Text(
+                            text       = restriction.groupName,
+                            style      = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold,
+                            color      = MaterialTheme.colorScheme.onSurface
+                        )
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(4.dp))
+                                .background(
+                                    MaterialTheme.colorScheme.tertiary.copy(alpha = 0.15f)
+                                )
+                                .padding(horizontal = 6.dp, vertical = 2.dp)
+                        ) {
+                            Text(
+                                text  = "Grupo",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.tertiary
+                            )
+                        }
+                    }
+                    Text(
+                        text  = "${restriction.apps.size} apps",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+
+                Switch(
+                    checked         = restriction.isEnabled,
+                    onCheckedChange = onToggle,
+                    enabled         = !restriction.pendingDelete,
+                    colors          = SwitchDefaults.colors(
+                        checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
+                        checkedTrackColor = MaterialTheme.colorScheme.primary
+                    )
+                )
+            }
+
+            // ── Barra de progreso ─────────────────────────────────
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                LinearProgressIndicator(
+                    progress   = { progress },
+                    modifier   = Modifier
+                        .fillMaxWidth()
+                        .height(6.dp)
+                        .clip(RoundedCornerShape(3.dp)),
+                    color      = if (isOverLimit) MaterialTheme.colorScheme.error
+                    else MaterialTheme.colorScheme.tertiary,
+                    trackColor = MaterialTheme.colorScheme.surfaceVariant
+                )
+                Row(
+                    modifier              = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text  = "Hoy: ${restriction.usedMinutesToday} / ${restriction.dailyLimitMinutes} min",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = if (isOverLimit) MaterialTheme.colorScheme.error
+                        else MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text  = "Notif: cada ${restriction.notificationIntervalSeconds}s",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            // ── Apps del grupo (desplegable) ──────────────────────
+            TextButton(
+                onClick  = { expanded = !expanded },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text  = if (expanded) "▲ Ocultar apps" else "▼ Ver apps (${restriction.apps.size})",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            if (expanded) {
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    restriction.apps.forEach { app ->
+                        Row(
+                            modifier              = Modifier.fillMaxWidth(),
+                            verticalAlignment     = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(28.dp)
+                                    .clip(RoundedCornerShape(6.dp))
+                                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text      = app.appName.first().uppercase(),
+                                    fontSize  = 12.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color     = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                            Text(
+                                text     = app.appName,
+                                style    = MaterialTheme.typography.bodySmall,
+                                color    = MaterialTheme.colorScheme.onSurface,
+                                modifier = Modifier.weight(1f)
+                            )
+                            Text(
+                                text  = "${app.usedMinutesToday}min",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
+            }
+
+            // ── Botones ───────────────────────────────────────────
+            Row(
+                modifier              = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                if (restriction.pendingDelete) {
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(MaterialTheme.colorScheme.error.copy(alpha = 0.1f))
+                            .padding(vertical = 8.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text  = "🗑 Se elimina mañana",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
+                } else {
+                    OutlinedButton(
+                        onClick  = onEdit,
+                        modifier = Modifier.weight(1f),
+                        shape    = RoundedCornerShape(10.dp)
+                    ) {
+                        Icon(
+                            imageVector        = Icons.Default.Edit,
+                            contentDescription = null,
+                            modifier           = Modifier.size(14.dp)
+                        )
+                        Spacer(Modifier.width(4.dp))
+                        Text("Editar", style = MaterialTheme.typography.labelMedium)
+                    }
+                    TextButton(
+                        onClick  = { showDeleteConfirm = true },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(
+                            text  = "Eliminar",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
+                }
+            }
+        }
+    }
+}

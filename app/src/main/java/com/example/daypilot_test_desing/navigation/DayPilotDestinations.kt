@@ -22,8 +22,12 @@ object DayPilotDestinations {
     const val STEPS       = "steps"
     const val REMINDERS   = "reminders"
     const val TECH_HEALTH = "tech_health"
-    const val TIMER = "timer/{timerMode}"
-    fun timerRoute(mode: String) = "timer/$mode"
+    const val TIMER_HUB = "timer_hub"
+    const val POMODORO  = "pomodoro/{sessions}"
+    const val TIMER     = "timer/{timerMode}/{minutes}"
+
+    fun timerRoute(mode: String, minutes: Int) = "timer/$mode/$minutes"
+    fun pomodoroRoute(sessions: Int)           = "pomodoro/$sessions"
 
     // Desde Perfil
     const val SETTINGS = "settings"

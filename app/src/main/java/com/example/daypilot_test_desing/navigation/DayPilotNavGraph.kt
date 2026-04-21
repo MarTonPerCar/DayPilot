@@ -1,5 +1,7 @@
 package com.example.daypilot_test_desing.navigation
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -10,15 +12,16 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.compose.material3.Scaffold
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.example.daypilot_test_desing.ui.model.TaskCategory
 import com.example.daypilot_test_desing.ui.model.TaskDifficulty
 import com.example.daypilot_test_desing.ui.components.cards.*
 import com.example.daypilot_test_desing.ui.components.basic.*
 import com.example.daypilot_test_desing.ui.screens.*
-import com.example.daypilot_test_desing.ui.model.CalendarTaskData
-import com.example.daypilot_test_desing.ui.model.DayProgress
-import com.example.daypilot_test_desing.ui.model.RankingData
+import com.example.daypilot_test_desing.ui.model.*
 
 private val tabRoutes = setOf(
     DayPilotDestinations.HOME,
@@ -308,17 +311,27 @@ fun DayPilotNavGraph(
             // ── Habits ───────────────────────────────────────────
             composable(DayPilotDestinations.HABITS) {
                 HabitsScreen(
-                    currentSteps          = 1200,
-                    goalSteps             = 2000,
-                    pointsEarned          = 1,
-                    pointsRemaining       = 5,
-                    timerPointEarnedToday = false,
-                    onBack                = { navController.popBackStack() },
-                    onNavigateToSteps     = { navController.navigate(DayPilotDestinations.STEPS) },
+                    currentSteps      = 1200,
+                    goalSteps         = 2000,
+                    pointsEarned      = 1,
+                    pointsRemaining   = 5,
+                    onBack            = { navController.popBackStack() },
+                    onNavigateToSteps = { navController.navigate(DayPilotDestinations.STEPS) },
+                    onNavigateToTimer = { navController.navigate(DayPilotDestinations.TIMER_HUB) },
                     onNavigateToReminders  = { navController.navigate(DayPilotDestinations.REMINDERS) },
-                    onNavigateToTechHealth = { navController.navigate(DayPilotDestinations.TECH_HEALTH) },
-                    onNavigateToTimer      = { mode -> navController.navigate(DayPilotDestinations.timerRoute(mode)) },
-                    onConfigureStepsGoal   = {}
+                    onNavigateToTechHealth = { navController.navigate(DayPilotDestinations.TECH_HEALTH) }
+                )
+            }
+
+            composable(DayPilotDestinations.TIMER_HUB) {
+                TimerHubScreen(
+                    onNavigateToTimer    = { id, minutes ->
+                        navController.navigate(DayPilotDestinations.timerRoute(id, minutes))
+                    },
+                    onNavigateToPomodoro = { sessions ->
+                        navController.navigate(DayPilotDestinations.pomodoroRoute(sessions))
+                    },
+                    onBack = { navController.popBackStack() }
                 )
             }
 
@@ -373,45 +386,117 @@ fun DayPilotNavGraph(
             // ── Timer ────────────────────────────────────────────
             composable(
                 route     = DayPilotDestinations.TIMER,
-                arguments = listOf(navArgument("timerMode") { type = NavType.StringType })
+                arguments = listOf(
+                    navArgument("timerMode") { type = NavType.StringType },
+                    navArgument("minutes")   { type = NavType.IntType }
+                )
             ) { backStackEntry ->
-                val mode = backStackEntry.arguments?.getString("timerMode") ?: "POMODORO"
+                val mode    = backStackEntry.arguments?.getString("timerMode") ?: "TRAINING"
+                val minutes = backStackEntry.arguments?.getInt("minutes") ?: 30
                 TimerScreen(
                     timerMode        = mode,
+                    customMinutes    = minutes,
                     pointEarnedToday = false,
                     onBack           = { navController.popBackStack() }
                 )
             }
 
+            composable(
+                route     = DayPilotDestinations.POMODORO,
+                arguments = listOf(navArgument("sessions") { type = NavType.IntType })
+            ) { backStackEntry ->
+                val sessions = backStackEntry.arguments?.getInt("sessions") ?: 4
+                PomodoroScreen(
+                    totalSessions = sessions,
+                    onBack        = { navController.popBackStack() }
+                )
+            }
+
             // ── Reminders ────────────────────────────────────────
             composable(DayPilotDestinations.REMINDERS) {
+                var reminders by remember {
+                    mutableStateOf(
+                        listOf(
+                            ReminderData("1", "Ejercicio matutino", "07:30", "30 minutos de cardio", true),
+                            ReminderData("2", "Tomar agua",         "12:00", "2 litros al día",      true),
+                            ReminderData("3", "Meditación",         "22:00", "15 minutos",           false)
+                        )
+                    )
+                }
                 RemindersScreen(
-                    reminders = listOf(
-                        ReminderData("1", "Ejercicio matutino", "07:30", "30 minutos de cardio", true),
-                        ReminderData("2", "Tomar agua",         "12:00", "2 litros al día",      true),
-                        ReminderData("3", "Meditación",         "22:00", "15 minutos",           false)
-                    ),
-                    onAddReminder    = {},
-                    onDeleteReminder = {},
-                    onToggleReminder = { _, _ -> },
-                    onBack           = { navController.popBackStack() }
+                    reminders        = reminders,
+                    onAddReminder    = { _ -> },
+                    onDeleteReminder = { id -> reminders = reminders.filter { it.id != id } },
+                    onToggleReminder = { id, enabled ->
+                        reminders = reminders.map {
+                            if (it.id == id) it.copy(isEnabled = enabled) else it
+                        }
+                    },
+                    onBack = { navController.popBackStack() }
                 )
             }
 
             // ── TechHealth ───────────────────────────────────────
             composable(DayPilotDestinations.TECH_HEALTH) {
+                var appRestrictions   by remember {
+                    mutableStateOf(
+                        listOf(
+                            AppRestriction(
+                                id                          = "1",
+                                appName                     = "YouTube",
+                                packageName                 = "com.google.android.youtube",
+                                dailyLimitMinutes           = 120,
+                                notificationIntervalSeconds = 60,
+                                isEnabled                   = true,
+                                usedMinutesToday            = 45
+                            )
+                        )
+                    )
+                }
+                var groupRestrictions by remember { mutableStateOf<List<GroupRestriction>>(emptyList()) }
+
                 TechHealthScreen(
-                    dailyLimitMinutes = 120,
-                    usedMinutesToday  = 75,
-                    pointEarnedToday  = false,
-                    appLimits = listOf(
-                        AppLimitData("1", "Instagram", 30, true),
-                        AppLimitData("2", "YouTube",   60, true),
-                        AppLimitData("3", "TikTok",    20, false)
-                    ),
-                    onUpdateDailyLimit = {},
-                    onToggleAppLimit   = { _, _ -> },
-                    onBack             = { navController.popBackStack() }
+                    appRestrictions     = appRestrictions,
+                    groupRestrictions   = groupRestrictions,
+                    onSaveApp           = { restriction, isEdit ->
+                        appRestrictions = if (isEdit) {
+                            appRestrictions.map {
+                                if (it.id == restriction.id) restriction else it
+                            }
+                        } else {
+                            appRestrictions + restriction
+                        }
+                    },
+                    onSaveGroup         = { group, isEdit ->
+                        groupRestrictions = if (isEdit) {
+                            groupRestrictions.map {
+                                if (it.id == group.id) group else it
+                            }
+                        } else {
+                            groupRestrictions + group
+                        }
+                    },
+                    onToggleRestriction = { id, enabled ->
+                        appRestrictions = appRestrictions.map {
+                            if (it.id == id) it.copy(isEnabled = enabled) else it
+                        }
+                    },
+                    onDeleteRestriction = { id ->
+                        appRestrictions = appRestrictions.map {
+                            if (it.id == id) it.copy(pendingDelete = true) else it
+                        }
+                    },
+                    onToggleGroup       = { id, enabled ->
+                        groupRestrictions = groupRestrictions.map {
+                            if (it.id == id) it.copy(isEnabled = enabled) else it
+                        }
+                    },
+                    onDeleteGroup       = { id ->
+                        groupRestrictions = groupRestrictions.map {
+                            if (it.id == id) it.copy(pendingDelete = true) else it
+                        }
+                    },
+                    onBack = { navController.popBackStack() }
                 )
             }
         }

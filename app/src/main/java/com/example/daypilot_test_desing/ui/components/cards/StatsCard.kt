@@ -82,12 +82,6 @@ fun StatsCard(
                 DayPilotDivider()
 
                 // ── Desglose de puntos ───────────────────────────
-                Text(
-                    text  = "Desglose",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     StatsBreakdownRow(
                         icon   = Icons.Default.CheckCircle,

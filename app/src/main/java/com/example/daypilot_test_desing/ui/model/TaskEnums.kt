@@ -38,3 +38,11 @@ data class RankingData(
     val streak: Int,
     val avatarUrl: String? = null
 )
+
+data class ReminderData(
+    val id: String,
+    val title: String,
+    val time: String,
+    val description: String = "",
+    val isEnabled: Boolean = true
+)

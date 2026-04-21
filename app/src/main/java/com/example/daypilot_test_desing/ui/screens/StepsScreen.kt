@@ -66,7 +66,7 @@ fun StepsScreen(
                 goalSteps       = goalSteps,
                 pointsEarned    = pointsEarned,
                 pointsRemaining = pointsRemaining,
-                onConfigureGoal = onConfigureGoal
+                onConfigureGoal = {}
             )
             StepsSummaryCard(
                 totalSteps7Days = totalSteps7Days,

@@ -1,262 +1,151 @@
 package com.example.daypilot_test_desing.ui.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.PhoneAndroid
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.daypilot_test_desing.R
+import com.example.daypilot_test_desing.ui.components.basic.*
+import com.example.daypilot_test_desing.ui.components.cards.*
+import com.example.daypilot_test_desing.ui.model.AppRestriction
+import com.example.daypilot_test_desing.ui.model.GroupRestriction
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TechHealthScreen(
-    dailyLimitMinutes: Int,
-    usedMinutesToday: Int,
-    pointEarnedToday: Boolean,
-    appLimits: List<AppLimitData>,
-    onUpdateDailyLimit: (Int) -> Unit,
-    onToggleAppLimit: (String, Boolean) -> Unit,
+    appRestrictions: List<AppRestriction>,
+    groupRestrictions: List<GroupRestriction>,
+    onSaveApp: (AppRestriction, isEdit: Boolean) -> Unit,
+    onSaveGroup: (GroupRestriction, isEdit: Boolean) -> Unit,
+    onToggleRestriction: (String, Boolean) -> Unit,
+    onDeleteRestriction: (String) -> Unit,
+    onToggleGroup: (String, Boolean) -> Unit,
+    onDeleteGroup: (String) -> Unit,
     onBack: () -> Unit
 ) {
-    val progress = (usedMinutesToday.toFloat() / dailyLimitMinutes).coerceIn(0f, 1f)
-    val isOverLimit = usedMinutesToday >= dailyLimitMinutes
+    var showAddSheet   by remember { mutableStateOf(false) }
+    var editingAppId   by remember { mutableStateOf<String?>(null) }
+    var editingGroupId by remember { mutableStateOf<String?>(null) }
+    val sheetState     = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val total          = appRestrictions.size + groupRestrictions.size
+
+    if (showAddSheet || editingAppId != null || editingGroupId != null) {
+        ModalBottomSheet(
+            onDismissRequest = {
+                showAddSheet   = false
+                editingAppId   = null
+                editingGroupId = null
+            },
+            sheetState     = sheetState,
+            shape          = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
+            containerColor = MaterialTheme.colorScheme.background
+        ) {
+            AppLimitFormCard(
+                isEditing    = editingAppId != null || editingGroupId != null,
+                initialApp   = appRestrictions.find { it.id == editingAppId },
+                initialGroup = groupRestrictions.find { it.id == editingGroupId },
+                onSaveApp    = { restriction ->
+                    onSaveApp(restriction, editingAppId != null)
+                    showAddSheet   = false
+                    editingAppId   = null
+                },
+                onSaveGroup  = { group ->
+                    onSaveGroup(group, editingGroupId != null)
+                    showAddSheet   = false
+                    editingGroupId = null
+                },
+                onCancel = {
+                    showAddSheet   = false
+                    editingAppId   = null
+                    editingGroupId = null
+                },
+                modifier = Modifier.padding(16.dp)
+            )
+            Spacer(Modifier.height(16.dp))
+        }
+    }
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Salud Tecnológica",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Volver",
-                            tint = MaterialTheme.colorScheme.onBackground
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
-                )
+            DayPilotTopBar(
+                title  = stringResource(R.string.tech_health_title),
+                onBack = onBack
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick        = { showAddSheet = true },
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor   = MaterialTheme.colorScheme.onPrimary,
+                shape          = RoundedCornerShape(16.dp)
+            ) {
+                Icon(
+                    imageVector        = Icons.Default.Add,
+                    contentDescription = "Añadir restricción"
+                )
+            }
         },
         containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
-        Column(
-            modifier = Modifier
+        LazyColumn(
+            modifier            = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(innerPadding),
+            contentPadding      = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            // ── Resumen del día ──────────────────────────────────
-            Card(
-                modifier  = Modifier.fillMaxWidth(),
-                shape     = RoundedCornerShape(20.dp),
-                colors    = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(20.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.PhoneAndroid,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(22.dp)
-                        )
-                        Text(
-                            text = "Uso de pantalla hoy",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = "${usedMinutesToday}min usados",
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.SemiBold,
-                            color = if (isOverLimit) MaterialTheme.colorScheme.error
-                            else MaterialTheme.colorScheme.onSurface
-                        )
-                        Text(
-                            text = "límite ${dailyLimitMinutes}min",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-
-                    LinearProgressIndicator(
-                        progress = { progress },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(10.dp)
-                            .clip(RoundedCornerShape(5.dp)),
-                        color = if (isOverLimit) MaterialTheme.colorScheme.error
-                        else MaterialTheme.colorScheme.primary,
-                        trackColor = MaterialTheme.colorScheme.surfaceVariant
-                    )
-
-                    if (pointEarnedToday) {
-                        Row(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f))
-                                .padding(horizontal = 12.dp, vertical = 6.dp),
-                            horizontalArrangement = Arrangement.spacedBy(6.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(text = "⭐")
-                            Text(
-                                text = "Punto del día conseguido",
-                                style = MaterialTheme.typography.labelMedium,
-                                fontWeight = FontWeight.SemiBold,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        }
-                    }
-                }
-            }
-
-            // ── Límite diario ────────────────────────────────────
-            Text(
-                text = "Límite diario",
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-
-            Card(
-                modifier  = Modifier.fillMaxWidth(),
-                shape     = RoundedCornerShape(16.dp),
-                colors    = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    listOf(60, 90, 120, 150, 180).forEach { minutes ->
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "$minutes minutos",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = if (minutes == dailyLimitMinutes)
-                                    MaterialTheme.colorScheme.primary
-                                else MaterialTheme.colorScheme.onSurface
-                            )
-                            RadioButton(
-                                selected = minutes == dailyLimitMinutes,
-                                onClick  = { onUpdateDailyLimit(minutes) },
-                                colors   = RadioButtonDefaults.colors(
-                                    selectedColor = MaterialTheme.colorScheme.primary
-                                )
-                            )
-                        }
-                        if (minutes != 180) {
-                            HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant)
-                        }
-                    }
-                }
-            }
-
-            // ── Límites por app ──────────────────────────────────
-            if (appLimits.isNotEmpty()) {
+            item {
+                DayPilotSectionHeader(title = "Restricciones")
                 Text(
-                    text = "Límites por aplicación",
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold,
+                    text  = "$total en total",
+                    style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+                Spacer(Modifier.height(4.dp))
+            }
 
-                appLimits.forEach { app ->
-                    Card(
-                        modifier  = Modifier.fillMaxWidth(),
-                        shape     = RoundedCornerShape(16.dp),
-                        colors    = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surface
-                        ),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column {
-                                Text(
-                                    text = app.appName,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                                Text(
-                                    text = "Límite: ${app.limitMinutes}min",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                            Switch(
-                                checked         = app.isEnabled,
-                                onCheckedChange = { onToggleAppLimit(app.id, it) },
-                                colors          = SwitchDefaults.colors(
-                                    checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
-                                    checkedTrackColor = MaterialTheme.colorScheme.primary
-                                )
-                            )
-                        }
-                    }
+            if (total == 0) {
+                item {
+                    DayPilotEmptyState(
+                        message  = "No hay restricciones\nPulsa + para crear una.",
+                        modifier = Modifier.height(200.dp)
+                    )
                 }
             }
 
-            Spacer(Modifier.height(8.dp))
+            items(appRestrictions, key = { it.id }) { restriction ->
+                AppLimitCard(
+                    restriction = restriction,
+                    onToggle    = { onToggleRestriction(restriction.id, it) },
+                    onEdit      = { editingAppId = restriction.id },
+                    onDelete    = { onDeleteRestriction(restriction.id) }
+                )
+            }
+
+            if (groupRestrictions.isNotEmpty()) {
+                item {
+                    Spacer(Modifier.height(4.dp))
+                    DayPilotSectionHeader(title = "Grupos")
+                }
+                items(groupRestrictions, key = { it.id }) { group ->
+                    GroupLimitCard(
+                        restriction = group,
+                        onToggle    = { onToggleGroup(group.id, it) },
+                        onEdit      = { editingGroupId = group.id },
+                        onDelete    = { onDeleteGroup(group.id) }
+                    )
+                }
+            }
+
+            item { Spacer(Modifier.height(80.dp)) }
         }
     }
 }
-
-data class AppLimitData(
-    val id: String,
-    val appName: String,
-    val limitMinutes: Int,
-    val isEnabled: Boolean
-)
