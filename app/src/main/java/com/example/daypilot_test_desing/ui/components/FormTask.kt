@@ -24,23 +24,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
+import com.example.daypilot_test_desing.ui.model.TaskCategory
+import com.example.daypilot_test_desing.ui.model.TaskDifficulty
 
 // ── Datos ────────────────────────────────────────────────────────
-enum class TaskDifficulty(val label: String, val color: Color) {
-    EASY("Fácil",   Color(0xFF4CAF50)),
-    MEDIUM("Media", Color(0xFFFF9800)),
-    HARD("Difícil", Color(0xFFF44336))
-}
-
-enum class TaskCategory(val label: String, val icon: ImageVector) {
-    WORK("Trabajo",    Icons.Default.Work),
-    STUDY("Estudio",   Icons.Default.School),
-    SPORT("Deporte",   Icons.Default.FitnessCenter),
-    HEALTH("Salud",    Icons.Default.Favorite),
-    PERSONAL("Personal", Icons.Default.Person),
-    HOME("Hogar",      Icons.Default.Home),
-    OTHER("Otro",      Icons.Default.Star)
-}
 
 // ── Formulario principal ─────────────────────────────────────────
 @Composable

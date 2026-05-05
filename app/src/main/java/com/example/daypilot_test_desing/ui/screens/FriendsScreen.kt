@@ -18,6 +18,8 @@ import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.ui.components.basic.*
 import com.example.daypilot_test_desing.ui.components.cards.*
+import com.example.daypilot_test_desing.ui.model.FriendData
+import com.example.daypilot_test_desing.ui.model.FriendWeeklySummary
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -139,12 +141,4 @@ fun FriendsScreen(
     }
 }
 
-data class FriendData(
-    val id: String,
-    val name: String,
-    val email: String,
-    val points: Int,
-    val streak: Int,
-    val avatarUrl: String? = null,
-    val weeklySummary: FriendWeeklySummary? = null
 )

@@ -1,5 +1,7 @@
-package com.example.daypilot_test_desing.ui.components.cards
+package com.example.daypilot_test_desing.ui.components.basic
 
+import androidx.compose.ui.res.stringResource
+import com.example.daypilot_test_desing.R
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -59,7 +61,7 @@ fun AppPickerSheet(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(
-            text       = "Elegir app",
+            text       = stringResource(R.string.app_picker_title),
             style      = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
             color      = MaterialTheme.colorScheme.onBackground
@@ -68,7 +70,7 @@ fun AppPickerSheet(
         OutlinedTextField(
             value         = query,
             onValueChange = { query = it },
-            placeholder   = { Text("Buscar") },
+            placeholder   = { Text(stringResource(R.string.app_picker_search)) },
             leadingIcon   = {
                 Icon(Icons.Default.Search, contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -116,7 +118,7 @@ fun AppPickerSheet(
             horizontalArrangement = Arrangement.End
         ) {
             TextButton(onClick = onDismiss) {
-                Text("Cerrar", color = MaterialTheme.colorScheme.primary)
+                Text(stringResource(R.string.app_picker_close), color = MaterialTheme.colorScheme.primary)
             }
         }
 
@@ -146,13 +148,13 @@ fun AppMultiPickerSheet(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(
-            text       = "Apps del grupo",
+            text       = stringResource(R.string.app_picker_group_title),
             style      = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
             color      = MaterialTheme.colorScheme.onBackground
         )
         Text(
-            text  = "${selected.size} seleccionadas",
+            text  = stringResource(R.string.app_picker_selected_count, selected.size),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -160,7 +162,7 @@ fun AppMultiPickerSheet(
         OutlinedTextField(
             value         = query,
             onValueChange = { query = it },
-            placeholder   = { Text("Buscar") },
+            placeholder   = { Text(stringResource(R.string.app_picker_search)) },
             leadingIcon   = {
                 Icon(Icons.Default.Search, contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -212,7 +214,7 @@ fun AppMultiPickerSheet(
             verticalAlignment     = Alignment.CenterVertically
         ) {
             TextButton(onClick = onDismiss) {
-                Text("Cancelar", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(stringResource(R.string.common_cancel), color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             Spacer(Modifier.width(8.dp))
             Button(
@@ -222,7 +224,7 @@ fun AppMultiPickerSheet(
                 },
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text("Listo")
+                Text(stringResource(R.string.app_picker_confirm))
             }
         }
     }

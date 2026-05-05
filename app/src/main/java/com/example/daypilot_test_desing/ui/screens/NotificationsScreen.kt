@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.ui.components.basic.*
 import com.example.daypilot_test_desing.ui.components.cards.*
+import com.example.daypilot_test_desing.ui.model.NotificationData
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -135,11 +136,3 @@ fun NotificationsScreen(
     }
 }
 
-data class NotificationData(
-    val id: String,
-    val title: String,
-    val message: String,
-    val timeAgo: String,
-    val type: NotificationType,
-    val isRead: Boolean
-)

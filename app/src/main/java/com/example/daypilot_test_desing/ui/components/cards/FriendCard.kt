@@ -22,13 +22,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.ui.components.basic.*
-import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
-
-data class FriendWeeklySummary(
-    val totalPoints: Int,
-    val tasksCompleted: Int,
-    val totalSteps: Int,
-    val bestStreak: Int,
+import com.example.daypilot_test_desing.ui.model.FriendWeeklySummary
+import com.example.daypilot_test_desing.ui.model.FriendData
     val myReaction: ReactionType? = null
 )
 

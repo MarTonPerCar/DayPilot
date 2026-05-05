@@ -21,14 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
-
-enum class TimerMode(val label: String, val durationMinutes: Int) {
-    POMODORO("Pomodoro",       25),
-    TRAINING("Entreno",        90),
-    MEDITATION("Meditación",   60),
-    COOKING("Cocina",         120),
-    CUSTOM("Personalizable",   30)
-}
+import com.example.daypilot_test_desing.ui.model.TimerMode
 
 @Composable
 fun TimerCard(

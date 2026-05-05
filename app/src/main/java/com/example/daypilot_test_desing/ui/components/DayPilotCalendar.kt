@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.ui.components.basic
+package com.example.daypilot_test_desing.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,11 +19,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import java.util.Calendar
+import com.example.daypilot_test_desing.ui.model.CalendarTaskDot
 
-data class CalendarTaskDot(
-    val day: Int,
-    val color: Color
-)
 
 @Composable
 fun DayPilotCalendar(

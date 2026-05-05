@@ -1,5 +1,7 @@
 package com.example.daypilot_test_desing.ui.components.basic
 
+import com.example.daypilot_test_desing.ui.model.ReactionType
+
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.*
 import androidx.compose.animation.fadeIn
@@ -35,12 +37,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 // ── Tipos de reacción ────────────────────────────────────────────
-enum class ReactionType(val emoji: String, val label: String) {
-    FIRE("🔥", "Fuego"),
-    CLAP("👏", "Aplausos"),
-    STRONG("💪", "Fuerza"),
-    STAR("⭐", "Estrella")
-}
 
 // ── Barra de reacciones ──────────────────────────────────────────
 @Composable

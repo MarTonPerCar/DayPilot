@@ -19,18 +19,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
+import com.example.daypilot_test_desing.ui.model.NotificationType
 
-enum class NotificationType(
-    val icon: ImageVector,
-    val color: Color
-) {
-    TASK(Icons.Default.CheckCircle,    Color(0xFF4CAF50)),
-    SOCIAL(Icons.Default.People,       Color(0xFF2196F3)),
-    STEPS(Icons.AutoMirrored.Filled.DirectionsWalk,Color(0xFFFF9800)),
-    STREAK(Icons.Default.Whatshot, Color(0xFFFF5722)),
-    REMINDER(Icons.Default.Notifications, Color(0xFF9C27B0)),
-    ACHIEVEMENT(Icons.Default.EmojiEvents, Color(0xFFFFD700))
-}
 
 @Composable
 fun NotificationCard(

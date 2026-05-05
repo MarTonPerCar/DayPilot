@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.example.daypilot_test_desing.ui.model.TimerOption
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -23,16 +24,6 @@ import androidx.compose.ui.unit.sp
 import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.ui.components.basic.*
 
-data class TimerOption(
-    val id: String,
-    val label: String,
-    val description: String,
-    val icon: ImageVector,
-    val accentColor: Color,
-    val durationMinutes: Int = 0,
-    val isCustom: Boolean = false,
-    val isPomodoro: Boolean = false
-)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

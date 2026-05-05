@@ -20,22 +20,9 @@ import com.example.daypilot_test_desing.ui.components.basic.DayPilotReactionBadg
 import com.example.daypilot_test_desing.ui.components.basic.DayPilotWeeklyStat
 import com.example.daypilot_test_desing.ui.components.basic.ReactionType
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
+import com.example.daypilot_test_desing.ui.model.ReceivedReaction
+import com.example.daypilot_test_desing.ui.model.WeeklySummaryData
 
-data class ReceivedReaction(
-    val fromName: String,
-    val reaction: ReactionType,
-    val avatarUrl: String? = null
-)
-
-data class WeeklySummaryData(
-    val totalPoints: Int,
-    val tasksCompleted: Int,
-    val totalSteps: Int,
-    val bestStreak: Int,
-    val reactions: List<ReceivedReaction> = emptyList()
-)
-
-@Composable
 fun WeeklyReactionCard(
     summary: WeeklySummaryData,
     modifier: Modifier = Modifier

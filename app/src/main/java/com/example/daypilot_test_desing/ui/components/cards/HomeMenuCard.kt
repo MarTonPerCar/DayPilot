@@ -22,42 +22,10 @@ import androidx.compose.ui.unit.sp
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
 import com.example.daypilot_test_desing.ui.model.DayProgress
 import com.example.daypilot_test_desing.ui.model.ProgressFilter
+import com.example.daypilot_test_desing.ui.model.HomeSection
+import com.example.daypilot_test_desing.ui.model.HomeSectionData
 
 // ── Tipos de sección ─────────────────────────────────────────────
-enum class HomeSection(
-    val title: String,
-    val icon: ImageVector,
-    val accentColor: Color
-) {
-    CALENDAR(
-        title = "Calendario",
-        icon = Icons.Default.CalendarMonth,
-        accentColor = Color(0xFF4A7C59)
-    ),
-    PROGRESS(
-        title = "Progreso",
-        icon = Icons.Default.BarChart,
-        accentColor = Color(0xFF1A6B8A)
-    ),
-    HABITS(
-        title = "Hábitos",
-        icon = Icons.Default.FitnessCenter,
-        accentColor = Color(0xFF6B4FA8)
-    ),
-    RIVALRY(
-        title = "Rivalidad",
-        icon = Icons.Default.EmojiEvents,
-        accentColor = Color(0xFFB85C00)
-    )
-}
-
-// ── Datos de preview por sección ─────────────────────────────────
-sealed class HomeSectionData {
-    data class Calendar(val pendingTasks: Int, val completedTasks: Int) : HomeSectionData()
-    data class Progress(val data: List<DayProgress>, val currentFilter: ProgressFilter = ProgressFilter.POINTS) : HomeSectionData()
-    data class Habits(val stepsProgress: Float, val timerDone: Boolean) : HomeSectionData()
-    data class Rivalry(val position: Int, val totalFriends: Int) : HomeSectionData()
-}
 
 // ── HomeMenuCard ─────────────────────────────────────────────────
 @Composable

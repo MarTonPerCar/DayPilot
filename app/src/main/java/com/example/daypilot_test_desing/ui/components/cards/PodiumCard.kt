@@ -19,16 +19,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.daypilot_test_desing.ui.components.basic.DayPilotAvatar
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
+import com.example.daypilot_test_desing.ui.model.PodiumEntry
 
-data class PodiumEntry(
-    val name: String,
-    val points: Int,
-    val streak: Int,
-    val avatarUrl: String? = null,
-    val isCurrentUser: Boolean = false
-)
-
-@Composable
 fun PodiumCard(
     first: PodiumEntry,
     second: PodiumEntry,
