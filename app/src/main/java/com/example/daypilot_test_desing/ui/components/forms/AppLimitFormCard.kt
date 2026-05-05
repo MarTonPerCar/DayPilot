@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.ui.components.cards
+package com.example.daypilot_test_desing.ui.components.forms
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border

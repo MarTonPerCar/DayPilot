@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.ui.components.cards
+package com.example.daypilot_test_desing.ui.components.forms
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
@@ -21,7 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.ui.components.basic.DayPilotTextField
-import com.example.daypilot_test_desing.ui.model.ReminderFormData
+import com.example.daypilot_test_desing.ui.model.ReminderFormDataF
 import com.example.daypilot_test_desing.ui.model.FrequencyType
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
 import java.util.Calendar
@@ -29,7 +29,7 @@ import java.util.Calendar
 
 @Composable
 fun ReminderFormCard(
-    onSave: (ReminderFormData) -> Unit,
+    onSave: (ReminderFormDataF) -> Unit,
     onCancel: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -282,7 +282,7 @@ fun ReminderFormCard(
                     onClick  = {
                         if (isValid) {
                             onSave(
-                                ReminderFormData(
+                                ReminderFormDataF(
                                     title           = title,
                                     frequencyType   = frequency,
                                     earlyWarning    = earlyWarning,

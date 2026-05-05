@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.ui.model.TimerOption
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -23,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.ui.components.basic.*
+import com.example.daypilot_test_desing.ui.components.cards.TimerHubCard
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -41,40 +43,40 @@ fun TimerHubScreen(
     val timers = listOf(
         TimerOption(
             id              = "POMODORO",
-            label           = "Pomodoro",
-            description     = "25 min trabajo + 5 min descanso por sesión",
+            labelRes        = R.string.timer_pomodoro,
+            descriptionRes  = R.string.timer_pomodoro_desc,
             icon            = Icons.Default.Timer,
             accentColor     = Color(0xFFE53935),
             isPomodoro      = true
         ),
         TimerOption(
             id              = "TRAINING",
-            label           = "Entrenamiento",
-            description     = "90 minutos de ejercicio",
+            labelRes        = R.string.timer_training,
+            descriptionRes  = R.string.timer_training_desc,
             icon            = Icons.Default.FitnessCenter,
             accentColor     = Color(0xFF43A047),
             durationMinutes = 90
         ),
         TimerOption(
             id              = "MEDITATION",
-            label           = "Meditación",
-            description     = "60 minutos de concentración",
+            labelRes        = R.string.timer_meditation,
+            descriptionRes  = R.string.timer_meditation_desc,
             icon            = Icons.Default.SelfImprovement,
             accentColor     = Color(0xFF5E35B1),
             durationMinutes = 60
         ),
         TimerOption(
             id              = "COOKING",
-            label           = "Cocina",
-            description     = "120 minutos en la cocina",
+            labelRes        = R.string.timer_cooking,
+            descriptionRes  = R.string.timer_cooking_desc,
             icon            = Icons.Default.Restaurant,
             accentColor     = Color(0xFFFF8F00),
             durationMinutes = 120
         ),
         TimerOption(
             id              = "CUSTOM",
-            label           = "Personalizable",
-            description     = "Elige tu propio tiempo",
+            labelRes        = R.string.timer_custom,
+            descriptionRes  = R.string.timer_custom_desc,
             icon            = Icons.Default.Tune,
             accentColor     = Color(0xFF00ACC1),
             isCustom        = true
@@ -349,73 +351,4 @@ fun TimerHubScreen(
         }
     }
 }
-
-@Composable
-fun TimerHubCard(
-    timer: TimerOption,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier  = modifier
-            .fillMaxWidth()
-            .clickable { onClick() },
-        shape     = RoundedCornerShape(16.dp),
-        colors    = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment     = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(14.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(timer.accentColor.copy(alpha = 0.15f)),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector        = timer.icon,
-                    contentDescription = null,
-                    tint               = timer.accentColor,
-                    modifier           = Modifier.size(24.dp)
-                )
-            }
-
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text       = timer.label,
-                    style      = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold,
-                    color      = MaterialTheme.colorScheme.onSurface
-                )
-                Text(
-                    text  = timer.description,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-
-            Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(timer.accentColor),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector        = Icons.Default.PlayArrow,
-                    contentDescription = null,
-                    tint               = Color.White,
-                    modifier           = Modifier.size(20.dp)
-                )
-            }
-        }
-    }
 }

@@ -115,22 +115,4 @@ fun ProfileScreen(
     }
 }
 
-@Composable
-fun ProfileInfoRow(label: String, value: String) {
-    Row(
-        modifier              = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(
-            text  = label,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Text(
-            text       = value,
-            style      = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.SemiBold,
-            color      = MaterialTheme.colorScheme.onSurface
-        )
-    }
 }

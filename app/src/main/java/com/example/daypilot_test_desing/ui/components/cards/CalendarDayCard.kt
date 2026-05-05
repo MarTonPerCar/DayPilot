@@ -19,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
+import com.example.daypilot_test_desing.ui.components.basic.TaskDot
 
 @Composable
 fun CalendarDayCard(
@@ -99,15 +100,6 @@ fun CalendarDayCard(
 }
 
 @Composable
-fun TaskDot(color: Color) {
-    Box(
-        modifier = Modifier
-            .size(5.dp)
-            .clip(CircleShape)
-            .background(color)
-    )
-}
-
 @Preview(showBackground = true)
 @Composable
 fun CalendarDayCardPreview() {

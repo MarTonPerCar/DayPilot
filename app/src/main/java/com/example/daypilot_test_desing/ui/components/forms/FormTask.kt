@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.ui.components
+package com.example.daypilot_test_desing.ui.components.forms
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.animateFloatAsState

@@ -20,6 +20,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
+import com.example.daypilot_test_desing.ui.components.basic.MilestoneChip
+import com.example.daypilot_test_desing.ui.components.basic.StepStatRow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -291,56 +293,6 @@ fun StepsCard(
         }
     }
 }
-
-@Composable
-fun MilestoneChip(label: String, reached: Boolean) {
-    val bgColor by animateColorAsState(
-        targetValue   = if (reached) MaterialTheme.colorScheme.primary
-        else MaterialTheme.colorScheme.surfaceVariant,
-        animationSpec = tween(400),
-        label         = "milestone_color"
-    )
-    val textColor by animateColorAsState(
-        targetValue   = if (reached) MaterialTheme.colorScheme.onPrimary
-        else MaterialTheme.colorScheme.onSurfaceVariant,
-        animationSpec = tween(400),
-        label         = "milestone_text"
-    )
-    Box(
-        modifier = Modifier
-            .background(bgColor, RoundedCornerShape(6.dp))
-            .padding(horizontal = 6.dp, vertical = 4.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text       = label,
-            style      = MaterialTheme.typography.labelSmall,
-            fontWeight = FontWeight.SemiBold,
-            color      = textColor
-        )
-    }
-}
-
-@Composable
-fun StepStatRow(label: String, value: String) {
-    Row(
-        modifier              = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(
-            text  = label,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Text(
-            text       = value,
-            style      = MaterialTheme.typography.bodySmall,
-            fontWeight = FontWeight.SemiBold,
-            color      = MaterialTheme.colorScheme.onSurface
-        )
-    }
-}
-
 @Preview(showBackground = true)
 @Composable
 fun StepsCardPreview() {

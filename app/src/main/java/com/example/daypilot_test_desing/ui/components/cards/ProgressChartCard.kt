@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import com.example.daypilot_test_desing.ui.model.DayProgress
 import com.example.daypilot_test_desing.ui.model.ProgressFilter
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
+import com.example.daypilot_test_desing.ui.components.basic.ChartSummaryItem
 
 @Composable
 fun ProgressChartCard(
@@ -265,24 +266,6 @@ fun ProgressChartCard(
     }
 }
 
-@Composable
-fun ChartSummaryItem(label: String, value: String) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(
-            text       = value,
-            style      = MaterialTheme.typography.titleSmall,
-            fontWeight = FontWeight.Bold,
-            color      = MaterialTheme.colorScheme.primary
-        )
-        Text(
-            text  = label,
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-    }
-}
-
-@Preview(showBackground = true)
 @Composable
 fun ProgressChartCardPreview() {
     DayPilotTheme(theme = DayPilotTheme.SAGE_GREEN, darkMode = true) {
