@@ -1,25 +1,42 @@
-package com.example.daypilot_test_desing.ui.components
+package com.example.daypilot_test_desing.ui.components.forms
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import java.util.Calendar
 import com.example.daypilot_test_desing.ui.model.CalendarTaskDot
+import com.example.daypilot_test_desing.ui.model.Month
+import com.example.daypilot_test_desing.ui.model.WeekDay
+import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
+import java.util.Calendar
 
 
 @Composable
@@ -40,24 +57,19 @@ fun DayPilotCalendar(
         set(Calendar.DAY_OF_MONTH, 1)
     }
 
-    val daysInMonth   = cal.getActualMaximum(Calendar.DAY_OF_MONTH)
+    val daysInMonth = cal.getActualMaximum(Calendar.DAY_OF_MONTH)
     val firstDayOfWeek = cal.get(Calendar.DAY_OF_WEEK)
 
     // Convierte domingo=1..sábado=7 a lunes=0..domingo=6
     val startOffset = (firstDayOfWeek + 5) % 7
 
-    val monthNames = listOf(
-        "Enero", "Febrero", "Marzo", "Abril",
-        "Mayo", "Junio", "Julio", "Agosto",
-        "Septiembre", "Octubre", "Noviembre", "Diciembre"
-    )
-
-    val dayHeaders = listOf("L", "M", "X", "J", "V", "S", "D")
+    val monthNames = Month.entries.map { stringResource(it.nameRes) }
+    val dayHeaders = WeekDay.entries.map { stringResource(it.headerRes) }
 
     Card(
-        modifier  = modifier.fillMaxWidth(),
-        shape     = RoundedCornerShape(20.dp),
-        colors    = CardDefaults.cardColors(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -70,28 +82,28 @@ fun DayPilotCalendar(
         ) {
             // ── Cabecera mes ─────────────────────────────────────
             Row(
-                modifier              = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment     = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = onPreviousMonth) {
                     Icon(
-                        imageVector        = Icons.Default.ChevronLeft,
+                        imageVector = Icons.Default.ChevronLeft,
                         contentDescription = "Mes anterior",
-                        tint               = MaterialTheme.colorScheme.onSurface
+                        tint = MaterialTheme.colorScheme.onSurface
                     )
                 }
                 Text(
-                    text       = "${monthNames[month - 1]} $year",
-                    style      = MaterialTheme.typography.titleMedium,
+                    text = "${monthNames[month - 1]} $year",
+                    style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color      = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 IconButton(onClick = onNextMonth) {
                     Icon(
-                        imageVector        = Icons.Default.ChevronRight,
+                        imageVector = Icons.Default.ChevronRight,
                         contentDescription = "Mes siguiente",
-                        tint               = MaterialTheme.colorScheme.onSurface
+                        tint = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }
@@ -100,43 +112,45 @@ fun DayPilotCalendar(
             Row(modifier = Modifier.fillMaxWidth()) {
                 dayHeaders.forEach { header ->
                     Text(
-                        text      = header,
-                        modifier  = Modifier.weight(1f),
+                        text = header,
+                        modifier = Modifier.weight(1f),
                         textAlign = TextAlign.Center,
-                        style     = MaterialTheme.typography.labelSmall,
+                        style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.SemiBold,
-                        color     = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
 
             // ── Grid de días ─────────────────────────────────────
             val totalCells = startOffset + daysInMonth
-            val rows       = (totalCells + 6) / 7
+            val rows = (totalCells + 6) / 7
 
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 repeat(rows) { row ->
                     Row(modifier = Modifier.fillMaxWidth()) {
                         repeat(7) { col ->
                             val cellIndex = row * 7 + col
-                            val day       = cellIndex - startOffset + 1
+                            val day = cellIndex - startOffset + 1
 
                             if (day < 1 || day > daysInMonth) {
                                 Box(modifier = Modifier.weight(1f))
                             } else {
-                                val dots       = taskDots.filter { it.day == day }
+                                val dots = taskDots.filter { it.day == day }
                                 val isSelected = day == selectedDay
-                                val isToday    = day == Calendar.getInstance().get(Calendar.DAY_OF_MONTH) &&
-                                        month == Calendar.getInstance().get(Calendar.MONTH) + 1 &&
-                                        year  == Calendar.getInstance().get(Calendar.YEAR)
+                                val isToday =
+                                    day == Calendar.getInstance().get(Calendar.DAY_OF_MONTH) &&
+                                            month == Calendar.getInstance()
+                                        .get(Calendar.MONTH) + 1 &&
+                                            year == Calendar.getInstance().get(Calendar.YEAR)
 
                                 CalendarDayCell(
-                                    day        = day,
+                                    day = day,
                                     isSelected = isSelected,
-                                    isToday    = isToday,
-                                    dots       = dots,
-                                    onClick    = { onDaySelected(day) },
-                                    modifier   = Modifier.weight(1f)
+                                    isToday = isToday,
+                                    dots = dots,
+                                    onClick = { onDaySelected(day) },
+                                    modifier = Modifier.weight(1f)
                                 )
                             }
                         }
@@ -158,14 +172,14 @@ fun CalendarDayCell(
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier            = modifier
+        modifier = modifier
             .padding(2.dp)
             .clip(RoundedCornerShape(10.dp))
             .background(
                 when {
                     isSelected -> MaterialTheme.colorScheme.primary
-                    isToday    -> MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
-                    else       -> Color.Transparent
+                    isToday -> MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
+                    else -> Color.Transparent
                 }
             )
             .clickable { onClick() }
@@ -174,13 +188,13 @@ fun CalendarDayCell(
         verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
         Text(
-            text      = day.toString(),
-            style     = MaterialTheme.typography.labelMedium,
+            text = day.toString(),
+            style = MaterialTheme.typography.labelMedium,
             fontWeight = if (isSelected || isToday) FontWeight.Bold else FontWeight.Normal,
-            color     = when {
+            color = when {
                 isSelected -> MaterialTheme.colorScheme.onPrimary
-                isToday    -> MaterialTheme.colorScheme.primary
-                else       -> MaterialTheme.colorScheme.onSurface
+                isToday -> MaterialTheme.colorScheme.primary
+                else -> MaterialTheme.colorScheme.onSurface
             },
             textAlign = TextAlign.Center
         )
@@ -189,7 +203,7 @@ fun CalendarDayCell(
         if (dots.isNotEmpty()) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(2.dp),
-                verticalAlignment     = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 dots.take(3).forEach { dot ->
                     Box(
@@ -205,6 +219,34 @@ fun CalendarDayCell(
             }
         } else {
             Spacer(Modifier.height(4.dp))
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DayPilotCalendarPreview() {
+    DayPilotTheme(theme = DayPilotTheme.SAGE_GREEN, darkMode = true) {
+        Box(
+            Modifier
+                .background(MaterialTheme.colorScheme.background)
+                .padding(16.dp)
+        ) {
+            DayPilotCalendar(
+                month = 5,
+                year = 2026,
+                taskDots = listOf(
+                    CalendarTaskDot(
+                        day = 5,
+                        color = Color(0xFF4CAF50)
+                    )
+                ),
+                selectedDay = 5,
+                onDaySelected = {},
+                onPreviousMonth = {},
+                onNextMonth = {},
+                onAddTask = {}
+            )
         }
     }
 }

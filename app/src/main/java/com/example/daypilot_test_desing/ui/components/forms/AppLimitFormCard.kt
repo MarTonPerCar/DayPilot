@@ -21,7 +21,7 @@ import com.example.daypilot_test_desing.ui.components.basic.DayPilotTextField
 import com.example.daypilot_test_desing.ui.model.AppRestriction
 import com.example.daypilot_test_desing.ui.model.GroupRestriction
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
-import androidx.compose.runtime.snapshots.SnapshotStateList
+import kotlin.collections.isNotEmpty
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,14 +40,14 @@ fun AppLimitFormCard(
     }
 
     // App
-    var selectedApp  by remember {
+    var selectedApp by remember {
         mutableStateOf(
             initialApp?.let { AppInfo(it.appName, it.packageName) }
         )
     }
 
     // Grupo
-    var groupName    by remember { mutableStateOf(initialGroup?.groupName ?: "") }
+    var groupName by remember { mutableStateOf(initialGroup?.groupName ?: "") }
     var groupApps: List<AppInfo> by remember {
         mutableStateOf(
             initialGroup?.apps?.map { AppInfo(it.appName, it.packageName) } ?: emptyList()
@@ -55,8 +55,8 @@ fun AppLimitFormCard(
     }
 
     // Común
-    val isGroup      = restrictionType == "Grupo"
-    val maxMinutes   = if (isGroup) 600f else 360f
+    val isGroup = restrictionType == "Grupo"
+    val maxMinutes = if (isGroup) 600f else 360f
     var limitMinutes by remember {
         mutableFloatStateOf(
             (initialApp?.dailyLimitMinutes ?: initialGroup?.dailyLimitMinutes ?: 60).toFloat()
@@ -72,9 +72,9 @@ fun AppLimitFormCard(
     var notifEnabled by remember { mutableStateOf(true) }
 
     // Sheets
-    var showAppPicker      by remember { mutableStateOf(false) }
+    var showAppPicker by remember { mutableStateOf(false) }
     var showGroupAppPicker by remember { mutableStateOf(false) }
-    val sheetState         = rememberModalBottomSheetState(skipPartiallyExpanded = false)
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
 
     val isValid = if (isGroup) groupName.isNotBlank() && groupApps.isNotEmpty()
     else selectedApp != null
@@ -82,19 +82,20 @@ fun AppLimitFormCard(
     val limitLabel = when {
         limitMinutes >= 60 -> "${(limitMinutes / 60).toInt()}h ${(limitMinutes % 60).toInt()}m"
             .replace(" 0m", "")
-        else               -> "${limitMinutes.toInt()}min"
+
+        else -> "${limitMinutes.toInt()}min"
     }
 
     // ── App picker sheet ─────────────────────────────────────────
     if (showAppPicker) {
         ModalBottomSheet(
             onDismissRequest = { showAppPicker = false },
-            sheetState       = rememberModalBottomSheetState(skipPartiallyExpanded = false),
-            containerColor   = MaterialTheme.colorScheme.background,
-            shape            = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
+            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false),
+            containerColor = MaterialTheme.colorScheme.background,
+            shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
         ) {
             AppPickerSheet(
-                onSelect  = { selectedApp = it },
+                onSelect = { selectedApp = it },
                 onDismiss = { showAppPicker = false }
             )
         }
@@ -104,44 +105,44 @@ fun AppLimitFormCard(
     if (showGroupAppPicker) {
         ModalBottomSheet(
             onDismissRequest = { showGroupAppPicker = false },
-            sheetState       = rememberModalBottomSheetState(skipPartiallyExpanded = false),
-            containerColor   = MaterialTheme.colorScheme.background,
-            shape            = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
+            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false),
+            containerColor = MaterialTheme.colorScheme.background,
+            shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
         ) {
             AppMultiPickerSheet(
                 initialSelected = groupApps,
-                onConfirm       = { groupApps = it },
-                onDismiss       = { showGroupAppPicker = false }
+                onConfirm = { groupApps = it },
+                onDismiss = { showGroupAppPicker = false }
             )
         }
     }
 
     Card(
-        modifier  = modifier.fillMaxWidth(),
-        shape     = RoundedCornerShape(24.dp),
-        colors    = CardDefaults.cardColors(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
         Column(
-            modifier            = Modifier
+            modifier = Modifier
                 .fillMaxWidth()
                 .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // ── Título ───────────────────────────────────────────
             Text(
-                text       = if (isEditing) "Editar restricción" else "Nueva restricción",
-                style      = MaterialTheme.typography.titleMedium,
+                text = if (isEditing) "Editar restricción" else "Nueva restricción",
+                style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
-                color      = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface
             )
 
             // ── Tipo (solo al crear) ──────────────────────────────
             if (!isEditing) {
                 Row(
-                    modifier              = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     listOf("App", "Grupo").forEach { type ->
@@ -159,10 +160,10 @@ fun AppLimitFormCard(
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                text       = type,
-                                style      = MaterialTheme.typography.labelLarge,
+                                text = type,
+                                style = MaterialTheme.typography.labelLarge,
                                 fontWeight = FontWeight.SemiBold,
-                                color      = if (isSelected)
+                                color = if (isSelected)
                                     MaterialTheme.colorScheme.onPrimary
                                 else
                                     MaterialTheme.colorScheme.onSurfaceVariant
@@ -175,15 +176,15 @@ fun AppLimitFormCard(
             // ── App ───────────────────────────────────────────────
             if (!isGroup) {
                 Text(
-                    text  = "Aplicación",
+                    text = "Aplicación",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 OutlinedButton(
-                    onClick  = { showAppPicker = true },
+                    onClick = { showAppPicker = true },
                     modifier = Modifier.fillMaxWidth(),
-                    shape    = RoundedCornerShape(12.dp),
-                    colors   = ButtonDefaults.outlinedButtonColors(
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(
                         containerColor = if (selectedApp != null)
                             MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
                         else Color.Transparent
@@ -200,41 +201,41 @@ fun AppLimitFormCard(
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                text      = selectedApp!!.name.first().uppercase(),
-                                fontSize  = 12.sp,
+                                text = selectedApp!!.name.first().uppercase(),
+                                fontSize = 12.sp,
                                 fontWeight = FontWeight.Bold,
-                                color     = MaterialTheme.colorScheme.primary
+                                color = MaterialTheme.colorScheme.primary
                             )
                         }
                         Spacer(Modifier.width(8.dp))
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text  = selectedApp!!.name,
+                                text = selectedApp!!.name,
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.primary,
                                 fontWeight = FontWeight.SemiBold
                             )
                             Text(
-                                text  = selectedApp!!.packageName,
+                                text = selectedApp!!.packageName,
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                         Icon(
-                            imageVector        = Icons.Default.Edit,
+                            imageVector = Icons.Default.Edit,
                             contentDescription = null,
-                            modifier           = Modifier.size(14.dp),
-                            tint               = MaterialTheme.colorScheme.onSurfaceVariant
+                            modifier = Modifier.size(14.dp),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     } else {
                         Icon(
-                            imageVector        = Icons.Default.PhoneAndroid,
+                            imageVector = Icons.Default.PhoneAndroid,
                             contentDescription = null,
-                            modifier           = Modifier.size(16.dp)
+                            modifier = Modifier.size(16.dp)
                         )
                         Spacer(Modifier.width(8.dp))
                         Text(
-                            text  = "Elegir app",
+                            text = "Elegir app",
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -245,14 +246,14 @@ fun AppLimitFormCard(
             // ── Grupo ─────────────────────────────────────────────
             if (isGroup) {
                 DayPilotTextField(
-                    value         = groupName,
+                    value = groupName,
                     onValueChange = { groupName = it },
-                    label         = "Nombre del grupo",
-                    placeholder   = "Por ejemplo: Redes Sociales"
+                    label = "Nombre del grupo",
+                    placeholder = "Por ejemplo: Redes Sociales"
                 )
 
                 Text(
-                    text  = "Apps del grupo",
+                    text = "Apps del grupo",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -269,8 +270,8 @@ fun AppLimitFormCard(
                     ) {
                         groupApps.forEach { app ->
                             Row(
-                                modifier              = Modifier.fillMaxWidth(),
-                                verticalAlignment     = Alignment.CenterVertically,
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 Box(
@@ -283,27 +284,27 @@ fun AppLimitFormCard(
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text(
-                                        text       = app.name.first().uppercase(),
-                                        fontSize   = 11.sp,
+                                        text = app.name.first().uppercase(),
+                                        fontSize = 11.sp,
                                         fontWeight = FontWeight.Bold,
-                                        color      = MaterialTheme.colorScheme.primary
+                                        color = MaterialTheme.colorScheme.primary
                                     )
                                 }
                                 Text(
-                                    text     = app.name,
-                                    style    = MaterialTheme.typography.bodySmall,
-                                    color    = MaterialTheme.colorScheme.onSurface,
+                                    text = app.name,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurface,
                                     modifier = Modifier.weight(1f)
                                 )
                                 IconButton(
-                                    onClick  = { groupApps = groupApps - app },
+                                    onClick = { groupApps = groupApps - app },
                                     modifier = Modifier.size(20.dp)
                                 ) {
                                     Icon(
-                                        imageVector        = Icons.Default.Close,
+                                        imageVector = Icons.Default.Close,
                                         contentDescription = null,
-                                        tint               = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        modifier           = Modifier.size(14.dp)
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.size(14.dp)
                                     )
                                 }
                             }
@@ -312,18 +313,18 @@ fun AppLimitFormCard(
                 }
 
                 OutlinedButton(
-                    onClick  = { showGroupAppPicker = true },
+                    onClick = { showGroupAppPicker = true },
                     modifier = Modifier.fillMaxWidth(),
-                    shape    = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(12.dp)
                 ) {
                     Icon(
-                        imageVector        = Icons.Default.Add,
+                        imageVector = Icons.Default.Add,
                         contentDescription = null,
-                        modifier           = Modifier.size(16.dp)
+                        modifier = Modifier.size(16.dp)
                     )
                     Spacer(Modifier.width(6.dp))
                     Text(
-                        text  = if (groupApps.isEmpty()) "Elegir apps" else "Cambiar apps",
+                        text = if (groupApps.isEmpty()) "Elegir apps" else "Cambiar apps",
                         style = MaterialTheme.typography.labelMedium
                     )
                 }
@@ -331,41 +332,41 @@ fun AppLimitFormCard(
 
             // ── Notificaciones ────────────────────────────────────
             Card(
-                modifier  = Modifier.fillMaxWidth(),
-                shape     = RoundedCornerShape(14.dp),
-                colors    = CardDefaults.cardColors(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(14.dp),
+                colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceVariant
                 ),
                 elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
             ) {
                 Column(
-                    modifier            = Modifier
+                    modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Row(
-                        modifier              = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment     = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         Column {
                             Text(
-                                text       = "Notificaciones",
-                                style      = MaterialTheme.typography.bodyMedium,
+                                text = "Notificaciones",
+                                style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.SemiBold,
-                                color      = MaterialTheme.colorScheme.onSurface
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                             Text(
-                                text  = "Avisar cuando supere el límite",
+                                text = "Avisar cuando supere el límite",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                         Switch(
-                            checked         = notifEnabled,
+                            checked = notifEnabled,
                             onCheckedChange = { notifEnabled = it },
-                            colors          = SwitchDefaults.colors(
+                            colors = SwitchDefaults.colors(
                                 checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
                                 checkedTrackColor = MaterialTheme.colorScheme.primary
                             )
@@ -375,22 +376,22 @@ fun AppLimitFormCard(
                     if (notifEnabled) {
                         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                             Text(
-                                text  = "Repetir notificación (5s → 60s)",
+                                text = "Repetir notificación (5s → 60s)",
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Text(
-                                text       = "Seleccionado: ${notifSeconds.toInt()}s",
-                                style      = MaterialTheme.typography.labelSmall,
+                                text = "Seleccionado: ${notifSeconds.toInt()}s",
+                                style = MaterialTheme.typography.labelSmall,
                                 fontWeight = FontWeight.Bold,
-                                color      = MaterialTheme.colorScheme.primary
+                                color = MaterialTheme.colorScheme.primary
                             )
                             Slider(
-                                value         = notifSeconds,
+                                value = notifSeconds,
                                 onValueChange = { notifSeconds = it },
-                                valueRange    = 5f..60f,
-                                steps         = 10,
-                                modifier      = Modifier.fillMaxWidth()
+                                valueRange = 5f..60f,
+                                steps = 10,
+                                modifier = Modifier.fillMaxWidth()
                             )
                         }
                     }
@@ -400,28 +401,28 @@ fun AppLimitFormCard(
             // ── Límite diario ─────────────────────────────────────
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
-                    text  = if (isGroup) "Límite diario (1.5h → 10h)"
+                    text = if (isGroup) "Límite diario (1.5h → 10h)"
                     else "Límite diario (30 min → 6 h)",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text       = "Seleccionado: $limitLabel",
-                    style      = MaterialTheme.typography.labelSmall,
+                    text = "Seleccionado: $limitLabel",
+                    style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
-                    color      = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.primary
                 )
                 Slider(
-                    value         = limitMinutes,
+                    value = limitMinutes,
                     onValueChange = { limitMinutes = it },
-                    valueRange    = if (isGroup) 90f..600f else 30f..360f,
-                    steps         = if (isGroup) 16 else 10,
-                    modifier      = Modifier.fillMaxWidth()
+                    valueRange = if (isGroup) 90f..600f else 30f..360f,
+                    steps = if (isGroup) 16 else 10,
+                    modifier = Modifier.fillMaxWidth()
                 )
 
                 // Presets
                 Row(
-                    modifier              = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     val presets = if (isGroup)
@@ -449,10 +450,10 @@ fun AppLimitFormCard(
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                text       = label,
-                                style      = MaterialTheme.typography.labelMedium,
+                                text = label,
+                                style = MaterialTheme.typography.labelMedium,
                                 fontWeight = FontWeight.SemiBold,
-                                color      = if (isSelected)
+                                color = if (isSelected)
                                     MaterialTheme.colorScheme.onPrimary
                                 else
                                     MaterialTheme.colorScheme.onSurfaceVariant
@@ -464,60 +465,60 @@ fun AppLimitFormCard(
 
             // ── Botones ───────────────────────────────────────────
             Row(
-                modifier              = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 OutlinedButton(
-                    onClick  = onCancel,
+                    onClick = onCancel,
                     modifier = Modifier.weight(1f),
-                    shape    = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(12.dp)
                 ) { Text("Cancelar") }
 
                 Button(
-                    onClick  = {
+                    onClick = {
                         if (isValid) {
                             if (isGroup) {
                                 onSaveGroup(
                                     GroupRestriction(
-                                        id                          = initialGroup?.id
+                                        id = initialGroup?.id
                                             ?: System.currentTimeMillis().toString(),
-                                        groupName                   = groupName,
-                                        apps                        = groupApps.map {
+                                        groupName = groupName,
+                                        apps = groupApps.map {
                                             AppRestriction(
-                                                id                          = it.packageName,
-                                                appName                     = it.name,
-                                                packageName                 = it.packageName,
-                                                dailyLimitMinutes           = limitMinutes.toInt(),
+                                                id = it.packageName,
+                                                appName = it.name,
+                                                packageName = it.packageName,
+                                                dailyLimitMinutes = limitMinutes.toInt(),
                                                 notificationIntervalSeconds = if (notifEnabled)
                                                     notifSeconds.toInt() else 0,
-                                                isEnabled                   = true
+                                                isEnabled = true
                                             )
                                         },
-                                        dailyLimitMinutes           = limitMinutes.toInt(),
+                                        dailyLimitMinutes = limitMinutes.toInt(),
                                         notificationIntervalSeconds = if (notifEnabled)
                                             notifSeconds.toInt() else 0,
-                                        isEnabled                   = true
+                                        isEnabled = true
                                     )
                                 )
                             } else {
                                 onSaveApp(
                                     AppRestriction(
-                                        id                          = initialApp?.id
+                                        id = initialApp?.id
                                             ?: System.currentTimeMillis().toString(),
-                                        appName                     = selectedApp!!.name,
-                                        packageName                 = selectedApp!!.packageName,
-                                        dailyLimitMinutes           = limitMinutes.toInt(),
+                                        appName = selectedApp!!.name,
+                                        packageName = selectedApp!!.packageName,
+                                        dailyLimitMinutes = limitMinutes.toInt(),
                                         notificationIntervalSeconds = if (notifEnabled)
                                             notifSeconds.toInt() else 0,
-                                        isEnabled                   = true
+                                        isEnabled = true
                                     )
                                 )
                             }
                         }
                     },
-                    enabled  = isValid,
+                    enabled = isValid,
                     modifier = Modifier.weight(1f),
-                    shape    = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(12.dp)
                 ) { Text(if (isEditing) "Guardar" else "Crear") }
             }
         }
@@ -534,9 +535,9 @@ fun AppLimitFormPreview() {
                 .padding(16.dp)
         ) {
             AppLimitFormCard(
-                onSaveApp   = {},
+                onSaveApp = {},
                 onSaveGroup = {},
-                onCancel    = {}
+                onCancel = {}
             )
         }
     }

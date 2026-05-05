@@ -26,14 +26,14 @@ fun RemindersScreen(
     onBack: () -> Unit
 ) {
     var showAddSheet by remember { mutableStateOf(false) }
-    val sheetState   = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     if (showAddSheet) {
         ModalBottomSheet(
             onDismissRequest = { showAddSheet = false },
-            sheetState       = sheetState,
-            shape            = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
-            containerColor   = MaterialTheme.colorScheme.background
+            sheetState = sheetState,
+            shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
+            containerColor = MaterialTheme.colorScheme.background
         ) {
             ReminderFormCard(
                 onSave = { data ->
@@ -50,19 +50,19 @@ fun RemindersScreen(
     Scaffold(
         topBar = {
             DayPilotTopBar(
-                title  = stringResource(R.string.reminders_title),
+                title = stringResource(R.string.reminders_title),
                 onBack = onBack
             )
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick            = { showAddSheet = true },
-                containerColor     = MaterialTheme.colorScheme.primary,
-                contentColor       = MaterialTheme.colorScheme.onPrimary,
-                shape              = RoundedCornerShape(16.dp)
+                onClick = { showAddSheet = true },
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+                shape = RoundedCornerShape(16.dp)
             ) {
                 Icon(
-                    imageVector        = Icons.Default.Add,
+                    imageVector = Icons.Default.Add,
                     contentDescription = stringResource(R.string.reminders_add)
                 )
             }
@@ -72,24 +72,24 @@ fun RemindersScreen(
         if (reminders.isEmpty()) {
             DayPilotEmptyState(
                 message = stringResource(R.string.reminders_empty),
-                icon    = Icons.Default.Add,
+                icon = Icons.Default.Add,
                 modifier = Modifier.padding(innerPadding)
             )
         } else {
             LazyColumn(
-                modifier        = Modifier
+                modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding),
-                contentPadding  = PaddingValues(16.dp),
+                contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 items(reminders, key = { it.id }) { reminder ->
                     ReminderCard(
-                        title     = reminder.title,
-                        time      = reminder.time,
+                        title = reminder.title,
+                        time = reminder.time,
                         isEnabled = reminder.isEnabled,
-                        onToggle  = { onToggleReminder(reminder.id, it) },
-                        onDelete  = { onDeleteReminder(reminder.id) }
+                        onToggle = { onToggleReminder(reminder.id, it) },
+                        onDelete = { onDeleteReminder(reminder.id) }
                     )
                 }
                 item { Spacer(Modifier.height(80.dp)) }

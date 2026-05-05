@@ -1,7 +1,6 @@
 package com.example.daypilot_test_desing.ui.components.basic
 
-import com.example.daypilot_test_desing.ui.model.ReactionType
-
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.*
 import androidx.compose.animation.fadeIn
@@ -32,18 +31,18 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
+import com.example.daypilot_test_desing.ui.model.ReactionType
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-// ── Tipos de reacción ────────────────────────────────────────────
 
 // ── Barra de reacciones ──────────────────────────────────────────
 @Composable
 fun DayPilotReactionBar(
+    modifier: Modifier = Modifier,
     selectedReaction: ReactionType? = null,
-    onReact: (ReactionType) -> Unit,
-    modifier: Modifier = Modifier
+    onReact: (ReactionType) -> Unit
 ) {
     Row(
         modifier = modifier
@@ -55,9 +54,9 @@ fun DayPilotReactionBar(
     ) {
         ReactionType.entries.forEach { reaction ->
             ReactionButton(
-                reaction   = reaction,
+                reaction = reaction,
                 isSelected = reaction == selectedReaction,
-                onReact    = onReact
+                onReact = onReact
             )
         }
     }
@@ -76,22 +75,22 @@ fun ReactionButton(
 
     val scale by animateFloatAsState(
         targetValue = when {
-            isPressed  -> 1.3f
+            isPressed -> 1.3f
             isSelected -> 1.15f
-            else       -> 1f
+            else -> 1f
         },
         animationSpec = spring(
             dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness    = Spring.StiffnessMedium
+            stiffness = Spring.StiffnessMedium
         ),
         label = "reaction_scale_${reaction.name}"
     )
 
     val offsetY by animateFloatAsState(
-        targetValue   = if (isPressed) -12f else 0f,
+        targetValue = if (isPressed) -12f else 0f,
         animationSpec = spring(
             dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness    = Spring.StiffnessMedium
+            stiffness = Spring.StiffnessMedium
         ),
         label = "reaction_offset_${reaction.name}"
     )
@@ -106,9 +105,9 @@ fun ReactionButton(
                     .padding(horizontal = 8.dp, vertical = 4.dp)
             ) {
                 Text(
-                    text       = reaction.label,
-                    style      = MaterialTheme.typography.labelSmall,
-                    color      = MaterialTheme.colorScheme.surface,
+                    text = stringResource(reaction.labelRes),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.surface,
                     fontWeight = FontWeight.SemiBold
                 )
             }
@@ -126,7 +125,7 @@ fun ReactionButton(
                 )
                 .clickable {
                     scope.launch {
-                        isPressed   = true
+                        isPressed = true
                         showTooltip = true
                         delay(150)
                         isPressed = false
@@ -138,8 +137,8 @@ fun ReactionButton(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text      = reaction.emoji,
-                fontSize  = 20.sp,
+                text = stringResource(reaction.emojiRes),
+                fontSize = 20.sp,
                 textAlign = TextAlign.Center
             )
         }
@@ -153,9 +152,9 @@ fun DayPilotReactionSummary(
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier              = modifier,
+        modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(6.dp),
-        verticalAlignment     = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically
     ) {
         reactions.filter { it.value > 0 }.forEach { (reaction, count) ->
             Row(
@@ -164,14 +163,14 @@ fun DayPilotReactionSummary(
                     .background(MaterialTheme.colorScheme.surfaceVariant)
                     .padding(horizontal = 8.dp, vertical = 4.dp),
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
-                verticalAlignment     = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = reaction.emoji, fontSize = 14.sp)
+                Text(text = stringResource(reaction.emojiRes), fontSize = 14.sp)
                 Text(
-                    text       = count.toString(),
-                    style      = MaterialTheme.typography.labelSmall,
+                    text = count.toString(),
+                    style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.SemiBold,
-                    color      = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
@@ -188,9 +187,9 @@ fun DayPilotReactionButton(
     var expanded by remember { mutableStateOf(false) }
 
     val rotation by animateFloatAsState(
-        targetValue   = if (expanded) 45f else 0f,
+        targetValue = if (expanded) 45f else 0f,
         animationSpec = tween(200),
-        label         = "icon_rotation"
+        label = "icon_rotation"
     )
 
     Box(modifier = modifier) {
@@ -209,10 +208,10 @@ fun DayPilotReactionButton(
             contentAlignment = Alignment.Center
         ) {
             Icon(
-                imageVector        = Icons.Default.Add,
+                imageVector = Icons.Default.Add,
                 contentDescription = null,
-                tint               = MaterialTheme.colorScheme.onPrimary,
-                modifier           = Modifier
+                tint = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier
                     .size(16.dp)
                     .rotate(rotation)
             )
@@ -222,18 +221,18 @@ fun DayPilotReactionButton(
         if (expanded) {
             Popup(
                 alignment = Alignment.TopEnd,
-                offset    = IntOffset(0, -120)
+                offset = IntOffset(0, -120)
             ) {
                 AnimatedVisibility(
                     visible = expanded,
-                    enter   = fadeIn(tween(150)) + scaleIn(
-                        animationSpec   = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
-                        initialScale    = 0f,
+                    enter = fadeIn(tween(150)) + scaleIn(
+                        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+                        initialScale = 0f,
                         transformOrigin = TransformOrigin(1f, 1f)
                     ),
-                    exit    = fadeOut(tween(100)) + scaleOut(
-                        animationSpec   = tween(100),
-                        targetScale     = 0f,
+                    exit = fadeOut(tween(100)) + scaleOut(
+                        animationSpec = tween(100),
+                        targetScale = 0f,
                         transformOrigin = TransformOrigin(1f, 1f)
                     )
                 ) {
@@ -248,19 +247,19 @@ fun DayPilotReactionButton(
                             )
                             .padding(horizontal = 8.dp, vertical = 6.dp),
                         horizontalArrangement = Arrangement.spacedBy(4.dp),
-                        verticalAlignment     = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         ReactionType.entries.forEach { reaction ->
                             var pressed by remember { mutableStateOf(false) }
                             val scale by animateFloatAsState(
-                                targetValue      = if (pressed) 1.4f else 1f,
-                                animationSpec    = tween(150),
-                                label            = "reaction_scale_${reaction.name}",
+                                targetValue = if (pressed) 1.4f else 1f,
+                                animationSpec = tween(150),
+                                label = "reaction_scale_${reaction.name}",
                                 finishedListener = {
                                     if (pressed) {
                                         onReact(reaction)
                                         expanded = false
-                                        pressed  = false
+                                        pressed = false
                                     }
                                 }
                             )
@@ -278,7 +277,7 @@ fun DayPilotReactionButton(
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
-                                    text     = reaction.emoji,
+                                    text = stringResource(reaction.emojiRes),
                                     fontSize = 20.sp,
                                     modifier = Modifier.scale(scale)
                                 )
@@ -306,22 +305,22 @@ fun DayPilotReactionsPreview() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text  = "Reacciona al resumen",
+                text = "Reacciona al resumen",
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             DayPilotReactionBar(
                 selectedReaction = selected,
-                onReact          = { selected = it }
+                onReact = { selected = it }
             )
 
             DayPilotReactionSummary(
                 reactions = mapOf(
-                    ReactionType.FIRE   to 3,
-                    ReactionType.CLAP   to 1,
+                    ReactionType.FIRE to 3,
+                    ReactionType.CLAP to 1,
                     ReactionType.STRONG to 5,
-                    ReactionType.STAR   to 2
+                    ReactionType.STAR to 2
                 )
             )
         }

@@ -5,10 +5,15 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -18,8 +23,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
 import com.example.daypilot_test_desing.ui.components.basic.TaskDot
+import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
 
 @Composable
 fun CalendarDayCard(
@@ -36,8 +41,8 @@ fun CalendarDayCard(
     val bgColor by animateColorAsState(
         targetValue = when {
             isSelected -> MaterialTheme.colorScheme.primary
-            isToday    -> MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
-            else       -> Color.Transparent
+            isToday -> MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
+            else -> Color.Transparent
         },
         animationSpec = tween(200),
         label = "day_bg"
@@ -45,10 +50,10 @@ fun CalendarDayCard(
 
     val textColor by animateColorAsState(
         targetValue = when {
-            isSelected        -> MaterialTheme.colorScheme.onPrimary
-            !isCurrentMonth   -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
-            isToday           -> MaterialTheme.colorScheme.primary
-            else              -> MaterialTheme.colorScheme.onSurface
+            isSelected -> MaterialTheme.colorScheme.onPrimary
+            !isCurrentMonth -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+            isToday -> MaterialTheme.colorScheme.primary
+            else -> MaterialTheme.colorScheme.onSurface
         },
         animationSpec = tween(200),
         label = "day_text"
@@ -101,7 +106,6 @@ fun CalendarDayCard(
 
 @Composable
 @Preview(showBackground = true)
-@Composable
 fun CalendarDayCardPreview() {
     DayPilotTheme(theme = DayPilotTheme.SAGE_GREEN, darkMode = true) {
         Column(

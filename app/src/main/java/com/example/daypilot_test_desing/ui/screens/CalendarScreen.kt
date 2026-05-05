@@ -28,6 +28,9 @@ import androidx.compose.material.icons.filled.List
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
+import com.example.daypilot_test_desing.ui.components.forms.DayPilotCalendar
+import com.example.daypilot_test_desing.ui.components.forms.TaskFormCard
+import com.example.daypilot_test_desing.ui.model.CalendarTaskDot
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -161,7 +164,7 @@ fun CalendarScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = selectedDifficulty?.label ?: "Dificultad",
+                                    text = selectedDifficulty?.let { stringResource(it.labelRes) } ?: stringResource(R.string.task_difficulty_label),
                                     style = MaterialTheme.typography.labelMedium,
                                     color = selectedDifficulty?.color
                                         ?: MaterialTheme.colorScheme.onSurfaceVariant
@@ -197,7 +200,7 @@ fun CalendarScreen(
                                 DropdownMenuItem(
                                     text = {
                                         Text(
-                                            text = diff.label,
+                                            text = stringResource(diff.labelRes),
                                             color = diff.color,
                                             fontWeight = if (selectedDifficulty == diff)
                                                 FontWeight.Bold else FontWeight.Normal
@@ -263,7 +266,7 @@ fun CalendarScreen(
                                         )
                                     }
                                     Text(
-                                        text = selectedCategory?.label ?: "Categoría",
+                                        text = selectedCategory?.let { stringResource(it.labelRes) } ?: stringResource(R.string.task_category_label),
                                         style = MaterialTheme.typography.labelMedium,
                                         color = selectedCategory?.color
                                             ?: MaterialTheme.colorScheme.onSurfaceVariant
@@ -300,7 +303,7 @@ fun CalendarScreen(
                                 DropdownMenuItem(
                                     text = {
                                         Text(
-                                            text = cat.label,
+                                            text = stringResource(cat.labelRes),
                                             color = cat.color,
                                             fontWeight = if (selectedCategory == cat)
                                                 FontWeight.Bold else FontWeight.Normal

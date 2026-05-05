@@ -1,15 +1,42 @@
 package com.example.daypilot_test_desing.ui.components.basic
 
-import androidx.compose.animation.core.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
 import kotlinx.coroutines.delay
 
 // ── Press scale compartido ───────────────────────────────────────
@@ -30,7 +57,7 @@ private fun rememberShakeOffset(trigger: Boolean): Float {
     LaunchedEffect(trigger) {
         if (trigger) {
             repeat(4) {
-                offset.animateTo(8f,  animationSpec = tween(50))
+                offset.animateTo(8f, animationSpec = tween(50))
                 offset.animateTo(-8f, animationSpec = tween(50))
             }
             offset.animateTo(0f, animationSpec = tween(50))
@@ -67,9 +94,9 @@ fun DayPilotButtonPrimary(
         shape = RoundedCornerShape(16.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.primary,
-            contentColor   = MaterialTheme.colorScheme.onPrimary,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
             disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-            disabledContentColor   = MaterialTheme.colorScheme.onSurfaceVariant
+            disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
         )
     ) {
         LaunchedEffect(pressed) {
@@ -195,9 +222,9 @@ fun DayPilotButtonError(
         shape = RoundedCornerShape(16.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.error,
-            contentColor   = MaterialTheme.colorScheme.onError,
+            contentColor = MaterialTheme.colorScheme.onError,
             disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-            disabledContentColor   = MaterialTheme.colorScheme.onSurfaceVariant
+            disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
         )
     ) {
         LaunchedEffect(pressed) {
@@ -236,7 +263,7 @@ fun DayPilotFAB(
         },
         modifier = modifier.scale(scale),
         containerColor = MaterialTheme.colorScheme.primary,
-        contentColor   = MaterialTheme.colorScheme.onPrimary,
+        contentColor = MaterialTheme.colorScheme.onPrimary,
         shape = RoundedCornerShape(16.dp)
     ) {
         LaunchedEffect(pressed) {
@@ -279,5 +306,23 @@ fun DayPilotIconButton(
             contentDescription = contentDescription,
             tint = tint
         )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DayPilotButtonPreview() {
+    DayPilotTheme(theme = DayPilotTheme.SAGE_GREEN, darkMode = true) {
+        Column(
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.background)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            DayPilotButtonPrimary(text = "Primary", onClick = {})
+            DayPilotButtonOutlined(text = "Outlined", onClick = {})
+            DayPilotButtonError(text = "Error", onClick = {})
+            DayPilotButtonText(text = "Text", onClick = {})
+        }
     }
 }

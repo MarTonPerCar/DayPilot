@@ -17,12 +17,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.ui.components.basic.DayPilotTextField
-import com.example.daypilot_test_desing.ui.model.ReminderFormDataF
 import com.example.daypilot_test_desing.ui.model.FrequencyType
+import com.example.daypilot_test_desing.ui.model.ReminderFormDataF
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
 import java.util.Calendar
 
@@ -35,61 +36,61 @@ fun ReminderFormCard(
 ) {
     val context = LocalContext.current
 
-    var title         by remember { mutableStateOf("") }
-    var frequency     by remember { mutableStateOf(FrequencyType.ONCE) }
-    var earlyWarning  by remember { mutableStateOf(false) }
-    var quickMinutes  by remember { mutableStateOf<Int?>(null) }
-    var selectedDate  by remember { mutableStateOf<Calendar?>(null) }
+    var title by remember { mutableStateOf("") }
+    var frequency by remember { mutableStateOf(FrequencyType.ONCE) }
+    var earlyWarning by remember { mutableStateOf(false) }
+    var quickMinutes by remember { mutableStateOf<Int?>(null) }
+    var selectedDate by remember { mutableStateOf<Calendar?>(null) }
 
     val isValid = title.isNotBlank() && (quickMinutes != null || selectedDate != null)
 
     val dateLabel = selectedDate?.let { cal ->
-        val day   = cal.get(Calendar.DAY_OF_MONTH)
+        val day = cal.get(Calendar.DAY_OF_MONTH)
         val month = cal.get(Calendar.MONTH) + 1
-        val year  = cal.get(Calendar.YEAR)
-        val hour  = cal.get(Calendar.HOUR_OF_DAY)
-        val min   = cal.get(Calendar.MINUTE)
+        val year = cal.get(Calendar.YEAR)
+        val hour = cal.get(Calendar.HOUR_OF_DAY)
+        val min = cal.get(Calendar.MINUTE)
         "%02d/%02d/%d %02d:%02d".format(day, month, year, hour, min)
     } ?: "Sin fecha seleccionada"
 
     Card(
-        modifier  = modifier.fillMaxWidth(),
-        shape     = RoundedCornerShape(24.dp),
-        colors    = CardDefaults.cardColors(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
         Column(
-            modifier            = Modifier
+            modifier = Modifier
                 .fillMaxWidth()
                 .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // ── Título ───────────────────────────────────────────
             Text(
-                text       = "Nuevo recordatorio",
-                style      = MaterialTheme.typography.titleMedium,
+                text = "Nuevo recordatorio",
+                style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
-                color      = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface
             )
 
             // ── Nombre ───────────────────────────────────────────
             DayPilotTextField(
-                value         = title,
+                value = title,
                 onValueChange = { title = it },
-                label         = "Nombre del recordatorio"
+                label = "Nombre del recordatorio"
             )
 
             // ── Accesos rápidos ──────────────────────────────────
             Text(
-                text  = "Acceso rápido",
+                text = "Acceso rápido",
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             Row(
-                modifier              = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 listOf(5, 10, 15, 30, 60).forEach { minutes ->
@@ -115,10 +116,10 @@ fun ReminderFormCard(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text       = if (minutes == 60) "1h" else "${minutes}m",
-                            style      = MaterialTheme.typography.labelMedium,
+                            text = if (minutes == 60) "1h" else "${minutes}m",
+                            style = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.SemiBold,
-                            color      = if (isSelected) MaterialTheme.colorScheme.onPrimary
+                            color = if (isSelected) MaterialTheme.colorScheme.onPrimary
                             else MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -127,13 +128,13 @@ fun ReminderFormCard(
 
             // ── Separador ────────────────────────────────────────
             Row(
-                modifier              = Modifier.fillMaxWidth(),
-                verticalAlignment     = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 HorizontalDivider(modifier = Modifier.weight(1f))
                 Text(
-                    text  = "o elige fecha y hora",
+                    text = "o elige fecha y hora",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -166,8 +167,8 @@ fun ReminderFormCard(
                     ).show()
                 },
                 modifier = Modifier.fillMaxWidth(),
-                shape    = RoundedCornerShape(12.dp),
-                colors   = ButtonDefaults.outlinedButtonColors(
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.outlinedButtonColors(
                     containerColor = if (selectedDate != null)
                         MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
                     else
@@ -175,13 +176,13 @@ fun ReminderFormCard(
                 )
             ) {
                 Icon(
-                    imageVector        = Icons.Default.CalendarMonth,
+                    imageVector = Icons.Default.CalendarMonth,
                     contentDescription = null,
-                    modifier           = Modifier.size(16.dp)
+                    modifier = Modifier.size(16.dp)
                 )
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    text  = dateLabel,
+                    text = dateLabel,
                     style = MaterialTheme.typography.labelMedium,
                     color = if (selectedDate != null)
                         MaterialTheme.colorScheme.primary
@@ -192,13 +193,13 @@ fun ReminderFormCard(
 
             // ── Frecuencia ────────────────────────────────────────
             Text(
-                text  = "Frecuencia",
+                text = "Frecuencia",
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             Row(
-                modifier              = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 FrequencyType.entries.forEach { freq ->
@@ -216,10 +217,10 @@ fun ReminderFormCard(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text       = freq.label,
-                            style      = MaterialTheme.typography.labelMedium,
+                            text = stringResource(freq.labelRes),
+                            style = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.SemiBold,
-                            color      = if (isSelected) MaterialTheme.colorScheme.onPrimary
+                            color = if (isSelected) MaterialTheme.colorScheme.onPrimary
                             else MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -228,9 +229,9 @@ fun ReminderFormCard(
 
             // ── Aviso previo ──────────────────────────────────────
             Card(
-                modifier  = Modifier.fillMaxWidth(),
-                shape     = RoundedCornerShape(14.dp),
-                colors    = CardDefaults.cardColors(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(14.dp),
+                colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceVariant
                 ),
                 elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
@@ -240,25 +241,25 @@ fun ReminderFormCard(
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 12.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment     = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column {
                         Text(
-                            text       = "Aviso previo",
-                            style      = MaterialTheme.typography.bodyMedium,
+                            text = "Aviso previo",
+                            style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.SemiBold,
-                            color      = MaterialTheme.colorScheme.onSurface
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
-                            text  = "Notifica 10 min antes",
+                            text = "Notifica 10 min antes",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                     Switch(
-                        checked         = earlyWarning,
+                        checked = earlyWarning,
                         onCheckedChange = { earlyWarning = it },
-                        colors          = SwitchDefaults.colors(
+                        colors = SwitchDefaults.colors(
                             checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
                             checkedTrackColor = MaterialTheme.colorScheme.primary
                         )
@@ -268,33 +269,33 @@ fun ReminderFormCard(
 
             // ── Botones ───────────────────────────────────────────
             Row(
-                modifier              = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 OutlinedButton(
-                    onClick  = onCancel,
+                    onClick = onCancel,
                     modifier = Modifier.weight(1f),
-                    shape    = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(12.dp)
                 ) {
                     Text("Cancelar")
                 }
                 Button(
-                    onClick  = {
+                    onClick = {
                         if (isValid) {
                             onSave(
                                 ReminderFormDataF(
-                                    title           = title,
-                                    frequencyType   = frequency,
-                                    earlyWarning    = earlyWarning,
-                                    quickMinutes    = quickMinutes,
+                                    title = title,
+                                    frequencyType = frequency,
+                                    earlyWarning = earlyWarning,
+                                    quickMinutes = quickMinutes,
                                     scheduledDateTime = selectedDate
                                 )
                             )
                         }
                     },
-                    enabled  = isValid,
+                    enabled = isValid,
                     modifier = Modifier.weight(1f),
-                    shape    = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(12.dp)
                 ) {
                     Text("Crear recordatorio")
                 }

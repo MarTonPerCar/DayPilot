@@ -1,21 +1,37 @@
 package com.example.daypilot_test_desing.ui.components.basic
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.daypilot_test_desing.ui.model.HomeSectionData
 import com.example.daypilot_test_desing.ui.model.ProgressFilter
+import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
 
 // ── Indicador visual por sección ─────────────────────────────────
 @Composable
@@ -47,18 +63,18 @@ fun HomeSectionIndicator(data: HomeSectionData, accentColor: Color) {
             val values = data.data.takeLast(7).map { day ->
                 when (data.currentFilter) {
                     ProgressFilter.POINTS -> day.points
-                    ProgressFilter.STEPS  -> day.steps
-                    ProgressFilter.TASKS  -> day.tasksCompleted
+                    ProgressFilter.STEPS -> day.steps
+                    ProgressFilter.TASKS -> day.tasksCompleted
                 }
             }
             val maxValue = values.maxOrNull() ?: 1
 
             Row(
-                modifier              = Modifier
+                modifier = Modifier
                     .fillMaxWidth()
                     .height(40.dp),
                 horizontalArrangement = Arrangement.spacedBy(2.dp),
-                verticalAlignment     = Alignment.Bottom
+                verticalAlignment = Alignment.Bottom
             ) {
                 values.forEach { value ->
                     Box(
@@ -120,14 +136,14 @@ fun HomeSectionIndicator(data: HomeSectionData, accentColor: Color) {
         is HomeSectionData.Rivalry -> {
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(
-                    text       = "🏆 #${data.position} de ${data.totalFriends}",
-                    style      = MaterialTheme.typography.labelMedium,
+                    text = "🏆 #${data.position} de ${data.totalFriends}",
+                    style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.Bold,
-                    color      = accentColor
+                    color = accentColor
                 )
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(3.dp),
-                    verticalAlignment     = Alignment.Bottom
+                    verticalAlignment = Alignment.Bottom
                 ) {
                     // Top 5
                     val topCount = minOf(5, data.totalFriends)
@@ -159,15 +175,39 @@ fun HomeSectionIndicator(data: HomeSectionData, accentColor: Color) {
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                text     = "${data.position}",
-                                style    = MaterialTheme.typography.labelSmall,
-                                color    = androidx.compose.ui.graphics.Color.White,
+                                text = "${data.position}",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = Color.White,
                                 fontSize = 8.sp
                             )
                         }
                     }
                 }
             }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun HomeSectionIndicatorPreview() {
+    DayPilotTheme(theme = DayPilotTheme.SAGE_GREEN, darkMode = true) {
+        Column(
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.background)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            HomeSectionIndicator(
+                data = HomeSectionData.Calendar(
+                    pendingTasks = 2,
+                    completedTasks = 3
+                ), accentColor = Color(0xFF4A7C59)
+            )
+            HomeSectionIndicator(
+                data = HomeSectionData.Rivalry(position = 2, totalFriends = 5),
+                accentColor = Color(0xFFB85C00)
+            )
         }
     }
 }

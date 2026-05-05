@@ -167,4 +167,110 @@
     <string name="common_minutes">Min.</string>
     <string name="common_days">Tage</string>
     <string name="common_streak">🔥 Serie</string>
+    <!-- App Picker -->
+    <string name="app_picker_title">App auswählen</string>
+    <string name="app_picker_group_title">Gruppen-Apps</string>
+    <string name="app_picker_selected_count">%1$d ausgewählt</string>
+    <string name="app_picker_search">Suchen</string>
+    <string name="app_picker_close">Schließen</string>
+    <string name="app_picker_confirm">Fertig</string>
+
+    <!-- Task categories -->
+    <string name="category_work">Arbeit</string>
+    <string name="category_study">Studium</string>
+    <string name="category_sport">Sport</string>
+    <string name="category_health">Gesundheit</string>
+    <string name="category_personal">Persönlich</string>
+    <string name="category_home">Zuhause</string>
+    <string name="category_other">Sonstiges</string>
+
+    <!-- Task difficulties -->
+    <string name="difficulty_easy">Einfach</string>
+    <string name="difficulty_medium">Mittel</string>
+    <string name="difficulty_hard">Schwer</string>
+
+    <!-- Progress filters -->
+    <string name="filter_points">Punkte</string>
+    <string name="filter_steps">Schritte</string>
+    <string name="filter_tasks">Aufgaben</string>
+
+    <!-- Month names -->
+    <string name="month_january">Januar</string>
+    <string name="month_february">Februar</string>
+    <string name="month_march">März</string>
+    <string name="month_april">April</string>
+    <string name="month_may">Mai</string>
+    <string name="month_june">Juni</string>
+    <string name="month_july">Juli</string>
+    <string name="month_august">August</string>
+    <string name="month_september">September</string>
+    <string name="month_october">Oktober</string>
+    <string name="month_november">November</string>
+    <string name="month_december">Dezember</string>
+
+    <!-- Day headers -->
+    <string name="day_mon">M</string>
+    <string name="day_tue">D</string>
+    <string name="day_wed">M</string>
+    <string name="day_thu">D</string>
+    <string name="day_fri">F</string>
+    <string name="day_sat">S</string>
+    <string name="day_sun">S</string>
+
+    <!-- Reaction emojis -->
+    <string name="reaction_fire_emoji">🔥</string>
+    <string name="reaction_clap_emoji">👏</string>
+    <string name="reaction_strong_emoji">💪</string>
+    <string name="reaction_star_emoji">⭐</string>
+
+    <!-- Reminder frequency -->
+    <string name="reminders_freq_once">Einmalig</string>
+    <string name="reminders_freq_daily">Täglich</string>
+    <string name="reminders_freq_weekly">Wöchentlich</string>
+
+    <!-- Home sections -->
+    <string name="section_calendar">Kalender</string>
+    <string name="section_progress">Fortschritt</string>
+    <string name="section_habits">Gewohnheiten</string>
+    <string name="section_rivalry">Rivalität</string>
+
+    <!-- Task form -->
+    <string name="task_new">Neue Aufgabe</string>
+    <string name="task_edit">Aufgabe bearbeiten</string>
+    <string name="task_save">Speichern</string>
+    <string name="task_create">Aufgabe erstellen</string>
+    <string name="task_title_label">Titel</string>
+    <string name="task_description_label">Beschreibung (optional)</string>
+    <string name="task_category_label">Kategorie</string>
+    <string name="task_difficulty_label">Schwierigkeitsgrad</string>
+    <string name="task_duration_label">Geschätzte Dauer</string>
+    <string name="task_section_info">Informationen</string>
+    <string name="task_section_details">Details</string>
+    <string name="task_section_reminder">Erinnerung</string>
+    <string name="task_section_recurrence">Wiederholung</string>
+    <string name="task_reminder_label">Erinnerung aktivieren</string>
+    <string name="task_reminder_description">Du erhältst eine Benachrichtigung</string>
+    <string name="task_recurring_label">Wiederkehrende Aufgabe</string>
+    <string name="task_recurring_description">Wiederholt sich alle X Tage</string>
+    <string name="task_recurring_repeat">Wiederholen alle</string>
+
+    <!-- Timers -->
+    <string name="timer_pomodoro">Pomodoro</string>
+    <string name="timer_pomodoro_desc">25 Min. Arbeit + 5 Min. Pause pro Sitzung</string>
+    <string name="timer_training">Training</string>
+    <string name="timer_training_desc">90 Minuten Sport</string>
+    <string name="timer_meditation">Meditation</string>
+    <string name="timer_meditation_desc">60 Minuten Konzentration</string>
+    <string name="timer_cooking">Kochen</string>
+    <string name="timer_cooking_desc">120 Minuten in der Küche</string>
+    <string name="timer_custom">Benutzerdefiniert</string>
+    <string name="timer_custom_desc">Wähle deine eigene Zeit</string>
+
+
+    <!-- Reaction labels -->
+    <string name="reaction_fire">Feuer</string>
+    <string name="reaction_clap">Applaus</string>
+    <string name="reaction_strong">Stärke</string>
+    <string name="reaction_star">Stern</string>
+
 </resources>

@@ -2,13 +2,21 @@ package com.example.daypilot_test_desing.ui.components.cards
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -182,9 +190,9 @@ fun RankingCardsPreview() {
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            RankingCard(name = "Ana López",    position = 1, points = 520, streak = 14)
-            RankingCard(name = "Carlos Ruiz",  position = 2, points = 480, streak = 9)
-            RankingCard(name = "Laura Sánchez",position = 3, points = 430, streak = 6)
+            RankingCard(name = "Ana López", position = 1, points = 520, streak = 14)
+            RankingCard(name = "Carlos Ruiz", position = 2, points = 480, streak = 9)
+            RankingCard(name = "Laura Sánchez", position = 3, points = 430, streak = 6)
             CurrentUserRankingCard(name = "Mario García", position = 4, points = 340, streak = 7)
             RankingCard(name = "Pedro Martín", position = 5, points = 290, streak = 3)
         }

@@ -1,5 +1,6 @@
 package com.example.daypilot_test_desing.ui.components.cards
 
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -20,15 +21,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
 import com.example.daypilot_test_desing.ui.model.TimerMode
+import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
 
 @Composable
 fun TimerCard(
+    modifier: Modifier = Modifier,
     mode: TimerMode,
     pointEarnedToday: Boolean = false,
     onStart: () -> Unit,
-    modifier: Modifier = Modifier,
     customMinutes: Int? = null
 ) {
     val duration = if (mode == TimerMode.CUSTOM && customMinutes != null)
@@ -79,7 +80,7 @@ fun TimerCard(
             // Info
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = mode.label,
+                    text = stringResource(mode.labelRes),
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onSurface
@@ -132,11 +133,16 @@ fun TimerCardPreview() {
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            TimerCard(mode = TimerMode.POMODORO,   pointEarnedToday = true,  onStart = {})
-            TimerCard(mode = TimerMode.TRAINING,   pointEarnedToday = false, onStart = {})
+            TimerCard(mode = TimerMode.POMODORO, pointEarnedToday = true, onStart = {})
+            TimerCard(mode = TimerMode.TRAINING, pointEarnedToday = false, onStart = {})
             TimerCard(mode = TimerMode.MEDITATION, pointEarnedToday = false, onStart = {})
-            TimerCard(mode = TimerMode.COOKING,    pointEarnedToday = false, onStart = {})
-            TimerCard(mode = TimerMode.CUSTOM,     pointEarnedToday = false, onStart = {}, customMinutes = 45)
+            TimerCard(mode = TimerMode.COOKING, pointEarnedToday = false, onStart = {})
+            TimerCard(
+                mode = TimerMode.CUSTOM,
+                pointEarnedToday = false,
+                onStart = {},
+                customMinutes = 45
+            )
         }
     }
 }

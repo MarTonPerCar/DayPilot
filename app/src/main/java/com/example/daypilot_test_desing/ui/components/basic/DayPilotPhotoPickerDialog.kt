@@ -1,11 +1,17 @@
 package com.example.daypilot_test_desing.ui.components.basic
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Image
-import androidx.compose.material3.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -21,14 +27,14 @@ fun DayPilotPhotoPickerDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                text       = "Cambiar foto",
-                style      = MaterialTheme.typography.titleMedium,
+                text = "Cambiar foto",
+                style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
         },
         text = {
             Text(
-                text  = "¿Desde dónde quieres elegir la foto?",
+                text = "¿Desde dónde quieres elegir la foto?",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -39,9 +45,9 @@ fun DayPilotPhotoPickerDialog(
                 onPickFromCamera()
             }) {
                 Icon(
-                    imageVector        = Icons.Default.CameraAlt,
+                    imageVector = Icons.Default.CameraAlt,
                     contentDescription = null,
-                    modifier           = Modifier.size(16.dp)
+                    modifier = Modifier.size(16.dp)
                 )
                 Spacer(Modifier.width(6.dp))
                 Text("Cámara")
@@ -53,9 +59,9 @@ fun DayPilotPhotoPickerDialog(
                 onPickFromGallery()
             }) {
                 Icon(
-                    imageVector        = Icons.Default.Image,
+                    imageVector = Icons.Default.Image,
                     contentDescription = null,
-                    modifier           = Modifier.size(16.dp)
+                    modifier = Modifier.size(16.dp)
                 )
                 Spacer(Modifier.width(6.dp))
                 Text("Galería")

@@ -2,19 +2,38 @@ package com.example.daypilot_test_desing.ui.components.forms
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.daypilot_test_desing.ui.components.basic.*
+import com.example.daypilot_test_desing.ui.components.basic.DayPilotButtonPrimary
+import com.example.daypilot_test_desing.ui.components.basic.DayPilotButtonText
+import com.example.daypilot_test_desing.ui.components.basic.DayPilotDropdownField
+import com.example.daypilot_test_desing.ui.components.basic.DayPilotPasswordField
+import com.example.daypilot_test_desing.ui.components.basic.DayPilotTextField
+import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
 
 @Composable
 fun AuthToggle(isLogin: Boolean, onToggle: (Boolean) -> Unit) {
@@ -26,14 +45,14 @@ fun AuthToggle(isLogin: Boolean, onToggle: (Boolean) -> Unit) {
         horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         ToggleOption(
-            text     = "Iniciar sesión",
+            text = "Iniciar sesión",
             selected = isLogin,
-            onClick  = { onToggle(true) }
+            onClick = { onToggle(true) }
         )
         ToggleOption(
-            text     = "Crear cuenta",
+            text = "Crear cuenta",
             selected = !isLogin,
-            onClick  = { onToggle(false) }
+            onClick = { onToggle(false) }
         )
     }
 }
@@ -52,7 +71,7 @@ fun ToggleOption(text: String, selected: Boolean, onClick: () -> Unit) {
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text  = text,
+            text = text,
             style = MaterialTheme.typography.labelLarge,
             color = if (selected) MaterialTheme.colorScheme.onPrimary
             else MaterialTheme.colorScheme.onSurfaceVariant
@@ -67,45 +86,45 @@ fun LoginCard(
     errorMessage: String = "",
     onLogin: (email: String, password: String) -> Unit
 ) {
-    var email    by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
     AuthCard {
         Text(
-            text       = "Iniciar sesión",
-            style      = MaterialTheme.typography.headlineSmall,
+            text = "Iniciar sesión",
+            style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
-            color      = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.onSurface
         )
 
         Spacer(Modifier.height(4.dp))
 
         DayPilotTextField(
-            value         = email,
+            value = email,
             onValueChange = { email = it },
-            label         = "Email",
-            keyboardType  = KeyboardType.Email,
-            isError       = errorMessage.isNotEmpty(),
+            label = "Email",
+            keyboardType = KeyboardType.Email,
+            isError = errorMessage.isNotEmpty(),
         )
 
         DayPilotPasswordField(
-            value         = password,
+            value = password,
             onValueChange = { password = it },
-            isError       = errorMessage.isNotEmpty(),
-            errorMessage  = errorMessage
+            isError = errorMessage.isNotEmpty(),
+            errorMessage = errorMessage
         )
 
         DayPilotButtonText(
-            text     = "¿Has olvidado tu contraseña?",
-            onClick  = {},
+            text = "¿Has olvidado tu contraseña?",
+            onClick = {},
             modifier = Modifier.align(Alignment.End)
         )
 
         DayPilotButtonPrimary(
-            text      = "Entrar",
-            onClick   = { onLogin(email, password) },
+            text = "Entrar",
+            onClick = { onLogin(email, password) },
             isLoading = isLoading,
-            hasError  = errorMessage.isNotEmpty()
+            hasError = errorMessage.isNotEmpty()
         )
     }
 }
@@ -118,11 +137,11 @@ fun RegisterCard(
     onRegister: (name: String, username: String, email: String, password: String, region: String) -> Unit,
     onSuccess: () -> Unit
 ) {
-    var name     by remember { mutableStateOf("") }
+    var name by remember { mutableStateOf("") }
     var username by remember { mutableStateOf("") }
-    var email    by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var region   by remember { mutableStateOf("Europe/Madrid") }
+    var region by remember { mutableStateOf("Europe/Madrid") }
 
     val regions = listOf(
         "Europe/Madrid",
@@ -138,52 +157,52 @@ fun RegisterCard(
 
     AuthCard {
         Text(
-            text       = "Crear cuenta",
-            style      = MaterialTheme.typography.headlineSmall,
+            text = "Crear cuenta",
+            style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
-            color      = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.onSurface
         )
 
         Spacer(Modifier.height(4.dp))
 
         DayPilotTextField(
-            value         = name,
+            value = name,
             onValueChange = { name = it },
-            label         = "Nombre"
+            label = "Nombre"
         )
 
         DayPilotTextField(
-            value         = username,
+            value = username,
             onValueChange = { username = it },
-            label         = "Nombre de usuario"
+            label = "Nombre de usuario"
         )
 
         DayPilotDropdownField(
-            value       = region,
-            options     = regions,
-            onSelect    = { region = it },
-            label       = "Región / zona horaria",
+            value = region,
+            options = regions,
+            onSelect = { region = it },
+            label = "Región / zona horaria",
             displayText = { it }
         )
 
         DayPilotTextField(
-            value         = email,
+            value = email,
             onValueChange = { email = it },
-            label         = "Email",
-            keyboardType  = KeyboardType.Email,
-            isError       = errorMessage.isNotEmpty()
+            label = "Email",
+            keyboardType = KeyboardType.Email,
+            isError = errorMessage.isNotEmpty()
         )
 
         DayPilotPasswordField(
-            value         = password,
+            value = password,
             onValueChange = { password = it },
-            isError       = errorMessage.isNotEmpty(),
-            errorMessage  = errorMessage
+            isError = errorMessage.isNotEmpty(),
+            errorMessage = errorMessage
         )
 
         DayPilotButtonPrimary(
-            text      = "Registrar",
-            onClick   = { onRegister(name, username, email, password, region) },
+            text = "Registrar",
+            onClick = { onRegister(name, username, email, password, region) },
             isLoading = isLoading
         )
     }
@@ -193,9 +212,9 @@ fun RegisterCard(
 @Composable
 fun AuthCard(content: @Composable ColumnScope.() -> Unit) {
     Card(
-        modifier  = Modifier.fillMaxWidth(),
-        shape     = RoundedCornerShape(24.dp),
-        colors    = CardDefaults.cardColors(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
@@ -209,3 +228,20 @@ fun AuthCard(content: @Composable ColumnScope.() -> Unit) {
             content = content
         )
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AuthComponentsPreview() {
+    DayPilotTheme(theme = DayPilotTheme.SAGE_GREEN, darkMode = true) {
+        Column(
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.background)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            AuthToggle(isLogin = true, onToggle = {})
+            LoginCard(onLogin = { _, _ -> })
+        }
+    }
+}

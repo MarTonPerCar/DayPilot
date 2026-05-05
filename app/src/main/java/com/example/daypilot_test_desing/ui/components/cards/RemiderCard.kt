@@ -1,10 +1,25 @@
 package com.example.daypilot_test_desing.ui.components.cards
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -13,7 +28,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
 
 @Composable
 fun ReminderCard(
@@ -30,7 +47,7 @@ fun ReminderCard(
         AlertDialog(
             onDismissRequest = { showDeleteConfirm = false },
             title = { Text("Eliminar recordatorio", fontWeight = FontWeight.Bold) },
-            text  = { Text("¿Seguro que quieres eliminar \"$title\"?") },
+            text = { Text("¿Seguro que quieres eliminar \"$title\"?") },
             confirmButton = {
                 TextButton(onClick = {
                     showDeleteConfirm = false
@@ -49,9 +66,9 @@ fun ReminderCard(
     }
 
     Card(
-        modifier  = modifier.fillMaxWidth(),
-        shape     = RoundedCornerShape(16.dp),
-        colors    = CardDefaults.cardColors(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -60,44 +77,70 @@ fun ReminderCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalAlignment     = Alignment.CenterVertically,
+            verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text       = title,
-                    style      = MaterialTheme.typography.titleSmall,
+                    text = title,
+                    style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.SemiBold,
-                    color      = if (isEnabled) MaterialTheme.colorScheme.onSurface
+                    color = if (isEnabled) MaterialTheme.colorScheme.onSurface
                     else MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text  = time,
+                    text = time,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
             IconButton(
-                onClick  = { showDeleteConfirm = true },
+                onClick = { showDeleteConfirm = true },
                 modifier = Modifier.size(32.dp)
             ) {
                 Icon(
-                    imageVector        = Icons.Default.Delete,
+                    imageVector = Icons.Default.Delete,
                     contentDescription = "Eliminar",
-                    tint               = MaterialTheme.colorScheme.error,
-                    modifier           = Modifier.size(16.dp)
+                    tint = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.size(16.dp)
                 )
             }
 
             Switch(
-                checked         = isEnabled,
+                checked = isEnabled,
                 onCheckedChange = onToggle,
-                colors          = SwitchDefaults.colors(
+                colors = SwitchDefaults.colors(
                     checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
                     checkedTrackColor = MaterialTheme.colorScheme.primary
                 )
             )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ReminderCardPreview() {
+    DayPilotTheme(theme = DayPilotTheme.SAGE_GREEN, darkMode = true) {
+        Column(
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.background)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            ReminderCard(
+                title = "Morning exercise",
+                time = "07:30",
+                isEnabled = true,
+                onToggle = {},
+                onDelete = {})
+            ReminderCard(
+                title = "Meditation",
+                time = "22:00",
+                isEnabled = false,
+                onToggle = {},
+                onDelete = {})
         }
     }
 }

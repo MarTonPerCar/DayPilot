@@ -11,11 +11,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.res.stringResource
+import com.example.daypilot_test_desing.ui.components.basic.HomeSectionIndicator
 import com.example.daypilot_test_desing.ui.model.HomeSection
-import androidx.compose.ui.res.stringResource
 import com.example.daypilot_test_desing.ui.model.HomeSectionData
 
 @Composable
@@ -47,10 +47,10 @@ fun HomeMenuCardInline(
 
         // Icono decorativo fondo
         Icon(
-            imageVector        = section.icon,
+            imageVector = section.icon,
             contentDescription = null,
-            tint               = section.accentColor.copy(alpha = 0.08f),
-            modifier           = Modifier
+            tint = section.accentColor.copy(alpha = 0.08f),
+            modifier = Modifier
                 .size(80.dp)
                 .align(Alignment.BottomEnd)
                 .offset(x = 10.dp, y = 10.dp)
@@ -59,7 +59,7 @@ fun HomeMenuCardInline(
 
         // Contenido
         Column(
-            modifier            = Modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(14.dp),
             verticalArrangement = Arrangement.SpaceBetween
@@ -73,20 +73,21 @@ fun HomeMenuCardInline(
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        imageVector        = section.icon,
+                        imageVector = section.icon,
                         contentDescription = null,
-                        tint               = section.accentColor,
-                        modifier           = Modifier.size(18.dp)
+                        tint = section.accentColor,
+                        modifier = Modifier.size(18.dp)
                     )
                 }
                 Text(
-                    text       = stringResource(section.titleRes),
-                    style      = MaterialTheme.typography.titleSmall,
+                    text = stringResource(section.titleRes),
+                    style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
-                    color      = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
 
             HomeSectionIndicator(data = data, accentColor = section.accentColor)
         }
     }
+}

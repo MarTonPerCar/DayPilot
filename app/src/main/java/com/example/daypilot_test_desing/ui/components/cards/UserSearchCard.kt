@@ -24,12 +24,12 @@ import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
 // ── Base compartida ──────────────────────────────────────────────
 @Composable
 private fun UserCardBase(
+    modifier: Modifier = Modifier,
     name: String,
     email: String,
     points: Int,
     streak: Int,
     avatarUrl: String? = null,
-    modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
     action: @Composable (() -> Unit)? = null
 ) {

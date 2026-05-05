@@ -9,11 +9,11 @@ enum class TimerMode(
     @StringRes val labelRes: Int,
     val durationMinutes: Int
 ) {
-    POMODORO(R.string.timer_pomodoro,   25),
-    TRAINING(R.string.timer_training,   90),
+    POMODORO(R.string.timer_pomodoro, 25),
+    TRAINING(R.string.timer_training, 90),
     MEDITATION(R.string.timer_meditation, 60),
-    COOKING(R.string.timer_cooking,    120),
-    CUSTOM(R.string.timer_custom,       30)
+    COOKING(R.string.timer_cooking, 120),
+    CUSTOM(R.string.timer_custom, 30)
 }
 
 data class TimerOption(

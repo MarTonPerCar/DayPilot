@@ -1,7 +1,5 @@
 package com.example.daypilot_test_desing.ui.model
 
-import com.example.daypilot_test_desing.ui.components.basic.ReactionType
-
 data class FriendWeeklySummary(
     val totalPoints: Int,
     val tasksCompleted: Int,

@@ -22,7 +22,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.ui.components.basic.*
 import com.example.daypilot_test_desing.ui.components.cards.TimerHubCard
 
@@ -350,5 +349,4 @@ fun TimerHubScreen(
             Spacer(Modifier.height(8.dp))
         }
     }
-}
 }

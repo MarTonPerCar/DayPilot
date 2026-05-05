@@ -4,25 +4,31 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.R
-import com.example.daypilot_test_desing.ui.components.basic.*
-import com.example.daypilot_test_desing.ui.components.forms.*
+import com.example.daypilot_test_desing.ui.components.forms.AuthToggle
+import com.example.daypilot_test_desing.ui.components.forms.LoginCard
+import com.example.daypilot_test_desing.ui.components.forms.RegisterCard
 
 @Composable
 fun AuthScreen(
@@ -37,9 +43,9 @@ fun AuthScreen(
     var isLogin by remember { mutableStateOf(true) }
 
     val rotation by animateFloatAsState(
-        targetValue   = if (isLogin) 0f else 180f,
+        targetValue = if (isLogin) 0f else 180f,
         animationSpec = tween(durationMillis = 600),
-        label         = "card_flip"
+        label = "card_flip"
     )
 
     val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
@@ -76,15 +82,15 @@ fun AuthScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .graphicsLayer {
-                        rotationY      = rotation
+                        rotationY = rotation
                         cameraDistance = 12f * density
                     }
             ) {
                 if (rotation <= 90f) {
                     LoginCard(
-                        isLoading    = isLoginLoading,
+                        isLoading = isLoginLoading,
                         errorMessage = loginError,
-                        onLogin      = onLoginClick
+                        onLogin = onLoginClick
                     )
                 }
 
@@ -95,9 +101,9 @@ fun AuthScreen(
                             .graphicsLayer { rotationY = 180f }
                     ) {
                         RegisterCard(
-                            isLoading    = isRegisterLoading,
+                            isLoading = isRegisterLoading,
                             errorMessage = registerError,
-                            onRegister   = { name, username, email, password, region ->
+                            onRegister = { name, username, email, password, region ->
                                 onRegisterClick(name, username, email, password, region)
                                 isLogin = true
                             },
@@ -108,7 +114,4 @@ fun AuthScreen(
             }
         }
     }
-}
-
-// ── Toggle ───────────────────────────────────────────────────────
 }

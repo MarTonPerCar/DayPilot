@@ -1,5 +1,7 @@
 package com.example.daypilot_test_desing.ui.screens
 
+import androidx.compose.ui.res.stringResource
+import com.example.daypilot_test_desing.R
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -34,7 +36,7 @@ fun TimerScreen(
 ) {
     val mode         = TimerMode.entries.find { it.name == timerMode } ?: TimerMode.TRAINING
     val totalSeconds = if (customMinutes > 0) customMinutes * 60 else mode.durationMinutes * 60
-    val label        = if (timerMode == "CUSTOM") "Personalizable" else mode.label
+    val label = if (timerMode == "CUSTOM") stringResource(R.string.timer_custom) else stringResource(mode.labelRes)
 
     var secondsLeft by remember { mutableIntStateOf(totalSeconds) }
     var isRunning   by remember { mutableStateOf(false) }

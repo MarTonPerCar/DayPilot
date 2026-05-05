@@ -166,7 +166,6 @@ fun SettingsScreen(
             ) {
                 DayPilotOptionSelector(
                     title          = stringResource(R.string.settings_language),
-                    subtitle       = selectedLanguage,
                     icon           = Icons.Default.Language,
                     selectedOption = selectedLanguage,
                     options        = listOf("Español", "English", "Deutsch"),

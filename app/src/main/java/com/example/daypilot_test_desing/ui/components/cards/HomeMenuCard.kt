@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -13,18 +12,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
+import com.example.daypilot_test_desing.ui.components.basic.HomeSectionIndicator
 import com.example.daypilot_test_desing.ui.model.DayProgress
-import com.example.daypilot_test_desing.ui.model.ProgressFilter
 import com.example.daypilot_test_desing.ui.model.HomeSection
 import com.example.daypilot_test_desing.ui.model.HomeSectionData
-import com.example.daypilot_test_desing.ui.components.basic.HomeSectionIndicator
+import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
 
 // ── Tipos de sección ─────────────────────────────────────────────
 
@@ -98,14 +94,13 @@ fun HomeMenuCard(
                         )
                     }
                     Text(
-                        text = section.title,
+                        text = stringResource(section.titleRes),
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                 }
 
-                // Indicador visual por sección
                 HomeSectionIndicator(data = data, accentColor = section.accentColor)
             }
         }
@@ -133,18 +128,18 @@ fun HomeMenuCardPreview() {
                     modifier = Modifier.weight(1f)
                 )
                 HomeMenuCard(
-                    section  = HomeSection.PROGRESS,
-                    data     = HomeSectionData.Progress(
+                    section = HomeSection.PROGRESS,
+                    data = HomeSectionData.Progress(
                         data = List(7) { index ->
                             DayProgress(
-                                day            = index + 1,
-                                points         = listOf(8, 12, 5, 15, 20, 10, 7)[index],
-                                steps          = listOf(1200, 2500, 800, 3000, 2200, 1500, 900)[index],
+                                day = index + 1,
+                                points = listOf(8, 12, 5, 15, 20, 10, 7)[index],
+                                steps = listOf(1200, 2500, 800, 3000, 2200, 1500, 900)[index],
                                 tasksCompleted = listOf(3, 5, 2, 6, 8, 4, 2)[index]
                             )
                         }
                     ),
-                    onClick  = {},
+                    onClick = {},
                     modifier = Modifier.weight(1f)
                 )
             }

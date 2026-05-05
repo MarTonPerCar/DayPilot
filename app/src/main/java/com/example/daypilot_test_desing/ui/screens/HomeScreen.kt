@@ -140,6 +140,3 @@ fun HomeScreen(
         }
     }
 }
-
-// ── HomeMenuCard inline ──────────────────────────────────────────
-}

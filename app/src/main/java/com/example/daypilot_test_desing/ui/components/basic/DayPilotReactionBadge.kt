@@ -1,13 +1,18 @@
 package com.example.daypilot_test_desing.ui.components.basic
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.daypilot_test_desing.ui.model.ReactionType
+import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
+import kotlin.collections.listOf
 
 @Composable
 fun DayPilotReactionBadge(
@@ -27,9 +32,9 @@ fun DayPilotReactionBadge(
                 avatarUrl = avatarUrl,
                 size      = 36
             )
-            // Emoji encima esquina inferior derecha
+
             Text(
-                text     = reaction.emoji,
+                text     = stringResource(reaction.emojiRes),
                 fontSize = 14.sp,
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
@@ -60,6 +65,18 @@ fun DayPilotReactionBadgeRow(
             DayPilotReactionBadge(
                 name     = name,
                 reaction = reaction
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DayPilotReactionBadgePreview() {
+    DayPilotTheme(theme = DayPilotTheme.SAGE_GREEN, darkMode = true) {
+        Box(Modifier.background(MaterialTheme.colorScheme.background).padding(16.dp)) {
+            DayPilotReactionBadgeRow(
+                reactions = listOf("Ana" to ReactionType.CLAP, "Carlos" to ReactionType.FIRE, "Laura" to ReactionType.STAR)
             )
         }
     }

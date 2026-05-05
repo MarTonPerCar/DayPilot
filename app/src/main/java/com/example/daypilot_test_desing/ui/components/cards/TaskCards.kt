@@ -1,17 +1,41 @@
 package com.example.daypilot_test_desing.ui.components.cards
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,18 +65,18 @@ fun TaskCard(
     modifier: Modifier = Modifier
 ) {
     val textColor by animateColorAsState(
-        targetValue   = if (isCompleted) MaterialTheme.colorScheme.onSurfaceVariant
+        targetValue = if (isCompleted) MaterialTheme.colorScheme.onSurfaceVariant
         else MaterialTheme.colorScheme.onSurface,
         animationSpec = tween(300),
-        label         = "text_color"
+        label = "text_color"
     )
 
     Card(
-        modifier  = modifier
+        modifier = modifier
             .fillMaxWidth()
             .clickable { onTap() },
-        shape     = RoundedCornerShape(16.dp),
-        colors    = CardDefaults.cardColors(
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
         elevation = CardDefaults.cardElevation(
@@ -63,45 +87,45 @@ fun TaskCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            verticalAlignment     = Alignment.CenterVertically,
+            verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Checkbox(
-                checked         = isCompleted,
+                checked = isCompleted,
                 onCheckedChange = onToggleComplete,
-                colors          = CheckboxDefaults.colors(
-                    checkedColor   = MaterialTheme.colorScheme.primary,
+                colors = CheckboxDefaults.colors(
+                    checkedColor = MaterialTheme.colorScheme.primary,
                     uncheckedColor = MaterialTheme.colorScheme.outline
                 )
             )
             Column(
-                modifier            = Modifier.weight(1f),
+                modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
-                    text       = title,
-                    style      = MaterialTheme.typography.titleSmall.copy(
+                    text = title,
+                    style = MaterialTheme.typography.titleSmall.copy(
                         textDecoration = if (isCompleted) TextDecoration.LineThrough
                         else TextDecoration.None
                     ),
                     fontWeight = FontWeight.SemiBold,
-                    color      = textColor,
-                    maxLines   = 2,
-                    overflow   = TextOverflow.Ellipsis
+                    color = textColor,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    verticalAlignment     = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     DifficultyChip(difficulty = difficulty)
                     CategoryChip(category = category)
                     DurationChip(minutes = durationMinutes)
                     if (hasReminder) {
                         Icon(
-                            imageVector        = Icons.Default.Notifications,
+                            imageVector = Icons.Default.Notifications,
                             contentDescription = "Recordatorio",
-                            modifier           = Modifier.size(14.dp),
-                            tint               = MaterialTheme.colorScheme.primary
+                            modifier = Modifier.size(14.dp),
+                            tint = MaterialTheme.colorScheme.primary
                         )
                     }
                 }
@@ -120,10 +144,10 @@ fun TaskMiniCard(
     modifier: Modifier = Modifier
 ) {
     val textColor by animateColorAsState(
-        targetValue   = if (isCompleted) MaterialTheme.colorScheme.onSurfaceVariant
+        targetValue = if (isCompleted) MaterialTheme.colorScheme.onSurfaceVariant
         else MaterialTheme.colorScheme.onSurface,
         animationSpec = tween(300),
-        label         = "mini_text_color"
+        label = "mini_text_color"
     )
 
     Row(
@@ -138,7 +162,7 @@ fun TaskMiniCard(
             )
             .clickable { onTap() }
             .padding(horizontal = 10.dp, vertical = 6.dp),
-        verticalAlignment     = Alignment.CenterVertically,
+        verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Box(
@@ -149,22 +173,22 @@ fun TaskMiniCard(
                 .background(difficulty.color)
         )
         Text(
-            text     = title,
-            style    = MaterialTheme.typography.bodySmall.copy(
+            text = title,
+            style = MaterialTheme.typography.bodySmall.copy(
                 textDecoration = if (isCompleted) TextDecoration.LineThrough
                 else TextDecoration.None
             ),
-            color    = textColor,
+            color = textColor,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.weight(1f)
         )
         if (isCompleted) {
             Icon(
-                imageVector        = Icons.Default.CheckCircle,
+                imageVector = Icons.Default.CheckCircle,
                 contentDescription = null,
-                modifier           = Modifier.size(14.dp),
-                tint               = MaterialTheme.colorScheme.primary
+                modifier = Modifier.size(14.dp),
+                tint = MaterialTheme.colorScheme.primary
             )
         }
     }
@@ -191,7 +215,7 @@ fun TaskDayCard(
             onDismissRequest = { showDeleteConfirm = false },
             title = {
                 Text(
-                    text       = "Eliminar tarea",
+                    text = "Eliminar tarea",
                     fontWeight = FontWeight.Bold
                 )
             },
@@ -204,7 +228,7 @@ fun TaskDayCard(
                     onDelete()
                 }) {
                     Text(
-                        text  = "Eliminar",
+                        text = "Eliminar",
                         color = MaterialTheme.colorScheme.error
                     )
                 }
@@ -219,24 +243,28 @@ fun TaskDayCard(
     }
 
     val textColor by animateColorAsState(
-        targetValue   = if (isCompleted) MaterialTheme.colorScheme.onSurfaceVariant
+        targetValue = if (isCompleted) MaterialTheme.colorScheme.onSurfaceVariant
         else MaterialTheme.colorScheme.onSurface,
         animationSpec = tween(300),
-        label         = "day_text_color"
+        label = "day_text_color"
     )
 
     Card(
-        modifier  = modifier
+        modifier = modifier
             .fillMaxWidth()
             .clickable { onTap() },
-        shape     = RoundedCornerShape(14.dp),
-        colors    = CardDefaults.cardColors(
+        shape = RoundedCornerShape(14.dp),
+        colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         // Barra de color por dificultad
-        Row(modifier = Modifier.fillMaxWidth().height(3.dp)) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(3.dp)
+        ) {
             Box(
                 modifier = Modifier
                     .weight(1f)
@@ -255,36 +283,36 @@ fun TaskDayCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 12.dp, vertical = 10.dp),
-            verticalAlignment     = Alignment.CenterVertically,
+            verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Checkbox(
-                checked         = isCompleted,
+                checked = isCompleted,
                 onCheckedChange = onToggleComplete,
-                colors          = CheckboxDefaults.colors(
-                    checkedColor   = MaterialTheme.colorScheme.primary,
+                colors = CheckboxDefaults.colors(
+                    checkedColor = MaterialTheme.colorScheme.primary,
                     uncheckedColor = MaterialTheme.colorScheme.outline
                 )
             )
 
             Column(
-                modifier            = Modifier.weight(1f),
+                modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text(
-                    text       = title,
-                    style      = MaterialTheme.typography.bodyMedium.copy(
+                    text = title,
+                    style = MaterialTheme.typography.bodyMedium.copy(
                         textDecoration = if (isCompleted) TextDecoration.LineThrough
                         else TextDecoration.None
                     ),
                     fontWeight = FontWeight.SemiBold,
-                    color      = textColor,
-                    maxLines   = 1,
-                    overflow   = TextOverflow.Ellipsis
+                    color = textColor,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    verticalAlignment     = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     CategoryChip(category = category)
                     DurationChip(minutes = durationMinutes)
@@ -294,25 +322,25 @@ fun TaskDayCard(
             // Botones editar / eliminar
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                 IconButton(
-                    onClick  = onEdit,
+                    onClick = onEdit,
                     modifier = Modifier.size(32.dp)
                 ) {
                     Icon(
-                        imageVector        = Icons.Default.Edit,
+                        imageVector = Icons.Default.Edit,
                         contentDescription = "Editar",
-                        tint               = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier           = Modifier.size(16.dp)
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(16.dp)
                     )
                 }
                 IconButton(
-                    onClick  = { showDeleteConfirm = true },
+                    onClick = { showDeleteConfirm = true },
                     modifier = Modifier.size(32.dp)
                 ) {
                     Icon(
-                        imageVector        = Icons.Default.Delete,
+                        imageVector = Icons.Default.Delete,
                         contentDescription = "Eliminar",
-                        tint               = MaterialTheme.colorScheme.error,
-                        modifier           = Modifier.size(16.dp)
+                        tint = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.size(16.dp)
                     )
                 }
             }
@@ -320,3 +348,35 @@ fun TaskDayCard(
     }
 }
 
+@Preview(showBackground = true)
+@Composable
+fun TaskCardsPreview() {
+    DayPilotTheme(theme = DayPilotTheme.SAGE_GREEN, darkMode = true) {
+        Column(
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.background)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            TaskCard(
+                title = "Finish TFG",
+                category = TaskCategory.STUDY,
+                difficulty = TaskDifficulty.HARD,
+                durationMinutes = 120,
+                isCompleted = false,
+                onToggleComplete = {},
+                onTap = {})
+            TaskMiniCard(title = "Team meeting", difficulty = TaskDifficulty.MEDIUM, onTap = {})
+            TaskDayCard(
+                title = "Presentation",
+                category = TaskCategory.WORK,
+                difficulty = TaskDifficulty.HARD,
+                durationMinutes = 60,
+                isCompleted = false,
+                onToggleComplete = {},
+                onTap = {},
+                onEdit = {},
+                onDelete = {})
+        }
+    }
+}

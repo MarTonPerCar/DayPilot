@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.ui.model.TaskCategory
@@ -24,7 +25,7 @@ fun DifficultyChip(difficulty: TaskDifficulty) {
             .padding(horizontal = 8.dp, vertical = 3.dp)
     ) {
         Text(
-            text = difficulty.label,
+            text = stringResource(difficulty.labelRes),
             style = MaterialTheme.typography.labelSmall,
             fontWeight = FontWeight.SemiBold,
             color = difficulty.color
@@ -49,7 +50,7 @@ fun CategoryChip(category: TaskCategory) {
             tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Text(
-            text = category.label,
+            text = stringResource(category.labelRes),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )

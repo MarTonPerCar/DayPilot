@@ -1,12 +1,25 @@
 package com.example.daypilot_test_desing.ui.components.basic
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBackIosNew
-import androidx.compose.material3.*
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
 
 // ── 1. TopBar simple con título ──────────────────────────────────
 @Composable
@@ -17,19 +30,19 @@ fun DayPilotTopBar(
     TopAppBar(
         title = {
             Text(
-                text       = title,
-                style      = MaterialTheme.typography.titleLarge,
+                text = title,
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
-                color      = MaterialTheme.colorScheme.onBackground
+                color = MaterialTheme.colorScheme.onBackground
             )
         },
         navigationIcon = {
             if (onBack != null) {
                 IconButton(onClick = onBack) {
                     Icon(
-                        imageVector        = Icons.Default.ArrowBack,
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Volver",
-                        tint               = MaterialTheme.colorScheme.onBackground
+                        tint = MaterialTheme.colorScheme.onBackground
                     )
                 }
             }
@@ -52,19 +65,19 @@ fun DayPilotTopBarWithAction(
     TopAppBar(
         title = {
             Text(
-                text       = title,
-                style      = MaterialTheme.typography.titleLarge,
+                text = title,
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
-                color      = MaterialTheme.colorScheme.onBackground
+                color = MaterialTheme.colorScheme.onBackground
             )
         },
         navigationIcon = {
             if (onBack != null) {
                 IconButton(onClick = onBack) {
                     Icon(
-                        imageVector        = Icons.Default.ArrowBack,
+                        imageVector = Icons.Default.ArrowBack,
                         contentDescription = "Volver",
-                        tint               = MaterialTheme.colorScheme.onBackground
+                        tint = MaterialTheme.colorScheme.onBackground
                     )
                 }
             }
@@ -72,9 +85,9 @@ fun DayPilotTopBarWithAction(
         actions = {
             IconButton(onClick = onAction) {
                 Icon(
-                    imageVector        = actionIcon,
+                    imageVector = actionIcon,
                     contentDescription = actionDescription,
-                    tint               = MaterialTheme.colorScheme.onBackground
+                    tint = MaterialTheme.colorScheme.onBackground
                 )
             }
         },
@@ -99,19 +112,19 @@ fun DayPilotTopBarWithTwoActions(
     TopAppBar(
         title = {
             Text(
-                text       = title,
-                style      = MaterialTheme.typography.titleLarge,
+                text = title,
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
-                color      = MaterialTheme.colorScheme.onBackground
+                color = MaterialTheme.colorScheme.onBackground
             )
         },
         navigationIcon = {
             if (onBack != null) {
                 IconButton(onClick = onBack) {
                     Icon(
-                        imageVector        = Icons.Default.ArrowBack,
+                        imageVector = Icons.Default.ArrowBack,
                         contentDescription = "Volver",
-                        tint               = MaterialTheme.colorScheme.onBackground
+                        tint = MaterialTheme.colorScheme.onBackground
                     )
                 }
             }
@@ -119,16 +132,16 @@ fun DayPilotTopBarWithTwoActions(
         actions = {
             IconButton(onClick = onFirstAction) {
                 Icon(
-                    imageVector        = firstActionIcon,
+                    imageVector = firstActionIcon,
                     contentDescription = firstActionDescription,
-                    tint               = MaterialTheme.colorScheme.onBackground
+                    tint = MaterialTheme.colorScheme.onBackground
                 )
             }
             IconButton(onClick = onSecondAction) {
                 Icon(
-                    imageVector        = secondActionIcon,
+                    imageVector = secondActionIcon,
                     contentDescription = secondActionDescription,
-                    tint               = MaterialTheme.colorScheme.onBackground
+                    tint = MaterialTheme.colorScheme.onBackground
                 )
             }
         },
@@ -151,19 +164,19 @@ fun DayPilotCenteredTopBar(
     CenterAlignedTopAppBar(
         title = {
             Text(
-                text       = title,
-                style      = MaterialTheme.typography.titleLarge,
+                text = title,
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
-                color      = MaterialTheme.colorScheme.onBackground
+                color = MaterialTheme.colorScheme.onBackground
             )
         },
         navigationIcon = {
             if (onBack != null) {
                 IconButton(onClick = onBack) {
                     Icon(
-                        imageVector        = Icons.Default.ArrowBack,
+                        imageVector = Icons.Default.ArrowBack,
                         contentDescription = "Volver",
-                        tint               = MaterialTheme.colorScheme.onBackground
+                        tint = MaterialTheme.colorScheme.onBackground
                     )
                 }
             }
@@ -172,9 +185,9 @@ fun DayPilotCenteredTopBar(
             if (actionIcon != null && onAction != null) {
                 IconButton(onClick = onAction) {
                     Icon(
-                        imageVector        = actionIcon,
+                        imageVector = actionIcon,
                         contentDescription = actionDescription,
-                        tint               = MaterialTheme.colorScheme.onBackground
+                        tint = MaterialTheme.colorScheme.onBackground
                     )
                 }
             }
@@ -183,4 +196,20 @@ fun DayPilotCenteredTopBar(
             containerColor = MaterialTheme.colorScheme.background
         )
     )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DayPilotTopBarsPreview() {
+    DayPilotTheme(theme = DayPilotTheme.SAGE_GREEN, darkMode = true) {
+        Column(Modifier.background(MaterialTheme.colorScheme.background)) {
+            DayPilotTopBar(title = "Simple")
+            DayPilotTopBar(title = "With back", onBack = {})
+            DayPilotTopBarWithAction(
+                title = "With action",
+                actionIcon = Icons.Default.Settings,
+                onAction = {}
+            )
+        }
+    }
 }
