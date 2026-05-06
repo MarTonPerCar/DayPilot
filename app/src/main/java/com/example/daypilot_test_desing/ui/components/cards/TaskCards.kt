@@ -39,11 +39,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.ui.components.basic.CategoryChip
 import com.example.daypilot_test_desing.ui.components.basic.DifficultyChip
 import com.example.daypilot_test_desing.ui.components.basic.DurationChip
@@ -51,7 +53,7 @@ import com.example.daypilot_test_desing.ui.model.TaskCategory
 import com.example.daypilot_test_desing.ui.model.TaskDifficulty
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
 
-// ── 1. TaskCard ──────────────────────────────────────────────────
+// ── 1. TaskCard ───────────────────────────────────────────────────
 @Composable
 fun TaskCard(
     title: String,
@@ -76,9 +78,7 @@ fun TaskCard(
             .fillMaxWidth()
             .clickable { onTap() },
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(
             defaultElevation = if (isCompleted) 0.dp else 2.dp
         )
@@ -123,7 +123,7 @@ fun TaskCard(
                     if (hasReminder) {
                         Icon(
                             imageVector = Icons.Default.Notifications,
-                            contentDescription = "Recordatorio",
+                            contentDescription = stringResource(R.string.task_reminder_icon),
                             modifier = Modifier.size(14.dp),
                             tint = MaterialTheme.colorScheme.primary
                         )
@@ -134,7 +134,7 @@ fun TaskCard(
     }
 }
 
-// ── 2. TaskMiniCard ──────────────────────────────────────────────
+// ── 2. TaskMiniCard ───────────────────────────────────────────────
 @Composable
 fun TaskMiniCard(
     title: String,
@@ -194,7 +194,7 @@ fun TaskMiniCard(
     }
 }
 
-// ── 3. TaskDayCard ───────────────────────────────────────────────
+// ── 3. TaskDayCard ────────────────────────────────────────────────
 @Composable
 fun TaskDayCard(
     title: String,
@@ -210,17 +210,18 @@ fun TaskDayCard(
 ) {
     var showDeleteConfirm by remember { mutableStateOf(false) }
 
+    // ── Diálogo de confirmación ───────────────────────────────────
     if (showDeleteConfirm) {
         AlertDialog(
             onDismissRequest = { showDeleteConfirm = false },
             title = {
                 Text(
-                    text = "Eliminar tarea",
+                    text = stringResource(R.string.task_delete_title),
                     fontWeight = FontWeight.Bold
                 )
             },
             text = {
-                Text("¿Seguro que quieres eliminar \"$title\"?")
+                Text(stringResource(R.string.task_delete_message, title))
             },
             confirmButton = {
                 TextButton(onClick = {
@@ -228,14 +229,14 @@ fun TaskDayCard(
                     onDelete()
                 }) {
                     Text(
-                        text = "Eliminar",
+                        text = stringResource(R.string.common_delete),
                         color = MaterialTheme.colorScheme.error
                     )
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteConfirm = false }) {
-                    Text("Cancelar")
+                    Text(stringResource(R.string.common_cancel))
                 }
             },
             shape = RoundedCornerShape(20.dp)
@@ -254,12 +255,10 @@ fun TaskDayCard(
             .fillMaxWidth()
             .clickable { onTap() },
         shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        // Barra de color por dificultad
+        // Barra de color por dificultad + categoría
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -327,7 +326,7 @@ fun TaskDayCard(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Edit,
-                        contentDescription = "Editar",
+                        contentDescription = stringResource(R.string.common_edit),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(16.dp)
                     )
@@ -338,7 +337,7 @@ fun TaskDayCard(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Delete,
-                        contentDescription = "Eliminar",
+                        contentDescription = stringResource(R.string.common_delete),
                         tint = MaterialTheme.colorScheme.error,
                         modifier = Modifier.size(16.dp)
                     )
@@ -348,6 +347,7 @@ fun TaskDayCard(
     }
 }
 
+// ── Preview ──────────────────────────────────────────────────────
 @Preview(showBackground = true)
 @Composable
 fun TaskCardsPreview() {
@@ -359,16 +359,21 @@ fun TaskCardsPreview() {
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             TaskCard(
-                title = "Finish TFG",
+                title = "Terminar TFG",
                 category = TaskCategory.STUDY,
                 difficulty = TaskDifficulty.HARD,
                 durationMinutes = 120,
                 isCompleted = false,
                 onToggleComplete = {},
-                onTap = {})
-            TaskMiniCard(title = "Team meeting", difficulty = TaskDifficulty.MEDIUM, onTap = {})
+                onTap = {}
+            )
+            TaskMiniCard(
+                title = "Reunión de equipo",
+                difficulty = TaskDifficulty.MEDIUM,
+                onTap = {}
+            )
             TaskDayCard(
-                title = "Presentation",
+                title = "Presentación",
                 category = TaskCategory.WORK,
                 difficulty = TaskDifficulty.HARD,
                 durationMinutes = 60,
@@ -376,7 +381,8 @@ fun TaskCardsPreview() {
                 onToggleComplete = {},
                 onTap = {},
                 onEdit = {},
-                onDelete = {})
+                onDelete = {}
+            )
         }
     }
 }

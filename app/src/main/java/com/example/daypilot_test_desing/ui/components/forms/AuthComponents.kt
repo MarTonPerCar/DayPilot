@@ -24,17 +24,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.ui.components.basic.DayPilotButtonPrimary
 import com.example.daypilot_test_desing.ui.components.basic.DayPilotButtonText
 import com.example.daypilot_test_desing.ui.components.basic.DayPilotDropdownField
 import com.example.daypilot_test_desing.ui.components.basic.DayPilotPasswordField
 import com.example.daypilot_test_desing.ui.components.basic.DayPilotTextField
+import com.example.daypilot_test_desing.ui.model.TimeZoneRegion
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
 
+// ── Toggle login / registro ───────────────────────────────────────
 @Composable
 fun AuthToggle(isLogin: Boolean, onToggle: (Boolean) -> Unit) {
     Row(
@@ -45,12 +49,12 @@ fun AuthToggle(isLogin: Boolean, onToggle: (Boolean) -> Unit) {
         horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         ToggleOption(
-            text = "Iniciar sesión",
+            text = stringResource(R.string.auth_login),
             selected = isLogin,
             onClick = { onToggle(true) }
         )
         ToggleOption(
-            text = "Crear cuenta",
+            text = stringResource(R.string.auth_register),
             selected = !isLogin,
             onClick = { onToggle(false) }
         )
@@ -79,7 +83,7 @@ fun ToggleOption(text: String, selected: Boolean, onClick: () -> Unit) {
     }
 }
 
-// ── Login Card ───────────────────────────────────────────────────
+// ── Login Card ────────────────────────────────────────────────────
 @Composable
 fun LoginCard(
     isLoading: Boolean = false,
@@ -91,7 +95,7 @@ fun LoginCard(
 
     AuthCard {
         Text(
-            text = "Iniciar sesión",
+            text = stringResource(R.string.auth_login),
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface
@@ -102,9 +106,9 @@ fun LoginCard(
         DayPilotTextField(
             value = email,
             onValueChange = { email = it },
-            label = "Email",
+            label = stringResource(R.string.email),
             keyboardType = KeyboardType.Email,
-            isError = errorMessage.isNotEmpty(),
+            isError = errorMessage.isNotEmpty()
         )
 
         DayPilotPasswordField(
@@ -115,13 +119,13 @@ fun LoginCard(
         )
 
         DayPilotButtonText(
-            text = "¿Has olvidado tu contraseña?",
+            text = stringResource(R.string.forgot_password),
             onClick = {},
             modifier = Modifier.align(Alignment.End)
         )
 
         DayPilotButtonPrimary(
-            text = "Entrar",
+            text = stringResource(R.string.auth_enter),
             onClick = { onLogin(email, password) },
             isLoading = isLoading,
             hasError = errorMessage.isNotEmpty()
@@ -129,35 +133,22 @@ fun LoginCard(
     }
 }
 
-// ── Register Card ────────────────────────────────────────────────
+// ── Register Card ─────────────────────────────────────────────────
 @Composable
 fun RegisterCard(
     isLoading: Boolean = false,
     errorMessage: String = "",
-    onRegister: (name: String, username: String, email: String, password: String, region: String) -> Unit,
-    onSuccess: () -> Unit
+    onRegister: (name: String, username: String, email: String, password: String, region: String) -> Unit
 ) {
     var name by remember { mutableStateOf("") }
     var username by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var region by remember { mutableStateOf("Europe/Madrid") }
-
-    val regions = listOf(
-        "Europe/Madrid",
-        "Atlantic/Canary",
-        "America/New_York",
-        "America/Los_Angeles",
-        "America/Mexico_City",
-        "America/Sao_Paulo",
-        "Asia/Tokyo",
-        "Asia/Shanghai",
-        "Australia/Sydney"
-    )
+    var region by remember { mutableStateOf(TimeZoneRegion.EUROPE_MADRID) }
 
     AuthCard {
         Text(
-            text = "Crear cuenta",
+            text = stringResource(R.string.auth_register),
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface
@@ -168,27 +159,27 @@ fun RegisterCard(
         DayPilotTextField(
             value = name,
             onValueChange = { name = it },
-            label = "Nombre"
+            label = stringResource(R.string.auth_name_label)
         )
 
         DayPilotTextField(
             value = username,
             onValueChange = { username = it },
-            label = "Nombre de usuario"
+            label = stringResource(R.string.auth_username_label)
         )
 
         DayPilotDropdownField(
             value = region,
-            options = regions,
+            options = TimeZoneRegion.entries,
             onSelect = { region = it },
-            label = "Región / zona horaria",
-            displayText = { it }
+            label = stringResource(R.string.auth_region_label),
+            displayText = { it.value }
         )
 
         DayPilotTextField(
             value = email,
             onValueChange = { email = it },
-            label = "Email",
+            label = stringResource(R.string.email),
             keyboardType = KeyboardType.Email,
             isError = errorMessage.isNotEmpty()
         )
@@ -201,22 +192,20 @@ fun RegisterCard(
         )
 
         DayPilotButtonPrimary(
-            text = "Registrar",
-            onClick = { onRegister(name, username, email, password, region) },
+            text = stringResource(R.string.auth_register_button),
+            onClick = { onRegister(name, username, email, password, region.value) },
             isLoading = isLoading
         )
     }
 }
 
-// ── AuthCard base ────────────────────────────────────────────────
+// ── AuthCard base ─────────────────────────────────────────────────
 @Composable
 fun AuthCard(content: @Composable ColumnScope.() -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(
@@ -230,6 +219,7 @@ fun AuthCard(content: @Composable ColumnScope.() -> Unit) {
     }
 }
 
+// ── Preview ──────────────────────────────────────────────────────
 @Preview(showBackground = true)
 @Composable
 fun AuthComponentsPreview() {

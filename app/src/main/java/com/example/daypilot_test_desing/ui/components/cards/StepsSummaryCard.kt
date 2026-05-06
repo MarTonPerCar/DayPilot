@@ -19,8 +19,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.ui.components.basic.SummaryStatCard
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
 
@@ -44,6 +47,7 @@ fun StepsSummaryCard(
                 .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            // ── Cabecera ──────────────────────────────────────────
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -55,24 +59,25 @@ fun StepsSummaryCard(
                     modifier = Modifier.size(22.dp)
                 )
                 Text(
-                    text = "Resumen semanal",
+                    text = stringResource(R.string.steps_summary_title),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
             }
 
+            // ── Grid de stats ─────────────────────────────────────
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 SummaryStatCard(
-                    label = "Total 7 días",
+                    label = stringResource(R.string.steps_summary_total_7days),
                     value = totalSteps7Days.toString(),
                     modifier = Modifier.weight(1f)
                 )
                 SummaryStatCard(
-                    label = "Mejor día",
+                    label = stringResource(R.string.steps_summary_best_day),
                     value = bestDaySteps.toString(),
                     modifier = Modifier.weight(1f)
                 )
@@ -82,12 +87,12 @@ fun StepsSummaryCard(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 SummaryStatCard(
-                    label = "Media diaria",
+                    label = stringResource(R.string.steps_summary_daily_average),
                     value = dailyAverage.toString(),
                     modifier = Modifier.weight(1f)
                 )
                 SummaryStatCard(
-                    label = "Racha meta",
+                    label = stringResource(R.string.steps_summary_goal_streak),
                     value = "${goalStreak}🔥",
                     modifier = Modifier.weight(1f)
                 )
@@ -96,12 +101,16 @@ fun StepsSummaryCard(
     }
 }
 
+// ── Preview ──────────────────────────────────────────────────────
+@Preview(showBackground = true)
 @Composable
 fun StepsSummaryCardPreview() {
     DayPilotTheme(theme = DayPilotTheme.SAGE_GREEN, darkMode = true) {
-        Box(modifier = Modifier
-            .background(MaterialTheme.colorScheme.background)
-            .padding(16.dp)) {
+        Box(
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.background)
+                .padding(16.dp)
+        ) {
             StepsSummaryCard(
                 totalSteps7Days = 42000,
                 bestDaySteps = 8500,

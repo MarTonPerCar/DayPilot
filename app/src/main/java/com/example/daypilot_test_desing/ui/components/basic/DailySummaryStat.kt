@@ -78,14 +78,14 @@ fun DailySummaryStatPreview() {
         ) {
             DailySummaryStat(
                 icon = Icons.AutoMirrored.Filled.DirectionsWalk,
-                label = "Steps",
+                label = "Pasos",
                 value = "1200",
                 subValue = "goal 2000",
                 modifier = Modifier.weight(1f)
             )
             DailySummaryStat(
                 icon = Icons.Default.CheckCircle,
-                label = "Tasks",
+                label = "Tareas",
                 value = "3/5",
                 subValue = "completed",
                 modifier = Modifier.weight(1f)

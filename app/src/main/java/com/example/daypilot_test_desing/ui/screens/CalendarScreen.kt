@@ -2,35 +2,30 @@ package com.example.daypilot_test_desing.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.ui.components.basic.*
-import com.example.daypilot_test_desing.ui.components.TaskFormCard
 import com.example.daypilot_test_desing.ui.components.cards.*
+import com.example.daypilot_test_desing.ui.components.DayPilotCalendar
+import com.example.daypilot_test_desing.ui.components.forms.TaskFormCard
+import com.example.daypilot_test_desing.ui.model.CalendarTaskData
+import com.example.daypilot_test_desing.ui.model.CalendarTaskDot
 import com.example.daypilot_test_desing.ui.model.TaskCategory
 import com.example.daypilot_test_desing.ui.model.TaskDifficulty
-import com.example.daypilot_test_desing.ui.model.CalendarTaskData
 import java.util.Calendar
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.List
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
-import com.example.daypilot_test_desing.ui.components.forms.DayPilotCalendar
-import com.example.daypilot_test_desing.ui.components.forms.TaskFormCard
-import com.example.daypilot_test_desing.ui.model.CalendarTaskDot
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -164,7 +159,8 @@ fun CalendarScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = selectedDifficulty?.let { stringResource(it.labelRes) } ?: stringResource(R.string.task_difficulty_label),
+                                    text = selectedDifficulty?.let { stringResource(it.labelRes) }
+                                        ?: stringResource(R.string.task_difficulty_label),
                                     style = MaterialTheme.typography.labelMedium,
                                     color = selectedDifficulty?.color
                                         ?: MaterialTheme.colorScheme.onSurfaceVariant
@@ -183,7 +179,7 @@ fun CalendarScreen(
                             onDismissRequest = { showDifficultyMenu = false }
                         ) {
                             DropdownMenuItem(
-                                text = { Text("Todas") },
+                                text = { Text(stringResource(R.string.calendar_filter_all)) },
                                 onClick = {
                                     selectedDifficulty = null
                                     showDifficultyMenu = false
@@ -266,7 +262,8 @@ fun CalendarScreen(
                                         )
                                     }
                                     Text(
-                                        text = selectedCategory?.let { stringResource(it.labelRes) } ?: stringResource(R.string.task_category_label),
+                                        text = selectedCategory?.let { stringResource(it.labelRes) }
+                                            ?: stringResource(R.string.task_category_label),
                                         style = MaterialTheme.typography.labelMedium,
                                         color = selectedCategory?.color
                                             ?: MaterialTheme.colorScheme.onSurfaceVariant
@@ -286,7 +283,7 @@ fun CalendarScreen(
                             onDismissRequest = { showCategoryMenu = false }
                         ) {
                             DropdownMenuItem(
-                                text = { Text("Todas") },
+                                text = { Text(stringResource(R.string.calendar_filter_all)) },
                                 onClick = {
                                     selectedCategory = null
                                     showCategoryMenu = false
@@ -339,32 +336,32 @@ fun CalendarScreen(
                 }
                 // ── Tareas del día ───────────────────────────────
                 DayPilotSectionHeader(
-                    title      = "Tareas del día $selectedDay",
-                    actionText = "+ Añadir",
-                    onAction   = {
+                    title = stringResource(R.string.calendar_day_tasks_title, selectedDay ?: 0),
+                    actionText = stringResource(R.string.calendar_add_task_action),
+                    onAction = {
                         dayForNewTask = selectedDay ?: 1
-                        showAddSheet  = true
+                        showAddSheet = true
                     }
                 )
 
                 if (tasksForSelectedDay.isEmpty()) {
                     DayPilotEmptyState(
-                        message  = stringResource(R.string.calendar_no_tasks),
+                        message = stringResource(R.string.calendar_no_tasks),
                         modifier = Modifier.height(100.dp)
                     )
                 } else {
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         tasksForSelectedDay.forEach { task ->
                             TaskDayCard(
-                                title            = task.title,
-                                category         = task.category,
-                                difficulty       = task.difficulty,
-                                durationMinutes  = task.duration,
-                                isCompleted      = task.isDone,
+                                title = task.title,
+                                category = task.category,
+                                difficulty = task.difficulty,
+                                durationMinutes = task.duration,
+                                isCompleted = task.isDone,
                                 onToggleComplete = { onToggleTask(task.id, it) },
-                                onTap            = { onTapTask(task.id) },
-                                onEdit           = { editingTaskId = task.id },
-                                onDelete         = { onDeleteTask(task.id) }
+                                onTap = { onTapTask(task.id) },
+                                onEdit = { editingTaskId = task.id },
+                                onDelete = { onDeleteTask(task.id) }
                             )
                         }
                     }

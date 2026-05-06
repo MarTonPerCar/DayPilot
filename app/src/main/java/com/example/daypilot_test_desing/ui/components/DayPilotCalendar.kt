@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.ui.components.forms
+package com.example.daypilot_test_desing.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -31,6 +31,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.daypilot_test_desing.R
 import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.ui.model.CalendarTaskDot
 import com.example.daypilot_test_desing.ui.model.Month
@@ -60,7 +61,6 @@ fun DayPilotCalendar(
     val daysInMonth = cal.getActualMaximum(Calendar.DAY_OF_MONTH)
     val firstDayOfWeek = cal.get(Calendar.DAY_OF_WEEK)
 
-    // Convierte domingo=1..sábado=7 a lunes=0..domingo=6
     val startOffset = (firstDayOfWeek + 5) % 7
 
     val monthNames = Month.entries.map { stringResource(it.nameRes) }
@@ -89,7 +89,7 @@ fun DayPilotCalendar(
                 IconButton(onClick = onPreviousMonth) {
                     Icon(
                         imageVector = Icons.Default.ChevronLeft,
-                        contentDescription = "Mes anterior",
+                        contentDescription = stringResource(R.string.calendar_prev_month),
                         tint = MaterialTheme.colorScheme.onSurface
                     )
                 }
@@ -102,7 +102,7 @@ fun DayPilotCalendar(
                 IconButton(onClick = onNextMonth) {
                     Icon(
                         imageVector = Icons.Default.ChevronRight,
-                        contentDescription = "Mes siguiente",
+                        contentDescription = stringResource(R.string.calendar_next_month),
                         tint = MaterialTheme.colorScheme.onSurface
                     )
                 }

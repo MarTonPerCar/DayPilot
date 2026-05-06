@@ -16,9 +16,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.daypilot_test_desing.R
+import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
 
+// ── Ítem de estadística individual ──────────────────────────────
 @Composable
 fun DayPilotStatItem(label: String, value: String) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -36,6 +41,7 @@ fun DayPilotStatItem(label: String, value: String) {
     }
 }
 
+// ── Fila de puntos y racha ───────────────────────────────────────
 @Composable
 fun DayPilotStatsRow(points: Int, streak: Int) {
     Row(
@@ -46,18 +52,42 @@ fun DayPilotStatsRow(points: Int, streak: Int) {
             .padding(horizontal = 10.dp, vertical = 6.dp),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        DayPilotStatItem(label = "Puntos", value = points.toString())
+        DayPilotStatItem(
+            label = stringResource(R.string.common_points),
+            value = points.toString()
+        )
         DayPilotStatVerticalDivider()
-        DayPilotStatItem(label = "Racha", value = "${streak}🔥")
+        DayPilotStatItem(
+            label = stringResource(R.string.common_streak),
+            value = streak.toString()
+        )
     }
 }
 
+// ── Divisor vertical ─────────────────────────────────────────────
 @Composable
-fun DayPilotStatVerticalDivider() {
+fun DayPilotStatVerticalDivider(height: androidx.compose.ui.unit.Dp = 28.dp) {
     Box(
         modifier = Modifier
-            .height(28.dp)
+            .height(height)
             .width(1.dp)
             .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.4f))
     )
+}
+
+// ── Preview ──────────────────────────────────────────────────────
+@Preview(showBackground = true)
+@Composable
+fun DayPilotStatItemPreview() {
+    DayPilotTheme(theme = DayPilotTheme.SAGE_GREEN, darkMode = true) {
+        Column(
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.background)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            DayPilotStatItem(label = "Puntos", value = "340")
+            DayPilotStatsRow(points = 340, streak = 7)
+        }
+    }
 }

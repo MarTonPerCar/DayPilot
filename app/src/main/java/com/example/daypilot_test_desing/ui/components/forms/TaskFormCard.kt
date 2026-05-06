@@ -43,7 +43,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
@@ -60,9 +59,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.R
+import com.example.daypilot_test_desing.ui.components.basic.dayPilotTextFieldColors
 import com.example.daypilot_test_desing.ui.model.TaskCategory
 import com.example.daypilot_test_desing.ui.model.TaskDifficulty
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
@@ -103,13 +102,13 @@ fun TaskFormCard(
                 value = title, onValueChange = { title = it },
                 label = { Text(stringResource(R.string.task_title_label)) },
                 singleLine = true, modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp), colors = formTextFieldColors()
+                shape = RoundedCornerShape(12.dp), colors = dayPilotTextFieldColors()
             )
             OutlinedTextField(
                 value = description, onValueChange = { description = it },
                 label = { Text(stringResource(R.string.task_description_label)) },
                 minLines = 2, maxLines = 4, modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp), colors = formTextFieldColors()
+                shape = RoundedCornerShape(12.dp), colors = dayPilotTextFieldColors()
             )
         }
 
@@ -433,19 +432,6 @@ fun DurationSelector(
     }
 }
 
-@Composable
-fun formTextFieldColors() = OutlinedTextFieldDefaults.colors(
-    focusedBorderColor = MaterialTheme.colorScheme.primary,
-    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-    focusedContainerColor = MaterialTheme.colorScheme.background,
-    unfocusedContainerColor = MaterialTheme.colorScheme.background,
-    focusedTextColor = MaterialTheme.colorScheme.onBackground,
-    unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
-    focusedLabelColor = MaterialTheme.colorScheme.primary,
-    unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
-)
-
-@Preview(showBackground = true)
 @Composable
 fun TaskFormCardPreview() {
     DayPilotTheme(theme = DayPilotTheme.SAGE_GREEN, darkMode = true) {

@@ -43,29 +43,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.daypilot_test_desing.R
+import com.example.daypilot_test_desing.navigation.MOCK_APPS
 
 data class AppInfo(
     val name: String,
     val packageName: String
 )
 
-val MOCK_APPS = listOf(
-    AppInfo("YouTube", "com.google.android.youtube"),
-    AppInfo("Instagram", "com.instagram.android"),
-    AppInfo("TikTok", "com.zhiliaoapp.musically"),
-    AppInfo("WhatsApp", "com.whatsapp"),
-    AppInfo("Twitter", "com.twitter.android"),
-    AppInfo("Facebook", "com.facebook.katana"),
-    AppInfo("Spotify", "com.spotify.music"),
-    AppInfo("Netflix", "com.netflix.mediaclient"),
-    AppInfo("Gmail", "com.google.android.gm"),
-    AppInfo("Chrome", "com.android.chrome"),
-    AppInfo("Maps", "com.google.android.apps.maps"),
-    AppInfo("Telegram", "org.telegram.messenger"),
-    AppInfo("Discord", "com.discord"),
-    AppInfo("Twitch", "tv.twitch.android.app"),
-    AppInfo("Amazon", "com.amazon.mShop.android.shopping")
-)
+
 
 // ── Picker app única ─────────────────────────────────────────────
 @Composable

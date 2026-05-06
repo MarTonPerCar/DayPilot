@@ -21,6 +21,8 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.ui.components.basic.DayPilotTopBar
 import kotlinx.coroutines.delay
 
@@ -87,7 +89,7 @@ fun PomodoroScreen(
     Scaffold(
         topBar = {
             DayPilotTopBar(
-                title  = "Pomodoro",
+                title = stringResource(R.string.pomodoro_title),
                 onBack = onBack
             )
         },
@@ -140,9 +142,9 @@ fun PomodoroScreen(
                     fontSize = 14.sp
                 )
                 Text(
-                    text       = if (isFinished) "¡Completado!"
-                    else if (isWorkPhase) "Sesión $currentSession de $totalSessions — Trabajo"
-                    else "Sesión $currentSession de $totalSessions — Descanso",
+                    text       = if (isFinished) stringResource(R.string.pomodoro_completed)
+                    else if (isWorkPhase) stringResource(R.string.pomodoro_session_work, currentSession, totalSessions)
+                    else stringResource(R.string.pomodoro_session_break, currentSession, totalSessions),
                     style      = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.SemiBold,
                     color      = arcColor
@@ -188,7 +190,7 @@ fun PomodoroScreen(
                         color      = MaterialTheme.colorScheme.onBackground
                     )
                     Text(
-                        text  = if (isWorkPhase) "25 min trabajo" else "5 min descanso",
+                        text = if (isWorkPhase) stringResource(R.string.pomodoro_work_label) else stringResource(R.string.pomodoro_break_label),
                         style = MaterialTheme.typography.bodyMedium,
                         color = arcColor
                     )
@@ -217,7 +219,7 @@ fun PomodoroScreen(
                     }) {
                         Icon(
                             imageVector        = Icons.Default.Refresh,
-                            contentDescription = "Reiniciar",
+                            contentDescription = stringResource(R.string.pomodoro_reset),
                             tint               = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier           = Modifier.size(24.dp)
                         )
@@ -242,7 +244,7 @@ fun PomodoroScreen(
                         Icon(
                             imageVector        = if (isRunning) Icons.Default.Pause
                             else Icons.Default.PlayArrow,
-                            contentDescription = if (isRunning) "Pausar" else "Iniciar",
+                            contentDescription = if (isRunning) stringResource(R.string.pomodoro_pause) else stringResource(R.string.pomodoro_start),
                             tint               = if (isFinished)
                                 MaterialTheme.colorScheme.onSurfaceVariant
                             else Color.White,
@@ -278,7 +280,7 @@ fun PomodoroScreen(
                     }) {
                         Icon(
                             imageVector        = Icons.Default.SkipNext,
-                            contentDescription = "Saltar fase",
+                            contentDescription = stringResource(R.string.pomodoro_skip),
                             tint               = arcColor,
                             modifier           = Modifier.size(24.dp)
                         )
@@ -300,7 +302,7 @@ fun PomodoroScreen(
                 ) {
                     Text(text = "⭐", fontSize = 16.sp)
                     Text(
-                        text       = "¡Todas las sesiones completadas!",
+                        text = stringResource(R.string.pomodoro_all_done),
                         style      = MaterialTheme.typography.labelMedium,
                         fontWeight = FontWeight.SemiBold,
                         color      = MaterialTheme.colorScheme.primary

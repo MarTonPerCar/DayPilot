@@ -28,6 +28,7 @@ import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
 
 @Composable
 fun CalendarDayCard(
+    modifier: Modifier = Modifier,
     day: Int,
     isToday: Boolean = false,
     isSelected: Boolean = false,
@@ -35,8 +36,7 @@ fun CalendarDayCard(
     hasMediumTask: Boolean = false,
     hasHardTask: Boolean = false,
     isCurrentMonth: Boolean = true,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    onClick: () -> Unit
 ) {
     val bgColor by animateColorAsState(
         targetValue = when {

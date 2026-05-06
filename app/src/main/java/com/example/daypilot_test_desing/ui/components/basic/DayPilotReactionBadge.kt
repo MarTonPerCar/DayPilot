@@ -1,8 +1,14 @@
 package com.example.daypilot_test_desing.ui.components.basic
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -12,29 +18,28 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.daypilot_test_desing.ui.model.ReactionType
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
-import kotlin.collections.listOf
 
 @Composable
 fun DayPilotReactionBadge(
+    modifier: Modifier = Modifier,
     name: String,
     reaction: ReactionType,
-    avatarUrl: String? = null,
-    modifier: Modifier = Modifier
+    avatarUrl: String? = null
 ) {
     Column(
-        modifier            = modifier,
+        modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         Box {
             DayPilotAvatar(
-                name      = name,
+                name = name,
                 avatarUrl = avatarUrl,
-                size      = 36
+                size = 36
             )
 
             Text(
-                text     = stringResource(reaction.emojiRes),
+                text = stringResource(reaction.emojiRes),
                 fontSize = 14.sp,
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
@@ -42,7 +47,7 @@ fun DayPilotReactionBadge(
             )
         }
         Text(
-            text  = name.split(" ").first(), // solo el nombre
+            text = name.split(" ").first(),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -57,13 +62,13 @@ fun DayPilotReactionBadgeRow(
     if (reactions.isEmpty()) return
 
     Row(
-        modifier              = modifier,
+        modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalAlignment     = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically
     ) {
         reactions.forEach { (name, reaction) ->
             DayPilotReactionBadge(
-                name     = name,
+                name = name,
                 reaction = reaction
             )
         }
@@ -74,9 +79,15 @@ fun DayPilotReactionBadgeRow(
 @Composable
 fun DayPilotReactionBadgePreview() {
     DayPilotTheme(theme = DayPilotTheme.SAGE_GREEN, darkMode = true) {
-        Box(Modifier.background(MaterialTheme.colorScheme.background).padding(16.dp)) {
+        Box(Modifier
+            .background(MaterialTheme.colorScheme.background)
+            .padding(16.dp)) {
             DayPilotReactionBadgeRow(
-                reactions = listOf("Ana" to ReactionType.CLAP, "Carlos" to ReactionType.FIRE, "Laura" to ReactionType.STAR)
+                reactions = listOf(
+                    "Ana" to ReactionType.CLAP,
+                    "Carlos" to ReactionType.FIRE,
+                    "Laura" to ReactionType.STAR
+                )
             )
         }
     }

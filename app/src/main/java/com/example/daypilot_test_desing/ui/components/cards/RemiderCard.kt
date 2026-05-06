@@ -27,9 +27,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
 
 @Composable
@@ -43,22 +45,33 @@ fun ReminderCard(
 ) {
     var showDeleteConfirm by remember { mutableStateOf(false) }
 
+    // ── Diálogo de confirmación ───────────────────────────────────
     if (showDeleteConfirm) {
         AlertDialog(
             onDismissRequest = { showDeleteConfirm = false },
-            title = { Text("Eliminar recordatorio", fontWeight = FontWeight.Bold) },
-            text = { Text("¿Seguro que quieres eliminar \"$title\"?") },
+            title = {
+                Text(
+                    stringResource(R.string.reminder_delete_title),
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Text(stringResource(R.string.reminder_delete_message, title))
+            },
             confirmButton = {
                 TextButton(onClick = {
                     showDeleteConfirm = false
                     onDelete()
                 }) {
-                    Text("Eliminar", color = MaterialTheme.colorScheme.error)
+                    Text(
+                        stringResource(R.string.common_delete),
+                        color = MaterialTheme.colorScheme.error
+                    )
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteConfirm = false }) {
-                    Text("Cancelar")
+                    Text(stringResource(R.string.common_cancel))
                 }
             },
             shape = RoundedCornerShape(20.dp)
@@ -68,9 +81,7 @@ fun ReminderCard(
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
@@ -101,7 +112,7 @@ fun ReminderCard(
             ) {
                 Icon(
                     imageVector = Icons.Default.Delete,
-                    contentDescription = "Eliminar",
+                    contentDescription = stringResource(R.string.common_delete),
                     tint = MaterialTheme.colorScheme.error,
                     modifier = Modifier.size(16.dp)
                 )
@@ -119,6 +130,7 @@ fun ReminderCard(
     }
 }
 
+// ── Preview ──────────────────────────────────────────────────────
 @Preview(showBackground = true)
 @Composable
 fun ReminderCardPreview() {
@@ -130,17 +142,19 @@ fun ReminderCardPreview() {
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             ReminderCard(
-                title = "Morning exercise",
+                title = "Ejercicio mañanero",
                 time = "07:30",
                 isEnabled = true,
                 onToggle = {},
-                onDelete = {})
+                onDelete = {}
+            )
             ReminderCard(
-                title = "Meditation",
+                title = "Meditación",
                 time = "22:00",
                 isEnabled = false,
                 onToggle = {},
-                onDelete = {})
+                onDelete = {}
+            )
         }
     }
 }

@@ -109,7 +109,6 @@
 
     <!-- Timer -->
     <string name="timer_completed">Completed! 🎉</string>
-    <string name="timer_point_earned">Daily point earned</string>
     <string name="timer_restart">Restart</string>
 
     <!-- Progress -->
@@ -272,5 +271,242 @@
     <string name="reaction_clap">Applause</string>
     <string name="reaction_strong">Strength</string>
     <string name="reaction_star">Star</string>
+
+
+    <!-- Selectores -->
+    <string name="selector_theme_title">Color theme</string>
+    <string name="selector_dark_mode">Dark mode</string>
+    <string name="selector_dark_mode_on">Enabled</string>
+    <string name="selector_dark_mode_off">Disabled</string>
+    <string name="theme_sage_green">Sage Green</string>
+    <string name="theme_ocean">Ocean Blue</string>
+    <string name="theme_lavender">Lavender Purple</string>
+    <string name="theme_amber">Amber Orange</string>
+    <string name="theme_amoled">Pure Black</string>
+
+
+    <string name="password_show">Show password</string>
+    <string name="password_hide">Hide password</string>
+
+
+    <!-- Home Section Indicator -->
+    <string name="indicator_tasks_progress">%1$d/%2$d tasks</string>
+    <string name="indicator_steps_progress">👣 %1$d%% steps</string>
+    <string name="indicator_timer_done">Timer completed</string>
+    <string name="indicator_timer_pending">Timer pending</string>
+    <string name="indicator_rivalry_position">🏆 #%1$d of %2$d</string>
+
+
+    <!-- App Limit Card -->
+    <string name="tech_health_delete_app_title">Delete restriction</string>
+    <string name="tech_health_delete_app_message">The restriction for \"%1$s\" will be deleted tomorrow. It will remain active today if you\'ve already used the app.</string>
+    <string name="tech_health_delete_tomorrow">Delete tomorrow</string>
+    <string name="tech_health_app_badge">App</string>
+    <string name="tech_health_pending_delete">🗑 Deleting tomorrow</string>
+    <string name="tech_health_usage_today">Today: %1$d / %2$d min</string>
+    <string name="tech_health_notif_interval">Notif: every %1$ds</string>
+
+
+    <string name="common_edit">Edit</string>
+
+
+    <!-- Daily Summary Card -->
+    <string name="daily_summary_hello">Hello, %1$s!</string>
+    <string name="daily_summary_subtitle">Today\'s summary</string>
+    <string name="daily_summary_streak_days">%1$d days</string>
+    <string name="daily_summary_steps_goal">goal %1$d</string>
+    <string name="daily_summary_tasks_completed">completed</string>
+    <string name="daily_summary_points_today">today</string>
+    <string name="daily_summary_ranking_among">among friends</string>
+    <string name="daily_summary_label_steps">Steps</string>
+    <string name="daily_summary_label_tasks">Tasks</string>
+    <string name="daily_summary_label_points">Points</string>
+    <string name="daily_summary_label_ranking">Ranking</string>
+
+
+    <!-- Group Limit Card -->
+    <string name="tech_health_delete_group_title">Delete group</string>
+    <string name="tech_health_delete_group_message">The group \"%1$s\" will be deleted tomorrow. It will remain active today if you\'ve already used the apps.</string>
+    <string name="tech_health_group_badge">Group</string>
+    <string name="tech_health_group_apps_count">%1$d apps</string>
+    <string name="tech_health_group_hide_apps">▲ Hide apps</string>
+    <string name="tech_health_group_show_apps">▼ Show apps (%1$d)</string>
+
+
+    <!-- Profile Stats Card -->
+    <string name="profile_level_badge">⚡ Level %1$d</string>
+    <string name="profile_level_progress">Progress level %1$d</string>
+    <string name="profile_level_points">%1$d / %2$d pts</string>
+    <string name="profile_stat_total_points">Total points</string>
+    <string name="profile_stat_current_streak">Current streak</string>
+    <string name="profile_stat_best_streak">Best streak</string>
+
+
+    <!-- Progress Chart Card -->
+    <string name="progress_chart_points">⭐ Points</string>
+    <string name="progress_chart_steps">👣 Steps</string>
+    <string name="progress_chart_tasks">✅ Completed tasks</string>
+    <string name="progress_chart_total">Total</string>
+    <string name="progress_chart_average">Average</string>
+    <string name="progress_chart_best">Best</string>
+
+
+    <!-- Ranking Card -->
+    <string name="ranking_streak">%1$d🔥 streak</string>
+    <string name="ranking_points">points</string>
+
+
+    <!-- Reminder Card -->
+    <string name="reminder_delete_title">Delete reminder</string>
+    <string name="reminder_delete_message">Are you sure you want to delete \"%1$s\"?</string>
+
+
+    <!-- Stats Card -->
+    <string name="stats_daily_summary">Daily summary</string>
+    <string name="stats_ranking">Ranking</string>
+    <string name="stats_points_today">Points today</string>
+    <string name="stats_label_tasks">Tasks</string>
+    <string name="stats_label_steps">Steps</string>
+    <string name="stats_label_habits">Habits</string>
+    <string name="stats_label_timer">Timer</string>
+
+
+    <!-- Steps Card -->
+    <string name="steps_label">Steps</string>
+    <string name="steps_configure_goal">Configure goal</string>
+    <string name="steps_goal_sheet_title">Configure steps goal</string>
+    <string name="steps_goal_value">%1$d steps</string>
+    <string name="steps_goal_of">of %1$d</string>
+    <string name="steps_quick_goals">Quick goals</string>
+    <string name="steps_milestones">Milestones</string>
+    <string name="steps_next_milestone">Next milestone</string>
+    <string name="steps_points_earned">Points earned today</string>
+    <string name="steps_pts_value">%1$d pts</string>
+    <string name="steps_goal_reached">Goal reached!</string>
+
+
+    <!-- Steps Summary Card -->
+    <string name="steps_summary_title">Weekly summary</string>
+    <string name="steps_summary_total_7days">Total 7 days</string>
+    <string name="steps_summary_best_day">Best day</string>
+    <string name="steps_summary_daily_average">Daily average</string>
+    <string name="steps_summary_goal_streak">Goal streak</string>
+
+
+    <!-- Task Cards -->
+    <string name="task_reminder_icon">Reminder</string>
+    <string name="task_delete_title">Delete task</string>
+    <string name="task_delete_message">Are you sure you want to delete \"%1$s\"?</string>
+
+
+    <!-- Timer Card -->
+    <string name="timer_duration_minutes">%1$d min</string>
+    <string name="timer_point_earned_today">Point earned today</string>
+    <string name="timer_start">Start</string>
+
+
+    <!-- User Search Card -->
+    <string name="user_add_friend">Add friend</string>
+    <string name="user_accept_request">Accept</string>
+    <string name="user_reject_request">Reject</string>
+
+
+    <!-- App Limit Form -->
+    <string name="app_limit_form_title_new">New restriction</string>
+    <string name="app_limit_form_title_edit">Edit restriction</string>
+    <string name="app_limit_form_type_app">App</string>
+    <string name="app_limit_form_type_group">Group</string>
+    <string name="app_limit_form_app_label">Application</string>
+    <string name="app_limit_form_app_pick">Pick app</string>
+    <string name="app_limit_form_group_name_label">Group name</string>
+    <string name="app_limit_form_group_name_placeholder">E.g. Social Networks</string>
+    <string name="app_limit_form_group_apps_label">Group apps</string>
+    <string name="app_limit_form_group_apps_pick">Pick apps</string>
+    <string name="app_limit_form_group_apps_change">Change apps</string>
+    <string name="app_limit_form_notif_title">Notifications</string>
+    <string name="app_limit_form_notif_description">Alert when limit is exceeded</string>
+    <string name="app_limit_form_notif_interval_label">Repeat notification (5s → 60s)</string>
+    <string name="app_limit_form_notif_selected">Selected: %1$ds</string>
+    <string name="app_limit_form_limit_group">Daily limit (1.5h → 10h)</string>
+    <string name="app_limit_form_limit_app">Daily limit (30 min → 6 h)</string>
+    <string name="app_limit_form_limit_selected">Selected: %1$s</string>
+    <string name="app_limit_form_save">Save</string>
+    <string name="app_limit_form_create">Create</string>
+
+
+    <!-- Auth Components -->
+    <string name="auth_login">Log in</string>
+    <string name="auth_register">Create account</string>
+    <string name="auth_forgot_password">Forgot your password?</string>
+    <string name="auth_enter">Enter</string>
+    <string name="auth_name_label">Name</string>
+    <string name="auth_username_label">Username</string>
+    <string name="auth_region_label">Region / timezone</string>
+    <string name="auth_register_button">Register</string>
+
+
+    <!-- Reminder Form Card -->
+    <string name="reminder_form_title">New reminder</string>
+    <string name="reminder_form_name_label">Reminder name</string>
+    <string name="reminder_form_quick_access">Quick access</string>
+    <string name="reminder_form_or_pick_date">or pick date and time</string>
+    <string name="reminder_form_no_date">No date selected</string>
+    <string name="reminder_form_frequency">Frequency</string>
+    <string name="reminder_form_early_warning">Early warning</string>
+    <string name="reminder_form_early_warning_desc">Notifies 10 min before</string>
+    <string name="reminder_form_create">Create reminder</string>
+
+
+    <!-- Calendar -->
+    <string name="calendar_prev_month">Previous month</string>
+    <string name="calendar_next_month">Next month</string>
+
+
+    <!-- Calendar Screen -->
+    <string name="calendar_filter_all">All</string>
+    <string name="calendar_day_tasks_title">Tasks for day %1$d</string>
+    <string name="calendar_add_task_action">+ Add</string>
+
+
+    <!-- Pomodoro Screen -->
+    <string name="pomodoro_title">Pomodoro</string>
+    <string name="pomodoro_completed">Completed!</string>
+    <string name="pomodoro_session_work">Session %1$d of %2$d — Work</string>
+    <string name="pomodoro_session_break">Session %1$d of %2$d — Break</string>
+    <string name="pomodoro_work_label">25 min work</string>
+    <string name="pomodoro_break_label">5 min break</string>
+    <string name="pomodoro_reset">Reset</string>
+    <string name="pomodoro_pause">Pause</string>
+    <string name="pomodoro_start">Start</string>
+    <string name="pomodoro_skip">Skip phase</string>
+    <string name="pomodoro_all_done">All sessions completed!</string>
+
+
+    <!-- Tech Health Screen -->
+    <string name="tech_health_add_restriction">Add restriction</string>
+    <string name="tech_health_restrictions_title">Restrictions</string>
+    <string name="tech_health_restrictions_count">%1$d total</string>
+    <string name="tech_health_empty">No restrictions\nTap + to create one.</string>
+    <string name="tech_health_groups_title">Groups</string>
+
+
+    <!-- Timer Hub Screen -->
+    <string name="timer_hub_title">Timers</string>
+    <string name="timer_custom_sheet_title">Custom timer</string>
+    <string name="timer_custom_minutes">%1$d minutes</string>
+    <string name="timer_custom_start">Start</string>
+    <string name="timer_pomodoro_sheet_title">Configure Pomodoro</string>
+    <string name="timer_pomodoro_work_label">Work</string>
+    <string name="timer_pomodoro_break_label">Break</string>
+    <string name="timer_pomodoro_total_label">Total</string>
+    <string name="timer_pomodoro_sessions_label">Number of sessions</string>
+    <string name="timer_pomodoro_sessions_value">%1$d sessions</string>
+    <string name="timer_pomodoro_min_sessions">1 session (30 min)</string>
+    <string name="timer_pomodoro_max_sessions">8 sessions (4h)</string>
+    <string name="timer_pomodoro_start">Start Pomodoro</string>
+
+
+    <!-- Timer Screen -->
+    <string name="timer_point_earned">Daily point earned</string>
 
 </resources>

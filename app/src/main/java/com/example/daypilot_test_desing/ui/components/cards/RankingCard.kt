@@ -18,10 +18,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.ui.components.basic.DayPilotAvatar
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
 
@@ -37,11 +39,11 @@ private fun rankMedal(position: Int): String = when (position) {
 @Composable
 private fun RankingCardBase(
     name: String,
-    avatarUrl: String? = null,
     position: Int,
     points: Int,
     streak: Int,
     modifier: Modifier = Modifier,
+    avatarUrl: String? = null,
     isCurrentUser: Boolean = false
 ) {
     val shape = RoundedCornerShape(20.dp)
@@ -81,7 +83,7 @@ private fun RankingCardBase(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // ── Posición / medalla ───────────────────────────────
+            // ── Posición / medalla ────────────────────────────────
             Box(
                 modifier = Modifier.width(36.dp),
                 contentAlignment = Alignment.Center
@@ -101,10 +103,10 @@ private fun RankingCardBase(
                 }
             }
 
-            // ── Avatar ───────────────────────────────────────────
+            // ── Avatar ────────────────────────────────────────────
             DayPilotAvatar(name = name, avatarUrl = avatarUrl, size = 44)
 
-            // ── Nombre ───────────────────────────────────────────
+            // ── Nombre + racha ────────────────────────────────────
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = name,
@@ -113,13 +115,13 @@ private fun RankingCardBase(
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text = "${streak}🔥 racha",
+                    text = stringResource(R.string.ranking_streak, streak),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
-            // ── Puntos ───────────────────────────────────────────
+            // ── Puntos ────────────────────────────────────────────
             Column(horizontalAlignment = Alignment.End) {
                 Text(
                     text = points.toString(),
@@ -128,7 +130,7 @@ private fun RankingCardBase(
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(
-                    text = "puntos",
+                    text = stringResource(R.string.ranking_points),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -137,7 +139,7 @@ private fun RankingCardBase(
     }
 }
 
-// ── RankingCard ──────────────────────────────────────────────────
+// ── RankingCard ───────────────────────────────────────────────────
 @Composable
 fun RankingCard(
     name: String,
@@ -158,7 +160,7 @@ fun RankingCard(
     )
 }
 
-// ── CurrentUserRankingCard ───────────────────────────────────────
+// ── CurrentUserRankingCard ────────────────────────────────────────
 @Composable
 fun CurrentUserRankingCard(
     name: String,

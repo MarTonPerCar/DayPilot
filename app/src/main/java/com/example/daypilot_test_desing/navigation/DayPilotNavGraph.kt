@@ -22,12 +22,31 @@ import com.example.daypilot_test_desing.ui.components.cards.*
 import com.example.daypilot_test_desing.ui.components.basic.*
 import com.example.daypilot_test_desing.ui.screens.*
 import com.example.daypilot_test_desing.ui.model.*
+import com.example.daypilot_test_desing.ui.model.TimeZoneRegion
 
 private val tabRoutes = setOf(
     DayPilotDestinations.HOME,
     DayPilotDestinations.FRIENDS,
     DayPilotDestinations.NOTIFICATIONS,
     DayPilotDestinations.PROFILE
+)
+
+val MOCK_APPS = listOf(
+    AppInfo("YouTube", "com.google.android.youtube"),
+    AppInfo("Instagram", "com.instagram.android"),
+    AppInfo("TikTok", "com.zhiliaoapp.musically"),
+    AppInfo("WhatsApp", "com.whatsapp"),
+    AppInfo("Twitter", "com.twitter.android"),
+    AppInfo("Facebook", "com.facebook.katana"),
+    AppInfo("Spotify", "com.spotify.music"),
+    AppInfo("Netflix", "com.netflix.mediaclient"),
+    AppInfo("Gmail", "com.google.android.gm"),
+    AppInfo("Chrome", "com.android.chrome"),
+    AppInfo("Maps", "com.google.android.apps.maps"),
+    AppInfo("Telegram", "org.telegram.messenger"),
+    AppInfo("Discord", "com.discord"),
+    AppInfo("Twitch", "tv.twitch.android.app"),
+    AppInfo("Amazon", "com.amazon.mShop.android.shopping")
 )
 
 @Composable
@@ -260,7 +279,7 @@ fun DayPilotNavGraph(
                 EditProfileScreen(
                     currentName     = "Mario García",
                     currentUsername = "mariogarcia",
-                    currentRegion   = "Europe/Madrid",
+                    currentRegion = TimeZoneRegion.EUROPE_MADRID,
                     onSave          = { _, _, _ -> navController.popBackStack() },
                     onNavigateToResetPassword = {
                         navController.navigate(DayPilotDestinations.RESET_PASSWORD)
@@ -379,7 +398,7 @@ fun DayPilotNavGraph(
                     dailyAverage    = 6000,
                     goalStreak      = 4,
                     onBack          = { navController.popBackStack() },
-                    onConfigureGoal = {}
+                    onConfigureGoal = { _ -> }
                 )
             }
 

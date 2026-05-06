@@ -14,8 +14,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.daypilot_test_desing.R
+import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
 
 @Composable
 fun DayPilotPhotoPickerDialog(
@@ -27,14 +31,14 @@ fun DayPilotPhotoPickerDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                text = "Cambiar foto",
+                text = stringResource(R.string.photo_picker_title),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
         },
         text = {
             Text(
-                text = "¿Desde dónde quieres elegir la foto?",
+                text = stringResource(R.string.photo_picker_description),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -50,7 +54,7 @@ fun DayPilotPhotoPickerDialog(
                     modifier = Modifier.size(16.dp)
                 )
                 Spacer(Modifier.width(6.dp))
-                Text("Cámara")
+                Text(stringResource(R.string.photo_picker_camera))
             }
         },
         dismissButton = {
@@ -64,9 +68,21 @@ fun DayPilotPhotoPickerDialog(
                     modifier = Modifier.size(16.dp)
                 )
                 Spacer(Modifier.width(6.dp))
-                Text("Galería")
+                Text(stringResource(R.string.photo_picker_gallery))
             }
         },
         shape = RoundedCornerShape(20.dp)
     )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DayPilotPhotoPickerDialogPreview() {
+    DayPilotTheme(theme = DayPilotTheme.SAGE_GREEN, darkMode = true) {
+        DayPilotPhotoPickerDialog(
+            onDismiss = {},
+            onPickFromCamera = {},
+            onPickFromGallery = {}
+        )
+    }
 }

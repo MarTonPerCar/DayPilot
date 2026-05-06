@@ -9,8 +9,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
@@ -22,8 +22,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.ui.components.basic.DailySummaryStat
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
 
@@ -60,7 +63,7 @@ fun DailySummaryCard(
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
 
-                // ── Cabecera ─────────────────────────────────────
+                // ── Cabecera ──────────────────────────────────────
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -68,17 +71,18 @@ fun DailySummaryCard(
                 ) {
                     Column {
                         Text(
-                            text = "¡Hola, $userName!",
+                            text = stringResource(R.string.daily_summary_hello, userName),
                             style = MaterialTheme.typography.headlineSmall,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
-                            text = "Resumen de hoy",
+                            text = stringResource(R.string.daily_summary_subtitle),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
+
                     // Racha
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -92,7 +96,7 @@ fun DailySummaryCard(
                             style = MaterialTheme.typography.titleMedium
                         )
                         Text(
-                            text = "$streak días",
+                            text = stringResource(R.string.daily_summary_streak_days, streak),
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary
@@ -106,17 +110,17 @@ fun DailySummaryCard(
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     DailySummaryStat(
-                        icon = Icons.Default.DirectionsWalk,
-                        label = "Pasos",
+                        icon = Icons.AutoMirrored.Filled.DirectionsWalk,
+                        label = stringResource(R.string.daily_summary_label_steps),
                         value = stepsToday.toString(),
-                        subValue = "meta $stepsGoal",
+                        subValue = stringResource(R.string.daily_summary_steps_goal, stepsGoal),
                         modifier = Modifier.weight(1f)
                     )
                     DailySummaryStat(
                         icon = Icons.Default.CheckCircle,
-                        label = "Tareas",
+                        label = stringResource(R.string.daily_summary_label_tasks),
                         value = "$tasksCompleted/$tasksTotal",
-                        subValue = "completadas",
+                        subValue = stringResource(R.string.daily_summary_tasks_completed),
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -126,16 +130,16 @@ fun DailySummaryCard(
                 ) {
                     DailySummaryStat(
                         icon = Icons.Default.Star,
-                        label = "Puntos",
+                        label = stringResource(R.string.daily_summary_label_points),
                         value = pointsToday.toString(),
-                        subValue = "hoy",
+                        subValue = stringResource(R.string.daily_summary_points_today),
                         modifier = Modifier.weight(1f)
                     )
                     DailySummaryStat(
                         icon = Icons.Default.EmojiEvents,
-                        label = "Ranking",
+                        label = stringResource(R.string.daily_summary_label_ranking),
                         value = "#$rankingPosition",
-                        subValue = "entre amigos",
+                        subValue = stringResource(R.string.daily_summary_ranking_among),
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -144,6 +148,8 @@ fun DailySummaryCard(
     }
 }
 
+// ── Preview ──────────────────────────────────────────────────────
+@Preview(showBackground = true)
 @Composable
 fun DailySummaryCardPreview() {
     DayPilotTheme(theme = DayPilotTheme.SAGE_GREEN, darkMode = true) {

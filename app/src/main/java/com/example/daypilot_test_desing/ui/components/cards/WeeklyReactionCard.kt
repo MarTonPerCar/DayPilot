@@ -6,9 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -17,7 +15,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -26,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.ui.components.basic.DayPilotDivider
 import com.example.daypilot_test_desing.ui.components.basic.DayPilotReactionBadgeRow
+import com.example.daypilot_test_desing.ui.components.basic.DayPilotStatVerticalDivider
 import com.example.daypilot_test_desing.ui.components.basic.DayPilotWeeklyStat
 import com.example.daypilot_test_desing.ui.model.ReactionType
 import com.example.daypilot_test_desing.ui.model.ReceivedReaction
@@ -79,19 +77,19 @@ fun WeeklyReactionCard(
                         value = summary.totalPoints.toString(),
                         label = stringResource(R.string.weekly_summary_points)
                     )
-                    WeeklyStatDivider()
+                    DayPilotStatVerticalDivider(height = 32.dp)
                     DayPilotWeeklyStat(
                         emoji = "✅",
                         value = summary.tasksCompleted.toString(),
                         label = stringResource(R.string.weekly_summary_tasks)
                     )
-                    WeeklyStatDivider()
+                    DayPilotStatVerticalDivider(height = 32.dp)
                     DayPilotWeeklyStat(
                         emoji = "👣",
                         value = summary.totalSteps.toString(),
                         label = stringResource(R.string.weekly_summary_steps)
                     )
-                    WeeklyStatDivider()
+                    DayPilotStatVerticalDivider(height = 32.dp)
                     DayPilotWeeklyStat(
                         emoji = "🔥",
                         value = "${summary.bestStreak}d",
@@ -121,21 +119,10 @@ fun WeeklyReactionCard(
     }
 }
 
-// ── Stat compacto ────────────────────────────────────────────────
-@Composable
-private fun WeeklyStatDivider() {
-    Box(
-        modifier = Modifier
-            .height(32.dp)
-            .width(1.dp)
-            .clip(RoundedCornerShape(1.dp))
-            .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
-    )
-}
 
 // ── Preview ──────────────────────────────────────────────────────
-@Preview(showBackground = true)
 @Composable
+@Preview(showBackground = true)
 fun WeeklyReactionCardPreview() {
     DayPilotTheme(theme = DayPilotTheme.SAGE_GREEN, darkMode = true) {
         Box(

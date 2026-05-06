@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.ui.components.forms.AuthToggle
@@ -70,7 +71,7 @@ fun AuthScreen(
                     id = if (isDark) R.drawable.mi_logo_blanco
                     else R.drawable.mi_logo_negro
                 ),
-                contentDescription = "DayPilot Logo",
+                contentDescription = stringResource(R.string.app_name),
                 modifier = Modifier.height(60.dp)
             )
 
@@ -107,7 +108,6 @@ fun AuthScreen(
                                 onRegisterClick(name, username, email, password, region)
                                 isLogin = true
                             },
-                            onSuccess = { isLogin = true }
                         )
                     }
                 }

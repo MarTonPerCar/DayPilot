@@ -33,10 +33,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.ui.model.AppRestriction
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
 
@@ -54,29 +56,33 @@ fun AppLimitCard(
             restriction.dailyLimitMinutes).coerceIn(0f, 1f)
     val isOverLimit = restriction.usedMinutesToday >= restriction.dailyLimitMinutes
 
+    // ── Diálogo de confirmación de borrado ────────────────────────
     if (showDeleteConfirm) {
         AlertDialog(
             onDismissRequest = { showDeleteConfirm = false },
             title = {
-                Text("Eliminar restricción", fontWeight = FontWeight.Bold)
+                Text(
+                    stringResource(R.string.tech_health_delete_app_title),
+                    fontWeight = FontWeight.Bold
+                )
             },
             text = {
-                Text(
-                    "La restricción de \"${restriction.appName}\" se eliminará mañana. " +
-                            "Hoy seguirá activa si ya has usado la app."
-                )
+                Text(stringResource(R.string.tech_health_delete_app_message, restriction.appName))
             },
             confirmButton = {
                 TextButton(onClick = {
                     showDeleteConfirm = false
                     onDelete()
                 }) {
-                    Text("Eliminar mañana", color = MaterialTheme.colorScheme.error)
+                    Text(
+                        stringResource(R.string.tech_health_delete_tomorrow),
+                        color = MaterialTheme.colorScheme.error
+                    )
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteConfirm = false }) {
-                    Text("Cancelar")
+                    Text(stringResource(R.string.common_cancel))
                 }
             },
             shape = RoundedCornerShape(20.dp)
@@ -86,9 +92,7 @@ fun AppLimitCard(
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
@@ -97,7 +101,7 @@ fun AppLimitCard(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            // ── Cabecera ─────────────────────────────────────────
+            // ── Cabecera ──────────────────────────────────────────
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -134,13 +138,11 @@ fun AppLimitCard(
                         Box(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(4.dp))
-                                .background(
-                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
-                                )
+                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f))
                                 .padding(horizontal = 6.dp, vertical = 2.dp)
                         ) {
                             Text(
-                                text = "App",
+                                text = stringResource(R.string.tech_health_app_badge),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.primary
                             )
@@ -181,13 +183,20 @@ fun AppLimitCard(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "Hoy: ${restriction.usedMinutesToday} / ${restriction.dailyLimitMinutes} min",
+                        text = stringResource(
+                            R.string.tech_health_usage_today,
+                            restriction.usedMinutesToday,
+                            restriction.dailyLimitMinutes
+                        ),
                         style = MaterialTheme.typography.labelSmall,
                         color = if (isOverLimit) MaterialTheme.colorScheme.error
                         else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        text = "Notif: cada ${restriction.notificationIntervalSeconds}s",
+                        text = stringResource(
+                            R.string.tech_health_notif_interval,
+                            restriction.notificationIntervalSeconds
+                        ),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -209,7 +218,7 @@ fun AppLimitCard(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "🗑 Se elimina mañana",
+                            text = stringResource(R.string.tech_health_pending_delete),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.error
                         )
@@ -226,14 +235,17 @@ fun AppLimitCard(
                             modifier = Modifier.size(14.dp)
                         )
                         Spacer(Modifier.width(4.dp))
-                        Text("Editar", style = MaterialTheme.typography.labelMedium)
+                        Text(
+                            stringResource(R.string.common_edit),
+                            style = MaterialTheme.typography.labelMedium
+                        )
                     }
                     TextButton(
                         onClick = { showDeleteConfirm = true },
                         modifier = Modifier.weight(1f)
                     ) {
                         Text(
-                            text = "Eliminar",
+                            text = stringResource(R.string.common_delete),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.error
                         )
@@ -244,6 +256,7 @@ fun AppLimitCard(
     }
 }
 
+// ── Preview ──────────────────────────────────────────────────────
 @Preview(showBackground = true)
 @Composable
 fun AppLimitCardPreview() {

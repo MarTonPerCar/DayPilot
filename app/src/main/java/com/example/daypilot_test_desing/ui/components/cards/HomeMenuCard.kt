@@ -22,8 +22,6 @@ import com.example.daypilot_test_desing.ui.model.HomeSection
 import com.example.daypilot_test_desing.ui.model.HomeSectionData
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
 
-// ── Tipos de sección ─────────────────────────────────────────────
-
 // ── HomeMenuCard ─────────────────────────────────────────────────
 @Composable
 fun HomeMenuCard(

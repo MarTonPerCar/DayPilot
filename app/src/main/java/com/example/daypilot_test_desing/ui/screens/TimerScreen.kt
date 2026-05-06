@@ -23,7 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.daypilot_test_desing.ui.components.basic.DayPilotTopBar
-import com.example.daypilot_test_desing.ui.components.cards.TimerMode
+import com.example.daypilot_test_desing.ui.model.TimerMode
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -122,15 +122,15 @@ fun TimerScreen(
                         color      = MaterialTheme.colorScheme.onBackground
                     )
                     Text(
-                        text  = if (customMinutes > 0) "$customMinutes min"
-                        else "${mode.durationMinutes} min",
+                        text = if (customMinutes > 0) stringResource(R.string.timer_duration_minutes, customMinutes)
+                        else stringResource(R.string.timer_duration_minutes, mode.durationMinutes),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     if (isFinished) {
                         Spacer(Modifier.height(4.dp))
                         Text(
-                            text       = "¡Completado! 🎉",
+                            text = stringResource(R.string.pomodoro_completed) + " 🎉",
                             style      = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.SemiBold,
                             color      = MaterialTheme.colorScheme.primary
@@ -151,7 +151,7 @@ fun TimerScreen(
                 ) {
                     Text(text = "⭐", fontSize = 16.sp)
                     Text(
-                        text       = "Punto del día conseguido",
+                        text = stringResource(R.string.timer_point_earned),
                         style      = MaterialTheme.typography.labelMedium,
                         fontWeight = FontWeight.SemiBold,
                         color      = MaterialTheme.colorScheme.primary
@@ -178,7 +178,7 @@ fun TimerScreen(
                     }) {
                         Icon(
                             imageVector        = Icons.Default.Refresh,
-                            contentDescription = "Reiniciar",
+                            contentDescription = stringResource(R.string.pomodoro_reset),
                             tint               = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier           = Modifier.size(24.dp)
                         )
@@ -202,7 +202,7 @@ fun TimerScreen(
                         Icon(
                             imageVector        = if (isRunning) Icons.Default.Pause
                             else Icons.Default.PlayArrow,
-                            contentDescription = if (isRunning) "Pausar" else "Iniciar",
+                            contentDescription = if (isRunning) stringResource(R.string.pomodoro_pause) else stringResource(R.string.pomodoro_start),
                             tint               = if (isFinished)
                                 MaterialTheme.colorScheme.onSurfaceVariant
                             else MaterialTheme.colorScheme.onPrimary,

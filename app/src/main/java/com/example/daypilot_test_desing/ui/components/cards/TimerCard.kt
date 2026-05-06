@@ -1,35 +1,47 @@
 package com.example.daypilot_test_desing.ui.components.cards
 
-import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Timer
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.ui.model.TimerMode
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
 
 @Composable
 fun TimerCard(
-    modifier: Modifier = Modifier,
     mode: TimerMode,
-    pointEarnedToday: Boolean = false,
     onStart: () -> Unit,
+    modifier: Modifier = Modifier,
+    pointEarnedToday: Boolean = false,
     customMinutes: Int? = null
 ) {
     val duration = if (mode == TimerMode.CUSTOM && customMinutes != null)
@@ -86,17 +98,17 @@ fun TimerCard(
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text = "${duration} min",
+                    text = stringResource(R.string.timer_duration_minutes, duration),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
-            // Punto ganado
+            // Punto ganado hoy
             if (pointEarnedToday) {
                 Icon(
                     imageVector = Icons.Default.CheckCircle,
-                    contentDescription = "Punto ganado hoy",
+                    contentDescription = stringResource(R.string.timer_point_earned_today),
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(18.dp)
                 )
@@ -113,7 +125,7 @@ fun TimerCard(
                 IconButton(onClick = onStart) {
                     Icon(
                         imageVector = Icons.Default.PlayArrow,
-                        contentDescription = "Iniciar",
+                        contentDescription = stringResource(R.string.timer_start),
                         tint = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.size(20.dp)
                     )
@@ -123,6 +135,7 @@ fun TimerCard(
     }
 }
 
+// ── Preview ──────────────────────────────────────────────────────
 @Preview(showBackground = true)
 @Composable
 fun TimerCardPreview() {

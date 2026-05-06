@@ -2,7 +2,7 @@ package com.example.daypilot_test_desing.ui.model
 
 import java.util.Calendar
 
-data class ReminderFormDataF(
+data class ReminderFormDataInfo(
     val title: String,
     val frequencyType: FrequencyType,
     val earlyWarning: Boolean,

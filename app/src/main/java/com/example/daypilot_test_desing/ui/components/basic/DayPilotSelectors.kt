@@ -36,22 +36,25 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
 
 // ── Datos de cada tema ───────────────────────────────────────────
 data class ThemeOption(
     val id: String,
-    val name: String,
+    val nameRes: Int,
     val colors: List<Color>
 )
 
 val dayPilotThemes = listOf(
     ThemeOption(
         id = "sage_green",
-        name = "Verde Salvia",
+        nameRes = R.string.theme_sage_green,
         colors = listOf(
             Color(0xFF4A7C59),
             Color(0xFF81A88D),
@@ -62,7 +65,7 @@ val dayPilotThemes = listOf(
     ),
     ThemeOption(
         id = "ocean",
-        name = "Azul Océano",
+        nameRes = R.string.theme_ocean,
         colors = listOf(
             Color(0xFF1A6B8A),
             Color(0xFF4A9BB5),
@@ -73,7 +76,7 @@ val dayPilotThemes = listOf(
     ),
     ThemeOption(
         id = "lavender",
-        name = "Morado Lavanda",
+        nameRes = R.string.theme_lavender,
         colors = listOf(
             Color(0xFF6B4FA8),
             Color(0xFF9B7FCC),
@@ -84,7 +87,7 @@ val dayPilotThemes = listOf(
     ),
     ThemeOption(
         id = "amber",
-        name = "Naranja Ámbar",
+        nameRes = R.string.theme_amber,
         colors = listOf(
             Color(0xFFB85C00),
             Color(0xFFD4843A),
@@ -95,7 +98,7 @@ val dayPilotThemes = listOf(
     ),
     ThemeOption(
         id = "amoled",
-        name = "Oscuro Puro",
+        nameRes = R.string.theme_amoled,
         colors = listOf(
             Color(0xFF000000),
             Color(0xFF0A0A0A),
@@ -121,19 +124,16 @@ fun DayPilotThemeSelector(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(
-            text = "Tema de color",
+            text = stringResource(R.string.selector_theme_title),
             style = MaterialTheme.typography.titleSmall,
             fontWeight = FontWeight.SemiBold,
             color = MaterialTheme.colorScheme.onSurface
         )
 
-        // Paleta expandible
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            ),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
         ) {
             Column {
@@ -145,11 +145,9 @@ fun DayPilotThemeSelector(
                 ) {
                     dayPilotThemes.forEach { theme ->
                         val isSelected = theme.id == selectedThemeId
-                        val flex = if (isSelected) 2f else 1f
-
                         Box(
                             modifier = Modifier
-                                .weight(flex)
+                                .weight(if (isSelected) 2f else 1f)
                                 .fillMaxHeight()
                                 .background(theme.colors.first())
                                 .clickable { onThemeSelect(theme.id) },
@@ -192,7 +190,7 @@ fun DayPilotThemeSelector(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = selectedTheme.name,
+                        text = stringResource(selectedTheme.nameRes),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onSurface
@@ -219,9 +217,7 @@ fun DayPilotDarkModeSelector(
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
@@ -252,13 +248,16 @@ fun DayPilotDarkModeSelector(
                 }
                 Column {
                     Text(
-                        text = "Modo oscuro",
+                        text = stringResource(R.string.selector_dark_mode),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
-                        text = if (isDarkMode) "Activado" else "Desactivado",
+                        text = stringResource(
+                            if (isDarkMode) R.string.selector_dark_mode_on
+                            else R.string.selector_dark_mode_off
+                        ),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -276,11 +275,11 @@ fun DayPilotDarkModeSelector(
     }
 }
 
-// ── Selector de región/idioma ────────────────────────────────────
+// ── Selector de opción (idioma, región, etc.) ────────────────────
 @Composable
 fun DayPilotOptionSelector(
     title: String,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector,
     selectedOption: String,
     options: List<String>,
     onSelect: (String) -> Unit,
@@ -291,9 +290,7 @@ fun DayPilotOptionSelector(
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column {

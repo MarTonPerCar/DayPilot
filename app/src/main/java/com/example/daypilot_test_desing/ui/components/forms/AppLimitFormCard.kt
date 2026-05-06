@@ -3,50 +3,83 @@ package com.example.daypilot_test_desing.ui.components.forms
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.PhoneAndroid
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Slider
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.daypilot_test_desing.R
+import com.example.daypilot_test_desing.ui.components.basic.AppInfo
+import com.example.daypilot_test_desing.ui.components.basic.AppMultiPickerSheet
+import com.example.daypilot_test_desing.ui.components.basic.AppPickerSheet
 import com.example.daypilot_test_desing.ui.components.basic.DayPilotTextField
 import com.example.daypilot_test_desing.ui.model.AppRestriction
 import com.example.daypilot_test_desing.ui.model.GroupRestriction
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
-import kotlin.collections.isNotEmpty
+
+// ── Tipo de restricción ───────────────────────────────────────────
+private enum class RestrictionType { APP, GROUP }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppLimitFormCard(
+    modifier: Modifier = Modifier,
     isEditing: Boolean = false,
     initialApp: AppRestriction? = null,
     initialGroup: GroupRestriction? = null,
     onSaveApp: (AppRestriction) -> Unit,
     onSaveGroup: (GroupRestriction) -> Unit,
     onCancel: () -> Unit,
-    modifier: Modifier = Modifier
 ) {
-    // Tipo — si viene un grupo inicial forzamos "Grupo"
     var restrictionType by remember {
-        mutableStateOf(if (initialGroup != null) "Grupo" else "App")
+        mutableStateOf(if (initialGroup != null) RestrictionType.GROUP else RestrictionType.APP)
     }
+    val isGroup = restrictionType == RestrictionType.GROUP
 
-    // App
     var selectedApp by remember {
-        mutableStateOf(
-            initialApp?.let { AppInfo(it.appName, it.packageName) }
-        )
+        mutableStateOf(initialApp?.let { AppInfo(it.appName, it.packageName) })
     }
 
-    // Grupo
     var groupName by remember { mutableStateOf(initialGroup?.groupName ?: "") }
     var groupApps: List<AppInfo> by remember {
         mutableStateOf(
@@ -54,13 +87,11 @@ fun AppLimitFormCard(
         )
     }
 
-    // Común
-    val isGroup = restrictionType == "Grupo"
     val maxMinutes = if (isGroup) 600f else 360f
     var limitMinutes by remember {
         mutableFloatStateOf(
-            (initialApp?.dailyLimitMinutes ?: initialGroup?.dailyLimitMinutes ?: 60).toFloat()
-                .coerceAtMost(maxMinutes)
+            (initialApp?.dailyLimitMinutes ?: initialGroup?.dailyLimitMinutes ?: 60)
+                .toFloat().coerceAtMost(maxMinutes)
         )
     }
     var notifSeconds by remember {
@@ -70,11 +101,8 @@ fun AppLimitFormCard(
         )
     }
     var notifEnabled by remember { mutableStateOf(true) }
-
-    // Sheets
     var showAppPicker by remember { mutableStateOf(false) }
     var showGroupAppPicker by remember { mutableStateOf(false) }
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
 
     val isValid = if (isGroup) groupName.isNotBlank() && groupApps.isNotEmpty()
     else selectedApp != null
@@ -86,7 +114,7 @@ fun AppLimitFormCard(
         else -> "${limitMinutes.toInt()}min"
     }
 
-    // ── App picker sheet ─────────────────────────────────────────
+    // ── App picker sheet ──────────────────────────────────────────
     if (showAppPicker) {
         ModalBottomSheet(
             onDismissRequest = { showAppPicker = false },
@@ -120,9 +148,7 @@ fun AppLimitFormCard(
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
         Column(
@@ -131,21 +157,27 @@ fun AppLimitFormCard(
                 .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // ── Título ───────────────────────────────────────────
+            // ── Título ────────────────────────────────────────────
             Text(
-                text = if (isEditing) "Editar restricción" else "Nueva restricción",
+                text = stringResource(
+                    if (isEditing) R.string.app_limit_form_title_edit
+                    else R.string.app_limit_form_title_new
+                ),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
             )
 
-            // ── Tipo (solo al crear) ──────────────────────────────
+            // ── Selector de tipo (solo al crear) ──────────────────
             if (!isEditing) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    listOf("App", "Grupo").forEach { type ->
+                    listOf(
+                        RestrictionType.APP to stringResource(R.string.app_limit_form_type_app),
+                        RestrictionType.GROUP to stringResource(R.string.app_limit_form_type_group)
+                    ).forEach { (type, label) ->
                         val isSelected = restrictionType == type
                         Box(
                             modifier = Modifier
@@ -160,13 +192,11 @@ fun AppLimitFormCard(
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                text = type,
+                                text = label,
                                 style = MaterialTheme.typography.labelLarge,
                                 fontWeight = FontWeight.SemiBold,
-                                color = if (isSelected)
-                                    MaterialTheme.colorScheme.onPrimary
-                                else
-                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                color = if (isSelected) MaterialTheme.colorScheme.onPrimary
+                                else MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
@@ -176,7 +206,7 @@ fun AppLimitFormCard(
             // ── App ───────────────────────────────────────────────
             if (!isGroup) {
                 Text(
-                    text = "Aplicación",
+                    text = stringResource(R.string.app_limit_form_app_label),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -195,9 +225,7 @@ fun AppLimitFormCard(
                             modifier = Modifier
                                 .size(28.dp)
                                 .clip(RoundedCornerShape(6.dp))
-                                .background(
-                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
-                                ),
+                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)),
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
@@ -235,7 +263,7 @@ fun AppLimitFormCard(
                         )
                         Spacer(Modifier.width(8.dp))
                         Text(
-                            text = "Elegir app",
+                            text = stringResource(R.string.app_limit_form_app_pick),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -248,17 +276,14 @@ fun AppLimitFormCard(
                 DayPilotTextField(
                     value = groupName,
                     onValueChange = { groupName = it },
-                    label = "Nombre del grupo",
-                    placeholder = "Por ejemplo: Redes Sociales"
+                    label = stringResource(R.string.app_limit_form_group_name_label),
+                    placeholder = stringResource(R.string.app_limit_form_group_name_placeholder)
                 )
-
                 Text(
-                    text = "Apps del grupo",
+                    text = stringResource(R.string.app_limit_form_group_apps_label),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-
-                // Apps seleccionadas
                 if (groupApps.isNotEmpty()) {
                     Column(
                         modifier = Modifier
@@ -278,9 +303,7 @@ fun AppLimitFormCard(
                                     modifier = Modifier
                                         .size(28.dp)
                                         .clip(RoundedCornerShape(6.dp))
-                                        .background(
-                                            MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
-                                        ),
+                                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text(
@@ -311,7 +334,6 @@ fun AppLimitFormCard(
                         }
                     }
                 }
-
                 OutlinedButton(
                     onClick = { showGroupAppPicker = true },
                     modifier = Modifier.fillMaxWidth(),
@@ -324,7 +346,10 @@ fun AppLimitFormCard(
                     )
                     Spacer(Modifier.width(6.dp))
                     Text(
-                        text = if (groupApps.isEmpty()) "Elegir apps" else "Cambiar apps",
+                        text = stringResource(
+                            if (groupApps.isEmpty()) R.string.app_limit_form_group_apps_pick
+                            else R.string.app_limit_form_group_apps_change
+                        ),
                         style = MaterialTheme.typography.labelMedium
                     )
                 }
@@ -334,9 +359,7 @@ fun AppLimitFormCard(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(14.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant
-                ),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
                 elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
             ) {
                 Column(
@@ -352,13 +375,13 @@ fun AppLimitFormCard(
                     ) {
                         Column {
                             Text(
-                                text = "Notificaciones",
+                                text = stringResource(R.string.app_limit_form_notif_title),
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
                             Text(
-                                text = "Avisar cuando supere el límite",
+                                text = stringResource(R.string.app_limit_form_notif_description),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -372,16 +395,18 @@ fun AppLimitFormCard(
                             )
                         )
                     }
-
                     if (notifEnabled) {
                         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                             Text(
-                                text = "Repetir notificación (5s → 60s)",
+                                text = stringResource(R.string.app_limit_form_notif_interval_label),
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Text(
-                                text = "Seleccionado: ${notifSeconds.toInt()}s",
+                                text = stringResource(
+                                    R.string.app_limit_form_notif_selected,
+                                    notifSeconds.toInt()
+                                ),
                                 style = MaterialTheme.typography.labelSmall,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.primary
@@ -401,13 +426,15 @@ fun AppLimitFormCard(
             // ── Límite diario ─────────────────────────────────────
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
-                    text = if (isGroup) "Límite diario (1.5h → 10h)"
-                    else "Límite diario (30 min → 6 h)",
+                    text = stringResource(
+                        if (isGroup) R.string.app_limit_form_limit_group
+                        else R.string.app_limit_form_limit_app
+                    ),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = "Seleccionado: $limitLabel",
+                    text = stringResource(R.string.app_limit_form_limit_selected, limitLabel),
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
@@ -419,7 +446,6 @@ fun AppLimitFormCard(
                     steps = if (isGroup) 16 else 10,
                     modifier = Modifier.fillMaxWidth()
                 )
-
                 // Presets
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -453,10 +479,8 @@ fun AppLimitFormCard(
                                 text = label,
                                 style = MaterialTheme.typography.labelMedium,
                                 fontWeight = FontWeight.SemiBold,
-                                color = if (isSelected)
-                                    MaterialTheme.colorScheme.onPrimary
-                                else
-                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                color = if (isSelected) MaterialTheme.colorScheme.onPrimary
+                                else MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
@@ -472,7 +496,7 @@ fun AppLimitFormCard(
                     onClick = onCancel,
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(12.dp)
-                ) { Text("Cancelar") }
+                ) { Text(stringResource(R.string.common_cancel)) }
 
                 Button(
                     onClick = {
@@ -489,14 +513,12 @@ fun AppLimitFormCard(
                                                 appName = it.name,
                                                 packageName = it.packageName,
                                                 dailyLimitMinutes = limitMinutes.toInt(),
-                                                notificationIntervalSeconds = if (notifEnabled)
-                                                    notifSeconds.toInt() else 0,
+                                                notificationIntervalSeconds = if (notifEnabled) notifSeconds.toInt() else 0,
                                                 isEnabled = true
                                             )
                                         },
                                         dailyLimitMinutes = limitMinutes.toInt(),
-                                        notificationIntervalSeconds = if (notifEnabled)
-                                            notifSeconds.toInt() else 0,
+                                        notificationIntervalSeconds = if (notifEnabled) notifSeconds.toInt() else 0,
                                         isEnabled = true
                                     )
                                 )
@@ -508,8 +530,7 @@ fun AppLimitFormCard(
                                         appName = selectedApp!!.name,
                                         packageName = selectedApp!!.packageName,
                                         dailyLimitMinutes = limitMinutes.toInt(),
-                                        notificationIntervalSeconds = if (notifEnabled)
-                                            notifSeconds.toInt() else 0,
+                                        notificationIntervalSeconds = if (notifEnabled) notifSeconds.toInt() else 0,
                                         isEnabled = true
                                     )
                                 )
@@ -519,12 +540,20 @@ fun AppLimitFormCard(
                     enabled = isValid,
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(12.dp)
-                ) { Text(if (isEditing) "Guardar" else "Crear") }
+                ) {
+                    Text(
+                        stringResource(
+                            if (isEditing) R.string.app_limit_form_save
+                            else R.string.app_limit_form_create
+                        )
+                    )
+                }
             }
         }
     }
 }
 
+// ── Preview ──────────────────────────────────────────────────────
 @Preview(showBackground = true)
 @Composable
 fun AppLimitFormPreview() {

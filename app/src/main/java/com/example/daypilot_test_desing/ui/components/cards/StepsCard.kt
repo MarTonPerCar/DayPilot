@@ -46,9 +46,11 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.ui.components.basic.MilestoneChip
 import com.example.daypilot_test_desing.ui.components.basic.StepStatRow
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
@@ -84,13 +86,13 @@ fun StepsCard(
         !milestone50 -> "50%"
         !milestone75 -> "75%"
         !milestone100 -> "100%"
-        else -> "¡Meta cumplida!"
+        else -> stringResource(R.string.steps_goal_reached)
     }
 
     val primaryColor = MaterialTheme.colorScheme.primary
     val surfaceVarColor = MaterialTheme.colorScheme.surfaceVariant
 
-    // ── BottomSheet ──────────────────────────────────────────────
+    // ── BottomSheet de configuración ─────────────────────────────
     if (showGoalSheet) {
         ModalBottomSheet(
             onDismissRequest = { showGoalSheet = false },
@@ -105,7 +107,7 @@ fun StepsCard(
                 verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
                 Text(
-                    text = "Configurar meta de pasos",
+                    text = stringResource(R.string.steps_goal_sheet_title),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground
@@ -115,7 +117,7 @@ fun StepsCard(
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = "${sliderValue.toInt()} pasos",
+                        text = stringResource(R.string.steps_goal_value, sliderValue.toInt()),
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
@@ -137,16 +139,18 @@ fun StepsCard(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        "1.000", style = MaterialTheme.typography.labelSmall,
+                        "1.000",
+                        style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        "30.000", style = MaterialTheme.typography.labelSmall,
+                        "30.000",
+                        style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
                 Text(
-                    text = "Metas rápidas",
+                    text = stringResource(R.string.steps_quick_goals),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -180,7 +184,7 @@ fun StepsCard(
                         onClick = { showGoalSheet = false },
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(12.dp)
-                    ) { Text("Cancelar") }
+                    ) { Text(stringResource(R.string.common_cancel)) }
                     Button(
                         onClick = {
                             onConfigureGoal(sliderValue.toInt())
@@ -188,20 +192,18 @@ fun StepsCard(
                         },
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(12.dp)
-                    ) { Text("Guardar") }
+                    ) { Text(stringResource(R.string.common_save)) }
                 }
                 Spacer(Modifier.height(16.dp))
             }
         }
     }
 
-    // ── Card ─────────────────────────────────────────────────────
+    // ── Card ──────────────────────────────────────────────────────
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
@@ -210,7 +212,7 @@ fun StepsCard(
                 .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // ── Cabecera con configurar meta ──────────────────────
+            // ── Cabecera ──────────────────────────────────────────
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -227,7 +229,7 @@ fun StepsCard(
                         modifier = Modifier.size(22.dp)
                     )
                     Text(
-                        text = "Pasos",
+                        text = stringResource(R.string.steps_label),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
@@ -235,7 +237,7 @@ fun StepsCard(
                 }
                 TextButton(onClick = { showGoalSheet = true }) {
                     Text(
-                        text = "Configurar meta",
+                        text = stringResource(R.string.steps_configure_goal),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.primary
                     )
@@ -284,7 +286,7 @@ fun StepsCard(
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
-                            text = "de $goalSteps",
+                            text = stringResource(R.string.steps_goal_of, goalSteps),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -302,7 +304,7 @@ fun StepsCard(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Text(
-                        text = "Hitos",
+                        text = stringResource(R.string.steps_milestones),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -312,14 +314,12 @@ fun StepsCard(
                         MilestoneChip(label = "100%", reached = milestone100)
                     }
                     HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant)
-
-                    // ── Textos actualizados ───────────────────────
                     StepStatRow(
-                        label = "Puntos ganados hoy",
-                        value = "$pointsEarned pts"
+                        label = stringResource(R.string.steps_points_earned),
+                        value = stringResource(R.string.steps_pts_value, pointsEarned)
                     )
                     StepStatRow(
-                        label = "Siguiente meta",
+                        label = stringResource(R.string.steps_next_milestone),
                         value = nextMilestone
                     )
                 }
@@ -328,6 +328,7 @@ fun StepsCard(
     }
 }
 
+// ── Preview ──────────────────────────────────────────────────────
 @Preview(showBackground = true)
 @Composable
 fun StepsCardPreview() {

@@ -22,8 +22,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.ui.components.basic.DayPilotDivider
 import com.example.daypilot_test_desing.ui.components.basic.StatsBreakdownRow
 import com.example.daypilot_test_desing.ui.components.basic.StatsTopBlock
@@ -42,9 +45,7 @@ fun StatsCard(
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Box(
@@ -62,28 +63,28 @@ fun StatsCard(
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
 
-                // ── Cabecera ─────────────────────────────────────
+                // ── Cabecera ──────────────────────────────────────
                 Text(
-                    text = "Resumen del día",
+                    text = stringResource(R.string.stats_daily_summary),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
 
-                // ── Ranking + Total ──────────────────────────────
+                // ── Ranking + Total ───────────────────────────────
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     StatsTopBlock(
                         icon = Icons.Default.EmojiEvents,
-                        label = "Ranking",
+                        label = stringResource(R.string.stats_ranking),
                         value = "#$rankingPosition",
                         modifier = Modifier.weight(1f)
                     )
                     StatsTopBlock(
                         icon = Icons.Default.Star,
-                        label = "Puntos hoy",
+                        label = stringResource(R.string.stats_points_today),
                         value = pointsToday.toString(),
                         modifier = Modifier.weight(1f)
                     )
@@ -91,26 +92,26 @@ fun StatsCard(
 
                 DayPilotDivider()
 
-                // ── Desglose de puntos ───────────────────────────
+                // ── Desglose de puntos ────────────────────────────
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     StatsBreakdownRow(
                         icon = Icons.Default.CheckCircle,
-                        label = "Tareas",
+                        label = stringResource(R.string.stats_label_tasks),
                         points = pointsFromTasks
                     )
                     StatsBreakdownRow(
                         icon = Icons.AutoMirrored.Filled.DirectionsWalk,
-                        label = "Pasos",
+                        label = stringResource(R.string.stats_label_steps),
                         points = pointsFromSteps
                     )
                     StatsBreakdownRow(
                         icon = Icons.Default.Favorite,
-                        label = "Hábitos",
+                        label = stringResource(R.string.stats_label_habits),
                         points = pointsFromHabits
                     )
                     StatsBreakdownRow(
                         icon = Icons.Default.Timer,
-                        label = "Cronómetro",
+                        label = stringResource(R.string.stats_label_timer),
                         points = pointsFromTimers
                     )
                 }
@@ -119,7 +120,8 @@ fun StatsCard(
     }
 }
 
-// ── Bloque superior (ranking / total) ────────────────────────────
+// ── Preview ──────────────────────────────────────────────────────
+@Preview(showBackground = true)
 @Composable
 fun StatsCardPreview() {
     DayPilotTheme(theme = DayPilotTheme.SAGE_GREEN, darkMode = true) {

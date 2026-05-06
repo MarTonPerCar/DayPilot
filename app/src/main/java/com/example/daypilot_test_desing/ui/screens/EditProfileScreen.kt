@@ -16,15 +16,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.ui.components.basic.*
+import com.example.daypilot_test_desing.ui.model.TimeZoneRegion
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditProfileScreen(
     currentName: String,
     currentUsername: String,
-    currentRegion: String,
+    currentRegion: TimeZoneRegion = TimeZoneRegion.EUROPE_MADRID,
     avatarUrl: String? = null,
-    onSave: (name: String, username: String, region: String) -> Unit,
+    onSave: (name: String, username: String, region: TimeZoneRegion) -> Unit,
     onNavigateToResetPassword: () -> Unit,
     onPickFromCamera: () -> Unit,
     onPickFromGallery: () -> Unit,
@@ -35,11 +36,7 @@ fun EditProfileScreen(
     var region          by remember { mutableStateOf(currentRegion) }
     var showPhotoDialog by remember { mutableStateOf(false) }
 
-    val regions = listOf(
-        "Europe/Madrid", "Atlantic/Canary", "America/New_York",
-        "America/Los_Angeles", "America/Mexico_City", "America/Sao_Paulo",
-        "Asia/Tokyo", "Asia/Shanghai", "Australia/Sydney"
-    )
+    val regions = TimeZoneRegion.entries
 
     if (showPhotoDialog) {
         DayPilotPhotoPickerDialog(
@@ -127,7 +124,7 @@ fun EditProfileScreen(
                 options     = regions,
                 onSelect    = { region = it },
                 label       = stringResource(R.string.region),
-                displayText = { it }
+                displayText = { it.value }
             )
 
             // ── Seguridad ────────────────────────────────────────

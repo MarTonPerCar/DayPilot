@@ -34,10 +34,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.ui.model.AppRestriction
 import com.example.daypilot_test_desing.ui.model.GroupRestriction
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
@@ -57,24 +59,39 @@ fun GroupLimitCard(
             restriction.dailyLimitMinutes).coerceIn(0f, 1f)
     val isOverLimit = restriction.usedMinutesToday >= restriction.dailyLimitMinutes
 
+    // ── Diálogo de confirmación de borrado ────────────────────────
     if (showDeleteConfirm) {
         AlertDialog(
             onDismissRequest = { showDeleteConfirm = false },
-            title = { Text("Eliminar grupo", fontWeight = FontWeight.Bold) },
+            title = {
+                Text(
+                    stringResource(R.string.tech_health_delete_group_title),
+                    fontWeight = FontWeight.Bold
+                )
+            },
             text = {
                 Text(
-                    "El grupo \"${restriction.groupName}\" se eliminará mañana. " +
-                            "Hoy seguirá activo si ya has usado las apps."
+                    stringResource(
+                        R.string.tech_health_delete_group_message,
+                        restriction.groupName
+                    )
                 )
             },
             confirmButton = {
                 TextButton(onClick = {
                     showDeleteConfirm = false
                     onDelete()
-                }) { Text("Eliminar mañana", color = MaterialTheme.colorScheme.error) }
+                }) {
+                    Text(
+                        stringResource(R.string.tech_health_delete_tomorrow),
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
             },
             dismissButton = {
-                TextButton(onClick = { showDeleteConfirm = false }) { Text("Cancelar") }
+                TextButton(onClick = { showDeleteConfirm = false }) {
+                    Text(stringResource(R.string.common_cancel))
+                }
             },
             shape = RoundedCornerShape(20.dp)
         )
@@ -83,9 +100,7 @@ fun GroupLimitCard(
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
@@ -94,7 +109,7 @@ fun GroupLimitCard(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            // ── Cabecera ─────────────────────────────────────────
+            // ── Cabecera ──────────────────────────────────────────
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -105,9 +120,7 @@ fun GroupLimitCard(
                     modifier = Modifier
                         .size(44.dp)
                         .clip(RoundedCornerShape(10.dp))
-                        .background(
-                            MaterialTheme.colorScheme.tertiary.copy(alpha = 0.15f)
-                        ),
+                        .background(MaterialTheme.colorScheme.tertiary.copy(alpha = 0.15f)),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
@@ -129,23 +142,25 @@ fun GroupLimitCard(
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface
                         )
+                        // Badge "Grupo"
                         Box(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(4.dp))
-                                .background(
-                                    MaterialTheme.colorScheme.tertiary.copy(alpha = 0.15f)
-                                )
+                                .background(MaterialTheme.colorScheme.tertiary.copy(alpha = 0.15f))
                                 .padding(horizontal = 6.dp, vertical = 2.dp)
                         ) {
                             Text(
-                                text = "Grupo",
+                                text = stringResource(R.string.tech_health_group_badge),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.tertiary
                             )
                         }
                     }
                     Text(
-                        text = "${restriction.apps.size} apps",
+                        text = stringResource(
+                            R.string.tech_health_group_apps_count,
+                            restriction.apps.size
+                        ),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -179,13 +194,20 @@ fun GroupLimitCard(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "Hoy: ${restriction.usedMinutesToday} / ${restriction.dailyLimitMinutes} min",
+                        text = stringResource(
+                            R.string.tech_health_usage_today,
+                            restriction.usedMinutesToday,
+                            restriction.dailyLimitMinutes
+                        ),
                         style = MaterialTheme.typography.labelSmall,
                         color = if (isOverLimit) MaterialTheme.colorScheme.error
                         else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        text = "Notif: cada ${restriction.notificationIntervalSeconds}s",
+                        text = stringResource(
+                            R.string.tech_health_notif_interval,
+                            restriction.notificationIntervalSeconds
+                        ),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -198,7 +220,10 @@ fun GroupLimitCard(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = if (expanded) "▲ Ocultar apps" else "▼ Ver apps (${restriction.apps.size})",
+                    text = if (expanded)
+                        stringResource(R.string.tech_health_group_hide_apps)
+                    else
+                        stringResource(R.string.tech_health_group_show_apps, restriction.apps.size),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -233,7 +258,7 @@ fun GroupLimitCard(
                                 modifier = Modifier.weight(1f)
                             )
                             Text(
-                                text = "${app.usedMinutesToday}min",
+                                text = "${app.usedMinutesToday}${stringResource(R.string.common_minutes)}",
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -257,7 +282,7 @@ fun GroupLimitCard(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "🗑 Se elimina mañana",
+                            text = stringResource(R.string.tech_health_pending_delete),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.error
                         )
@@ -274,14 +299,17 @@ fun GroupLimitCard(
                             modifier = Modifier.size(14.dp)
                         )
                         Spacer(Modifier.width(4.dp))
-                        Text("Editar", style = MaterialTheme.typography.labelMedium)
+                        Text(
+                            stringResource(R.string.common_edit),
+                            style = MaterialTheme.typography.labelMedium
+                        )
                     }
                     TextButton(
                         onClick = { showDeleteConfirm = true },
                         modifier = Modifier.weight(1f)
                     ) {
                         Text(
-                            text = "Eliminar",
+                            text = stringResource(R.string.common_delete),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.error
                         )
@@ -292,26 +320,29 @@ fun GroupLimitCard(
     }
 }
 
+// ── Preview ──────────────────────────────────────────────────────
 @Preview(showBackground = true)
 @Composable
 fun GroupLimitCardPreview() {
     DayPilotTheme(theme = DayPilotTheme.SAGE_GREEN, darkMode = true) {
-        Box(Modifier
-            .background(MaterialTheme.colorScheme.background)
-            .padding(16.dp)) {
+        Box(
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.background)
+                .padding(16.dp)
+        ) {
             GroupLimitCard(
                 restriction = GroupRestriction(
                     id = "1",
                     groupName = "Social Networks",
                     apps = listOf(
                         AppRestriction(
-                            "1",
-                            "Instagram",
-                            "com.instagram.android",
-                            60,
-                            30,
-                            true,
-                            20
+                            id = "1",
+                            appName = "Instagram",
+                            packageName = "com.instagram.android",
+                            dailyLimitMinutes = 60,
+                            notificationIntervalSeconds = 30,
+                            isEnabled = true,
+                            usedMinutesToday = 20
                         )
                     ),
                     dailyLimitMinutes = 120,
@@ -319,7 +350,9 @@ fun GroupLimitCardPreview() {
                     isEnabled = true,
                     usedMinutesToday = 45
                 ),
-                onToggle = {}, onEdit = {}, onDelete = {}
+                onToggle = {},
+                onEdit = {},
+                onDelete = {}
             )
         }
     }

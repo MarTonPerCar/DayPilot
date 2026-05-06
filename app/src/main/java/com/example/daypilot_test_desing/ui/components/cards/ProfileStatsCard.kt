@@ -23,30 +23,35 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.ui.components.basic.DayPilotAvatar
 import com.example.daypilot_test_desing.ui.components.basic.ProfileStatBlock
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
 
 @Composable
 fun ProfileStatsCard(
-    modifier: Modifier = Modifier,
     name: String,
     username: String,
     level: Int,
     totalPoints: Int,
     currentStreak: Int,
     longestStreak: Int,
+    modifier: Modifier = Modifier,
     avatarUrl: String? = null
 ) {
+    val pointsForCurrentLevel = (level - 1) * 50
+    val pointsForNextLevel = level * 50
+    val levelProgress = ((totalPoints - pointsForCurrentLevel).toFloat() /
+            (pointsForNextLevel - pointsForCurrentLevel)).coerceIn(0f, 1f)
+
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Box(
@@ -91,7 +96,7 @@ fun ProfileStatsCard(
                                 .padding(horizontal = 10.dp, vertical = 4.dp)
                         ) {
                             Text(
-                                text = "⚡ Nivel $level",
+                                text = stringResource(R.string.profile_level_badge, level),
                                 style = MaterialTheme.typography.labelMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.primary
@@ -101,23 +106,22 @@ fun ProfileStatsCard(
                 }
 
                 // ── Barra de progreso de nivel ────────────────────
-                val pointsForCurrentLevel = (level - 1) * 50
-                val pointsForNextLevel = level * 50
-                val levelProgress = ((totalPoints - pointsForCurrentLevel).toFloat() /
-                        (pointsForNextLevel - pointsForCurrentLevel)).coerceIn(0f, 1f)
-
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "Progreso nivel ${level + 1}",
+                            text = stringResource(R.string.profile_level_progress, level + 1),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
-                            text = "$totalPoints / $pointsForNextLevel pts",
+                            text = stringResource(
+                                R.string.profile_level_points,
+                                totalPoints,
+                                pointsForNextLevel
+                            ),
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.primary
@@ -141,19 +145,19 @@ fun ProfileStatsCard(
                 ) {
                     ProfileStatBlock(
                         icon = Icons.Default.Star,
-                        label = "Puntos totales",
+                        label = stringResource(R.string.profile_stat_total_points),
                         value = totalPoints.toString(),
                         modifier = Modifier.weight(1f)
                     )
                     ProfileStatBlock(
                         icon = Icons.Default.Whatshot,
-                        label = "Racha actual",
+                        label = stringResource(R.string.profile_stat_current_streak),
                         value = "${currentStreak}🔥",
                         modifier = Modifier.weight(1f)
                     )
                     ProfileStatBlock(
                         icon = Icons.Default.EmojiEvents,
-                        label = "Mejor racha",
+                        label = stringResource(R.string.profile_stat_best_streak),
                         value = "${longestStreak}⚡",
                         modifier = Modifier.weight(1f)
                     )
@@ -163,8 +167,9 @@ fun ProfileStatsCard(
     }
 }
 
-@Composable
+// ── Preview ──────────────────────────────────────────────────────
 @Preview(showBackground = true)
+@Composable
 fun ProfileStatsCardPreview() {
     DayPilotTheme(theme = DayPilotTheme.SAGE_GREEN, darkMode = true) {
         Box(

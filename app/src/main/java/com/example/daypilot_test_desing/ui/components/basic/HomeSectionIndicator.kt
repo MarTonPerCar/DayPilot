@@ -25,10 +25,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.ui.model.HomeSectionData
 import com.example.daypilot_test_desing.ui.model.ProgressFilter
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
@@ -41,9 +43,14 @@ fun HomeSectionIndicator(data: HomeSectionData, accentColor: Color) {
         is HomeSectionData.Calendar -> {
             val total = data.pendingTasks + data.completedTasks
             val progress = if (total > 0) data.completedTasks.toFloat() / total else 0f
+
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(
-                    text = "${data.completedTasks}/${total} tareas",
+                    text = stringResource(
+                        R.string.indicator_tasks_progress,
+                        data.completedTasks,
+                        total
+                    ),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -95,7 +102,10 @@ fun HomeSectionIndicator(data: HomeSectionData, accentColor: Color) {
                 // Pasos
                 Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
                     Text(
-                        text = "👣 ${(data.stepsProgress * 100).toInt()}% pasos",
+                        text = stringResource(
+                            R.string.indicator_steps_progress,
+                            (data.stepsProgress * 100).toInt()
+                        ),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -109,7 +119,8 @@ fun HomeSectionIndicator(data: HomeSectionData, accentColor: Color) {
                         trackColor = accentColor.copy(alpha = 0.2f)
                     )
                 }
-                // Timer
+
+                // Estado del cronómetro
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
@@ -123,8 +134,10 @@ fun HomeSectionIndicator(data: HomeSectionData, accentColor: Color) {
                         modifier = Modifier.size(12.dp)
                     )
                     Text(
-                        text = if (data.timerDone) "Cronómetro completado"
-                        else "Cronómetro pendiente",
+                        text = stringResource(
+                            if (data.timerDone) R.string.indicator_timer_done
+                            else R.string.indicator_timer_pending
+                        ),
                         style = MaterialTheme.typography.labelSmall,
                         color = if (data.timerDone) accentColor
                         else MaterialTheme.colorScheme.onSurfaceVariant
@@ -136,7 +149,11 @@ fun HomeSectionIndicator(data: HomeSectionData, accentColor: Color) {
         is HomeSectionData.Rivalry -> {
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(
-                    text = "🏆 #${data.position} de ${data.totalFriends}",
+                    text = stringResource(
+                        R.string.indicator_rivalry_position,
+                        data.position,
+                        data.totalFriends
+                    ),
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.Bold,
                     color = accentColor
@@ -145,7 +162,6 @@ fun HomeSectionIndicator(data: HomeSectionData, accentColor: Color) {
                     horizontalArrangement = Arrangement.spacedBy(3.dp),
                     verticalAlignment = Alignment.Bottom
                 ) {
-                    // Top 5
                     val topCount = minOf(5, data.totalFriends)
                     repeat(topCount) { index ->
                         val isCurrentUser = index == data.position - 1
@@ -162,10 +178,7 @@ fun HomeSectionIndicator(data: HomeSectionData, accentColor: Color) {
                     }
 
                     if (data.position > 5) {
-                        // Separador
                         Spacer(Modifier.width(4.dp))
-
-                        // Barra del usuario
                         Box(
                             modifier = Modifier
                                 .weight(1f)
@@ -188,6 +201,7 @@ fun HomeSectionIndicator(data: HomeSectionData, accentColor: Color) {
     }
 }
 
+// ── Preview ──────────────────────────────────────────────────────
 @Preview(showBackground = true)
 @Composable
 fun HomeSectionIndicatorPreview() {
@@ -199,10 +213,8 @@ fun HomeSectionIndicatorPreview() {
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             HomeSectionIndicator(
-                data = HomeSectionData.Calendar(
-                    pendingTasks = 2,
-                    completedTasks = 3
-                ), accentColor = Color(0xFF4A7C59)
+                data = HomeSectionData.Calendar(pendingTasks = 2, completedTasks = 3),
+                accentColor = Color(0xFF4A7C59)
             )
             HomeSectionIndicator(
                 data = HomeSectionData.Rivalry(position = 2, totalFriends = 5),

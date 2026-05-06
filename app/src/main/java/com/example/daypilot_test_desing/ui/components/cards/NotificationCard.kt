@@ -49,7 +49,6 @@ fun NotificationCard(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(14.dp)
     ) {
-        // Icono con color del tipo
         Box(
             modifier = Modifier
                 .size(44.dp)
@@ -65,7 +64,6 @@ fun NotificationCard(
             )
         }
 
-        // Contenido
         Column(modifier = Modifier.weight(1f)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -92,7 +90,6 @@ fun NotificationCard(
             )
         }
 
-        // Punto de no leída
         if (!isRead) {
             Box(
                 modifier = Modifier

@@ -90,7 +90,7 @@ fun TechHealthScreen(
             ) {
                 Icon(
                     imageVector        = Icons.Default.Add,
-                    contentDescription = "Añadir restricción"
+                    contentDescription = stringResource(R.string.tech_health_add_restriction)
                 )
             }
         },
@@ -104,9 +104,9 @@ fun TechHealthScreen(
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             item {
-                DayPilotSectionHeader(title = "Restricciones")
+                DayPilotSectionHeader(title = stringResource(R.string.tech_health_restrictions_title))
                 Text(
-                    text  = "$total en total",
+                    text = stringResource(R.string.tech_health_restrictions_count, total),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -116,7 +116,7 @@ fun TechHealthScreen(
             if (total == 0) {
                 item {
                     DayPilotEmptyState(
-                        message  = "No hay restricciones\nPulsa + para crear una.",
+                        message  = stringResource(R.string.tech_health_empty),
                         modifier = Modifier.height(200.dp)
                     )
                 }
@@ -134,7 +134,7 @@ fun TechHealthScreen(
             if (groupRestrictions.isNotEmpty()) {
                 item {
                     Spacer(Modifier.height(4.dp))
-                    DayPilotSectionHeader(title = "Grupos")
+                    DayPilotSectionHeader(title = stringResource(R.string.tech_health_groups_title))
                 }
                 items(groupRestrictions, key = { it.id }) { group ->
                     GroupLimitCard(

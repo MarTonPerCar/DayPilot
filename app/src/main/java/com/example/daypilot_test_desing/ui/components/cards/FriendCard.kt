@@ -31,8 +31,6 @@ fun FriendCard(
     weeklySummary: FriendWeeklySummary? = null,
     onReact: (ReactionType) -> Unit = {}
 ) {
-    var reactionsVisible by remember { mutableStateOf(false) }
-
     Column(
         modifier = modifier
             .fillMaxWidth()

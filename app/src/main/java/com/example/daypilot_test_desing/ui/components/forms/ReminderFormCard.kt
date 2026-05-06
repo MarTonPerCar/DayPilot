@@ -2,16 +2,37 @@ package com.example.daypilot_test_desing.ui.components.forms
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
-import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -21,16 +42,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.ui.components.basic.DayPilotTextField
 import com.example.daypilot_test_desing.ui.model.FrequencyType
-import com.example.daypilot_test_desing.ui.model.ReminderFormDataF
+import com.example.daypilot_test_desing.ui.model.ReminderFormDataInfo
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
 import java.util.Calendar
 
-
 @Composable
 fun ReminderFormCard(
-    onSave: (ReminderFormDataF) -> Unit,
+    onSave: (ReminderFormDataInfo) -> Unit,
     onCancel: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -51,14 +72,12 @@ fun ReminderFormCard(
         val hour = cal.get(Calendar.HOUR_OF_DAY)
         val min = cal.get(Calendar.MINUTE)
         "%02d/%02d/%d %02d:%02d".format(day, month, year, hour, min)
-    } ?: "Sin fecha seleccionada"
+    } ?: stringResource(R.string.reminder_form_no_date)
 
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
         Column(
@@ -67,28 +86,27 @@ fun ReminderFormCard(
                 .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // ── Título ───────────────────────────────────────────
+            // ── Título ────────────────────────────────────────────
             Text(
-                text = "Nuevo recordatorio",
+                text = stringResource(R.string.reminder_form_title),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
             )
 
-            // ── Nombre ───────────────────────────────────────────
+            // ── Nombre ────────────────────────────────────────────
             DayPilotTextField(
                 value = title,
                 onValueChange = { title = it },
-                label = "Nombre del recordatorio"
+                label = stringResource(R.string.reminder_form_name_label)
             )
 
-            // ── Accesos rápidos ──────────────────────────────────
+            // ── Accesos rápidos ───────────────────────────────────
             Text(
-                text = "Acceso rápido",
+                text = stringResource(R.string.reminder_form_quick_access),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -126,7 +144,7 @@ fun ReminderFormCard(
                 }
             }
 
-            // ── Separador ────────────────────────────────────────
+            // ── Separador ─────────────────────────────────────────
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -134,7 +152,7 @@ fun ReminderFormCard(
             ) {
                 HorizontalDivider(modifier = Modifier.weight(1f))
                 Text(
-                    text = "o elige fecha y hora",
+                    text = stringResource(R.string.reminder_form_or_pick_date),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -171,8 +189,7 @@ fun ReminderFormCard(
                 colors = ButtonDefaults.outlinedButtonColors(
                     containerColor = if (selectedDate != null)
                         MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
-                    else
-                        Color.Transparent
+                    else Color.Transparent
                 )
             ) {
                 Icon(
@@ -184,20 +201,17 @@ fun ReminderFormCard(
                 Text(
                     text = dateLabel,
                     style = MaterialTheme.typography.labelMedium,
-                    color = if (selectedDate != null)
-                        MaterialTheme.colorScheme.primary
-                    else
-                        MaterialTheme.colorScheme.onSurfaceVariant
+                    color = if (selectedDate != null) MaterialTheme.colorScheme.primary
+                    else MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
             // ── Frecuencia ────────────────────────────────────────
             Text(
-                text = "Frecuencia",
+                text = stringResource(R.string.reminder_form_frequency),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -231,9 +245,7 @@ fun ReminderFormCard(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(14.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant
-                ),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
                 elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
             ) {
                 Row(
@@ -245,13 +257,13 @@ fun ReminderFormCard(
                 ) {
                     Column {
                         Text(
-                            text = "Aviso previo",
+                            text = stringResource(R.string.reminder_form_early_warning),
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
-                            text = "Notifica 10 min antes",
+                            text = stringResource(R.string.reminder_form_early_warning_desc),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -276,14 +288,13 @@ fun ReminderFormCard(
                     onClick = onCancel,
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(12.dp)
-                ) {
-                    Text("Cancelar")
-                }
+                ) { Text(stringResource(R.string.common_cancel)) }
+
                 Button(
                     onClick = {
                         if (isValid) {
                             onSave(
-                                ReminderFormDataF(
+                                ReminderFormDataInfo(
                                     title = title,
                                     frequencyType = frequency,
                                     earlyWarning = earlyWarning,
@@ -296,14 +307,13 @@ fun ReminderFormCard(
                     enabled = isValid,
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(12.dp)
-                ) {
-                    Text("Crear recordatorio")
-                }
+                ) { Text(stringResource(R.string.reminder_form_create)) }
             }
         }
     }
 }
 
+// ── Preview ──────────────────────────────────────────────────────
 @Preview(showBackground = true)
 @Composable
 fun ReminderFormCardPreview() {
