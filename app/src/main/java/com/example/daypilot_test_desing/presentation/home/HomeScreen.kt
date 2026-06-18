@@ -1,28 +1,14 @@
 package com.example.daypilot_test_desing.ui.screens
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.daypilot_test_desing.R
-import com.example.daypilot_test_desing.ui.components.basic.DayPilotTopBar
 import com.example.daypilot_test_desing.ui.components.cards.*
-import com.example.daypilot_test_desing.ui.model.DayProgress
-import com.example.daypilot_test_desing.ui.model.HomeSection
-import com.example.daypilot_test_desing.ui.model.HomeSectionData
+import com.example.daypilot_test_desing.data.model.DayProgress
+import com.example.daypilot_test_desing.data.model.HomeSection
+import com.example.daypilot_test_desing.data.model.HomeSectionData
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

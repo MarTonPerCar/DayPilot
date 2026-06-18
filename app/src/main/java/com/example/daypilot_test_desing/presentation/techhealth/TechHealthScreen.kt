@@ -10,14 +10,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.ui.components.basic.*
 import com.example.daypilot_test_desing.ui.components.cards.*
 import com.example.daypilot_test_desing.ui.components.forms.AppLimitFormCard
-import com.example.daypilot_test_desing.ui.model.AppRestriction
-import com.example.daypilot_test_desing.ui.model.GroupRestriction
+import com.example.daypilot_test_desing.data.model.AppRestriction
+import com.example.daypilot_test_desing.data.model.GroupRestriction
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -16,7 +16,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.ui.components.basic.*
-import com.example.daypilot_test_desing.ui.model.TimeZoneRegion
+import com.example.daypilot_test_desing.data.model.TimeZoneRegion
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

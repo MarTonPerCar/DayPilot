@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.ui.components.basic.*
 import com.example.daypilot_test_desing.ui.components.cards.UserSearchCard
-import com.example.daypilot_test_desing.ui.model.SearchUserData
+import com.example.daypilot_test_desing.data.model.SearchUserData
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

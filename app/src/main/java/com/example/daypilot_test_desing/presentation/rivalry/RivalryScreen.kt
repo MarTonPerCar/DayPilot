@@ -21,8 +21,8 @@ import com.example.daypilot_test_desing.ui.components.basic.DayPilotTopBar
 import com.example.daypilot_test_desing.ui.components.cards.CurrentUserRankingCard
 import com.example.daypilot_test_desing.ui.components.cards.PodiumCard
 import com.example.daypilot_test_desing.ui.components.cards.RankingCard
-import com.example.daypilot_test_desing.ui.model.PodiumEntry
-import com.example.daypilot_test_desing.ui.model.RankingData
+import com.example.daypilot_test_desing.data.model.PodiumEntry
+import com.example.daypilot_test_desing.data.model.RankingData
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

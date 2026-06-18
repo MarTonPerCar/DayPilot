@@ -23,7 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.daypilot_test_desing.ui.components.basic.DayPilotTopBar
-import com.example.daypilot_test_desing.ui.model.TimerMode
+import com.example.daypilot_test_desing.data.model.TimerMode
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
