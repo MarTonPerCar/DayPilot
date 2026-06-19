@@ -33,9 +33,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.daypilot_test_desing.R
 import androidx.compose.ui.unit.dp
-import com.example.daypilot_test_desing.ui.model.CalendarTaskDot
-import com.example.daypilot_test_desing.ui.model.Month
-import com.example.daypilot_test_desing.ui.model.WeekDay
+import com.example.daypilot_test_desing.data.model.CalendarTaskDot
+import com.example.daypilot_test_desing.data.model.Month
+import com.example.daypilot_test_desing.data.model.WeekDay
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
 import java.util.Calendar
 
@@ -136,7 +136,7 @@ fun DayPilotCalendar(
                             if (day < 1 || day > daysInMonth) {
                                 Box(modifier = Modifier.weight(1f))
                             } else {
-                                val dots = taskDots.filter { it.day == day }
+                                val dots = taskDots.filter { it.day == day && it.month == month && it.year == year }
                                 val isSelected = day == selectedDay
                                 val isToday =
                                     day == Calendar.getInstance().get(Calendar.DAY_OF_MONTH) &&
@@ -236,10 +236,7 @@ fun DayPilotCalendarPreview() {
                 month = 5,
                 year = 2026,
                 taskDots = listOf(
-                    CalendarTaskDot(
-                        day = 5,
-                        color = Color(0xFF4CAF50)
-                    )
+                    CalendarTaskDot(day = 5, month = 5, year = 2026, color = Color(0xFF4CAF50))
                 ),
                 selectedDay = 5,
                 onDaySelected = {},

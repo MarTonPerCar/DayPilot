@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.ui.screens
+package com.example.daypilot_test_desing.presentation.friends
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*

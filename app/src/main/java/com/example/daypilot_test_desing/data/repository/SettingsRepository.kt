@@ -1,0 +1,11 @@
+package com.example.daypilot_test_desing.data.repository
+
+import com.example.daypilot_test_desing.data.model.AppSettings
+
+interface SettingsRepository {
+    fun getSettings(): AppSettings
+    fun toggleDarkMode(enabled: Boolean)
+    fun selectTheme(themeId: String)
+    fun selectLanguage(language: String)
+    fun toggleNotifications(enabled: Boolean)
+}

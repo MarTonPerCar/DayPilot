@@ -62,13 +62,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.ui.components.basic.dayPilotTextFieldColors
-import com.example.daypilot_test_desing.ui.model.TaskCategory
-import com.example.daypilot_test_desing.ui.model.TaskDifficulty
+import com.example.daypilot_test_desing.data.model.TaskCategory
+import com.example.daypilot_test_desing.data.model.TaskDifficulty
+import com.example.daypilot_test_desing.data.model.NewTaskData
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
 
 @Composable
 fun TaskFormCard(
-    onSave: () -> Unit,
+    onSave: (title: String, category: TaskCategory, difficulty: TaskDifficulty, duration: Int) -> Unit,
     onCancel: () -> Unit,
     modifier: Modifier = Modifier,
     isEditing: Boolean = false
@@ -241,7 +242,8 @@ fun TaskFormCard(
                 Text(stringResource(R.string.common_cancel))
             }
             Button(
-                onClick = onSave,
+                onClick = { if (title.isNotBlank()) onSave(title.trim(), category, difficulty, duration) },
+                enabled = title.isNotBlank(),
                 modifier = Modifier
                     .weight(1f)
                     .height(50.dp),
@@ -436,7 +438,7 @@ fun DurationSelector(
 fun TaskFormCardPreview() {
     DayPilotTheme(theme = DayPilotTheme.SAGE_GREEN, darkMode = true) {
         Box(Modifier.background(MaterialTheme.colorScheme.background)) {
-            TaskFormCard(onSave = {}, onCancel = {})
+            TaskFormCard(onSave = { _, _, _, _ -> }, onCancel = {})
         }
     }
 }

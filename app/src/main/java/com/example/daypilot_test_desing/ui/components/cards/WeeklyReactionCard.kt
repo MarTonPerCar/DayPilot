@@ -25,9 +25,9 @@ import com.example.daypilot_test_desing.ui.components.basic.DayPilotDivider
 import com.example.daypilot_test_desing.ui.components.basic.DayPilotReactionBadgeRow
 import com.example.daypilot_test_desing.ui.components.basic.DayPilotStatVerticalDivider
 import com.example.daypilot_test_desing.ui.components.basic.DayPilotWeeklyStat
-import com.example.daypilot_test_desing.ui.model.ReactionType
-import com.example.daypilot_test_desing.ui.model.ReceivedReaction
-import com.example.daypilot_test_desing.ui.model.WeeklySummaryData
+import com.example.daypilot_test_desing.data.model.ReactionType
+import com.example.daypilot_test_desing.data.model.ReceivedReaction
+import com.example.daypilot_test_desing.data.model.WeeklySummaryData
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
 
 @Composable

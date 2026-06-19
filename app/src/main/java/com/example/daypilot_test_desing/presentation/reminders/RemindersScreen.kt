@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.ui.screens
+package com.example.daypilot_test_desing.presentation.reminders
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues

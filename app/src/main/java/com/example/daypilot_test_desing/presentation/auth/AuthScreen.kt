@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.ui.screens
+package com.example.daypilot_test_desing.presentation.auth
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween

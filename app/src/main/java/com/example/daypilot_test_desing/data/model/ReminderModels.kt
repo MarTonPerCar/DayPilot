@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.ui.model
+package com.example.daypilot_test_desing.data.model
 
 import androidx.annotation.StringRes
 import com.example.daypilot_test_desing.R

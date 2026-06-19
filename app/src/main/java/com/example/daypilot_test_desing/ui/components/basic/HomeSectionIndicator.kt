@@ -31,8 +31,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.daypilot_test_desing.R
-import com.example.daypilot_test_desing.ui.model.HomeSectionData
-import com.example.daypilot_test_desing.ui.model.ProgressFilter
+import com.example.daypilot_test_desing.data.model.HomeSectionData
+import com.example.daypilot_test_desing.data.model.ProgressFilter
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
 
 // ── Indicador visual por sección ─────────────────────────────────

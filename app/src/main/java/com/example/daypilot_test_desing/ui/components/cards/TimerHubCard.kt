@@ -18,7 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.daypilot_test_desing.ui.model.TimerOption
+import com.example.daypilot_test_desing.data.model.TimerOption
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
 import com.example.daypilot_test_desing.R
 

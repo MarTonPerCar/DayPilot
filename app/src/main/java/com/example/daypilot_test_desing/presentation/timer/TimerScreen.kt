@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.ui.screens
+package com.example.daypilot_test_desing.presentation.timer
 
 import androidx.compose.ui.res.stringResource
 import com.example.daypilot_test_desing.R

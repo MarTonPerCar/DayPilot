@@ -15,8 +15,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.ui.components.basic.HomeSectionIndicator
-import com.example.daypilot_test_desing.ui.model.HomeSection
-import com.example.daypilot_test_desing.ui.model.HomeSectionData
+import com.example.daypilot_test_desing.data.model.HomeSection
+import com.example.daypilot_test_desing.data.model.HomeSectionData
 
 @Composable
 fun HomeMenuCardInline(

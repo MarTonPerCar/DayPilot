@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.ui.model
+package com.example.daypilot_test_desing.data.model
 
 import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
@@ -32,6 +32,8 @@ enum class TaskCategory(@StringRes val labelRes: Int, val icon: ImageVector, val
 data class CalendarTaskData(
     val id: String,
     val day: Int,
+    val month: Int,
+    val year: Int,
     val title: String,
     val category: TaskCategory,
     val difficulty: TaskDifficulty,
@@ -39,8 +41,20 @@ data class CalendarTaskData(
     val isDone: Boolean
 )
 
+data class NewTaskData(
+    val day: Int,
+    val month: Int,
+    val year: Int,
+    val title: String,
+    val category: TaskCategory,
+    val difficulty: TaskDifficulty,
+    val duration: Int
+)
+
 data class CalendarTaskDot(
     val day: Int,
+    val month: Int,
+    val year: Int,
     val color: androidx.compose.ui.graphics.Color
 )
 

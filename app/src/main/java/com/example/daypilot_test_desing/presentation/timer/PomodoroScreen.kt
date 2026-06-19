@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.ui.screens
+package com.example.daypilot_test_desing.presentation.timer
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas

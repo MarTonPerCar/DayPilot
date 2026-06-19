@@ -13,8 +13,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.daypilot_test_desing.ui.model.TaskCategory
-import com.example.daypilot_test_desing.ui.model.TaskDifficulty
+import com.example.daypilot_test_desing.data.model.TaskCategory
+import com.example.daypilot_test_desing.data.model.TaskDifficulty
 
 @Composable
 fun DifficultyChip(difficulty: TaskDifficulty) {

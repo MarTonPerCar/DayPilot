@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.ui.screens
+package com.example.daypilot_test_desing.presentation.settings
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*

@@ -17,7 +17,7 @@ import com.example.daypilot_test_desing.ui.components.DayPilotCalendar
 import com.example.daypilot_test_desing.ui.components.basic.*
 import com.example.daypilot_test_desing.ui.components.cards.*
 import com.example.daypilot_test_desing.ui.components.forms.*
-import com.example.daypilot_test_desing.ui.model.*
+import com.example.daypilot_test_desing.data.model.*
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
 
 // ── Preview 1: Botones, Avatar, Chips, TextFields ─────────────────
@@ -327,9 +327,9 @@ fun CatalogCardsCalendar() {
                 DayPilotCalendar(
                     month = 5, year = 2026,
                     taskDots = listOf(
-                        CalendarTaskDot(day = 5,  color = Color(0xFF4CAF50)),
-                        CalendarTaskDot(day = 10, color = Color(0xFFFF9800)),
-                        CalendarTaskDot(day = 15, color = Color(0xFFF44336))
+                        CalendarTaskDot(day = 5,  month = 5, year = 2026, color = Color(0xFF4CAF50)),
+                        CalendarTaskDot(day = 10, month = 5, year = 2026, color = Color(0xFFFF9800)),
+                        CalendarTaskDot(day = 15, month = 5, year = 2026, color = Color(0xFFF44336))
                     ),
                     selectedDay     = 5,
                     onDaySelected   = {},
@@ -354,7 +354,7 @@ fun CatalogForms() {
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             CatalogSection("Task Form") {
-                TaskFormCard(onSave = {}, onCancel = {})
+                TaskFormCard(onSave = { _, _, _, _ -> }, onCancel = {})
             }
             CatalogSection("Reminder Form") {
                 ReminderFormCard(onSave = {}, onCancel = {})

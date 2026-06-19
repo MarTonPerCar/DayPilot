@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.ui.screens
+package com.example.daypilot_test_desing.presentation.calendar
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -23,6 +23,7 @@ import com.example.daypilot_test_desing.ui.components.DayPilotCalendar
 import com.example.daypilot_test_desing.ui.components.forms.TaskFormCard
 import com.example.daypilot_test_desing.data.model.CalendarTaskData
 import com.example.daypilot_test_desing.data.model.CalendarTaskDot
+import com.example.daypilot_test_desing.data.model.NewTaskData
 import com.example.daypilot_test_desing.data.model.TaskCategory
 import com.example.daypilot_test_desing.data.model.TaskDifficulty
 import java.util.Calendar
@@ -32,7 +33,7 @@ import java.util.Calendar
 fun CalendarScreen(
     tasks: List<CalendarTaskData>,
     onBack: () -> Unit,
-    onAddTask: (day: Int) -> Unit,
+    onCreateTask: (NewTaskData) -> Unit,
     onTapTask: (String) -> Unit,
     onToggleTask: (String, Boolean) -> Unit,
     onDeleteTask: (String) -> Unit = {},
@@ -54,14 +55,14 @@ fun CalendarScreen(
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    // Puntos de color para el calendario
+    // Puntos de color para el calendario (filtrados al mes/año visibles)
     val taskDots = tasks.map { task ->
-        CalendarTaskDot(day = task.day, color = task.category.color)
+        CalendarTaskDot(day = task.day, month = task.month, year = task.year, color = task.category.color)
     }
 
-    // Tareas filtradas del día seleccionado
+    // Tareas filtradas del día seleccionado dentro del mes/año actual
     val tasksForSelectedDay = selectedDay?.let { day ->
-        tasks.filter { it.day == day }
+        tasks.filter { it.day == day && it.month == currentMonth && it.year == currentYear }
             .filter { selectedDifficulty == null || it.difficulty == selectedDifficulty }
             .filter { selectedCategory == null || it.category == selectedCategory }
     } ?: emptyList()
@@ -79,7 +80,20 @@ fun CalendarScreen(
         ) {
             TaskFormCard(
                 isEditing = editingTaskId != null,
-                onSave = {
+                onSave = { title, category, difficulty, duration ->
+                    if (editingTaskId == null) {
+                        onCreateTask(
+                            NewTaskData(
+                                day        = dayForNewTask,
+                                month      = currentMonth,
+                                year       = currentYear,
+                                title      = title,
+                                category   = category,
+                                difficulty = difficulty,
+                                duration   = duration
+                            )
+                        )
+                    }
                     showAddSheet = false
                     editingTaskId = null
                 },

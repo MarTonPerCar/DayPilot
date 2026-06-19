@@ -41,8 +41,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.ui.components.basic.ChartSummaryItem
-import com.example.daypilot_test_desing.ui.model.DayProgress
-import com.example.daypilot_test_desing.ui.model.ProgressFilter
+import com.example.daypilot_test_desing.data.model.DayProgress
+import com.example.daypilot_test_desing.data.model.ProgressFilter
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
 
 @Composable

@@ -53,8 +53,8 @@ import com.example.daypilot_test_desing.ui.components.basic.AppInfo
 import com.example.daypilot_test_desing.ui.components.basic.AppMultiPickerSheet
 import com.example.daypilot_test_desing.ui.components.basic.AppPickerSheet
 import com.example.daypilot_test_desing.ui.components.basic.DayPilotTextField
-import com.example.daypilot_test_desing.ui.model.AppRestriction
-import com.example.daypilot_test_desing.ui.model.GroupRestriction
+import com.example.daypilot_test_desing.data.model.AppRestriction
+import com.example.daypilot_test_desing.data.model.GroupRestriction
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
 
 // ── Tipo de restricción ───────────────────────────────────────────

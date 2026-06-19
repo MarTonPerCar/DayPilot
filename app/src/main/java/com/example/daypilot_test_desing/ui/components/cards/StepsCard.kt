@@ -66,7 +66,7 @@ fun StepsCard(
     modifier: Modifier = Modifier
 ) {
     var showGoalSheet by remember { mutableStateOf(false) }
-    var sliderValue by remember { mutableFloatStateOf(goalSteps.toFloat()) }
+    var sliderValue by remember(goalSteps) { mutableFloatStateOf(goalSteps.toFloat()) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     val progress = (currentSteps.toFloat() / goalSteps.toFloat()).coerceIn(0f, 1f)
