@@ -27,8 +27,8 @@ object FakeTaskRepository : TaskRepository {
         val (d3, m3, y3) = dateOffset(3)
         val (d4, m4, y4) = dateOffset(4)
         mutableListOf(
-            CalendarTaskData("t1", d0, m0, y0, "Reunión de equipo",      TaskCategory.WORK,     TaskDifficulty.MEDIUM, 60,  false),
-            CalendarTaskData("t2", d0, m0, y0, "Sesión de gimnasio",     TaskCategory.SPORT,    TaskDifficulty.HARD,   90,  false),
+            CalendarTaskData("t1", d0, m0, y0, "Reunión de equipo",      TaskCategory.WORK,     TaskDifficulty.MEDIUM, 60,  true),
+            CalendarTaskData("t2", d0, m0, y0, "Sesión de gimnasio",     TaskCategory.SPORT,    TaskDifficulty.HARD,   90,  true),
             CalendarTaskData("t3", d0, m0, y0, "Estudiar Kotlin",        TaskCategory.STUDY,    TaskDifficulty.MEDIUM, 120, true),
             CalendarTaskData("t4", d1, m1, y1, "Revisión del proyecto",  TaskCategory.WORK,     TaskDifficulty.HARD,   180, false),
             CalendarTaskData("t5", d1, m1, y1, "Meditación matutina",    TaskCategory.HEALTH,   TaskDifficulty.EASY,   20,  false),
@@ -54,6 +54,11 @@ object FakeTaskRepository : TaskRepository {
                 isDone     = false
             )
         )
+    }
+
+    override fun updateTask(id: String, title: String, category: TaskCategory, difficulty: TaskDifficulty, duration: Int) {
+        val idx = _tasks.indexOfFirst { it.id == id }
+        if (idx >= 0) _tasks[idx] = _tasks[idx].copy(title = title, category = category, difficulty = difficulty, duration = duration)
     }
 
     override fun toggleTask(id: String, isDone: Boolean) {

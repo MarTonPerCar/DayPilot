@@ -75,4 +75,6 @@ object FakeFriendRepository : FriendRepository {
             ))
         }
     }
+
+    override fun removeFriend(userId: String) { friends.removeAll { it.id == userId } }
 }

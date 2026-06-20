@@ -12,4 +12,5 @@ interface TechHealthRepository {
     fun deleteRestriction(id: String)
     fun toggleGroup(id: String, enabled: Boolean)
     fun deleteGroup(id: String)
+    fun updateUsage(id: String, usedMinutes: Int)
 }

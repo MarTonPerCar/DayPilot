@@ -58,10 +58,18 @@ fun DayPilotCalendar(
         set(Calendar.DAY_OF_MONTH, 1)
     }
 
-    val daysInMonth = cal.getActualMaximum(Calendar.DAY_OF_MONTH)
+    val daysInMonth  = cal.getActualMaximum(Calendar.DAY_OF_MONTH)
     val firstDayOfWeek = cal.get(Calendar.DAY_OF_WEEK)
+    val startOffset  = (firstDayOfWeek + 5) % 7
 
-    val startOffset = (firstDayOfWeek + 5) % 7
+    // Hoist today once — avoids 3 × Calendar.getInstance() per grid cell
+    val nowCal      = Calendar.getInstance()
+    val todayDay    = nowCal.get(Calendar.DAY_OF_MONTH)
+    val todayMonth  = nowCal.get(Calendar.MONTH) + 1
+    val todayYear   = nowCal.get(Calendar.YEAR)
+
+    // Pre-group dots by day so each cell lookup is O(1) instead of O(tasks)
+    val dotsByDay   = taskDots.groupBy { it.day }
 
     val monthNames = Month.entries.map { stringResource(it.nameRes) }
     val dayHeaders = WeekDay.entries.map { stringResource(it.headerRes) }
@@ -136,13 +144,9 @@ fun DayPilotCalendar(
                             if (day < 1 || day > daysInMonth) {
                                 Box(modifier = Modifier.weight(1f))
                             } else {
-                                val dots = taskDots.filter { it.day == day && it.month == month && it.year == year }
+                                val dots = dotsByDay[day]?.filter { it.month == month && it.year == year }.orEmpty()
                                 val isSelected = day == selectedDay
-                                val isToday =
-                                    day == Calendar.getInstance().get(Calendar.DAY_OF_MONTH) &&
-                                            month == Calendar.getInstance()
-                                        .get(Calendar.MONTH) + 1 &&
-                                            year == Calendar.getInstance().get(Calendar.YEAR)
+                                val isToday = day == todayDay && month == todayMonth && year == todayYear
 
                                 CalendarDayCell(
                                     day = day,

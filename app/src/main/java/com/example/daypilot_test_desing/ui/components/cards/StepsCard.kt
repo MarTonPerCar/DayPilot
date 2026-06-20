@@ -5,6 +5,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -62,6 +63,8 @@ fun StepsCard(
     goalSteps: Int,
     pointsEarned: Int,
     pointsRemaining: Int,
+    goalLocked: Boolean = false,
+    pendingGoal: Int? = null,
     onConfigureGoal: (newGoal: Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -235,11 +238,16 @@ fun StepsCard(
                         color = MaterialTheme.colorScheme.onSurface
                     )
                 }
-                TextButton(onClick = { showGoalSheet = true }) {
+                TextButton(
+                    onClick  = { if (!goalLocked) showGoalSheet = true },
+                    enabled  = !goalLocked
+                ) {
                     Text(
-                        text = stringResource(R.string.steps_configure_goal),
+                        text  = if (goalLocked) stringResource(R.string.steps_goal_locked)
+                                else stringResource(R.string.steps_configure_goal),
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.primary
+                        color = if (goalLocked) MaterialTheme.colorScheme.onSurfaceVariant
+                                else MaterialTheme.colorScheme.primary
                     )
                 }
             }
@@ -321,6 +329,24 @@ fun StepsCard(
                     StepStatRow(
                         label = stringResource(R.string.steps_next_milestone),
                         value = nextMilestone
+                    )
+                }
+            }
+
+            // ── Banner meta pendiente ─────────────────────────────
+            if (pendingGoal != null) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.10f))
+                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(R.string.steps_pending_goal, pendingGoal),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
             }

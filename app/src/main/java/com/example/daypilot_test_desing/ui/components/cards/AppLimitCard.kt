@@ -1,5 +1,7 @@
 package com.example.daypilot_test_desing.ui.components.cards
 
+import android.graphics.Bitmap
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -33,11 +35,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.graphics.drawable.toBitmap
 import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.data.model.AppRestriction
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
@@ -51,6 +57,11 @@ fun AppLimitCard(
     modifier: Modifier = Modifier
 ) {
     var showDeleteConfirm by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val appIcon: Bitmap? = remember(restriction.packageName) {
+        try { context.packageManager.getApplicationIcon(restriction.packageName).toBitmap() }
+        catch (_: Exception) { null }
+    }
 
     val progress = (restriction.usedMinutesToday.toFloat() /
             restriction.dailyLimitMinutes).coerceIn(0f, 1f)
@@ -107,20 +118,29 @@ fun AppLimitCard(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Avatar app — placeholder hasta PackageManager
-                Box(
-                    modifier = Modifier
-                        .size(44.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(MaterialTheme.colorScheme.surfaceVariant),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = restriction.appName.first().uppercase(),
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
+                // App icon — real launcher icon when available, letter avatar as fallback
+                if (appIcon != null) {
+                    Image(
+                        bitmap             = appIcon.asImageBitmap(),
+                        contentDescription = null,
+                        contentScale       = ContentScale.Fit,
+                        modifier           = Modifier.size(44.dp).clip(RoundedCornerShape(10.dp))
                     )
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .size(44.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(MaterialTheme.colorScheme.surfaceVariant),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text       = restriction.appName.first().uppercase(),
+                            fontSize   = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color      = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
 
                 Column(modifier = Modifier.weight(1f)) {

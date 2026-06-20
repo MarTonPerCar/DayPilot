@@ -12,4 +12,5 @@ interface FriendRepository {
     fun reactToFriend(userId: String, reaction: ReactionType)
     fun searchUsers(query: String): List<SearchUserData>
     fun addFriend(userId: String)
+    fun removeFriend(userId: String)
 }

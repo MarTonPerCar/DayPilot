@@ -50,6 +50,9 @@
     <string name="profile_email">E-Mail</string>
     <string name="profile_since">Seit</string>
     <string name="profile_username">Benutzername</string>
+    <string name="profile_section_account">Konto</string>
+    <string name="profile_section_stats">Heutige Statistiken</string>
+    <string name="profile_section_weekly">Wöchentliche Aktivität</string>
     <string name="profile_points_today">Punkte heute</string>
     <string name="profile_points_tasks">Aufgaben</string>
     <string name="profile_points_steps">Schritte</string>
@@ -125,6 +128,7 @@
     <string name="friends_tab_requests">Anfragen</string>
     <string name="friends_empty">Du hast noch keine Freunde.\nSuche und füge Freunde hinzu!</string>
     <string name="friends_requests_empty">Keine ausstehenden Anfragen</string>
+    <string name="friends_remove">Freund entfernen</string>
 
     <!-- Notifications -->
     <string name="notifications_title">Benachrichtigungen</string>
@@ -247,6 +251,7 @@
     <string name="task_section_details">Details</string>
     <string name="task_section_reminder">Erinnerung</string>
     <string name="task_section_recurrence">Wiederholung</string>
+    <string name="task_section_extras">Erinnerung &amp; Wiederholung</string>
     <string name="task_reminder_label">Erinnerung aktivieren</string>
     <string name="task_reminder_description">Du erhältst eine Benachrichtigung</string>
     <string name="task_recurring_label">Wiederkehrende Aufgabe</string>
@@ -374,6 +379,8 @@
     <!-- Steps Card -->
     <string name="steps_label">Schritte</string>
     <string name="steps_configure_goal">Ziel konfigurieren</string>
+    <string name="steps_goal_locked">Bis morgen gesperrt</string>
+    <string name="steps_pending_goal">Ausstehendes Ziel: %1$d Schritte (aktiv morgen)</string>
     <string name="steps_goal_sheet_title">Schrittziel konfigurieren</string>
     <string name="steps_goal_value">%1$d Schritte</string>
     <string name="steps_goal_of">von %1$d</string>
@@ -383,6 +390,8 @@
     <string name="steps_points_earned">Heute verdiente Punkte</string>
     <string name="steps_pts_value">%1$d Pkt.</string>
     <string name="steps_goal_reached">Ziel erreicht!</string>
+    <string name="steps_see_details">Details</string>
+    <string name="steps_sensor_unavailable">Schrittzähler-Sensor nicht verfügbar auf diesem Gerät. Verbinde ein physisches Gerät um deine Schritte zu erfassen.</string>
 
 
     <!-- Steps Summary Card -->
@@ -508,5 +517,17 @@
 
     <!-- Timer Screen -->
     <string name="timer_point_earned">Tagespunkt erreicht</string>
+
+    <!-- Reminders / Notifications -->
+    <string name="reminder_channel_name">Erinnerungen</string>
+    <string name="reminder_channel_desc">DayPilot-Erinnerungsbenachrichtigungen</string>
+    <string name="reminder_body">Zeit für deine Erinnerung!</string>
+    <string name="reminder_early_body">Deine Erinnerung aktiviert in 10 Minuten</string>
+
+    <!-- Tech Health Notifications -->
+    <string name="tech_health_channel_name">Tech-Gesundheit</string>
+    <string name="tech_health_channel_desc">Benachrichtigungen wenn das Nutzungslimit einer App erreicht wird</string>
+    <string name="tech_health_notif_title">Limit erreicht: %s</string>
+    <string name="tech_health_notif_body">Du hast %1$d Min. von %2$d Min. genutzt</string>
 
 </resources>

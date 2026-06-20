@@ -22,6 +22,8 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import android.media.RingtoneManager
+import androidx.compose.ui.platform.LocalContext
 import com.example.daypilot_test_desing.ui.components.basic.DayPilotTopBar
 import com.example.daypilot_test_desing.data.model.TimerMode
 import kotlinx.coroutines.delay
@@ -32,8 +34,10 @@ fun TimerScreen(
     timerMode: String,
     customMinutes: Int = 0,
     pointEarnedToday: Boolean = false,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onTimerCompleted: () -> Unit = {}
 ) {
+    val context      = LocalContext.current
     val mode         = TimerMode.entries.find { it.name == timerMode } ?: TimerMode.TRAINING
     val totalSeconds = if (customMinutes > 0) customMinutes * 60 else mode.durationMinutes * 60
     val label = if (timerMode == "CUSTOM") stringResource(R.string.timer_custom) else stringResource(mode.labelRes)
@@ -59,6 +63,16 @@ fun TimerScreen(
                 isFinished = true
             }
         }
+    }
+
+    LaunchedEffect(isFinished) {
+        if (!isFinished) return@LaunchedEffect
+        onTimerCompleted()
+        val uri      = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
+        val ringtone = RingtoneManager.getRingtone(context, uri)
+        ringtone?.play()
+        delay(3_000L)
+        if (ringtone?.isPlaying == true) ringtone.stop()
     }
 
     val minutes     = secondsLeft / 60

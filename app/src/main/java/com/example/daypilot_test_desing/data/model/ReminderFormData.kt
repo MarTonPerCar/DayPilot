@@ -7,5 +7,6 @@ data class ReminderFormDataInfo(
     val frequencyType: FrequencyType,
     val earlyWarning: Boolean,
     val quickMinutes: Int?,
-    val scheduledDateTime: Calendar?
+    val scheduledDateTime: Calendar?,
+    val triggerAtMillis: Long = 0L
 )

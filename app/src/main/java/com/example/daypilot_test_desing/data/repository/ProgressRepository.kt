@@ -10,4 +10,12 @@ interface ProgressRepository {
     fun getPointsFromSteps(): Int
     fun getPointsFromHabits(): Int
     fun getPointsFromTimers(): Int
+    fun addTaskPoints(amount: Int)
+    fun removeTaskPoints(amount: Int)
+    fun addStepsPoints(amount: Int)
+    fun addTimerPoints(amount: Int)
+    fun addTechHealthPoints(amount: Int)
+    fun getMonthlyPoints(): Int
+    fun isTimerCompletedToday(): Boolean
+    fun isTechHealthBonusAwarded(): Boolean
 }

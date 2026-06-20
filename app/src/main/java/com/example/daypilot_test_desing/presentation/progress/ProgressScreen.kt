@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -26,6 +26,8 @@ fun ProgressScreen(
     pointsFromTimers: Int,
     onBack: () -> Unit
 ) {
+    var selectedFilter by remember { mutableStateOf(ProgressFilter.POINTS) }
+
     Scaffold(
         topBar = {
             DayPilotTopBar(
@@ -52,19 +54,23 @@ fun ProgressScreen(
                 pointsFromTimers = pointsFromTimers
             )
 
-            ProgressChartCard(
-                data   = progressData,
-                filter = ProgressFilter.POINTS
-            )
+            SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+                ProgressFilter.entries.forEachIndexed { index, filter ->
+                    SegmentedButton(
+                        shape = SegmentedButtonDefaults.itemShape(
+                            index = index,
+                            count = ProgressFilter.entries.size
+                        ),
+                        onClick = { selectedFilter = filter },
+                        selected = filter == selectedFilter,
+                        label = { Text(stringResource(filter.labelRes)) }
+                    )
+                }
+            }
 
             ProgressChartCard(
                 data   = progressData,
-                filter = ProgressFilter.STEPS
-            )
-
-            ProgressChartCard(
-                data   = progressData,
-                filter = ProgressFilter.TASKS
+                filter = selectedFilter
             )
 
             Spacer(Modifier.height(8.dp))

@@ -5,26 +5,8 @@ import com.example.daypilot_test_desing.data.model.GroupRestriction
 import com.example.daypilot_test_desing.data.repository.TechHealthRepository
 
 object FakeTechHealthRepository : TechHealthRepository {
-    private val apps = mutableListOf(
-        AppRestriction("a1", "Instagram",  "com.instagram.android",      60, 300, true,  45),
-        AppRestriction("a2", "TikTok",     "com.zhiliaoapp.musically",   30, 300, true,  28),
-        AppRestriction("a3", "YouTube",    "com.google.android.youtube", 90, 600, false, 12)
-    )
-
-    private val groups = mutableListOf(
-        GroupRestriction(
-            id = "g1",
-            groupName = "Redes sociales",
-            apps = listOf(
-                AppRestriction("g1a1", "Instagram", "com.instagram.android",   0, 300, true),
-                AppRestriction("g1a2", "TikTok",    "com.zhiliaoapp.musically",0, 300, true)
-            ),
-            dailyLimitMinutes         = 120,
-            notificationIntervalSeconds = 600,
-            isEnabled                 = true,
-            usedMinutesToday          = 73
-        )
-    )
+    private val apps   = mutableListOf<AppRestriction>()
+    private val groups = mutableListOf<GroupRestriction>()
 
     override fun getAppRestrictions(): List<AppRestriction>   = apps.toList()
     override fun getGroupRestrictions(): List<GroupRestriction> = groups.toList()
@@ -52,4 +34,9 @@ object FakeTechHealthRepository : TechHealthRepository {
     }
 
     override fun deleteGroup(id: String) { groups.removeAll { it.id == id } }
+
+    override fun updateUsage(id: String, usedMinutes: Int) {
+        val idx = apps.indexOfFirst { it.id == id }
+        if (idx >= 0) apps[idx] = apps[idx].copy(usedMinutesToday = usedMinutes)
+    }
 }

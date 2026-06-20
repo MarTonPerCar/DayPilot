@@ -1,14 +1,16 @@
 package com.example.daypilot_test_desing.navigation
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
+import android.app.LocaleManager
+import android.os.Build
+import android.os.LocaleList
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -17,20 +19,19 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.daypilot_test_desing.ui.components.basic.AppInfo
-import com.example.daypilot_test_desing.presentation.calendar.CalendarViewModel
-import com.example.daypilot_test_desing.presentation.friends.FriendsViewModel
-import com.example.daypilot_test_desing.presentation.friends.SearchFriendsViewModel
-import com.example.daypilot_test_desing.presentation.habits.HabitsViewModel
-import com.example.daypilot_test_desing.presentation.habits.StepsViewModel
-import com.example.daypilot_test_desing.presentation.home.HomeViewModel
-import com.example.daypilot_test_desing.presentation.notifications.NotificationsViewModel
-import com.example.daypilot_test_desing.presentation.profile.ProfileViewModel
-import com.example.daypilot_test_desing.presentation.progress.ProgressViewModel
-import com.example.daypilot_test_desing.presentation.reminders.RemindersViewModel
-import com.example.daypilot_test_desing.presentation.rivalry.RivalryViewModel
-import com.example.daypilot_test_desing.presentation.settings.SettingsViewModel
-import com.example.daypilot_test_desing.presentation.techhealth.TechHealthViewModel
+import com.example.daypilot_test_desing.viewmodel.calendar.CalendarViewModel
+import com.example.daypilot_test_desing.viewmodel.friends.FriendsViewModel
+import com.example.daypilot_test_desing.viewmodel.friends.SearchFriendsViewModel
+import com.example.daypilot_test_desing.viewmodel.habits.HabitsViewModel
+import com.example.daypilot_test_desing.viewmodel.habits.StepsViewModel
+import com.example.daypilot_test_desing.viewmodel.home.HomeViewModel
+import com.example.daypilot_test_desing.viewmodel.notifications.NotificationsViewModel
+import com.example.daypilot_test_desing.viewmodel.profile.ProfileViewModel
+import com.example.daypilot_test_desing.viewmodel.progress.ProgressViewModel
+import com.example.daypilot_test_desing.viewmodel.reminders.RemindersViewModel
+import com.example.daypilot_test_desing.viewmodel.rivalry.RivalryViewModel
+import com.example.daypilot_test_desing.viewmodel.settings.SettingsViewModel
+import com.example.daypilot_test_desing.viewmodel.techhealth.TechHealthViewModel
 import com.example.daypilot_test_desing.presentation.auth.AuthScreen
 import com.example.daypilot_test_desing.presentation.calendar.CalendarScreen
 import com.example.daypilot_test_desing.presentation.profile.EditProfileScreen
@@ -51,30 +52,6 @@ import com.example.daypilot_test_desing.presentation.techhealth.TechHealthScreen
 import com.example.daypilot_test_desing.presentation.timer.TimerHubScreen
 import com.example.daypilot_test_desing.presentation.timer.TimerScreen
 
-private val tabRoutes = setOf(
-    DayPilotDestinations.HOME,
-    DayPilotDestinations.FRIENDS,
-    DayPilotDestinations.NOTIFICATIONS,
-    DayPilotDestinations.PROFILE
-)
-
-val MOCK_APPS = listOf(
-    AppInfo("YouTube",   "com.google.android.youtube"),
-    AppInfo("Instagram", "com.instagram.android"),
-    AppInfo("TikTok",    "com.zhiliaoapp.musically"),
-    AppInfo("WhatsApp",  "com.whatsapp"),
-    AppInfo("Twitter",   "com.twitter.android"),
-    AppInfo("Facebook",  "com.facebook.katana"),
-    AppInfo("Spotify",   "com.spotify.music"),
-    AppInfo("Netflix",   "com.netflix.mediaclient"),
-    AppInfo("Gmail",     "com.google.android.gm"),
-    AppInfo("Chrome",    "com.android.chrome"),
-    AppInfo("Maps",      "com.google.android.apps.maps"),
-    AppInfo("Telegram",  "org.telegram.messenger"),
-    AppInfo("Discord",   "com.discord"),
-    AppInfo("Twitch",    "tv.twitch.android.app"),
-    AppInfo("Amazon",    "com.amazon.mShop.android.shopping")
-)
 
 @Composable
 fun DayPilotNavGraph(
@@ -98,13 +75,18 @@ fun DayPilotNavGraph(
     val remindersVM: RemindersViewModel         = viewModel()
     val techHealthVM: TechHealthViewModel       = viewModel()
 
+    val context = LocalContext.current
+
+    // Propagate sensor step updates to HabitsScreen and HomeScreen
+    val stepsState by stepsVM.uiState.collectAsState()
+    LaunchedEffect(stepsState.currentSteps) {
+        habitsVM.refresh()
+        homeVM.refresh()
+    }
+
     Scaffold(
         bottomBar = {
-            AnimatedVisibility(
-                visible = currentRoute in tabRoutes,
-                enter   = slideInVertically(initialOffsetY = { it }),
-                exit    = slideOutVertically(targetOffsetY = { it })
-            ) {
+            if (currentRoute != DayPilotDestinations.AUTH) {
                 DayPilotBottomBar(navController = navController)
             }
         }
@@ -136,19 +118,21 @@ fun DayPilotNavGraph(
             composable(DayPilotDestinations.HOME) {
                 val s by homeVM.uiState.collectAsState()
                 HomeScreen(
-                    userName            = s.userName,
-                    streak              = s.streak,
-                    stepsToday          = s.stepsToday,
-                    stepsGoal           = s.stepsGoal,
-                    tasksCompleted      = s.tasksCompleted,
-                    tasksTotal          = s.tasksTotal,
-                    progressData        = s.progressData,
-                    pointsToday         = s.pointsToday,
-                    rankingPosition     = s.rankingPosition,
-                    onNavigateToCalendar= { navController.navigate(DayPilotDestinations.CALENDAR) },
-                    onNavigateToHabits  = { navController.navigate(DayPilotDestinations.HABITS) },
-                    onNavigateToProgress= { navController.navigate(DayPilotDestinations.PROGRESS) },
-                    onNavigateToRivalry = { navController.navigate(DayPilotDestinations.RIVALRY) }
+                    userName              = s.userName,
+                    streak                = s.streak,
+                    stepsToday            = s.stepsToday,
+                    stepsGoal             = s.stepsGoal,
+                    tasksCompleted        = s.tasksCompleted,
+                    tasksTotal            = s.tasksTotal,
+                    progressData          = s.progressData,
+                    pointsToday           = s.pointsToday,
+                    rankingPosition       = s.rankingPosition,
+                    friendCount           = s.friendCount,
+                    timerCompletedToday   = s.timerCompletedToday,
+                    onNavigateToCalendar  = { navController.navigate(DayPilotDestinations.CALENDAR) },
+                    onNavigateToHabits    = { navController.navigate(DayPilotDestinations.HABITS) },
+                    onNavigateToProgress  = { navController.navigate(DayPilotDestinations.PROGRESS) },
+                    onNavigateToRivalry   = { navController.navigate(DayPilotDestinations.RIVALRY) }
                 )
             }
 
@@ -158,9 +142,18 @@ fun DayPilotNavGraph(
                 FriendsScreen(
                     friends            = s.friends,
                     friendRequests     = s.friendRequests,
-                    onAcceptRequest    = friendsVM::acceptRequest,
+                    onAcceptRequest    = { userId ->
+                        friendsVM.acceptRequest(userId)
+                        rivalryVM.refresh()
+                        homeVM.refresh()
+                    },
                     onRejectRequest    = friendsVM::rejectRequest,
                     onTapFriend        = {},
+                    onRemoveFriend     = { userId ->
+                        friendsVM.removeFriend(userId)
+                        rivalryVM.refresh()
+                        homeVM.refresh()
+                    },
                     onReactToFriend    = friendsVM::reactToFriend,
                     onNavigateToSearch = { navController.navigate(DayPilotDestinations.SEARCH_FRIENDS) }
                 )
@@ -175,6 +168,8 @@ fun DayPilotNavGraph(
                     onAddFriend   = { userId ->
                         searchVM.addFriend(userId)
                         friendsVM.refresh()
+                        rivalryVM.refresh()
+                        homeVM.refresh()
                     },
                     onBack        = { navController.popBackStack() }
                 )
@@ -224,7 +219,13 @@ fun DayPilotNavGraph(
                     notificationsEnabled = s.notificationsEnabled,
                     onToggleDarkMode     = settingsVM::toggleDarkMode,
                     onThemeSelect        = settingsVM::selectTheme,
-                    onLanguageSelect     = settingsVM::selectLanguage,
+                    onLanguageSelect     = { code ->
+                        settingsVM.selectLanguage(code)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            context.getSystemService(LocaleManager::class.java)
+                                .applicationLocales = LocaleList.forLanguageTags(code)
+                        }
+                    },
                     onToggleNotifications= settingsVM::toggleNotifications,
                     onNavigateToEditProfile = { navController.navigate(DayPilotDestinations.EDIT_PROFILE) },
                     onLogout = {
@@ -270,9 +271,20 @@ fun DayPilotNavGraph(
                     onBack        = { homeVM.refresh(); navController.popBackStack() },
                     onCreateTask  = calendarVM::addTask,
                     onTapTask     = {},
-                    onToggleTask  = calendarVM::toggleTask,
-                    onDeleteTask  = calendarVM::deleteTask,
-                    onEditTask    = calendarVM::editTask
+                    onToggleTask  = { id, isDone ->
+                        calendarVM.toggleTask(id, isDone)
+                        progressVM.refresh()
+                        profileVM.refresh()
+                        homeVM.refresh()
+                    },
+                    onDeleteTask  = { id ->
+                        calendarVM.deleteTask(id)
+                        progressVM.refresh()
+                        profileVM.refresh()
+                        homeVM.refresh()
+                    },
+                    onEditTask    = calendarVM::editTask,
+                    onUpdateTask  = calendarVM::updateTask
                 )
             }
 
@@ -284,11 +296,17 @@ fun DayPilotNavGraph(
                     goalSteps             = s.goalSteps,
                     pointsEarned          = s.pointsEarned,
                     pointsRemaining       = s.pointsRemaining,
+                    goalChangedToday      = s.goalChangedToday,
+                    pendingGoal           = s.pendingGoal,
                     onBack                = { navController.popBackStack() },
                     onNavigateToSteps     = { navController.navigate(DayPilotDestinations.STEPS) },
                     onNavigateToTimer     = { navController.navigate(DayPilotDestinations.TIMER_HUB) },
                     onNavigateToReminders = { navController.navigate(DayPilotDestinations.REMINDERS) },
-                    onNavigateToTechHealth= { navController.navigate(DayPilotDestinations.TECH_HEALTH) }
+                    onNavigateToTechHealth= { navController.navigate(DayPilotDestinations.TECH_HEALTH) },
+                    onConfigureGoal       = { newGoal ->
+                        habitsVM.configureGoal(newGoal)
+                        stepsVM.configureGoal(newGoal)
+                    }
                 )
             }
 
@@ -321,6 +339,7 @@ fun DayPilotNavGraph(
 
             // ── Rivalry ──────────────────────────────────────────
             composable(DayPilotDestinations.RIVALRY) {
+                LaunchedEffect(Unit) { rivalryVM.refresh() }
                 val s by rivalryVM.uiState.collectAsState()
                 RivalryScreen(
                     currentUserName    = s.currentUserName,
@@ -336,16 +355,19 @@ fun DayPilotNavGraph(
             composable(DayPilotDestinations.STEPS) {
                 val s by stepsVM.uiState.collectAsState()
                 StepsScreen(
-                    currentSteps   = s.currentSteps,
-                    goalSteps      = s.goalSteps,
-                    pointsEarned   = s.pointsEarned,
-                    pointsRemaining= s.pointsRemaining,
-                    totalSteps7Days= s.totalSteps7Days,
-                    bestDaySteps   = s.bestDaySteps,
-                    dailyAverage   = s.dailyAverage,
-                    goalStreak     = s.goalStreak,
-                    onBack         = { habitsVM.refresh(); navController.popBackStack() },
-                    onConfigureGoal= stepsVM::configureGoal
+                    currentSteps     = s.currentSteps,
+                    goalSteps        = s.goalSteps,
+                    pointsEarned     = s.pointsEarned,
+                    pointsRemaining  = s.pointsRemaining,
+                    totalSteps7Days  = s.totalSteps7Days,
+                    bestDaySteps     = s.bestDaySteps,
+                    dailyAverage     = s.dailyAverage,
+                    goalStreak       = s.goalStreak,
+                    pendingGoal      = s.pendingGoal,
+                    goalChangedToday = s.goalChangedToday,
+                    sensorAvailable  = s.sensorAvailable,
+                    onBack           = { habitsVM.refresh(); navController.popBackStack() },
+                    onConfigureGoal  = stepsVM::configureGoal
                 )
             }
 
@@ -359,10 +381,15 @@ fun DayPilotNavGraph(
             ) { backStackEntry ->
                 val mode    = backStackEntry.arguments?.getString("timerMode") ?: "TRAINING"
                 val minutes = backStackEntry.arguments?.getInt("minutes") ?: 30
+                val ps by progressVM.uiState.collectAsState()
                 TimerScreen(
                     timerMode        = mode,
                     customMinutes    = minutes,
-                    pointEarnedToday = false,
+                    pointEarnedToday = ps.timerCompletedToday,
+                    onTimerCompleted = {
+                        progressVM.recordTimerComplete()
+                        homeVM.refresh()
+                    },
                     onBack           = { navController.popBackStack() }
                 )
             }
@@ -392,6 +419,7 @@ fun DayPilotNavGraph(
 
             // ── TechHealth ───────────────────────────────────────
             composable(DayPilotDestinations.TECH_HEALTH) {
+                LaunchedEffect(Unit) { techHealthVM.refreshUsage() }
                 val s by techHealthVM.uiState.collectAsState()
                 TechHealthScreen(
                     appRestrictions   = s.appRestrictions,

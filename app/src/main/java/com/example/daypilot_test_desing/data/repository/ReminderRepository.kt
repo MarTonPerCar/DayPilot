@@ -5,7 +5,7 @@ import com.example.daypilot_test_desing.data.model.ReminderFormDataInfo
 
 interface ReminderRepository {
     fun getReminders(): List<ReminderData>
-    fun addReminder(form: ReminderFormDataInfo)
+    fun addReminder(form: ReminderFormDataInfo): ReminderData
     fun deleteReminder(id: String)
     fun toggleReminder(id: String, enabled: Boolean)
 }

@@ -38,6 +38,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -72,13 +73,17 @@ fun TaskFormCard(
     onSave: (title: String, category: TaskCategory, difficulty: TaskDifficulty, duration: Int) -> Unit,
     onCancel: () -> Unit,
     modifier: Modifier = Modifier,
-    isEditing: Boolean = false
+    isEditing: Boolean = false,
+    initialTitle: String = "",
+    initialCategory: TaskCategory = TaskCategory.PERSONAL,
+    initialDifficulty: TaskDifficulty = TaskDifficulty.EASY,
+    initialDuration: Int = 30
 ) {
-    var title by remember { mutableStateOf("") }
+    var title by remember(initialTitle) { mutableStateOf(initialTitle) }
     var description by remember { mutableStateOf("") }
-    var category by remember { mutableStateOf(TaskCategory.PERSONAL) }
-    var difficulty by remember { mutableStateOf(TaskDifficulty.EASY) }
-    var duration by remember { mutableStateOf(30) }
+    var category by remember(initialCategory) { mutableStateOf(initialCategory) }
+    var difficulty by remember(initialDifficulty) { mutableStateOf(initialDifficulty) }
+    var duration by remember(initialDuration) { mutableStateOf(initialDuration) }
     var reminder by remember { mutableStateOf(false) }
     var recurring by remember { mutableStateOf(false) }
     var recurrenceDays by remember { mutableStateOf(1) }
@@ -140,10 +145,11 @@ fun TaskFormCard(
             DurationSelector(value = duration, onValueChange = { duration = it })
         }
 
-        // Section: Reminder
+        // Section: Reminder & Recurrence — collapsed by default
         FormSection(
-            title = stringResource(R.string.task_section_reminder),
-            icon = Icons.Default.Notifications
+            title           = stringResource(R.string.task_section_extras),
+            icon            = Icons.Default.Notifications,
+            initiallyExpanded = false
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -171,13 +177,12 @@ fun TaskFormCard(
                     )
                 )
             }
-        }
 
-        // Section: Recurrence
-        FormSection(
-            title = stringResource(R.string.task_section_recurrence),
-            icon = Icons.Default.Refresh
-        ) {
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 4.dp),
+                color = MaterialTheme.colorScheme.surfaceVariant
+            )
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -262,8 +267,13 @@ fun TaskFormCard(
 
 // ── Collapsible section wrapper ───────────────────────────────────
 @Composable
-fun FormSection(title: String, icon: ImageVector, content: @Composable ColumnScope.() -> Unit) {
-    var expanded by remember { mutableStateOf(true) }
+fun FormSection(
+    title: String,
+    icon: ImageVector,
+    initiallyExpanded: Boolean = true,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    var expanded by remember { mutableStateOf(initiallyExpanded) }
     val arrowRotation by animateFloatAsState(
         targetValue = if (expanded) 0f else -90f,
         label = "arrow"

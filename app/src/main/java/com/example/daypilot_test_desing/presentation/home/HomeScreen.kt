@@ -22,6 +22,8 @@ fun HomeScreen(
     progressData: List<DayProgress>,
     pointsToday: Int,
     rankingPosition: Int,
+    friendCount: Int,
+    timerCompletedToday: Boolean,
     onNavigateToCalendar: () -> Unit,
     onNavigateToHabits: () -> Unit,
     onNavigateToProgress: () -> Unit,
@@ -34,11 +36,12 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .padding(horizontal = 16.dp)
+                .padding(top = 8.dp, bottom = 4.dp)
         ) {
-            val totalHeight = maxHeight
+            val totalHeight   = maxHeight
             val summaryHeight = totalHeight * 0.38f
-            val gridHeight    = totalHeight * 0.57f
+            val gridHeight    = totalHeight - summaryHeight - 10.dp
 
             Column(
                 verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -102,7 +105,7 @@ fun HomeScreen(
                             section  = HomeSection.HABITS,
                             data     = HomeSectionData.Habits(
                                 stepsProgress = stepsToday.toFloat() / stepsGoal,
-                                timerDone     = false
+                                timerDone     = timerCompletedToday
                             ),
                             onClick  = onNavigateToHabits,
                             modifier = Modifier
@@ -113,7 +116,7 @@ fun HomeScreen(
                             section  = HomeSection.RIVALRY,
                             data     = HomeSectionData.Rivalry(
                                 position     = rankingPosition,
-                                totalFriends = 5
+                                totalFriends = friendCount
                             ),
                             onClick  = onNavigateToRivalry,
                             modifier = Modifier

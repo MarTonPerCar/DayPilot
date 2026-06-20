@@ -42,6 +42,7 @@ fun FriendsScreen(
     onAcceptRequest: (String) -> Unit,
     onRejectRequest: (String) -> Unit,
     onTapFriend: (String) -> Unit,
+    onRemoveFriend: (String) -> Unit,
     onNavigateToSearch: () -> Unit,
     onReactToFriend: (userId: String, reaction: ReactionType) -> Unit = { _, _ -> }
 ) {
@@ -115,9 +116,8 @@ fun FriendsScreen(
                                     streak = friend.streak,
                                     avatarUrl = friend.avatarUrl,
                                     weeklySummary = friend.weeklySummary,
-                                    onReact = { reaction ->
-                                        onReactToFriend(friend.id, reaction)
-                                    }
+                                    onReact = { reaction -> onReactToFriend(friend.id, reaction) },
+                                    onRemove = { onRemoveFriend(friend.id) }
                                 )
                             }
                         }

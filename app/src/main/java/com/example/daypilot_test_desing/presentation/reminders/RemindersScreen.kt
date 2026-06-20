@@ -104,11 +104,12 @@ fun RemindersScreen(
             ) {
                 items(reminders, key = { it.id }) { reminder ->
                     ReminderCard(
-                        title = reminder.title,
-                        time = reminder.time,
-                        isEnabled = reminder.isEnabled,
-                        onToggle = { onToggleReminder(reminder.id, it) },
-                        onDelete = { onDeleteReminder(reminder.id) }
+                        title           = reminder.title,
+                        time            = reminder.time,
+                        triggerAtMillis = reminder.triggerAtMillis,
+                        isEnabled       = reminder.isEnabled,
+                        onToggle        = { onToggleReminder(reminder.id, it) },
+                        onDelete        = { onDeleteReminder(reminder.id) }
                     )
                 }
                 item { Spacer(Modifier.height(80.dp)) }

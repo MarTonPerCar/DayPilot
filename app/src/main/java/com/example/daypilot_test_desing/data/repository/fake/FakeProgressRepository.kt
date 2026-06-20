@@ -17,11 +17,52 @@ object FakeProgressRepository : ProgressRepository {
         )
     }
 
-    override fun getProgressData()      = progressData
-    override fun getRankingPosition()   = 3
-    override fun getPointsToday()       = 110
-    override fun getPointsFromTasks()   = 60
-    override fun getPointsFromSteps()   = 20
-    override fun getPointsFromHabits()  = 20
-    override fun getPointsFromTimers()  = 10
+    // All category totals are mutable and start at 0 (only tasks seeded with mock completions)
+    private var pointsFromTasks_        = 60   // t1 + t2 + t3 pre-seeded as done × 20 pts
+    private var pointsFromSteps_        = 0
+    private var pointsFromHabits_       = 0    // tech-health daily bonus
+    private var pointsFromTimers_       = 0
+    private var pointsTotal             = 60
+    // Base accumulated this month before today; total monthly = base + pointsTotal
+    private val monthlyPointsBase       = 420
+    private var timerCompletedToday     = false
+    private var techHealthBonusAwarded  = false
+
+    override fun getProgressData()     = progressData
+    override fun getRankingPosition()  = FakeRankingRepository.getCurrentUserPosition()
+    override fun getPointsToday()      = pointsTotal
+    override fun getMonthlyPoints()    = monthlyPointsBase + pointsTotal
+    override fun getPointsFromTasks()  = pointsFromTasks_
+    override fun getPointsFromSteps()  = pointsFromSteps_
+    override fun getPointsFromHabits() = pointsFromHabits_
+    override fun getPointsFromTimers() = pointsFromTimers_
+
+    override fun addTaskPoints(amount: Int) {
+        pointsFromTasks_ += amount
+        pointsTotal      += amount
+    }
+    override fun removeTaskPoints(amount: Int) {
+        pointsFromTasks_ = maxOf(0, pointsFromTasks_ - amount)
+        pointsTotal      = maxOf(0, pointsTotal      - amount)
+    }
+    override fun addStepsPoints(amount: Int) {
+        pointsFromSteps_ += amount
+        pointsTotal      += amount
+    }
+    override fun addTimerPoints(amount: Int) {
+        if (!timerCompletedToday) {
+            pointsFromTimers_   += amount
+            pointsTotal         += amount
+            timerCompletedToday  = true
+        }
+    }
+    override fun addTechHealthPoints(amount: Int) {
+        if (!techHealthBonusAwarded) {
+            pointsFromHabits_      += amount
+            pointsTotal            += amount
+            techHealthBonusAwarded  = true
+        }
+    }
+    override fun isTimerCompletedToday()    = timerCompletedToday
+    override fun isTechHealthBonusAwarded() = techHealthBonusAwarded
 }

@@ -4,6 +4,8 @@ import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PersonRemove
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -29,7 +31,8 @@ fun FriendCard(
     modifier: Modifier = Modifier,
     avatarUrl: String? = null,
     weeklySummary: FriendWeeklySummary? = null,
-    onReact: (ReactionType) -> Unit = {}
+    onReact: (ReactionType) -> Unit = {},
+    onRemove: (() -> Unit)? = null
 ) {
     Column(
         modifier = modifier
@@ -66,6 +69,16 @@ fun FriendCard(
                     )
                 }
                 DayPilotStatsRow(points = points, streak = streak)
+            }
+
+            if (onRemove != null) {
+                IconButton(onClick = onRemove) {
+                    Icon(
+                        imageVector = Icons.Default.PersonRemove,
+                        contentDescription = stringResource(R.string.friends_remove),
+                        tint = MaterialTheme.colorScheme.error
+                    )
+                }
             }
         }
 

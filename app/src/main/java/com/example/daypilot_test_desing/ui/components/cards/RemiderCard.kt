@@ -33,16 +33,38 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
+
+private fun formatTrigger(triggerAtMillis: Long): String {
+    if (triggerAtMillis <= 0L) return ""
+    val trigger = Calendar.getInstance().apply { timeInMillis = triggerAtMillis }
+    val now     = Calendar.getInstance()
+    val fmt     = SimpleDateFormat("HH:mm", Locale.getDefault())
+    return when {
+        trigger.get(Calendar.YEAR) == now.get(Calendar.YEAR) &&
+        trigger.get(Calendar.DAY_OF_YEAR) == now.get(Calendar.DAY_OF_YEAR) ->
+            "Hoy, ${fmt.format(trigger.time)}"
+        trigger.get(Calendar.YEAR) == now.get(Calendar.YEAR) &&
+        trigger.get(Calendar.DAY_OF_YEAR) == now.get(Calendar.DAY_OF_YEAR) + 1 ->
+            "Mañana, ${fmt.format(trigger.time)}"
+        else ->
+            SimpleDateFormat("d MMM yyyy, HH:mm", Locale.getDefault()).format(trigger.time)
+    }
+}
 
 @Composable
 fun ReminderCard(
     title: String,
     time: String,
+    triggerAtMillis: Long = 0L,
     isEnabled: Boolean,
     onToggle: (Boolean) -> Unit,
     onDelete: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val displayTime = if (triggerAtMillis > 0L) formatTrigger(triggerAtMillis) else time
     var showDeleteConfirm by remember { mutableStateOf(false) }
 
     // ── Diálogo de confirmación ───────────────────────────────────
@@ -100,7 +122,7 @@ fun ReminderCard(
                     else MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = time,
+                    text = displayTime,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

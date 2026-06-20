@@ -37,35 +37,62 @@ fun CalendarScreen(
     onTapTask: (String) -> Unit,
     onToggleTask: (String, Boolean) -> Unit,
     onDeleteTask: (String) -> Unit = {},
-    onEditTask: (String) -> Unit = {}
+    onEditTask: (String) -> Unit = {},
+    onUpdateTask: (id: String, title: String, category: TaskCategory, difficulty: TaskDifficulty, duration: Int) -> Unit = { _, _, _, _, _ -> }
 ) {
-    val today = Calendar.getInstance()
-    var currentMonth by remember { mutableIntStateOf(today.get(Calendar.MONTH) + 1) }
-    var currentYear by remember { mutableIntStateOf(today.get(Calendar.YEAR)) }
-    var selectedDay by remember { mutableStateOf<Int?>(today.get(Calendar.DAY_OF_MONTH)) }
+    val now         = remember { Calendar.getInstance() }
+    val todayDay    = remember { now.get(Calendar.DAY_OF_MONTH) }
+    val todayMonth  = remember { now.get(Calendar.MONTH) + 1 }
+    val todayYear   = remember { now.get(Calendar.YEAR) }
+
+    var currentMonth by remember { mutableIntStateOf(todayMonth) }
+    var currentYear  by remember { mutableIntStateOf(todayYear) }
+    var selectedDay  by remember { mutableStateOf<Int?>(todayDay) }
 
     // Filtros
     var selectedDifficulty by remember { mutableStateOf<TaskDifficulty?>(null) }
-    var selectedCategory by remember { mutableStateOf<TaskCategory?>(null) }
+    var selectedCategory   by remember { mutableStateOf<TaskCategory?>(null) }
 
     // BottomSheet
-    var showAddSheet by remember { mutableStateOf(false) }
+    var showAddSheet  by remember { mutableStateOf(false) }
     var editingTaskId by remember { mutableStateOf<String?>(null) }
     var dayForNewTask by remember { mutableStateOf(1) }
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    // Puntos de color para el calendario (filtrados al mes/año visibles)
-    val taskDots = tasks.map { task ->
-        CalendarTaskDot(day = task.day, month = task.month, year = task.year, color = task.category.color)
+    // Helper: given a new month+year, pick the day to auto-select
+    fun autoSelectDay(newMonth: Int, newYear: Int): Int = when {
+        newYear > todayYear || (newYear == todayYear && newMonth > todayMonth) -> 1
+        newYear < todayYear || (newYear == todayYear && newMonth < todayMonth) -> {
+            val cal = Calendar.getInstance()
+            cal.set(Calendar.YEAR, newYear)
+            cal.set(Calendar.MONTH, newMonth - 1)
+            cal.getActualMaximum(Calendar.DAY_OF_MONTH)
+        }
+        else -> todayDay
     }
 
-    // Tareas filtradas del día seleccionado dentro del mes/año actual
-    val tasksForSelectedDay = selectedDay?.let { day ->
-        tasks.filter { it.day == day && it.month == currentMonth && it.year == currentYear }
-            .filter { selectedDifficulty == null || it.difficulty == selectedDifficulty }
-            .filter { selectedCategory == null || it.category == selectedCategory }
-    } ?: emptyList()
+    // Memoised derived values — recompute only when their actual dependencies change
+    val taskDots by remember(tasks) {
+        derivedStateOf {
+            tasks.map { CalendarTaskDot(day = it.day, month = it.month, year = it.year, color = it.category.color) }
+        }
+    }
+
+    val tasksForSelectedDay by remember(tasks, selectedDay, currentMonth, currentYear, selectedDifficulty, selectedCategory) {
+        derivedStateOf {
+            val day = selectedDay ?: return@derivedStateOf emptyList<CalendarTaskData>()
+            tasks.filter {
+                it.day == day && it.month == currentMonth && it.year == currentYear &&
+                (selectedDifficulty == null || it.difficulty == selectedDifficulty) &&
+                (selectedCategory   == null || it.category   == selectedCategory)
+            }
+        }
+    }
+
+    val editingTask by remember(editingTaskId, tasks) {
+        derivedStateOf { editingTaskId?.let { id -> tasks.find { it.id == id } } }
+    }
 
     // BottomSheet para añadir/editar
     if (showAddSheet || editingTaskId != null) {
@@ -79,9 +106,14 @@ fun CalendarScreen(
             containerColor = MaterialTheme.colorScheme.background
         ) {
             TaskFormCard(
-                isEditing = editingTaskId != null,
+                isEditing         = editingTaskId != null,
+                initialTitle      = editingTask?.title      ?: "",
+                initialCategory   = editingTask?.category   ?: TaskCategory.PERSONAL,
+                initialDifficulty = editingTask?.difficulty ?: TaskDifficulty.EASY,
+                initialDuration   = editingTask?.duration   ?: 30,
                 onSave = { title, category, difficulty, duration ->
-                    if (editingTaskId == null) {
+                    val currentEditId = editingTaskId
+                    if (currentEditId == null) {
                         onCreateTask(
                             NewTaskData(
                                 day        = dayForNewTask,
@@ -93,6 +125,8 @@ fun CalendarScreen(
                                 duration   = duration
                             )
                         )
+                    } else {
+                        onUpdateTask(currentEditId, title, category, difficulty, duration)
                     }
                     showAddSheet = false
                     editingTaskId = null
@@ -130,16 +164,18 @@ fun CalendarScreen(
                 selectedDay = selectedDay,
                 onDaySelected = { selectedDay = it },
                 onPreviousMonth = {
-                    if (currentMonth == 1) {
-                        currentMonth = 12; currentYear--
-                    } else currentMonth--
-                    selectedDay = null
+                    val newMonth = if (currentMonth == 1) 12 else currentMonth - 1
+                    val newYear  = if (currentMonth == 1) currentYear - 1 else currentYear
+                    currentMonth = newMonth
+                    currentYear  = newYear
+                    selectedDay  = autoSelectDay(newMonth, newYear)
                 },
                 onNextMonth = {
-                    if (currentMonth == 12) {
-                        currentMonth = 1; currentYear++
-                    } else currentMonth++
-                    selectedDay = null
+                    val newMonth = if (currentMonth == 12) 1 else currentMonth + 1
+                    val newYear  = if (currentMonth == 12) currentYear + 1 else currentYear
+                    currentMonth = newMonth
+                    currentYear  = newYear
+                    selectedDay  = autoSelectDay(newMonth, newYear)
                 },
                 onAddTask = { day ->
                     dayForNewTask = day

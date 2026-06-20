@@ -4,17 +4,24 @@ import com.example.daypilot_test_desing.data.model.RankingData
 import com.example.daypilot_test_desing.data.repository.RankingRepository
 
 object FakeRankingRepository : RankingRepository {
-    private val ranking = listOf(
-        RankingData("f3", "Sara López",   740, 21),
-        RankingData("f1", "Ana García",   520, 14),
-        RankingData("me", "Mario",        480, 7),
-        RankingData("f2", "Luis Pérez",   310, 5),
-        RankingData("f4", "Pedro Martín", 290, 3)
-    )
 
-    override fun getRanking()              = ranking
-    override fun getCurrentUserId()        = "me"
-    override fun getCurrentUserPosition()  = 3
-    override fun getCurrentUserPoints()    = 480
-    override fun getCurrentUserStreak()    = 7
+    override fun getRanking(): List<RankingData> {
+        val user = FakeUserRepository.getCurrentUser()
+        val me = RankingData("me", user.name, FakeProgressRepository.getMonthlyPoints(), user.currentStreak)
+        val friends = FakeFriendRepository.getFriends().map {
+            RankingData(it.id, it.name, it.points, it.streak, it.avatarUrl)
+        }
+        return (listOf(me) + friends).sortedByDescending { it.points }
+    }
+
+    override fun getCurrentUserId() = "me"
+
+    override fun getCurrentUserPosition(): Int {
+        val idx = getRanking().indexOfFirst { it.id == "me" }
+        return if (idx >= 0) idx + 1 else getRanking().size + 1
+    }
+
+    override fun getCurrentUserPoints() = FakeProgressRepository.getMonthlyPoints()
+
+    override fun getCurrentUserStreak() = FakeUserRepository.getCurrentUser().currentStreak
 }

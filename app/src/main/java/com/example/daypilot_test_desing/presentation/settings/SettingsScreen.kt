@@ -156,6 +156,11 @@ fun SettingsScreen(
             }
 
             // ── Idioma ───────────────────────────────────────────
+            val languageDisplay = when (selectedLanguage) {
+                "en" -> "English"
+                "de" -> "Deutsch"
+                else -> "Español"
+            }
             Card(
                 modifier  = Modifier.fillMaxWidth(),
                 shape     = RoundedCornerShape(16.dp),
@@ -167,9 +172,16 @@ fun SettingsScreen(
                 DayPilotOptionSelector(
                     title          = stringResource(R.string.settings_language),
                     icon           = Icons.Default.Language,
-                    selectedOption = selectedLanguage,
+                    selectedOption = languageDisplay,
                     options        = listOf("Español", "English", "Deutsch"),
-                    onSelect       = onLanguageSelect
+                    onSelect       = { display ->
+                        val code = when (display) {
+                            "English" -> "en"
+                            "Deutsch" -> "de"
+                            else      -> "es"
+                        }
+                        onLanguageSelect(code)
+                    }
                 )
             }
 

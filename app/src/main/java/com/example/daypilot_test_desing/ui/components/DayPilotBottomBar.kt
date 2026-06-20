@@ -48,18 +48,42 @@ val bottomBarTabs = listOf(
     )
 )
 
+// Maps any route to the tab that "owns" it
+private fun rootTabFor(route: String?): String? = when (route) {
+    DayPilotDestinations.HOME,
+    DayPilotDestinations.CALENDAR,
+    DayPilotDestinations.HABITS,
+    DayPilotDestinations.STEPS,
+    DayPilotDestinations.PROGRESS,
+    DayPilotDestinations.RIVALRY,
+    DayPilotDestinations.TIMER_HUB,
+    DayPilotDestinations.TIMER,
+    DayPilotDestinations.POMODORO,
+    DayPilotDestinations.REMINDERS,
+    DayPilotDestinations.TECH_HEALTH -> DayPilotDestinations.HOME
+    DayPilotDestinations.FRIENDS,
+    DayPilotDestinations.SEARCH_FRIENDS -> DayPilotDestinations.FRIENDS
+    DayPilotDestinations.NOTIFICATIONS -> DayPilotDestinations.NOTIFICATIONS
+    DayPilotDestinations.PROFILE,
+    DayPilotDestinations.SETTINGS,
+    DayPilotDestinations.EDIT_PROFILE,
+    DayPilotDestinations.RESET_PASSWORD -> DayPilotDestinations.PROFILE
+    else -> null
+}
+
 // ── Bottom Bar ───────────────────────────────────────────────────
 @Composable
 fun DayPilotBottomBar(navController: NavController) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute   = backStackEntry?.destination?.route
+    val activeTab      = rootTabFor(currentRoute)
 
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.surface,
         tonalElevation = 8.dp
     ) {
         bottomBarTabs.forEach { tab ->
-            val isSelected = currentRoute == tab.route
+            val isSelected = activeTab == tab.route
 
             val iconScale by animateFloatAsState(
                 targetValue   = if (isSelected) 1.15f else 1f,
@@ -76,11 +100,14 @@ fun DayPilotBottomBar(navController: NavController) {
             NavigationBarItem(
                 selected = isSelected,
                 onClick  = {
-                    if (currentRoute != tab.route) {
+                    if (activeTab == tab.route) {
+                        // Already in this tab — pop sub-screens to return to tab root
+                        if (currentRoute != tab.route) {
+                            navController.popBackStack(tab.route, inclusive = false)
+                        }
+                    } else {
                         navController.navigate(tab.route) {
-                            popUpTo(DayPilotDestinations.HOME) {
-                                saveState = true
-                            }
+                            popUpTo(DayPilotDestinations.HOME) { saveState = true }
                             launchSingleTop = true
                             restoreState    = true
                         }

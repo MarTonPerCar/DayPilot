@@ -21,11 +21,14 @@ fun HabitsScreen(
     goalSteps: Int,
     pointsEarned: Int,
     pointsRemaining: Int,
+    goalChangedToday: Boolean = false,
+    pendingGoal: Int? = null,
     onBack: () -> Unit,
     onNavigateToSteps: () -> Unit,
     onNavigateToTimer: () -> Unit,
     onNavigateToReminders: () -> Unit,
-    onNavigateToTechHealth: () -> Unit
+    onNavigateToTechHealth: () -> Unit,
+    onConfigureGoal: (Int) -> Unit = {}
 ) {
     Scaffold(
         topBar = {
@@ -45,14 +48,20 @@ fun HabitsScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             // ── Pasos ────────────────────────────────────────────
-            DayPilotSectionHeader(title = stringResource(R.string.steps_title))
+            DayPilotSectionHeader(
+                title      = stringResource(R.string.steps_title),
+                actionText = stringResource(R.string.steps_see_details),
+                onAction   = onNavigateToSteps
+            )
 
             StepsCard(
                 currentSteps    = currentSteps,
                 goalSteps       = goalSteps,
                 pointsEarned    = pointsEarned,
                 pointsRemaining = pointsRemaining,
-                onConfigureGoal = {}
+                goalLocked      = goalChangedToday,
+                pendingGoal     = pendingGoal,
+                onConfigureGoal = onConfigureGoal
             )
 
             // ── Secciones ─────────────────────────────────────────

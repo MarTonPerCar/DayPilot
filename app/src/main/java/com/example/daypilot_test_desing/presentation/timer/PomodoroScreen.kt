@@ -1,5 +1,6 @@
 package com.example.daypilot_test_desing.presentation.timer
 
+import android.media.RingtoneManager
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -18,6 +19,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -32,6 +34,7 @@ fun PomodoroScreen(
     totalSessions: Int = 4,
     onBack: () -> Unit
 ) {
+    val context      = LocalContext.current
     val workSeconds  = 25 * 60
     val breakSeconds = 5  * 60
 
@@ -40,6 +43,7 @@ fun PomodoroScreen(
     var secondsLeft    by remember { mutableIntStateOf(workSeconds) }
     var isRunning      by remember { mutableStateOf(false) }
     var isFinished     by remember { mutableStateOf(false) }
+    var phaseEndCount  by remember { mutableIntStateOf(0) }
 
     val totalSeconds = if (isWorkPhase) workSeconds else breakSeconds
     val progress     = secondsLeft.toFloat() / totalSeconds
@@ -64,13 +68,12 @@ fun PomodoroScreen(
 
             if (secondsLeft <= 0) {
                 isRunning = false
+                phaseEndCount++
 
                 if (isWorkPhase) {
-                    // Cambio a descanso
                     isWorkPhase = false
                     secondsLeft = breakSeconds
                 } else {
-                    // Fin del descanso
                     if (currentSession < totalSessions) {
                         currentSession++
                         isWorkPhase = true
@@ -81,6 +84,19 @@ fun PomodoroScreen(
                 }
             }
         }
+    }
+
+    // Sonido al cambio de fase
+    LaunchedEffect(phaseEndCount) {
+        if (phaseEndCount == 0) return@LaunchedEffect
+        val uri = if (isFinished)
+            RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
+        else
+            RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+        val ringtone = RingtoneManager.getRingtone(context, uri)
+        ringtone?.play()
+        delay(if (isFinished) 3_000L else 1_500L)
+        if (ringtone?.isPlaying == true) ringtone.stop()
     }
 
     val minutes = secondsLeft / 60

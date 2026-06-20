@@ -42,13 +42,29 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import android.content.Context
+import android.content.pm.ApplicationInfo
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import androidx.compose.foundation.Image
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.graphics.drawable.toBitmap
 import com.example.daypilot_test_desing.R
-import com.example.daypilot_test_desing.navigation.MOCK_APPS
 
 data class AppInfo(
     val name: String,
     val packageName: String
 )
+
+fun loadInstalledApps(context: Context): List<AppInfo> {
+    val pm = context.packageManager
+    return pm.getInstalledApplications(PackageManager.GET_META_DATA)
+        .filter { it.flags and ApplicationInfo.FLAG_SYSTEM == 0 }
+        .map { AppInfo(name = pm.getApplicationLabel(it).toString(), packageName = it.packageName) }
+        .sortedBy { it.name.lowercase() }
+}
 
 
 
@@ -58,8 +74,10 @@ fun AppPickerSheet(
     onSelect: (AppInfo) -> Unit,
     onDismiss: () -> Unit
 ) {
+    val context = LocalContext.current
+    val allApps = remember { loadInstalledApps(context) }
     var query by remember { mutableStateOf("") }
-    val filtered = MOCK_APPS.filter {
+    val filtered = allApps.filter {
         it.name.contains(query, ignoreCase = true) ||
                 it.packageName.contains(query, ignoreCase = true)
     }
@@ -150,10 +168,12 @@ fun AppMultiPickerSheet(
     onConfirm: (List<AppInfo>) -> Unit,
     onDismiss: () -> Unit
 ) {
+    val context = LocalContext.current
+    val allApps = remember { loadInstalledApps(context) }
     var query by remember { mutableStateOf("") }
     var selected by remember { mutableStateOf(initialSelected.toSet()) }
 
-    val filtered = MOCK_APPS.filter {
+    val filtered = allApps.filter {
         it.name.contains(query, ignoreCase = true) ||
                 it.packageName.contains(query, ignoreCase = true)
     }
@@ -262,6 +282,12 @@ fun AppPickerRow(
     showCheck: Boolean = false,
     onClick: () -> Unit
 ) {
+    val context = LocalContext.current
+    val icon: Bitmap? = remember(app.packageName) {
+        try { context.packageManager.getApplicationIcon(app.packageName).toBitmap() }
+        catch (_: Exception) { null }
+    }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -270,22 +296,30 @@ fun AppPickerRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        // Avatar app — placeholder inicial
-        Box(
-            modifier = Modifier
-                .size(44.dp)
-                .clip(RoundedCornerShape(10.dp))
-                .background(
-                    MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = app.name.first().uppercase(),
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
+        if (icon != null) {
+            Image(
+                bitmap = icon.asImageBitmap(),
+                contentDescription = null,
+                contentScale = ContentScale.Fit,
+                modifier = Modifier
+                    .size(44.dp)
+                    .clip(RoundedCornerShape(10.dp))
             )
+        } else {
+            Box(
+                modifier = Modifier
+                    .size(44.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = app.name.first().uppercase(),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
         }
 
         Column(modifier = Modifier.weight(1f)) {

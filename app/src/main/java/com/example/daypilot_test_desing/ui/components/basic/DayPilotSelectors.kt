@@ -53,7 +53,7 @@ data class ThemeOption(
 
 val dayPilotThemes = listOf(
     ThemeOption(
-        id = "sage_green",
+        id = "SAGE_GREEN",
         nameRes = R.string.theme_sage_green,
         colors = listOf(
             Color(0xFF4A7C59),
@@ -64,7 +64,7 @@ val dayPilotThemes = listOf(
         )
     ),
     ThemeOption(
-        id = "ocean",
+        id = "OCEAN",
         nameRes = R.string.theme_ocean,
         colors = listOf(
             Color(0xFF1A6B8A),
@@ -75,7 +75,7 @@ val dayPilotThemes = listOf(
         )
     ),
     ThemeOption(
-        id = "lavender",
+        id = "LAVENDER",
         nameRes = R.string.theme_lavender,
         colors = listOf(
             Color(0xFF6B4FA8),
@@ -86,7 +86,7 @@ val dayPilotThemes = listOf(
         )
     ),
     ThemeOption(
-        id = "amber",
+        id = "AMBER",
         nameRes = R.string.theme_amber,
         colors = listOf(
             Color(0xFFB85C00),
@@ -97,7 +97,7 @@ val dayPilotThemes = listOf(
         )
     ),
     ThemeOption(
-        id = "amoled",
+        id = "AMOLED",
         nameRes = R.string.theme_amoled,
         colors = listOf(
             Color(0xFF000000),
