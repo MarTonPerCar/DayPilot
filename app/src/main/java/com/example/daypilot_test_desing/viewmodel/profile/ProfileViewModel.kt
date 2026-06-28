@@ -25,7 +25,7 @@ class ProfileViewModel : ViewModel() {
             totalPoints     = FakeProgressRepository.getMonthlyPoints(),
             currentStreak   = user.currentStreak,
             longestStreak   = user.longestStreak,
-            rankingPosition = progress.getRankingPosition(),
+            rankingPosition = FakeProgressRepository.getRankingPositionSync(),
             pointsToday     = progress.getPointsToday(),
             pointsFromTasks = progress.getPointsFromTasks(),
             pointsFromSteps = progress.getPointsFromSteps(),

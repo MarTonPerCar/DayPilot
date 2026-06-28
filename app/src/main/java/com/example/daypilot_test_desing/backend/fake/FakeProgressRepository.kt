@@ -2,13 +2,19 @@ package com.example.daypilot_test_desing.backend.fake
 
 import com.example.daypilot_test_desing.backend.model.DayProgress
 import com.example.daypilot_test_desing.backend.repository.ProgressRepository
+import com.example.daypilot_test_desing.backend.supabase.dto.DailyLogDto
+import com.example.daypilot_test_desing.backend.supabase.dto.DailyProgressDto
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 object FakeProgressRepository : ProgressRepository {
-    private val today = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
+    private val todayDay = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
+    private fun todayStr() = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
 
     private val progressData = List(7) { i ->
-        val day = today - (6 - i)
+        val day = todayDay - (6 - i)
         DayProgress(
             day            = if (day < 1) day + 31 else day,
             points         = listOf(120, 95, 140, 80, 160, 60, 110)[i],
@@ -17,52 +23,60 @@ object FakeProgressRepository : ProgressRepository {
         )
     }
 
-    // All category totals are mutable and start at 0 (only tasks seeded with mock completions)
-    private var pointsFromTasks_        = 60   // t1 + t2 + t3 pre-seeded as done × 20 pts
+    private var pointsFromTasks_        = 60
     private var pointsFromSteps_        = 0
-    private var pointsFromHabits_       = 0    // tech-health daily bonus
+    private var pointsFromHabits_       = 0
     private var pointsFromTimers_       = 0
     private var pointsTotal             = 60
-    // Base accumulated this month before today; total monthly = base + pointsTotal
     private val monthlyPointsBase       = 420
     private var timerCompletedToday     = false
     private var techHealthBonusAwarded  = false
 
-    override fun getProgressData()     = progressData
-    override fun getRankingPosition()  = FakeRankingRepository.getCurrentUserPosition()
-    override fun getPointsToday()      = pointsTotal
-    override fun getMonthlyPoints()    = monthlyPointsBase + pointsTotal
-    override fun getPointsFromTasks()  = pointsFromTasks_
-    override fun getPointsFromSteps()  = pointsFromSteps_
-    override fun getPointsFromHabits() = pointsFromHabits_
-    override fun getPointsFromTimers() = pointsFromTimers_
+    // ── ProgressRepository interface ─────────────────────────────────
 
-    override fun addTaskPoints(amount: Int) {
-        pointsFromTasks_ += amount
-        pointsTotal      += amount
+    override suspend fun getTodayProgress(): DailyProgressDto = DailyProgressDto(
+        userId           = "",
+        date             = todayStr(),
+        tasksPoints      = pointsFromTasks_,
+        stepsPoints      = pointsFromSteps_,
+        techHealthPoints = pointsFromHabits_,
+        timerPoints      = pointsFromTimers_,
+        totalPoints      = pointsTotal
+    )
+
+    override suspend fun getHistory(days: Int): List<DailyLogDto> = progressData.takeLast(days).map { d ->
+        DailyLogDto(
+            userId         = "",
+            date           = "2024-01-${d.day.toString().padStart(2, '0')}",
+            steps          = d.steps,
+            tasksCompleted = d.tasksCompleted,
+            totalPoints    = d.points
+        )
     }
-    override fun removeTaskPoints(amount: Int) {
-        pointsFromTasks_ = maxOf(0, pointsFromTasks_ - amount)
-        pointsTotal      = maxOf(0, pointsTotal      - amount)
-    }
-    override fun addStepsPoints(amount: Int) {
-        pointsFromSteps_ += amount
-        pointsTotal      += amount
-    }
-    override fun addTimerPoints(amount: Int) {
-        if (!timerCompletedToday) {
-            pointsFromTimers_   += amount
-            pointsTotal         += amount
-            timerCompletedToday  = true
+
+    override suspend fun logPoints(points: Int, source: String) {
+        when (source) {
+            "TASKS"       -> { pointsFromTasks_ += points; pointsTotal += points }
+            "STEPS"       -> { pointsFromSteps_ += points; pointsTotal += points }
+            "TIMER"       -> if (points > 0 && !timerCompletedToday) {
+                                pointsFromTimers_ += points; pointsTotal += points; timerCompletedToday = true
+                             }
+            "TECH_HEALTH" -> { pointsFromHabits_ += points; pointsTotal += points }
         }
     }
-    override fun addTechHealthPoints(amount: Int) {
-        if (!techHealthBonusAwarded) {
-            pointsFromHabits_      += amount
-            pointsTotal            += amount
-            techHealthBonusAwarded  = true
-        }
-    }
-    override fun isTimerCompletedToday()    = timerCompletedToday
-    override fun isTechHealthBonusAwarded() = techHealthBonusAwarded
+
+    override suspend fun getRankingPosition(): Int = FakeRankingRepository.getCurrentUserPosition()
+
+    // ── Non-interface methods (used by ProfileViewModel until Piece 4) ─
+
+    fun getProgressData()     = progressData
+    fun getPointsToday()      = pointsTotal
+    fun getMonthlyPoints()    = monthlyPointsBase + pointsTotal
+    fun getPointsFromTasks()  = pointsFromTasks_
+    fun getPointsFromSteps()  = pointsFromSteps_
+    fun getPointsFromHabits() = pointsFromHabits_
+    fun getPointsFromTimers() = pointsFromTimers_
+    fun getRankingPositionSync() = FakeRankingRepository.getCurrentUserPosition()
+    fun isTimerCompletedToday()  = timerCompletedToday
+    fun isTechHealthBonusAwarded() = techHealthBonusAwarded
 }

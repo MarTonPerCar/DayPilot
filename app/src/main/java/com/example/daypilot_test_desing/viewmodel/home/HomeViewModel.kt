@@ -4,16 +4,20 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.daypilot_test_desing.backend.fake.FakeFriendRepository
-import com.example.daypilot_test_desing.backend.fake.FakeProgressRepository
 import com.example.daypilot_test_desing.backend.fake.FakeTaskRepository
 import com.example.daypilot_test_desing.backend.fake.FakeUserRepository
+import com.example.daypilot_test_desing.backend.model.DayProgress
+import com.example.daypilot_test_desing.backend.repository.ProgressRepository
 import com.example.daypilot_test_desing.backend.repository.StepsRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class HomeViewModel(private val stepsRepo: StepsRepository) : ViewModel() {
+class HomeViewModel(
+    private val stepsRepo: StepsRepository,
+    private val progressRepo: ProgressRepository
+) : ViewModel() {
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
@@ -24,7 +28,13 @@ class HomeViewModel(private val stepsRepo: StepsRepository) : ViewModel() {
             try {
                 val user     = FakeUserRepository.getCurrentUser()
                 val tasks    = FakeTaskRepository.getTasks()
-                val progress = FakeProgressRepository
+                val today    = progressRepo.getTodayProgress()
+                val history  = progressRepo.getHistory(7)
+                val ranking  = progressRepo.getRankingPosition()
+                val progressData = history.map { log ->
+                    val day = log.date.substringAfterLast("-").toIntOrNull() ?: 0
+                    DayProgress(day = day, points = log.totalPoints, steps = log.steps, tasksCompleted = log.tasksCompleted)
+                }
                 _uiState.value = HomeUiState(
                     userName            = user.name,
                     streak              = user.currentStreak,
@@ -32,24 +42,22 @@ class HomeViewModel(private val stepsRepo: StepsRepository) : ViewModel() {
                     stepsGoal           = stepsRepo.getGoalSteps(),
                     tasksCompleted      = tasks.count { it.isDone },
                     tasksTotal          = tasks.size,
-                    progressData        = progress.getProgressData(),
-                    pointsToday         = progress.getPointsToday(),
-                    rankingPosition     = progress.getRankingPosition(),
+                    progressData        = progressData,
+                    pointsToday         = today.totalPoints,
+                    rankingPosition     = ranking,
                     friendCount         = FakeFriendRepository.getFriends().size,
-                    timerCompletedToday = progress.isTimerCompletedToday()
+                    timerCompletedToday = today.timerPoints > 0
                 )
-            } catch (_: Exception) {
-                // retain previous state on error
-            }
+            } catch (_: Exception) { }
         }
     }
 
     companion object {
-        fun factory(stepsRepo: StepsRepository): ViewModelProvider.Factory =
+        fun factory(stepsRepo: StepsRepository, progressRepo: ProgressRepository): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T =
-                    HomeViewModel(stepsRepo) as T
+                    HomeViewModel(stepsRepo, progressRepo) as T
             }
     }
 }

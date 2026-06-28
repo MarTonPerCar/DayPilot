@@ -6,8 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.daypilot_test_desing.backend.model.NewTaskData
 import com.example.daypilot_test_desing.backend.model.TaskCategory
 import com.example.daypilot_test_desing.backend.model.TaskDifficulty
+import com.example.daypilot_test_desing.backend.repository.ProgressRepository
 import com.example.daypilot_test_desing.backend.repository.TaskRepository
-import com.example.daypilot_test_desing.backend.fake.FakeProgressRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,7 +15,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class CalendarViewModel(
-    private val repository: TaskRepository
+    private val taskRepo: TaskRepository,
+    private val progressRepo: ProgressRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CalendarUiState(isLoading = true))
@@ -27,7 +28,7 @@ class CalendarViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
             try {
-                val tasks = repository.getTasks()
+                val tasks = taskRepo.getTasks()
                 _uiState.update { it.copy(tasks = tasks, isLoading = false) }
             } catch (e: Exception) {
                 _uiState.update { it.copy(isLoading = false, error = e.message) }
@@ -40,7 +41,7 @@ class CalendarViewModel(
     fun addTask(data: NewTaskData) {
         viewModelScope.launch {
             try {
-                repository.addTask(data)
+                taskRepo.addTask(data)
                 load()
             } catch (e: Exception) {
                 _uiState.update { it.copy(error = e.message) }
@@ -51,7 +52,7 @@ class CalendarViewModel(
     fun updateTask(id: String, title: String, category: TaskCategory, difficulty: TaskDifficulty, duration: Int) {
         viewModelScope.launch {
             try {
-                repository.updateTask(id, title, category, difficulty, duration)
+                taskRepo.updateTask(id, title, category, difficulty, duration)
                 load()
             } catch (e: Exception) {
                 _uiState.update { it.copy(error = e.message) }
@@ -60,18 +61,16 @@ class CalendarViewModel(
     }
 
     fun toggleTask(id: String, isDone: Boolean) {
-        // Optimistic update — reflect the change immediately in the UI
         _uiState.update { state ->
             state.copy(tasks = state.tasks.map { if (it.id == id) it.copy(isDone = isDone) else it })
         }
         viewModelScope.launch {
             try {
-                repository.toggleTask(id, isDone)
-                if (isDone) FakeProgressRepository.addTaskPoints(20)
-                else        FakeProgressRepository.removeTaskPoints(20)
+                taskRepo.toggleTask(id, isDone)
+                val points = if (isDone) 20 else -20
+                progressRepo.logPoints(points, "TASKS")
                 load()
             } catch (e: Exception) {
-                // Revert the optimistic update and show the real state
                 load()
             }
         }
@@ -81,8 +80,8 @@ class CalendarViewModel(
         viewModelScope.launch {
             try {
                 val task = _uiState.value.tasks.find { it.id == id }
-                if (task?.isDone == true) FakeProgressRepository.removeTaskPoints(20)
-                repository.deleteTask(id)
+                if (task?.isDone == true) progressRepo.logPoints(-20, "TASKS")
+                taskRepo.deleteTask(id)
                 load()
             } catch (e: Exception) {
                 _uiState.update { it.copy(error = e.message) }
@@ -91,15 +90,15 @@ class CalendarViewModel(
     }
 
     fun editTask(id: String) {
-        viewModelScope.launch { repository.editTask(id) }
+        viewModelScope.launch { taskRepo.editTask(id) }
     }
 
     companion object {
-        fun factory(repository: TaskRepository): ViewModelProvider.Factory =
+        fun factory(taskRepo: TaskRepository, progressRepo: ProgressRepository): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T =
-                    CalendarViewModel(repository) as T
+                    CalendarViewModel(taskRepo, progressRepo) as T
             }
     }
 }
