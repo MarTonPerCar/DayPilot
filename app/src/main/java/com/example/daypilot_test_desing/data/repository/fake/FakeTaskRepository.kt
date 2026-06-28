@@ -38,9 +38,9 @@ object FakeTaskRepository : TaskRepository {
         )
     }
 
-    override fun getTasks(): List<CalendarTaskData> = _tasks.toList()
+    override suspend fun getTasks(): List<CalendarTaskData> = _tasks.toList()
 
-    override fun addTask(data: NewTaskData) {
+    override suspend fun addTask(data: NewTaskData) {
         _tasks.add(
             CalendarTaskData(
                 id         = UUID.randomUUID().toString(),
@@ -56,17 +56,17 @@ object FakeTaskRepository : TaskRepository {
         )
     }
 
-    override fun updateTask(id: String, title: String, category: TaskCategory, difficulty: TaskDifficulty, duration: Int) {
+    override suspend fun updateTask(id: String, title: String, category: TaskCategory, difficulty: TaskDifficulty, duration: Int) {
         val idx = _tasks.indexOfFirst { it.id == id }
         if (idx >= 0) _tasks[idx] = _tasks[idx].copy(title = title, category = category, difficulty = difficulty, duration = duration)
     }
 
-    override fun toggleTask(id: String, isDone: Boolean) {
+    override suspend fun toggleTask(id: String, isDone: Boolean) {
         val idx = _tasks.indexOfFirst { it.id == id }
         if (idx >= 0) _tasks[idx] = _tasks[idx].copy(isDone = isDone)
     }
 
-    override fun deleteTask(id: String) { _tasks.removeAll { it.id == id } }
+    override suspend fun deleteTask(id: String) { _tasks.removeAll { it.id == id } }
 
-    override fun editTask(id: String) { /* no-op until edit UI exists */ }
+    override suspend fun editTask(id: String) { /* no-op — edit is handled locally in the UI */ }
 }

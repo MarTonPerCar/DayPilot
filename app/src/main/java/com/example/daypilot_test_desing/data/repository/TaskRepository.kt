@@ -6,10 +6,10 @@ import com.example.daypilot_test_desing.data.model.TaskCategory
 import com.example.daypilot_test_desing.data.model.TaskDifficulty
 
 interface TaskRepository {
-    fun getTasks(): List<CalendarTaskData>
-    fun addTask(data: NewTaskData)
-    fun updateTask(id: String, title: String, category: TaskCategory, difficulty: TaskDifficulty, duration: Int)
-    fun toggleTask(id: String, isDone: Boolean)
-    fun deleteTask(id: String)
-    fun editTask(id: String)
+    suspend fun getTasks(): List<CalendarTaskData>
+    suspend fun addTask(data: NewTaskData)
+    suspend fun updateTask(id: String, title: String, category: TaskCategory, difficulty: TaskDifficulty, duration: Int)
+    suspend fun toggleTask(id: String, isDone: Boolean)
+    suspend fun deleteTask(id: String)
+    suspend fun editTask(id: String)
 }

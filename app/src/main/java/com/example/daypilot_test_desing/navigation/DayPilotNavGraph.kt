@@ -19,6 +19,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.daypilot_test_desing.data.repository.supabase.SupabaseTaskRepository
 import com.example.daypilot_test_desing.viewmodel.calendar.CalendarViewModel
 import com.example.daypilot_test_desing.viewmodel.friends.FriendsViewModel
 import com.example.daypilot_test_desing.viewmodel.friends.SearchFriendsViewModel
@@ -62,7 +63,9 @@ fun DayPilotNavGraph(
 
     // ViewModels scoped to the NavGraph lifetime
     val homeVM: HomeViewModel                   = viewModel()
-    val calendarVM: CalendarViewModel           = viewModel()
+    val calendarVM: CalendarViewModel           = viewModel(
+        factory = CalendarViewModel.factory(SupabaseTaskRepository())
+    )
     val friendsVM: FriendsViewModel             = viewModel()
     val searchVM: SearchFriendsViewModel        = viewModel()
     val notificationsVM: NotificationsViewModel = viewModel()
