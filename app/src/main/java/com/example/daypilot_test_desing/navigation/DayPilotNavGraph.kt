@@ -25,6 +25,7 @@ import androidx.compose.runtime.remember
 import com.example.daypilot_test_desing.backend.supabase.SupabaseProgressRepository
 import com.example.daypilot_test_desing.backend.supabase.SupabaseStepsRepository
 import com.example.daypilot_test_desing.backend.supabase.SupabaseTaskRepository
+import com.example.daypilot_test_desing.backend.supabase.SupabaseUserRepository
 import com.example.daypilot_test_desing.viewmodel.AppSessionViewModel
 import com.example.daypilot_test_desing.viewmodel.auth.AuthViewModel
 import com.example.daypilot_test_desing.viewmodel.calendar.CalendarViewModel
@@ -75,8 +76,6 @@ fun DayPilotNavGraph(
     val friendsVM: FriendsViewModel             = viewModel()
     val searchVM: SearchFriendsViewModel        = viewModel()
     val notificationsVM: NotificationsViewModel = viewModel()
-    val profileVM: ProfileViewModel             = viewModel()
-    val settingsVM: SettingsViewModel           = viewModel()
     val rivalryVM: RivalryViewModel             = viewModel()
     val remindersVM: RemindersViewModel         = viewModel()
     val techHealthVM: TechHealthViewModel       = viewModel()
@@ -85,17 +84,16 @@ fun DayPilotNavGraph(
     val application = context.applicationContext as Application
 
     // Shared repository instances — created once, passed to all ViewModels that need them.
-    val stepsRepo = remember {
-        SupabaseStepsRepository(
-            application.getSharedPreferences("daypilot_steps", Context.MODE_PRIVATE)
-        )
-    }
+    val stepsRepo    = remember { SupabaseStepsRepository(application.getSharedPreferences("daypilot_steps", Context.MODE_PRIVATE)) }
     val progressRepo = remember { SupabaseProgressRepository() }
+    val userRepo     = remember { SupabaseUserRepository() }
 
-    val homeVM: HomeViewModel     = viewModel(factory = HomeViewModel.factory(stepsRepo, progressRepo))
+    val homeVM: HomeViewModel     = viewModel(factory = HomeViewModel.factory(stepsRepo, progressRepo, userRepo))
     val habitsVM: HabitsViewModel = viewModel(factory = HabitsViewModel.factory(stepsRepo))
     val stepsVM: StepsViewModel   = viewModel(factory = StepsViewModel.factory(application, stepsRepo))
     val progressVM: ProgressViewModel = viewModel(factory = ProgressViewModel.factory(application, progressRepo))
+    val profileVM: ProfileViewModel   = viewModel(factory = ProfileViewModel.factory(userRepo, progressRepo))
+    val settingsVM: SettingsViewModel = viewModel(factory = SettingsViewModel.factory(application, userRepo))
     val calendarVM: CalendarViewModel = viewModel(
         factory = CalendarViewModel.factory(SupabaseTaskRepository(), progressRepo)
     )

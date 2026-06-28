@@ -14,7 +14,7 @@ class RivalryViewModel : ViewModel() {
     private fun buildState(): RivalryUiState {
         val r = FakeRankingRepository
         return RivalryUiState(
-            currentUserName    = FakeUserRepository.getCurrentUser().name,
+            currentUserName    = FakeUserRepository.getCurrentUserSync().name,
             currentUserId      = r.getCurrentUserId(),
             currentUserPosition= r.getCurrentUserPosition(),
             currentUserPoints  = r.getCurrentUserPoints(),

@@ -6,7 +6,7 @@ import com.example.daypilot_test_desing.backend.repository.RankingRepository
 object FakeRankingRepository : RankingRepository {
 
     override fun getRanking(): List<RankingData> {
-        val user = FakeUserRepository.getCurrentUser()
+        val user = FakeUserRepository.getCurrentUserSync()
         val me = RankingData("me", user.name, FakeProgressRepository.getMonthlyPoints(), user.currentStreak)
         val friends = FakeFriendRepository.getFriends().map {
             RankingData(it.id, it.name, it.points, it.streak, it.avatarUrl)
@@ -23,5 +23,5 @@ object FakeRankingRepository : RankingRepository {
 
     override fun getCurrentUserPoints() = FakeProgressRepository.getMonthlyPoints()
 
-    override fun getCurrentUserStreak() = FakeUserRepository.getCurrentUser().currentStreak
+    override fun getCurrentUserStreak() = FakeUserRepository.getCurrentUserSync().currentStreak
 }

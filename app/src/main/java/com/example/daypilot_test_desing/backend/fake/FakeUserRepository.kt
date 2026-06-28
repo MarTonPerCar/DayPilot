@@ -21,21 +21,27 @@ object FakeUserRepository : UserRepository {
         longestStreak = 21
     )
 
-    override fun getCurrentUser(): UserProfile = profile
+    // ── UserRepository interface ──────────────────────────────────────
 
-    override fun getWeeklySummary(): WeeklySummaryData = WeeklySummaryData(
+    override suspend fun getCurrentUser(): UserProfile = profile
+
+    override suspend fun getWeeklySummary(): WeeklySummaryData = WeeklySummaryData(
         totalPoints    = 156,
         tasksCompleted = 23,
         totalSteps     = 47320,
         bestStreak     = 7,
         reactions      = listOf(
-            ReceivedReaction("Ana García",  ReactionType.FIRE),
-            ReceivedReaction("Luis Pérez",  ReactionType.CLAP),
-            ReceivedReaction("Sara López",  ReactionType.STRONG)
+            ReceivedReaction("Ana García", ReactionType.FIRE),
+            ReceivedReaction("Luis Pérez", ReactionType.CLAP),
+            ReceivedReaction("Sara López", ReactionType.STRONG)
         )
     )
 
-    override fun updateProfile(name: String, username: String, region: TimeZoneRegion) {
+    override suspend fun updateProfile(name: String, username: String, region: TimeZoneRegion) {
         profile = profile.copy(name = name, username = username, region = region)
     }
+
+    // ── Non-interface sync methods (used by FakeRankingRepository until Piece 6) ─
+
+    fun getCurrentUserSync(): UserProfile = profile
 }
