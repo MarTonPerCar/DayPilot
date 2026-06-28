@@ -3,6 +3,8 @@ package com.example.daypilot_test_desing.backend.supabase
 import com.example.daypilot_test_desing.backend.repository.ProgressRepository
 import com.example.daypilot_test_desing.backend.supabase.dto.DailyLogDto
 import com.example.daypilot_test_desing.backend.supabase.dto.DailyProgressDto
+import com.example.daypilot_test_desing.backend.supabase.dto.FriendRowDto
+import com.example.daypilot_test_desing.backend.supabase.dto.FriendsRankingDto
 import com.example.daypilot_test_desing.backend.supabase.dto.InsertPointsLogDto
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
@@ -53,5 +55,20 @@ class SupabaseProgressRepository : ProgressRepository {
         } catch (_: Exception) { }
     }
 
-    override suspend fun getRankingPosition(): Int = 1  // stub — Piece 6 (Rivalry) will replace
+    override suspend fun getRankingPosition(): Int {
+        val uid = userId() ?: return 0
+        return try {
+            val friendIds = supabase.from("friends").select {
+                filter { or { eq("requester_id", uid); eq("receiver_id", uid) } }
+            }.decodeList<FriendRowDto>()
+                .map { if (it.requesterId == uid) it.receiverId else it.requesterId }
+            val allIds = (friendIds + uid).distinct()
+            val ranking = supabase.from("friends_ranking").select {
+                filter { isIn("id", allIds) }
+            }.decodeList<FriendsRankingDto>()
+                .sortedByDescending { it.pointsLast30Days }
+            val idx = ranking.indexOfFirst { it.id == uid }
+            if (idx >= 0) idx + 1 else ranking.size + 1
+        } catch (_: Exception) { 0 }
+    }
 }

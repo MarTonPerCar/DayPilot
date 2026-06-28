@@ -65,7 +65,7 @@ object FakeProgressRepository : ProgressRepository {
         }
     }
 
-    override suspend fun getRankingPosition(): Int = FakeRankingRepository.getCurrentUserPosition()
+    override suspend fun getRankingPosition(): Int = FakeRankingRepository.getCurrentUserPositionSync()
 
     // ── Non-interface methods (used by ProfileViewModel until Piece 4) ─
 
@@ -76,7 +76,7 @@ object FakeProgressRepository : ProgressRepository {
     fun getPointsFromSteps()  = pointsFromSteps_
     fun getPointsFromHabits() = pointsFromHabits_
     fun getPointsFromTimers() = pointsFromTimers_
-    fun getRankingPositionSync() = FakeRankingRepository.getCurrentUserPosition()
+    fun getRankingPositionSync() = FakeRankingRepository.getCurrentUserPositionSync()
     fun isTimerCompletedToday()  = timerCompletedToday
     fun isTechHealthBonusAwarded() = techHealthBonusAwarded
 }
