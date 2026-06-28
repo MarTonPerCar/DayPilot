@@ -1,5 +1,9 @@
 package com.example.daypilot_test_desing.backend.model
 
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
+
+@Serializable
 data class AppRestriction(
     val id: String,
     val appName: String,
@@ -8,9 +12,10 @@ data class AppRestriction(
     val notificationIntervalSeconds: Int,
     val isEnabled: Boolean,
     val usedMinutesToday: Int = 0,
-    val pendingDelete: Boolean = false
+    @Transient val pendingDelete: Boolean = false
 )
 
+@Serializable
 data class GroupRestriction(
     val id: String,
     val groupName: String,
@@ -19,5 +24,5 @@ data class GroupRestriction(
     val notificationIntervalSeconds: Int,
     val isEnabled: Boolean,
     val usedMinutesToday: Int = 0,
-    val pendingDelete: Boolean = false
+    @Transient val pendingDelete: Boolean = false
 )

@@ -3,21 +3,23 @@ package com.example.daypilot_test_desing.viewmodel.reminders
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.example.daypilot_test_desing.backend.model.ReminderFormDataInfo
-import com.example.daypilot_test_desing.backend.fake.FakeReminderRepository
-import com.example.daypilot_test_desing.backend.fake.FakeSettingsRepository
+import com.example.daypilot_test_desing.backend.preferences.AppPreferences
+import com.example.daypilot_test_desing.backend.sharedprefs.SharedPrefsReminderRepository
 import com.example.daypilot_test_desing.reminders.ReminderScheduler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class RemindersViewModel(application: Application) : AndroidViewModel(application) {
-    private val _uiState = MutableStateFlow(RemindersUiState(
-        reminders = FakeReminderRepository.getReminders()
-    ))
+
+    private val repository = SharedPrefsReminderRepository(application)
+    private val appPrefs   = AppPreferences(application)
+
+    private val _uiState = MutableStateFlow(RemindersUiState(reminders = repository.getReminders()))
     val uiState: StateFlow<RemindersUiState> = _uiState.asStateFlow()
 
     private fun refresh() {
-        _uiState.value = RemindersUiState(reminders = FakeReminderRepository.getReminders())
+        _uiState.value = RemindersUiState(reminders = repository.getReminders())
     }
 
     fun addReminder(form: ReminderFormDataInfo) {
@@ -27,12 +29,15 @@ class RemindersViewModel(application: Application) : AndroidViewModel(applicatio
             else                           -> return
         }
         val enriched = form.copy(triggerAtMillis = triggerAtMillis)
-        val reminder = FakeReminderRepository.addReminder(enriched)
+        val reminder = repository.addReminder(enriched)
         val ctx = getApplication<Application>()
-        if (FakeSettingsRepository.getSettings().notificationsEnabled) {
+        if (appPrefs.notificationsEnabled) {
             ReminderScheduler.schedule(ctx, reminder.id, reminder.title, triggerAtMillis)
             if (form.earlyWarning && triggerAtMillis - System.currentTimeMillis() > 10 * 60_000L) {
-                ReminderScheduler.schedule(ctx, reminder.id, reminder.title, triggerAtMillis - 10 * 60_000L, isEarly = true)
+                ReminderScheduler.schedule(
+                    ctx, reminder.id, reminder.title,
+                    triggerAtMillis - 10 * 60_000L, isEarly = true
+                )
             }
         }
         refresh()
@@ -40,13 +45,13 @@ class RemindersViewModel(application: Application) : AndroidViewModel(applicatio
 
     fun deleteReminder(id: String) {
         ReminderScheduler.cancel(getApplication(), id)
-        FakeReminderRepository.deleteReminder(id)
+        repository.deleteReminder(id)
         refresh()
     }
 
     fun toggleReminder(id: String, enabled: Boolean) {
         if (!enabled) ReminderScheduler.cancel(getApplication(), id)
-        FakeReminderRepository.toggleReminder(id, enabled)
+        repository.toggleReminder(id, enabled)
         refresh()
     }
 }

@@ -3,6 +3,7 @@ package com.example.daypilot_test_desing.backend.model
 import androidx.annotation.StringRes
 import com.example.daypilot_test_desing.R
 
+@kotlinx.serialization.Serializable
 data class ReminderData(
     val id: String,
     val title: String,
