@@ -20,6 +20,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.daypilot_test_desing.data.repository.supabase.SupabaseTaskRepository
+import com.example.daypilot_test_desing.viewmodel.AppSessionViewModel
 import com.example.daypilot_test_desing.viewmodel.auth.AuthViewModel
 import com.example.daypilot_test_desing.viewmodel.calendar.CalendarViewModel
 import com.example.daypilot_test_desing.viewmodel.friends.FriendsViewModel
@@ -63,6 +64,7 @@ fun DayPilotNavGraph(
     val currentRoute = backStackEntry?.destination?.route
 
     // ViewModels scoped to the NavGraph lifetime
+    val sessionVM: AppSessionViewModel          = viewModel()
     val authVM: AuthViewModel                   = viewModel()
     val homeVM: HomeViewModel                   = viewModel()
     val calendarVM: CalendarViewModel           = viewModel(
@@ -89,9 +91,38 @@ fun DayPilotNavGraph(
         homeVM.refresh()
     }
 
+    // Session restoration: on startup, skip AUTH if a saved session exists;
+    // on logout, return to AUTH from wherever the user is.
+    val sessionState by sessionVM.state.collectAsState()
+    LaunchedEffect(sessionState) {
+        val current = navController.currentBackStackEntry?.destination?.route
+        when (sessionState) {
+            AppSessionViewModel.State.Authenticated -> {
+                // Reload all user data (tasks, etc.) every time the session becomes active.
+                sessionVM.loadAll(calendarVM::refresh, homeVM::refresh)
+                // Navigate to HOME only if we are still on the AUTH screen.
+                if (current == DayPilotDestinations.AUTH || current == null) {
+                    navController.navigate(DayPilotDestinations.HOME) {
+                        popUpTo(DayPilotDestinations.AUTH) { inclusive = true }
+                    }
+                }
+            }
+            AppSessionViewModel.State.Unauthenticated -> {
+                // Navigate to AUTH on logout (but not if already there on first launch).
+                if (current != null && current != DayPilotDestinations.AUTH) {
+                    navController.navigate(DayPilotDestinations.AUTH) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+            }
+            AppSessionViewModel.State.Loading -> { /* wait for session check */ }
+        }
+    }
+
     Scaffold(
         bottomBar = {
-            if (currentRoute != DayPilotDestinations.AUTH) {
+            if (currentRoute != DayPilotDestinations.AUTH &&
+                currentRoute != DayPilotDestinations.RESET_PASSWORD) {
                 DayPilotBottomBar(navController = navController)
             }
         }
@@ -113,16 +144,14 @@ fun DayPilotNavGraph(
                     registerError       = authState.registerError,
                     onLoginClick        = { email, password ->
                         authVM.login(email, password) {
-                            navController.navigate(DayPilotDestinations.HOME) {
-                                popUpTo(DayPilotDestinations.AUTH) { inclusive = true }
-                            }
+                            // notifyAuthenticated triggers the LaunchedEffect above,
+                            // which navigates to HOME and loads all data.
+                            sessionVM.notifyAuthenticated()
                         }
                     },
                     onRegisterClick     = { name, username, email, password, region ->
                         authVM.register(name, username, email, password, region) {
-                            navController.navigate(DayPilotDestinations.HOME) {
-                                popUpTo(DayPilotDestinations.AUTH) { inclusive = true }
-                            }
+                            sessionVM.notifyAuthenticated()
                         }
                     },
                     onForgotPassword    = {
@@ -246,9 +275,9 @@ fun DayPilotNavGraph(
                     onToggleNotifications= settingsVM::toggleNotifications,
                     onNavigateToEditProfile = { navController.navigate(DayPilotDestinations.EDIT_PROFILE) },
                     onLogout = {
-                        navController.navigate(DayPilotDestinations.AUTH) {
-                            popUpTo(0) { inclusive = true }
-                        }
+                        // signOut() signs out of Supabase and flips the session
+                        // state to Unauthenticated; the LaunchedEffect handles navigation.
+                        sessionVM.signOut()
                     },
                     onBack = { navController.popBackStack() }
                 )

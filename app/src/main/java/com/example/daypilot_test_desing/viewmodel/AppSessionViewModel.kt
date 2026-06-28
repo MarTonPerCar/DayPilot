@@ -1,0 +1,67 @@
+package com.example.daypilot_test_desing.viewmodel
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.daypilot_test_desing.supabase
+import io.github.jan.supabase.auth.auth
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+
+/**
+ * Coordinates session lifecycle for the whole app.
+ *
+ * On startup it checks whether supabase-kt restored a saved session from
+ * SharedPreferences (the Auth plugin does this automatically). If one exists
+ * the app skips the auth screen and loads all user data immediately.
+ *
+ * Session persistence note: supabase-kt stores the JWT + refresh token in
+ * Android SharedPreferences automatically. JWTs expire after ~1 hour and are
+ * silently refreshed by the plugin. Refresh tokens last ~7 days, so users
+ * stay logged in without any extra work on our side.
+ */
+class AppSessionViewModel : ViewModel() {
+
+    sealed class State {
+        data object Loading : State()
+        data object Authenticated : State()
+        data object Unauthenticated : State()
+    }
+
+    private val _state = MutableStateFlow<State>(State.Loading)
+    val state: StateFlow<State> = _state.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            _state.value = try {
+                if (supabase.auth.currentUserOrNull() != null) State.Authenticated
+                else State.Unauthenticated
+            } catch (_: Exception) {
+                State.Unauthenticated
+            }
+        }
+    }
+
+    /** Call immediately after a successful login or registration. */
+    fun notifyAuthenticated() {
+        _state.value = State.Authenticated
+    }
+
+    /**
+     * Triggers all user-data loaders. Pass each ViewModel's refresh function.
+     * Example: loadAll(calendarVM::refresh, homeVM::refresh)
+     */
+    fun loadAll(vararg loaders: () -> Unit) {
+        loaders.forEach { it() }
+    }
+
+    /** Signs the user out of Supabase and marks the session as gone. */
+    fun signOut() {
+        // Update state immediately so the UI reacts without waiting for the network call.
+        _state.value = State.Unauthenticated
+        viewModelScope.launch {
+            try { supabase.auth.signOut() } catch (_: Exception) {}
+        }
+    }
+}
