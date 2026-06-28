@@ -31,25 +31,20 @@ object FakeFriendRepository : FriendRepository {
         SearchUserData("u5", "Lucía Castro",  "lucia@example.com",   590, 15)
     )
 
-    override fun getFriends(): List<FriendData>  = friends.toList()
-    override fun getFriendRequests(): List<FriendData> = requests.toList()
+    // ── FriendRepository interface ────────────────────────────────────
 
-    override fun acceptRequest(userId: String) {
+    override suspend fun getFriends(): List<FriendData>  = friends.toList()
+    override suspend fun getFriendRequests(): List<FriendData> = requests.toList()
+
+    override suspend fun acceptRequest(userId: String) {
         val req = requests.find { it.id == userId } ?: return
         requests.remove(req)
-        friends.add(req.copy(
-            weeklySummary = FriendWeeklySummary(
-                totalPoints    = 0,
-                tasksCompleted = 0,
-                totalSteps     = 0,
-                bestStreak     = req.streak
-            )
-        ))
+        friends.add(req.copy(weeklySummary = FriendWeeklySummary(0, 0, 0, req.streak)))
     }
 
-    override fun rejectRequest(userId: String) { requests.removeAll { it.id == userId } }
+    override suspend fun rejectRequest(userId: String) { requests.removeAll { it.id == userId } }
 
-    override fun reactToFriend(userId: String, reaction: ReactionType) {
+    override suspend fun reactToFriend(userId: String, reaction: ReactionType) {
         val idx = friends.indexOfFirst { it.id == userId }
         if (idx >= 0) {
             val summary = friends[idx].weeklySummary ?: FriendWeeklySummary(0, 0, 0, 0)
@@ -57,24 +52,21 @@ object FakeFriendRepository : FriendRepository {
         }
     }
 
-    override fun searchUsers(query: String): List<SearchUserData> =
+    override suspend fun searchUsers(query: String): List<SearchUserData> =
         if (query.isBlank()) emptyList()
         else allUsers.filter { it.name.contains(query, ignoreCase = true) || it.email.contains(query, ignoreCase = true) }
 
-    override fun addFriend(userId: String) {
+    override suspend fun addFriend(userId: String) {
         val user = allUsers.find { it.id == userId } ?: return
         if (friends.none { it.id == userId } && requests.none { it.id == userId }) {
-            friends.add(FriendData(
-                id            = user.id,
-                name          = user.name,
-                email         = user.email,
-                points        = user.points,
-                streak        = user.streak,
-                avatarUrl     = user.avatarUrl,
-                weeklySummary = FriendWeeklySummary(0, 0, 0, user.streak)
-            ))
+            friends.add(FriendData(user.id, user.name, user.email, user.points, user.streak, user.avatarUrl,
+                weeklySummary = FriendWeeklySummary(0, 0, 0, user.streak)))
         }
     }
 
-    override fun removeFriend(userId: String) { friends.removeAll { it.id == userId } }
+    override suspend fun removeFriend(userId: String) { friends.removeAll { it.id == userId } }
+
+    // ── Non-interface sync method (used by FakeRankingRepository until Piece 6) ─
+
+    fun getFriendsSync(): List<FriendData> = friends.toList()
 }

@@ -22,6 +22,7 @@ import androidx.navigation.navArgument
 import android.app.Application
 import android.content.Context
 import androidx.compose.runtime.remember
+import com.example.daypilot_test_desing.backend.supabase.SupabaseFriendRepository
 import com.example.daypilot_test_desing.backend.supabase.SupabaseProgressRepository
 import com.example.daypilot_test_desing.backend.supabase.SupabaseStepsRepository
 import com.example.daypilot_test_desing.backend.supabase.SupabaseTaskRepository
@@ -73,8 +74,6 @@ fun DayPilotNavGraph(
     // ViewModels scoped to the NavGraph lifetime
     val sessionVM: AppSessionViewModel          = viewModel()
     val authVM: AuthViewModel                   = viewModel()
-    val friendsVM: FriendsViewModel             = viewModel()
-    val searchVM: SearchFriendsViewModel        = viewModel()
     val notificationsVM: NotificationsViewModel = viewModel()
     val rivalryVM: RivalryViewModel             = viewModel()
     val remindersVM: RemindersViewModel         = viewModel()
@@ -87,8 +86,11 @@ fun DayPilotNavGraph(
     val stepsRepo    = remember { SupabaseStepsRepository(application.getSharedPreferences("daypilot_steps", Context.MODE_PRIVATE)) }
     val progressRepo = remember { SupabaseProgressRepository() }
     val userRepo     = remember { SupabaseUserRepository() }
+    val friendRepo   = remember { SupabaseFriendRepository() }
 
-    val homeVM: HomeViewModel     = viewModel(factory = HomeViewModel.factory(stepsRepo, progressRepo, userRepo))
+    val homeVM: HomeViewModel     = viewModel(factory = HomeViewModel.factory(stepsRepo, progressRepo, userRepo, friendRepo))
+    val friendsVM: FriendsViewModel     = viewModel(factory = FriendsViewModel.factory(friendRepo))
+    val searchVM: SearchFriendsViewModel = viewModel(factory = SearchFriendsViewModel.factory(friendRepo))
     val habitsVM: HabitsViewModel = viewModel(factory = HabitsViewModel.factory(stepsRepo))
     val stepsVM: StepsViewModel   = viewModel(factory = StepsViewModel.factory(application, stepsRepo))
     val progressVM: ProgressViewModel = viewModel(factory = ProgressViewModel.factory(application, progressRepo))

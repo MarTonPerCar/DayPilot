@@ -8,7 +8,7 @@ object FakeRankingRepository : RankingRepository {
     override fun getRanking(): List<RankingData> {
         val user = FakeUserRepository.getCurrentUserSync()
         val me = RankingData("me", user.name, FakeProgressRepository.getMonthlyPoints(), user.currentStreak)
-        val friends = FakeFriendRepository.getFriends().map {
+        val friends = FakeFriendRepository.getFriendsSync().map {
             RankingData(it.id, it.name, it.points, it.streak, it.avatarUrl)
         }
         return (listOf(me) + friends).sortedByDescending { it.points }

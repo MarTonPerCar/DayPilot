@@ -5,12 +5,12 @@ import com.example.daypilot_test_desing.backend.model.ReactionType
 import com.example.daypilot_test_desing.backend.model.SearchUserData
 
 interface FriendRepository {
-    fun getFriends(): List<FriendData>
-    fun getFriendRequests(): List<FriendData>
-    fun acceptRequest(userId: String)
-    fun rejectRequest(userId: String)
-    fun reactToFriend(userId: String, reaction: ReactionType)
-    fun searchUsers(query: String): List<SearchUserData>
-    fun addFriend(userId: String)
-    fun removeFriend(userId: String)
+    suspend fun getFriends(): List<FriendData>
+    suspend fun getFriendRequests(): List<FriendData>
+    suspend fun acceptRequest(userId: String)
+    suspend fun rejectRequest(userId: String)
+    suspend fun reactToFriend(userId: String, reaction: ReactionType)
+    suspend fun searchUsers(query: String): List<SearchUserData>
+    suspend fun addFriend(userId: String)
+    suspend fun removeFriend(userId: String)
 }

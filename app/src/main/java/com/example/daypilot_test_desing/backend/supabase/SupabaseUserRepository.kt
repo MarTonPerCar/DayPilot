@@ -4,14 +4,12 @@ import com.example.daypilot_test_desing.backend.model.TimeZoneRegion
 import com.example.daypilot_test_desing.backend.model.UserProfile
 import com.example.daypilot_test_desing.backend.model.WeeklySummaryData
 import com.example.daypilot_test_desing.backend.repository.UserRepository
-import com.example.daypilot_test_desing.backend.supabase.dto.DailyLogDto
 import com.example.daypilot_test_desing.backend.supabase.dto.UpdateUserDto
 import com.example.daypilot_test_desing.backend.supabase.dto.UserDto
+import com.example.daypilot_test_desing.backend.supabase.dto.UserStreakDto
+import com.example.daypilot_test_desing.backend.supabase.dto.WeeklySummaryRowDto
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 class SupabaseUserRepository : UserRepository {
 
@@ -26,22 +24,27 @@ class SupabaseUserRepository : UserRepository {
             }.decodeList<UserDto>().firstOrNull()
                 ?: return UserProfile(id = uid, name = "", username = "", email = "")
 
+            val streak = supabase.from("user_streaks").select {
+                filter { eq("user_id", uid) }
+                limit(1)
+            }.decodeList<UserStreakDto>().firstOrNull()
+
             val region = TimeZoneRegion.entries.firstOrNull { it.value == dto.region }
                 ?: TimeZoneRegion.EUROPE_MADRID
-            val memberSince = dto.createdAt.take(4)  // year from "2025-01-01T..."
+            val memberSince = dto.createdAt.take(4)
 
             UserProfile(
                 id            = dto.id,
                 name          = dto.name,
                 username      = dto.username,
                 email         = dto.email,
-                avatarUrl     = dto.avatarUrl,
+                avatarUrl     = dto.photoUrl,
                 region        = region,
                 memberSince   = memberSince,
                 level         = dto.level,
                 totalPoints   = dto.totalPointsHistorical,
-                currentStreak = dto.currentStreak,
-                longestStreak = dto.longestStreak
+                currentStreak = streak?.currentStreak ?: 0,
+                longestStreak = streak?.longestStreak ?: 0
             )
         } catch (_: Exception) {
             UserProfile(id = uid, name = "", username = "", email = "")
@@ -51,17 +54,18 @@ class SupabaseUserRepository : UserRepository {
     override suspend fun getWeeklySummary(): WeeklySummaryData {
         val uid = userId() ?: return WeeklySummaryData(0, 0, 0, 0)
         return try {
-            val logs = supabase.from("user_daily_log").select {
+            val row = supabase.from("user_weekly_summary").select {
                 filter { eq("user_id", uid) }
-                order("date", ascending = false)
-                limit(7)
-            }.decodeList<DailyLogDto>()
+                order("week_start", ascending = false)
+                limit(1)
+            }.decodeList<WeeklySummaryRowDto>().firstOrNull()
+                ?: return WeeklySummaryData(0, 0, 0, 0)
 
             WeeklySummaryData(
-                totalPoints    = logs.sumOf { it.totalPoints },
-                tasksCompleted = logs.sumOf { it.tasksCompleted },
-                totalSteps     = logs.sumOf { it.steps },
-                bestStreak     = 0,   // streak data lives on users row; not repeated in log
+                totalPoints    = row.totalPoints,
+                tasksCompleted = row.totalTasksCompleted,
+                totalSteps     = row.totalSteps,
+                bestStreak     = row.bestStreak,
                 reactions      = emptyList()  // reactions added in Piece 5
             )
         } catch (_: Exception) {
@@ -73,7 +77,12 @@ class SupabaseUserRepository : UserRepository {
         val uid = userId() ?: return
         try {
             supabase.from("users").update(
-                UpdateUserDto(name = name, username = username, region = region.value)
+                UpdateUserDto(
+                    name          = name,
+                    username      = username,
+                    usernameLower = username.lowercase(),
+                    region        = region.value
+                )
             ) {
                 filter { eq("id", uid) }
             }
