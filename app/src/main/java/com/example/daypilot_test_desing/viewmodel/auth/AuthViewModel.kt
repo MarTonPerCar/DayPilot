@@ -19,6 +19,10 @@ class AuthViewModel : ViewModel() {
     val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
 
     fun login(email: String, password: String, onSuccess: () -> Unit) {
+        if (email.isBlank() || password.isBlank()) {
+            _uiState.update { it.copy(loginError = "Please enter your email and password.") }
+            return
+        }
         viewModelScope.launch {
             _uiState.update { it.copy(loginLoading = true, loginError = "") }
             try {
