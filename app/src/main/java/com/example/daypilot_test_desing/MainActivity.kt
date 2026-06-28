@@ -12,6 +12,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.daypilot_test_desing.backend.supabase.SupabaseUserRepository
 import com.example.daypilot_test_desing.navigation.DayPilotNavGraph
 import com.example.daypilot_test_desing.viewmodel.settings.SettingsViewModel
 import com.example.daypilot_test_desing.reminders.createNotificationChannel
@@ -41,7 +42,9 @@ class MainActivity : ComponentActivity() {
         setTheme(R.style.Theme_DayPilotTestDesing)
         enableEdgeToEdge()
         setContent {
-            val settingsVM: SettingsViewModel = viewModel()
+            val settingsVM: SettingsViewModel = viewModel(
+                factory = SettingsViewModel.factory(application, SupabaseUserRepository())
+            )
             val settings by settingsVM.uiState.collectAsState()
 
             val theme = DayPilotTheme.entries.find { it.name == settings.selectedThemeId }
