@@ -36,6 +36,7 @@ import com.example.daypilot_test_desing.viewmodel.rivalry.RivalryViewModel
 import com.example.daypilot_test_desing.viewmodel.settings.SettingsViewModel
 import com.example.daypilot_test_desing.viewmodel.techhealth.TechHealthViewModel
 import com.example.daypilot_test_desing.presentation.auth.AuthScreen
+import com.example.daypilot_test_desing.presentation.loading.LoadingScreen
 import com.example.daypilot_test_desing.presentation.calendar.CalendarScreen
 import com.example.daypilot_test_desing.presentation.profile.EditProfileScreen
 import com.example.daypilot_test_desing.presentation.friends.FriendsScreen
@@ -98,30 +99,32 @@ fun DayPilotNavGraph(
         val current = navController.currentBackStackEntry?.destination?.route
         when (sessionState) {
             AppSessionViewModel.State.Authenticated -> {
-                // Reload all user data (tasks, etc.) every time the session becomes active.
                 sessionVM.loadAll(calendarVM::refresh, homeVM::refresh)
-                // Navigate to HOME only if we are still on the AUTH screen.
-                if (current == DayPilotDestinations.AUTH || current == null) {
+                // From LOADING or AUTH go to HOME; never navigate if already inside the app.
+                if (current == DayPilotDestinations.LOADING ||
+                    current == DayPilotDestinations.AUTH   ||
+                    current == null) {
                     navController.navigate(DayPilotDestinations.HOME) {
-                        popUpTo(DayPilotDestinations.AUTH) { inclusive = true }
+                        popUpTo(0) { inclusive = true }
                     }
                 }
             }
             AppSessionViewModel.State.Unauthenticated -> {
-                // Navigate to AUTH on logout (but not if already there on first launch).
+                // From LOADING go to AUTH; also handles logout from any screen.
                 if (current != null && current != DayPilotDestinations.AUTH) {
                     navController.navigate(DayPilotDestinations.AUTH) {
                         popUpTo(0) { inclusive = true }
                     }
                 }
             }
-            AppSessionViewModel.State.Loading -> { /* wait for session check */ }
+            AppSessionViewModel.State.Loading -> { /* show LoadingScreen, wait */ }
         }
     }
 
     Scaffold(
         bottomBar = {
-            if (currentRoute != DayPilotDestinations.AUTH &&
+            if (currentRoute != DayPilotDestinations.LOADING &&
+                currentRoute != DayPilotDestinations.AUTH &&
                 currentRoute != DayPilotDestinations.RESET_PASSWORD) {
                 DayPilotBottomBar(navController = navController)
             }
@@ -129,9 +132,14 @@ fun DayPilotNavGraph(
     ) { innerPadding ->
         NavHost(
             navController    = navController,
-            startDestination = DayPilotDestinations.AUTH,
+            startDestination = DayPilotDestinations.LOADING,
             modifier         = Modifier.padding(innerPadding)
         ) {
+
+            // ── Loading ───────────────────────────────────────────
+            composable(DayPilotDestinations.LOADING) {
+                LoadingScreen()
+            }
 
             // ── Auth ─────────────────────────────────────────────
             composable(DayPilotDestinations.AUTH) {

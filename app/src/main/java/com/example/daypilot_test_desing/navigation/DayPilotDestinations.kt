@@ -1,6 +1,9 @@
 package com.example.daypilot_test_desing.navigation
 
 object DayPilotDestinations {
+    // Startup
+    const val LOADING = "loading"
+
     // Auth
     const val AUTH = "auth"
 
