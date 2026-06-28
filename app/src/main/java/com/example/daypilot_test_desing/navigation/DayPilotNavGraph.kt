@@ -89,7 +89,7 @@ fun DayPilotNavGraph(
     val friendRepo   = remember { SupabaseFriendRepository() }
     val rankingRepo  = remember { SupabaseRankingRepository() }
 
-    val homeVM: HomeViewModel            = viewModel(factory = HomeViewModel.factory(stepsRepo, progressRepo, userRepo, friendRepo))
+    val homeVM: HomeViewModel            = viewModel(factory = HomeViewModel.factory(stepsRepo, progressRepo, userRepo, friendRepo, SupabaseTaskRepository()))
     val friendsVM: FriendsViewModel      = viewModel(factory = FriendsViewModel.factory(friendRepo))
     val searchVM: SearchFriendsViewModel = viewModel(factory = SearchFriendsViewModel.factory(friendRepo))
     val rivalryVM: RivalryViewModel      = viewModel(factory = RivalryViewModel.factory(rankingRepo))

@@ -3,11 +3,11 @@ package com.example.daypilot_test_desing.viewmodel.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.daypilot_test_desing.backend.fake.FakeTaskRepository
 import com.example.daypilot_test_desing.backend.model.DayProgress
 import com.example.daypilot_test_desing.backend.repository.FriendRepository
 import com.example.daypilot_test_desing.backend.repository.ProgressRepository
 import com.example.daypilot_test_desing.backend.repository.StepsRepository
+import com.example.daypilot_test_desing.backend.repository.TaskRepository
 import com.example.daypilot_test_desing.backend.repository.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,7 +18,8 @@ class HomeViewModel(
     private val stepsRepo: StepsRepository,
     private val progressRepo: ProgressRepository,
     private val userRepo: UserRepository,
-    private val friendRepo: FriendRepository
+    private val friendRepo: FriendRepository,
+    private val taskRepo: TaskRepository
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
@@ -29,7 +30,7 @@ class HomeViewModel(
         viewModelScope.launch {
             try {
                 val user     = userRepo.getCurrentUser()
-                val tasks    = FakeTaskRepository.getTasks()
+                val tasks    = taskRepo.getTasks()
                 val today    = progressRepo.getTodayProgress()
                 val history  = progressRepo.getHistory(7)
                 val ranking  = progressRepo.getRankingPosition()
@@ -60,12 +61,13 @@ class HomeViewModel(
             stepsRepo: StepsRepository,
             progressRepo: ProgressRepository,
             userRepo: UserRepository,
-            friendRepo: FriendRepository
+            friendRepo: FriendRepository,
+            taskRepo: TaskRepository
         ): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T =
-                    HomeViewModel(stepsRepo, progressRepo, userRepo, friendRepo) as T
+                    HomeViewModel(stepsRepo, progressRepo, userRepo, friendRepo, taskRepo) as T
             }
     }
 }
