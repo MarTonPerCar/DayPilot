@@ -39,7 +39,8 @@ fun AuthScreen(
     loginError: String = "",
     registerError: String = "",
     onLoginClick: (email: String, password: String) -> Unit = { _, _ -> },
-    onRegisterClick: (name: String, username: String, email: String, password: String, region: String) -> Unit = { _, _, _, _, _ -> }
+    onRegisterClick: (name: String, username: String, email: String, password: String, region: String) -> Unit = { _, _, _, _, _ -> },
+    onForgotPassword: () -> Unit = {}
 ) {
     var isLogin by remember { mutableStateOf(true) }
 
@@ -91,7 +92,8 @@ fun AuthScreen(
                     LoginCard(
                         isLoading = isLoginLoading,
                         errorMessage = loginError,
-                        onLogin = onLoginClick
+                        onLogin = onLoginClick,
+                        onForgotPassword = onForgotPassword
                     )
                 }
 

@@ -20,6 +20,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.daypilot_test_desing.data.repository.supabase.SupabaseTaskRepository
+import com.example.daypilot_test_desing.viewmodel.auth.AuthViewModel
 import com.example.daypilot_test_desing.viewmodel.calendar.CalendarViewModel
 import com.example.daypilot_test_desing.viewmodel.friends.FriendsViewModel
 import com.example.daypilot_test_desing.viewmodel.friends.SearchFriendsViewModel
@@ -62,6 +63,7 @@ fun DayPilotNavGraph(
     val currentRoute = backStackEntry?.destination?.route
 
     // ViewModels scoped to the NavGraph lifetime
+    val authVM: AuthViewModel                   = viewModel()
     val homeVM: HomeViewModel                   = viewModel()
     val calendarVM: CalendarViewModel           = viewModel(
         factory = CalendarViewModel.factory(SupabaseTaskRepository())
@@ -102,18 +104,30 @@ fun DayPilotNavGraph(
 
             // ── Auth ─────────────────────────────────────────────
             composable(DayPilotDestinations.AUTH) {
+                val authState by authVM.uiState.collectAsState()
                 AuthScreen(
-                    onLoginSuccess  = {
-                        navController.navigate(DayPilotDestinations.HOME) {
-                            popUpTo(DayPilotDestinations.AUTH) { inclusive = true }
+                    onLoginSuccess      = {},
+                    isLoginLoading      = authState.loginLoading,
+                    isRegisterLoading   = authState.registerLoading,
+                    loginError          = authState.loginError,
+                    registerError       = authState.registerError,
+                    onLoginClick        = { email, password ->
+                        authVM.login(email, password) {
+                            navController.navigate(DayPilotDestinations.HOME) {
+                                popUpTo(DayPilotDestinations.AUTH) { inclusive = true }
+                            }
                         }
                     },
-                    onLoginClick    = { _, _ ->
-                        navController.navigate(DayPilotDestinations.HOME) {
-                            popUpTo(DayPilotDestinations.AUTH) { inclusive = true }
+                    onRegisterClick     = { name, username, email, password, region ->
+                        authVM.register(name, username, email, password, region) {
+                            navController.navigate(DayPilotDestinations.HOME) {
+                                popUpTo(DayPilotDestinations.AUTH) { inclusive = true }
+                            }
                         }
                     },
-                    onRegisterClick = { _, _, _, _, _ -> }
+                    onForgotPassword    = {
+                        navController.navigate(DayPilotDestinations.RESET_PASSWORD)
+                    }
                 )
             }
 
@@ -260,8 +274,13 @@ fun DayPilotNavGraph(
             }
 
             composable(DayPilotDestinations.RESET_PASSWORD) {
+                val authState by authVM.uiState.collectAsState()
+                LaunchedEffect(Unit) { authVM.clearResetState() }
                 ResetPasswordScreen(
-                    onSendResetEmail = { _ -> },
+                    isLoading        = authState.resetLoading,
+                    isSuccess        = authState.resetSent,
+                    errorMessage     = authState.resetError,
+                    onSendResetEmail = authVM::sendResetEmail,
                     onBack           = { navController.popBackStack() }
                 )
             }

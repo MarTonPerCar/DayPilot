@@ -88,7 +88,8 @@ fun ToggleOption(text: String, selected: Boolean, onClick: () -> Unit) {
 fun LoginCard(
     isLoading: Boolean = false,
     errorMessage: String = "",
-    onLogin: (email: String, password: String) -> Unit
+    onLogin: (email: String, password: String) -> Unit,
+    onForgotPassword: () -> Unit = {}
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -120,7 +121,7 @@ fun LoginCard(
 
         DayPilotButtonText(
             text = stringResource(R.string.forgot_password),
-            onClick = {},
+            onClick = onForgotPassword,
             modifier = Modifier.align(Alignment.End)
         )
 
