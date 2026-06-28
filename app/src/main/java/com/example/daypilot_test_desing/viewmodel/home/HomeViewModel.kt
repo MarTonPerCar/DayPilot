@@ -20,23 +20,27 @@ class HomeViewModel : ViewModel() {
 
     fun refresh() {
         viewModelScope.launch {
-            val user     = FakeUserRepository.getCurrentUser()
-            val tasks    = FakeTaskRepository.getTasks()
-            val steps    = FakeStepsRepository
-            val progress = FakeProgressRepository
-            _uiState.value = HomeUiState(
-                userName            = user.name,
-                streak              = user.currentStreak,
-                stepsToday          = steps.getCurrentSteps(),
-                stepsGoal           = steps.getGoalSteps(),
-                tasksCompleted      = tasks.count { it.isDone },
-                tasksTotal          = tasks.size,
-                progressData        = progress.getProgressData(),
-                pointsToday         = progress.getPointsToday(),
-                rankingPosition     = progress.getRankingPosition(),
-                friendCount         = FakeFriendRepository.getFriends().size,
-                timerCompletedToday = progress.isTimerCompletedToday()
-            )
+            try {
+                val user     = FakeUserRepository.getCurrentUser()
+                val tasks    = FakeTaskRepository.getTasks()
+                val steps    = FakeStepsRepository
+                val progress = FakeProgressRepository
+                _uiState.value = HomeUiState(
+                    userName            = user.name,
+                    streak              = user.currentStreak,
+                    stepsToday          = steps.getCurrentSteps(),
+                    stepsGoal           = steps.getGoalSteps(),
+                    tasksCompleted      = tasks.count { it.isDone },
+                    tasksTotal          = tasks.size,
+                    progressData        = progress.getProgressData(),
+                    pointsToday         = progress.getPointsToday(),
+                    rankingPosition     = progress.getRankingPosition(),
+                    friendCount         = FakeFriendRepository.getFriends().size,
+                    timerCompletedToday = progress.isTimerCompletedToday()
+                )
+            } catch (_: Exception) {
+                // retain previous state on error
+            }
         }
     }
 }

@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.time.LocalDate
 
 class AuthViewModel : ViewModel() {
 
@@ -55,11 +54,11 @@ class AuthViewModel : ViewModel() {
                     supabase.from("users").insert(
                         NewUserDto(
                             id = uid,
+                            email = email,
                             name = name,
                             username = username,
-                            email = email,
-                            region = region,
-                            memberSince = LocalDate.now().year.toString()
+                            usernameLower = username.lowercase(),
+                            region = region
                         )
                     )
                     _uiState.update { it.copy(registerLoading = false) }

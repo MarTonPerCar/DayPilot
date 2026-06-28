@@ -19,33 +19,33 @@ class SupabaseTaskRepository : TaskRepository {
 
     override suspend fun getTasks(): List<CalendarTaskData> {
         val uid = userId() ?: return emptyList()
-        return supabase.from("calendar_tasks")
-            .select { filter { eq("user_id", uid) } }
-            .decodeList<CalendarTaskDto>()
-            .map { it.toModel() }
+        return try {
+            supabase.from("calendar_tasks")
+                .select { filter { eq("user_id", uid) } }
+                .decodeList<CalendarTaskDto>()
+                .map { it.toModel() }
+        } catch (e: Exception) {
+            emptyList()
+        }
     }
 
     override suspend fun addTask(data: NewTaskData) {
         val uid = userId() ?: return
         val taskId = UUID.randomUUID().toString()
-        val scheduledDate = "%04d-%02d-%02d".format(data.year, data.month, data.day)
+        val date = "%04d-%02d-%02d".format(data.year, data.month, data.day)
 
         supabase.from("tasks").insert(
             NewTaskDto(
                 id = taskId,
                 userId = uid,
                 title = data.title,
-                category = data.category.name.lowercase(),
-                difficulty = data.difficulty.name.lowercase(),
-                durationMinutes = data.duration
+                category = data.category.toDbString(),
+                difficulty = data.difficulty.name,        // "EASY", "MEDIUM", "HARD"
+                estimatedMinutes = data.duration
             )
         )
         supabase.from("task_days").insert(
-            NewTaskDayDto(
-                taskId = taskId,
-                userId = uid,
-                scheduledDate = scheduledDate
-            )
+            NewTaskDayDto(taskId = taskId, userId = uid, date = date)
         )
     }
 
@@ -58,19 +58,20 @@ class SupabaseTaskRepository : TaskRepository {
     ) {
         supabase.from("tasks").update({
             set("title", title)
-            set("category", category.name.lowercase())
-            set("difficulty", difficulty.name.lowercase())
-            set("duration_minutes", duration)
+            set("category", category.toDbString())
+            set("difficulty", difficulty.name)            // "EASY", "MEDIUM", "HARD"
+            set("estimated_minutes", duration)
         }) {
             filter { eq("id", id) }
         }
     }
 
+    // is_completed lives on `tasks`, not task_days
     override suspend fun toggleTask(id: String, isDone: Boolean) {
-        supabase.from("task_days").update({
-            set("is_done", isDone)
+        supabase.from("tasks").update({
+            set("is_completed", isDone)
         }) {
-            filter { eq("task_id", id) }
+            filter { eq("id", id) }
         }
     }
 
@@ -83,33 +84,48 @@ class SupabaseTaskRepository : TaskRepository {
     override suspend fun editTask(id: String) { /* edit is handled locally in the UI */ }
 }
 
+// ── DB ↔ App mappings ─────────────────────────────────────────────
+
+private fun TaskCategory.toDbString(): String = when (this) {
+    TaskCategory.WORK     -> "Trabajo"
+    TaskCategory.STUDY    -> "Estudio"
+    TaskCategory.SPORT    -> "Deporte"
+    TaskCategory.HEALTH   -> "Salud"
+    TaskCategory.PERSONAL -> "General"
+    TaskCategory.HOME     -> "Hogar"
+    TaskCategory.OTHER    -> "General"
+}
+
 private fun CalendarTaskDto.toModel(): CalendarTaskData {
-    val (year, month, day) = scheduledDate.split("-").map { it.toInt() }
+    val parts = date.split("-")
     return CalendarTaskData(
-        id = id,
-        day = day,
-        month = month,
-        year = year,
-        title = title,
-        category = category.toTaskCategory(),
+        id         = id,
+        day        = parts[2].toInt(),
+        month      = parts[1].toInt(),
+        year       = parts[0].toInt(),
+        title      = title,
+        category   = category.toTaskCategory(),
         difficulty = difficulty.toTaskDifficulty(),
-        duration = durationMinutes,
-        isDone = isDone
+        duration   = estimatedMinutes,
+        isDone     = isCompleted
     )
 }
 
-private fun String.toTaskCategory(): TaskCategory = when (this.lowercase()) {
-    "work"     -> TaskCategory.WORK
-    "study"    -> TaskCategory.STUDY
-    "sport"    -> TaskCategory.SPORT
-    "health"   -> TaskCategory.HEALTH
-    "personal" -> TaskCategory.PERSONAL
-    "home"     -> TaskCategory.HOME
+private fun String.toTaskCategory(): TaskCategory = when (this) {
+    "Estudio"  -> TaskCategory.STUDY
+    "Trabajo"  -> TaskCategory.WORK
+    "Deporte"  -> TaskCategory.SPORT
+    "Salud"    -> TaskCategory.HEALTH
+    "Bienestar"-> TaskCategory.HEALTH
+    "General"  -> TaskCategory.OTHER
+    "Hogar"    -> TaskCategory.HOME
+    "Compra"   -> TaskCategory.HOME
+    "Finanzas" -> TaskCategory.WORK
     else       -> TaskCategory.OTHER
 }
 
-private fun String.toTaskDifficulty(): TaskDifficulty = when (this.lowercase()) {
-    "medium" -> TaskDifficulty.MEDIUM
-    "hard"   -> TaskDifficulty.HARD
+private fun String.toTaskDifficulty(): TaskDifficulty = when (this.uppercase()) {
+    "MEDIUM" -> TaskDifficulty.MEDIUM
+    "HARD"   -> TaskDifficulty.HARD
     else     -> TaskDifficulty.EASY
 }
