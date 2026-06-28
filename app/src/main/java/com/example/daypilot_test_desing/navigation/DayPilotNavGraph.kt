@@ -19,6 +19,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import android.app.Application
+import android.content.Context
+import androidx.compose.runtime.remember
+import com.example.daypilot_test_desing.backend.supabase.SupabaseStepsRepository
 import com.example.daypilot_test_desing.backend.supabase.SupabaseTaskRepository
 import com.example.daypilot_test_desing.viewmodel.AppSessionViewModel
 import com.example.daypilot_test_desing.viewmodel.auth.AuthViewModel
@@ -67,7 +71,6 @@ fun DayPilotNavGraph(
     // ViewModels scoped to the NavGraph lifetime
     val sessionVM: AppSessionViewModel          = viewModel()
     val authVM: AuthViewModel                   = viewModel()
-    val homeVM: HomeViewModel                   = viewModel()
     val calendarVM: CalendarViewModel           = viewModel(
         factory = CalendarViewModel.factory(SupabaseTaskRepository())
     )
@@ -76,14 +79,25 @@ fun DayPilotNavGraph(
     val notificationsVM: NotificationsViewModel = viewModel()
     val profileVM: ProfileViewModel             = viewModel()
     val settingsVM: SettingsViewModel           = viewModel()
-    val habitsVM: HabitsViewModel               = viewModel()
-    val stepsVM: StepsViewModel                 = viewModel()
     val progressVM: ProgressViewModel           = viewModel()
     val rivalryVM: RivalryViewModel             = viewModel()
     val remindersVM: RemindersViewModel         = viewModel()
     val techHealthVM: TechHealthViewModel       = viewModel()
 
     val context = LocalContext.current
+    val application = context.applicationContext as Application
+
+    // Single shared SupabaseStepsRepository instance — both StepsViewModel and HabitsViewModel
+    // read from it, so they always reflect the same in-memory sensor state.
+    val stepsRepo = remember {
+        SupabaseStepsRepository(
+            application.getSharedPreferences("daypilot_steps", Context.MODE_PRIVATE)
+        )
+    }
+
+    val homeVM: HomeViewModel     = viewModel(factory = HomeViewModel.factory(stepsRepo))
+    val habitsVM: HabitsViewModel = viewModel(factory = HabitsViewModel.factory(stepsRepo))
+    val stepsVM: StepsViewModel   = viewModel(factory = StepsViewModel.factory(application, stepsRepo))
 
     // Propagate sensor step updates to HabitsScreen and HomeScreen
     val stepsState by stepsVM.uiState.collectAsState()

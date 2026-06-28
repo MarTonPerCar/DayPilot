@@ -1,6 +1,7 @@
 package com.example.daypilot_test_desing.backend.fake
 
 import com.example.daypilot_test_desing.backend.repository.StepsRepository
+import com.example.daypilot_test_desing.backend.repository.StepsWeeklyStats
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -11,10 +12,9 @@ object FakeStepsRepository : StepsRepository {
     private var pendingGoal: Int? = null
     private var goalChangeDate = ""
 
-    // Milestone tracking — reset on new day (handled by baseline in StepsViewModel)
-    var milestone1Awarded = false   // first third of daily goal  → +10 pts
-    var milestone2Awarded = false   // two thirds of daily goal   → +20 pts
-    var milestone3Awarded = false   // full daily goal            → +30 pts
+    private var milestone1Awarded = false
+    private var milestone2Awarded = false
+    private var milestone3Awarded = false
 
     private fun today() = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
 
@@ -30,16 +30,10 @@ object FakeStepsRepository : StepsRepository {
     override fun getGoalSteps(): Int     { applyPendingIfNewDay(); return activeGoal   }
     override fun getPendingGoal(): Int?  { applyPendingIfNewDay(); return pendingGoal  }
 
-    // Total step points awarded so far today (milestones: 10 + 20 + 30 = 60 max)
     override fun getPointsEarned(): Int =
         (if (milestone1Awarded) 10 else 0) +
         (if (milestone2Awarded) 20 else 0) +
         (if (milestone3Awarded) 30 else 0)
-
-    override fun getTotalSteps7Days() = 48_750
-    override fun getBestDaySteps()    = 12_340
-    override fun getDailyAverage()    = 6_964
-    override fun getGoalStreak()      = 4
 
     override fun canChangeGoal() = goalChangeDate != today()
 
@@ -48,25 +42,23 @@ object FakeStepsRepository : StepsRepository {
         goalChangeDate = today()
     }
 
-    // Called by StepsViewModel sensor listener with the computed daily step count
     override fun setSteps(steps: Int) {
         currentSteps = steps
-        awardMilestones()
+        if (!milestone1Awarded && currentSteps >= activeGoal / 3) milestone1Awarded = true
+        if (!milestone2Awarded && currentSteps >= (activeGoal * 2) / 3) milestone2Awarded = true
+        if (!milestone3Awarded && currentSteps >= activeGoal) milestone3Awarded = true
     }
 
-    private fun awardMilestones() {
-        val goal = activeGoal
-        if (!milestone1Awarded && currentSteps >= goal / 3) {
-            milestone1Awarded = true
-            FakeProgressRepository.addStepsPoints(10)
-        }
-        if (!milestone2Awarded && currentSteps >= (goal * 2) / 3) {
-            milestone2Awarded = true
-            FakeProgressRepository.addStepsPoints(20)
-        }
-        if (!milestone3Awarded && currentSteps >= goal) {
-            milestone3Awarded = true
-            FakeProgressRepository.addStepsPoints(30)
-        }
+    override fun resetMilestones() {
+        milestone1Awarded = false
+        milestone2Awarded = false
+        milestone3Awarded = false
     }
+
+    override suspend fun getWeeklyStats(): StepsWeeklyStats = StepsWeeklyStats(
+        totalSteps7Days = 48_750,
+        bestDaySteps    = 12_340,
+        dailyAverage    = 6_964,
+        goalStreak      = 4
+    )
 }

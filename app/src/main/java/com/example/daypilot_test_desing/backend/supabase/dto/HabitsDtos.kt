@@ -37,6 +37,7 @@ data class DailyLogDto(
     @SerialName("user_id") val userId: String,
     val date: String,
     val steps: Int,
+    @SerialName("steps_goal") val stepsGoal: Int = 0,
     @SerialName("tasks_completed") val tasksCompleted: Int,
     @SerialName("tasks_points") val tasksPoints: Int = 0,
     @SerialName("steps_points") val stepsPoints: Int = 0,

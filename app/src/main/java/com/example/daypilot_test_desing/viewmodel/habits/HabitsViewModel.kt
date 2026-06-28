@@ -1,33 +1,42 @@
 package com.example.daypilot_test_desing.viewmodel.habits
 
 import androidx.lifecycle.ViewModel
-import com.example.daypilot_test_desing.backend.fake.FakeStepsRepository
+import androidx.lifecycle.ViewModelProvider
+import com.example.daypilot_test_desing.backend.repository.StepsRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class HabitsViewModel : ViewModel() {
+class HabitsViewModel(private val stepsRepo: StepsRepository) : ViewModel() {
+
     private val _uiState = MutableStateFlow(buildState())
     val uiState: StateFlow<HabitsUiState> = _uiState.asStateFlow()
 
     private fun buildState(): HabitsUiState {
-        val current  = FakeStepsRepository.getCurrentSteps()
-        val goal     = FakeStepsRepository.getGoalSteps()
-        val earned   = FakeStepsRepository.getPointsEarned()
+        val earned = stepsRepo.getPointsEarned()
         return HabitsUiState(
-            currentSteps      = current,
-            goalSteps         = goal,
-            pointsEarned      = earned,
-            pointsRemaining   = maxOf(0, 60 - earned),
-            goalChangedToday  = !FakeStepsRepository.canChangeGoal(),
-            pendingGoal       = FakeStepsRepository.getPendingGoal()
+            currentSteps     = stepsRepo.getCurrentSteps(),
+            goalSteps        = stepsRepo.getGoalSteps(),
+            pointsEarned     = earned,
+            pointsRemaining  = maxOf(0, 60 - earned),
+            goalChangedToday = !stepsRepo.canChangeGoal(),
+            pendingGoal      = stepsRepo.getPendingGoal()
         )
     }
 
     fun refresh() { _uiState.value = buildState() }
 
     fun configureGoal(newGoal: Int) {
-        FakeStepsRepository.configureGoal(newGoal)
+        stepsRepo.configureGoal(newGoal)
         _uiState.value = buildState()
+    }
+
+    companion object {
+        fun factory(repo: StepsRepository): ViewModelProvider.Factory =
+            object : ViewModelProvider.Factory {
+                @Suppress("UNCHECKED_CAST")
+                override fun <T : ViewModel> create(modelClass: Class<T>): T =
+                    HabitsViewModel(repo) as T
+            }
     }
 }
