@@ -1,44 +1,44 @@
 package com.example.daypilot_test_desing.viewmodel.settings
 
-import androidx.lifecycle.ViewModel
-import com.example.daypilot_test_desing.data.repository.fake.FakeSettingsRepository
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
+import com.example.daypilot_test_desing.data.preferences.AppPreferences
 import com.example.daypilot_test_desing.data.repository.fake.FakeUserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class SettingsViewModel : ViewModel() {
-    private val _uiState = MutableStateFlow(buildState())
+class SettingsViewModel(application: Application) : AndroidViewModel(application) {
+    private val prefs = AppPreferences(application)
+
+    private val _uiState = MutableStateFlow(loadState())
     val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
 
-    private fun buildState(): SettingsUiState {
-        val s = FakeSettingsRepository.getSettings()
-        return SettingsUiState(
-            name                 = FakeUserRepository.getCurrentUser().name,
-            isDarkMode           = s.isDarkMode,
-            selectedThemeId      = s.selectedThemeId,
-            selectedLanguage     = s.selectedLanguage,
-            notificationsEnabled = s.notificationsEnabled
-        )
-    }
+    private fun loadState() = SettingsUiState(
+        name                 = FakeUserRepository.getCurrentUser().name,
+        isDarkMode           = prefs.isDarkMode,
+        selectedThemeId      = prefs.themeId,
+        selectedLanguage     = prefs.language,
+        notificationsEnabled = prefs.notificationsEnabled
+    )
 
     fun toggleDarkMode(enabled: Boolean) {
-        FakeSettingsRepository.toggleDarkMode(enabled)
-        _uiState.value = buildState()
+        prefs.isDarkMode = enabled
+        _uiState.value = loadState()
     }
 
     fun selectTheme(themeId: String) {
-        FakeSettingsRepository.selectTheme(themeId)
-        _uiState.value = buildState()
+        prefs.themeId = themeId
+        _uiState.value = loadState()
     }
 
     fun selectLanguage(language: String) {
-        FakeSettingsRepository.selectLanguage(language)
-        _uiState.value = buildState()
+        prefs.language = language
+        _uiState.value = loadState()
     }
 
     fun toggleNotifications(enabled: Boolean) {
-        FakeSettingsRepository.toggleNotifications(enabled)
-        _uiState.value = buildState()
+        prefs.notificationsEnabled = enabled
+        _uiState.value = loadState()
     }
 }

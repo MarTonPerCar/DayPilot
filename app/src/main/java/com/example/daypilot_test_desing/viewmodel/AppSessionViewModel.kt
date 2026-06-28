@@ -35,6 +35,11 @@ class AppSessionViewModel : ViewModel() {
     init {
         viewModelScope.launch {
             _state.value = try {
+                // Wait until the Auth plugin has finished loading the persisted session
+                // from SharedPreferences (via supabase-kt's SettingsSessionManager).
+                // Without this, currentUserOrNull() always returns null on a cold start
+                // because the async storage load hasn't completed yet.
+                supabase.auth.awaitInitialization()
                 if (supabase.auth.currentUserOrNull() != null) State.Authenticated
                 else State.Unauthenticated
             } catch (_: Exception) {
