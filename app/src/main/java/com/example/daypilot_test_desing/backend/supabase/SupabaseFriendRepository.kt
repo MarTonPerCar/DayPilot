@@ -14,6 +14,7 @@ import com.example.daypilot_test_desing.backend.supabase.dto.UserStreakDto
 import com.example.daypilot_test_desing.backend.supabase.dto.WeeklySummaryRowDto
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.postgrest.query.Order
 
 class SupabaseFriendRepository : FriendRepository {
 
@@ -129,7 +130,7 @@ class SupabaseFriendRepository : FriendRepository {
         try {
             val summaryId = supabase.from("user_weekly_summary").select {
                 filter { eq("user_id", userId) }
-                order("week_start", ascending = false)
+                order("week_start", Order.DESCENDING)
                 limit(1)
             }.decodeList<WeeklySummaryRowDto>().firstOrNull()?.id ?: return
 

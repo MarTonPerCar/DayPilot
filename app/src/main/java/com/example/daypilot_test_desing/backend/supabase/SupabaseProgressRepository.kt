@@ -8,6 +8,7 @@ import com.example.daypilot_test_desing.backend.supabase.dto.FriendsRankingDto
 import com.example.daypilot_test_desing.backend.supabase.dto.InsertPointsLogDto
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.postgrest.query.Order
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -38,7 +39,7 @@ class SupabaseProgressRepository : ProgressRepository {
         return try {
             supabase.from("user_daily_log").select {
                 filter { eq("user_id", uid) }
-                order("date", ascending = false)
+                order("date", Order.DESCENDING)
                 limit(days.toLong())
             }.decodeList<DailyLogDto>()
         } catch (_: Exception) {

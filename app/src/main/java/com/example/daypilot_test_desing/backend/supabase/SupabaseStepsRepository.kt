@@ -8,6 +8,7 @@ import com.example.daypilot_test_desing.backend.supabase.dto.HabitsDailyUpsertDt
 import com.example.daypilot_test_desing.backend.supabase.dto.InsertPointsLogDto
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.postgrest.query.Order
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -135,7 +136,7 @@ class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepos
             val logs = supabase.from("user_daily_log")
                 .select {
                     filter { eq("user_id", uid) }
-                    order("date", ascending = false)
+                    order("date", Order.DESCENDING)
                     limit(7)
                 }
                 .decodeList<DailyLogDto>()
