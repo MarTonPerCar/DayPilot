@@ -31,8 +31,8 @@ import com.example.daypilot_test_desing.ui.components.basic.DayPilotEmptyState
 import com.example.daypilot_test_desing.ui.components.basic.DayPilotTopBar
 import com.example.daypilot_test_desing.ui.components.cards.ReminderCard
 import com.example.daypilot_test_desing.ui.components.forms.ReminderFormCard
-import com.example.daypilot_test_desing.data.model.ReminderData
-import com.example.daypilot_test_desing.data.model.ReminderFormDataInfo
+import com.example.daypilot_test_desing.backend.model.ReminderData
+import com.example.daypilot_test_desing.backend.model.ReminderFormDataInfo
 
 
 @OptIn(ExperimentalMaterial3Api::class)

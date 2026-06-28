@@ -1,7 +1,7 @@
 package com.example.daypilot_test_desing.viewmodel.friends
 
 import androidx.lifecycle.ViewModel
-import com.example.daypilot_test_desing.data.repository.fake.FakeFriendRepository
+import com.example.daypilot_test_desing.backend.fake.FakeFriendRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

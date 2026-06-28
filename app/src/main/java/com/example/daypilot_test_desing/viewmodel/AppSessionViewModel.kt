@@ -2,7 +2,7 @@ package com.example.daypilot_test_desing.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.daypilot_test_desing.supabase
+import com.example.daypilot_test_desing.backend.supabase.supabase
 import io.github.jan.supabase.auth.auth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

@@ -1,6 +1,6 @@
 package com.example.daypilot_test_desing.viewmodel.rivalry
 
-import com.example.daypilot_test_desing.data.model.RankingData
+import com.example.daypilot_test_desing.backend.model.RankingData
 
 data class RivalryUiState(
     val currentUserName: String = "",

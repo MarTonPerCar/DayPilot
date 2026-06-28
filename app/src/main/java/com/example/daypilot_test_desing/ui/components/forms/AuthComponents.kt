@@ -35,7 +35,7 @@ import com.example.daypilot_test_desing.ui.components.basic.DayPilotButtonText
 import com.example.daypilot_test_desing.ui.components.basic.DayPilotDropdownField
 import com.example.daypilot_test_desing.ui.components.basic.DayPilotPasswordField
 import com.example.daypilot_test_desing.ui.components.basic.DayPilotTextField
-import com.example.daypilot_test_desing.data.model.TimeZoneRegion
+import com.example.daypilot_test_desing.backend.model.TimeZoneRegion
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
 
 // ── Toggle login / registro ───────────────────────────────────────

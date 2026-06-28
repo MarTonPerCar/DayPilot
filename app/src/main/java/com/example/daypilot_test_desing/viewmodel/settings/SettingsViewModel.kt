@@ -2,8 +2,8 @@ package com.example.daypilot_test_desing.viewmodel.settings
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import com.example.daypilot_test_desing.data.preferences.AppPreferences
-import com.example.daypilot_test_desing.data.repository.fake.FakeUserRepository
+import com.example.daypilot_test_desing.backend.preferences.AppPreferences
+import com.example.daypilot_test_desing.backend.fake.FakeUserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

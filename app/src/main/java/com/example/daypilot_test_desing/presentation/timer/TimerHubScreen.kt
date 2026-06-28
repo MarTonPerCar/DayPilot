@@ -49,7 +49,7 @@ import androidx.compose.ui.unit.sp
 import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.ui.components.basic.DayPilotTopBar
 import com.example.daypilot_test_desing.ui.components.cards.TimerHubCard
-import com.example.daypilot_test_desing.data.model.TimerOption
+import com.example.daypilot_test_desing.backend.model.TimerOption
 
 
 @OptIn(ExperimentalMaterial3Api::class)

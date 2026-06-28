@@ -3,11 +3,11 @@ package com.example.daypilot_test_desing.viewmodel.calendar
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.daypilot_test_desing.data.model.NewTaskData
-import com.example.daypilot_test_desing.data.model.TaskCategory
-import com.example.daypilot_test_desing.data.model.TaskDifficulty
-import com.example.daypilot_test_desing.data.repository.TaskRepository
-import com.example.daypilot_test_desing.data.repository.fake.FakeProgressRepository
+import com.example.daypilot_test_desing.backend.model.NewTaskData
+import com.example.daypilot_test_desing.backend.model.TaskCategory
+import com.example.daypilot_test_desing.backend.model.TaskDifficulty
+import com.example.daypilot_test_desing.backend.repository.TaskRepository
+import com.example.daypilot_test_desing.backend.fake.FakeProgressRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

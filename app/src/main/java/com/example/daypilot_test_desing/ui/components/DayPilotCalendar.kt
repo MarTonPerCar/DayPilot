@@ -33,9 +33,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.daypilot_test_desing.R
 import androidx.compose.ui.unit.dp
-import com.example.daypilot_test_desing.data.model.CalendarTaskDot
-import com.example.daypilot_test_desing.data.model.Month
-import com.example.daypilot_test_desing.data.model.WeekDay
+import com.example.daypilot_test_desing.backend.model.CalendarTaskDot
+import com.example.daypilot_test_desing.backend.model.Month
+import com.example.daypilot_test_desing.backend.model.WeekDay
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
 import java.util.Calendar
 

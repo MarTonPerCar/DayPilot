@@ -1,7 +1,7 @@
 package com.example.daypilot_test_desing.viewmodel.habits
 
 import androidx.lifecycle.ViewModel
-import com.example.daypilot_test_desing.data.repository.fake.FakeStepsRepository
+import com.example.daypilot_test_desing.backend.fake.FakeStepsRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

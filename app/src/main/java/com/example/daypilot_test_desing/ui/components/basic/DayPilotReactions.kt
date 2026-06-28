@@ -47,7 +47,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
-import com.example.daypilot_test_desing.data.model.ReactionType
+import com.example.daypilot_test_desing.backend.model.ReactionType
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

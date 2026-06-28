@@ -16,8 +16,8 @@ import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.ui.components.basic.*
 import com.example.daypilot_test_desing.ui.components.cards.*
-import com.example.daypilot_test_desing.data.model.NotificationData
-import com.example.daypilot_test_desing.data.model.NotificationType
+import com.example.daypilot_test_desing.backend.model.NotificationData
+import com.example.daypilot_test_desing.backend.model.NotificationType
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

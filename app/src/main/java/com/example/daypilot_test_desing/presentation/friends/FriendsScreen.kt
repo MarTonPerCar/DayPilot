@@ -31,8 +31,8 @@ import com.example.daypilot_test_desing.ui.components.basic.DayPilotEmptyState
 import com.example.daypilot_test_desing.ui.components.basic.DayPilotTopBarWithAction
 import com.example.daypilot_test_desing.ui.components.cards.FriendCard
 import com.example.daypilot_test_desing.ui.components.cards.FriendRequestCard
-import com.example.daypilot_test_desing.data.model.FriendData
-import com.example.daypilot_test_desing.data.model.ReactionType
+import com.example.daypilot_test_desing.backend.model.FriendData
+import com.example.daypilot_test_desing.backend.model.ReactionType
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

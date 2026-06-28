@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.ui.components.basic.*
 import com.example.daypilot_test_desing.ui.components.cards.*
-import com.example.daypilot_test_desing.data.model.WeeklySummaryData
+import com.example.daypilot_test_desing.backend.model.WeeklySummaryData
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.daypilot_test_desing.ui.components.basic.DayPilotAvatar
-import com.example.daypilot_test_desing.data.model.PodiumEntry
+import com.example.daypilot_test_desing.backend.model.PodiumEntry
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
 
 @Composable

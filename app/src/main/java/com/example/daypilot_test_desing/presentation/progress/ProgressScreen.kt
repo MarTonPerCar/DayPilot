@@ -11,8 +11,8 @@ import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.ui.components.basic.DayPilotTopBar
 import com.example.daypilot_test_desing.ui.components.cards.*
-import com.example.daypilot_test_desing.data.model.DayProgress
-import com.example.daypilot_test_desing.data.model.ProgressFilter
+import com.example.daypilot_test_desing.backend.model.DayProgress
+import com.example.daypilot_test_desing.backend.model.ProgressFilter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

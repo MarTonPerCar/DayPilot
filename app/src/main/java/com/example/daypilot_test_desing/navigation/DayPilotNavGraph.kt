@@ -19,7 +19,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.daypilot_test_desing.data.repository.supabase.SupabaseTaskRepository
+import com.example.daypilot_test_desing.backend.supabase.SupabaseTaskRepository
 import com.example.daypilot_test_desing.viewmodel.AppSessionViewModel
 import com.example.daypilot_test_desing.viewmodel.auth.AuthViewModel
 import com.example.daypilot_test_desing.viewmodel.calendar.CalendarViewModel

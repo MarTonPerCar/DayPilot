@@ -1,9 +1,9 @@
 package com.example.daypilot_test_desing.viewmodel.profile
 
 import androidx.lifecycle.ViewModel
-import com.example.daypilot_test_desing.data.model.TimeZoneRegion
-import com.example.daypilot_test_desing.data.repository.fake.FakeProgressRepository
-import com.example.daypilot_test_desing.data.repository.fake.FakeUserRepository
+import com.example.daypilot_test_desing.backend.model.TimeZoneRegion
+import com.example.daypilot_test_desing.backend.fake.FakeProgressRepository
+import com.example.daypilot_test_desing.backend.fake.FakeUserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

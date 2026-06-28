@@ -1,6 +1,6 @@
 package com.example.daypilot_test_desing.viewmodel.home
 
-import com.example.daypilot_test_desing.data.model.DayProgress
+import com.example.daypilot_test_desing.backend.model.DayProgress
 
 data class HomeUiState(
     val userName: String = "",

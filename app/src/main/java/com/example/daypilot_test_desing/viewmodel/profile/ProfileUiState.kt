@@ -1,6 +1,6 @@
 package com.example.daypilot_test_desing.viewmodel.profile
 
-import com.example.daypilot_test_desing.data.model.WeeklySummaryData
+import com.example.daypilot_test_desing.backend.model.WeeklySummaryData
 
 data class ProfileUiState(
     val name: String = "",

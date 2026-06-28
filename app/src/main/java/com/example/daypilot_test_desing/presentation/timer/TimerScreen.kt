@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.sp
 import android.media.RingtoneManager
 import androidx.compose.ui.platform.LocalContext
 import com.example.daypilot_test_desing.ui.components.basic.DayPilotTopBar
-import com.example.daypilot_test_desing.data.model.TimerMode
+import com.example.daypilot_test_desing.backend.model.TimerMode
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)

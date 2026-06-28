@@ -63,9 +63,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.ui.components.basic.dayPilotTextFieldColors
-import com.example.daypilot_test_desing.data.model.TaskCategory
-import com.example.daypilot_test_desing.data.model.TaskDifficulty
-import com.example.daypilot_test_desing.data.model.NewTaskData
+import com.example.daypilot_test_desing.backend.model.TaskCategory
+import com.example.daypilot_test_desing.backend.model.TaskDifficulty
+import com.example.daypilot_test_desing.backend.model.NewTaskData
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
 
 @Composable

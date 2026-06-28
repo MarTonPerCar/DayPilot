@@ -15,8 +15,8 @@ import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.ui.components.basic.*
 import com.example.daypilot_test_desing.ui.components.cards.*
 import com.example.daypilot_test_desing.ui.components.forms.AppLimitFormCard
-import com.example.daypilot_test_desing.data.model.AppRestriction
-import com.example.daypilot_test_desing.data.model.GroupRestriction
+import com.example.daypilot_test_desing.backend.model.AppRestriction
+import com.example.daypilot_test_desing.backend.model.GroupRestriction
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

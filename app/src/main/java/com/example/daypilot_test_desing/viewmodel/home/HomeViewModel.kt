@@ -2,11 +2,11 @@ package com.example.daypilot_test_desing.viewmodel.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.daypilot_test_desing.data.repository.fake.FakeFriendRepository
-import com.example.daypilot_test_desing.data.repository.fake.FakeProgressRepository
-import com.example.daypilot_test_desing.data.repository.fake.FakeStepsRepository
-import com.example.daypilot_test_desing.data.repository.fake.FakeTaskRepository
-import com.example.daypilot_test_desing.data.repository.fake.FakeUserRepository
+import com.example.daypilot_test_desing.backend.fake.FakeFriendRepository
+import com.example.daypilot_test_desing.backend.fake.FakeProgressRepository
+import com.example.daypilot_test_desing.backend.fake.FakeStepsRepository
+import com.example.daypilot_test_desing.backend.fake.FakeTaskRepository
+import com.example.daypilot_test_desing.backend.fake.FakeUserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

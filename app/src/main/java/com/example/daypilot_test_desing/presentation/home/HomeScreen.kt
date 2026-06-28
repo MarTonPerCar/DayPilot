@@ -6,9 +6,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.ui.components.cards.*
-import com.example.daypilot_test_desing.data.model.DayProgress
-import com.example.daypilot_test_desing.data.model.HomeSection
-import com.example.daypilot_test_desing.data.model.HomeSectionData
+import com.example.daypilot_test_desing.backend.model.DayProgress
+import com.example.daypilot_test_desing.backend.model.HomeSection
+import com.example.daypilot_test_desing.backend.model.HomeSectionData
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

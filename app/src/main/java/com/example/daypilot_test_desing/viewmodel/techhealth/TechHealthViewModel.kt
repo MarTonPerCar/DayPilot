@@ -2,10 +2,10 @@ package com.example.daypilot_test_desing.viewmodel.techhealth
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import com.example.daypilot_test_desing.data.model.AppRestriction
-import com.example.daypilot_test_desing.data.model.GroupRestriction
-import com.example.daypilot_test_desing.data.repository.fake.FakeProgressRepository
-import com.example.daypilot_test_desing.data.repository.fake.FakeTechHealthRepository
+import com.example.daypilot_test_desing.backend.model.AppRestriction
+import com.example.daypilot_test_desing.backend.model.GroupRestriction
+import com.example.daypilot_test_desing.backend.fake.FakeProgressRepository
+import com.example.daypilot_test_desing.backend.fake.FakeTechHealthRepository
 import com.example.daypilot_test_desing.reminders.AppUsageTracker
 import com.example.daypilot_test_desing.reminders.TechHealthNotificationManager
 import kotlinx.coroutines.flow.MutableStateFlow

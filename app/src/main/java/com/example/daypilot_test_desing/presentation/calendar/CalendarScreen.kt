@@ -21,11 +21,11 @@ import com.example.daypilot_test_desing.ui.components.basic.*
 import com.example.daypilot_test_desing.ui.components.cards.*
 import com.example.daypilot_test_desing.ui.components.DayPilotCalendar
 import com.example.daypilot_test_desing.ui.components.forms.TaskFormCard
-import com.example.daypilot_test_desing.data.model.CalendarTaskData
-import com.example.daypilot_test_desing.data.model.CalendarTaskDot
-import com.example.daypilot_test_desing.data.model.NewTaskData
-import com.example.daypilot_test_desing.data.model.TaskCategory
-import com.example.daypilot_test_desing.data.model.TaskDifficulty
+import com.example.daypilot_test_desing.backend.model.CalendarTaskData
+import com.example.daypilot_test_desing.backend.model.CalendarTaskDot
+import com.example.daypilot_test_desing.backend.model.NewTaskData
+import com.example.daypilot_test_desing.backend.model.TaskCategory
+import com.example.daypilot_test_desing.backend.model.TaskDifficulty
 import java.util.Calendar
 
 @OptIn(ExperimentalMaterial3Api::class)

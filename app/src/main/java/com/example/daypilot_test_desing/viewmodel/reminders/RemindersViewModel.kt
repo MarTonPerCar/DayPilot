@@ -2,9 +2,9 @@ package com.example.daypilot_test_desing.viewmodel.reminders
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import com.example.daypilot_test_desing.data.model.ReminderFormDataInfo
-import com.example.daypilot_test_desing.data.repository.fake.FakeReminderRepository
-import com.example.daypilot_test_desing.data.repository.fake.FakeSettingsRepository
+import com.example.daypilot_test_desing.backend.model.ReminderFormDataInfo
+import com.example.daypilot_test_desing.backend.fake.FakeReminderRepository
+import com.example.daypilot_test_desing.backend.fake.FakeSettingsRepository
 import com.example.daypilot_test_desing.reminders.ReminderScheduler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

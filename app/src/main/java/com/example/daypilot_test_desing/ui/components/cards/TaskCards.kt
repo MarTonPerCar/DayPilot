@@ -49,8 +49,8 @@ import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.ui.components.basic.CategoryChip
 import com.example.daypilot_test_desing.ui.components.basic.DifficultyChip
 import com.example.daypilot_test_desing.ui.components.basic.DurationChip
-import com.example.daypilot_test_desing.data.model.TaskCategory
-import com.example.daypilot_test_desing.data.model.TaskDifficulty
+import com.example.daypilot_test_desing.backend.model.TaskCategory
+import com.example.daypilot_test_desing.backend.model.TaskDifficulty
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
 
 // ── 1. TaskCard ───────────────────────────────────────────────────

@@ -17,7 +17,7 @@ import com.example.daypilot_test_desing.ui.components.DayPilotCalendar
 import com.example.daypilot_test_desing.ui.components.basic.*
 import com.example.daypilot_test_desing.ui.components.cards.*
 import com.example.daypilot_test_desing.ui.components.forms.*
-import com.example.daypilot_test_desing.data.model.*
+import com.example.daypilot_test_desing.backend.model.*
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
 
 // ── Preview 1: Botones, Avatar, Chips, TextFields ─────────────────
