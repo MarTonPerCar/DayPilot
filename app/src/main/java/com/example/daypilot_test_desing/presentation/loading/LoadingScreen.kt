@@ -29,7 +29,7 @@ fun LoadingScreen() {
         verticalArrangement = Arrangement.Center
     ) {
         Image(
-            painter = painterResource(R.drawable.ic_launcher_foreground),
+            painter = painterResource(R.drawable.icono_aplicacion),
             contentDescription = null,
             modifier = Modifier.size(120.dp)
         )

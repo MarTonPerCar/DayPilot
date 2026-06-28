@@ -60,17 +60,19 @@ class CalendarViewModel(
     }
 
     fun toggleTask(id: String, isDone: Boolean) {
+        // Optimistic update — reflect the change immediately in the UI
+        _uiState.update { state ->
+            state.copy(tasks = state.tasks.map { if (it.id == id) it.copy(isDone = isDone) else it })
+        }
         viewModelScope.launch {
             try {
-                val task = _uiState.value.tasks.find { it.id == id }
                 repository.toggleTask(id, isDone)
-                if (task != null) {
-                    if (isDone) FakeProgressRepository.addTaskPoints(20)
-                    else        FakeProgressRepository.removeTaskPoints(20)
-                }
+                if (isDone) FakeProgressRepository.addTaskPoints(20)
+                else        FakeProgressRepository.removeTaskPoints(20)
                 load()
             } catch (e: Exception) {
-                _uiState.update { it.copy(error = e.message) }
+                // Revert the optimistic update and show the real state
+                load()
             }
         }
     }

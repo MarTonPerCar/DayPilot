@@ -67,10 +67,16 @@ class SupabaseTaskRepository : TaskRepository {
 
     // is_completed lives on `tasks`, not task_days
     override suspend fun toggleTask(id: String, isDone: Boolean) {
+        val uid = userId() ?: return
+        val completedAt: String? = if (isDone) java.time.Instant.now().toString() else null
         supabase.from("tasks").update({
             set("is_completed", isDone)
+            set("completed_at", completedAt)
         }) {
-            filter { eq("id", id) }
+            filter {
+                eq("id", id)
+                eq("user_id", uid)
+            }
         }
     }
 
