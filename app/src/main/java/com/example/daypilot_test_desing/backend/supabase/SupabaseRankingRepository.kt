@@ -2,8 +2,10 @@ package com.example.daypilot_test_desing.backend.supabase
 
 import com.example.daypilot_test_desing.backend.model.RankingData
 import com.example.daypilot_test_desing.backend.repository.RankingRepository
+import com.example.daypilot_test_desing.backend.supabase.dto.DailyProgressDto
 import com.example.daypilot_test_desing.backend.supabase.dto.FriendRowDto
 import com.example.daypilot_test_desing.backend.supabase.dto.FriendsRankingDto
+import com.example.daypilot_test_desing.backend.supabase.dto.UserDto
 import com.example.daypilot_test_desing.backend.supabase.dto.UserStreakDto
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
@@ -43,9 +45,10 @@ class SupabaseRankingRepository : RankingRepository {
         return buildRanking(uid).map { dto ->
             RankingData(
                 id        = dto.id,
-                name      = dto.username,
+                name      = dto.name.ifBlank { dto.username },
                 points    = dto.pointsLast30Days,
                 streak    = dto.currentStreak,
+                level     = dto.level,
                 avatarUrl = dto.photoUrl
             )
         }
@@ -53,6 +56,44 @@ class SupabaseRankingRepository : RankingRepository {
 
     override suspend fun getCurrentUserId(): String = userId()
 
+    // Queries source tables directly — bypasses friends_ranking VIEW so RLS on
+    // user_streaks (streaks_own FOR ALL) doesn't block the current user's streak.
+    override suspend fun getCurrentUserData(): RankingData? {
+        val uid = userId()
+        if (uid.isEmpty()) return null
+        return try {
+            val user = supabase.from("users").select {
+                filter { eq("id", uid) }
+                limit(1)
+            }.decodeList<UserDto>().firstOrNull() ?: return null
+
+            val streak = try {
+                supabase.from("user_streaks").select {
+                    filter { eq("user_id", uid) }
+                    limit(1)
+                }.decodeList<UserStreakDto>().firstOrNull()?.currentStreak ?: 0
+            } catch (_: Exception) { 0 }
+
+            val points = try {
+                supabase.from("daily_progress").select {
+                    filter { eq("user_id", uid) }
+                    limit(1)
+                }.decodeList<DailyProgressDto>().firstOrNull()?.totalPoints ?: 0
+            } catch (_: Exception) { 0 }
+
+            RankingData(
+                id        = uid,
+                name      = user.name,
+                points    = points,
+                streak    = streak,
+                level     = user.level,
+                avatarUrl = user.photoUrl
+            )
+        } catch (_: Exception) { null }
+    }
+
+    // These are no longer called by RivalryViewModel (everything is derived from getRanking()),
+    // kept for interface compliance.
     override suspend fun getCurrentUserPosition(): Int {
         val uid = userId()
         val ranking = buildRanking(uid)

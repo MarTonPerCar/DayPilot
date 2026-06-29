@@ -121,6 +121,7 @@
     <string name="rivalry_title">Rivalität</string>
     <string name="rivalry_your_position">Deine Position</string>
     <string name="rivalry_ranking">Rangliste</string>
+    <string name="rivalry_no_friends">Du hast noch keine Freunde zum Wettkampf.\nFüge jemanden hinzu!</string>
 
     <!-- Friends -->
     <string name="friends_title">Freunde</string>

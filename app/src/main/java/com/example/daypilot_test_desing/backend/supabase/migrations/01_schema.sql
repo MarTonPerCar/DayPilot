@@ -136,6 +136,20 @@ CREATE TABLE daily_progress (
     UNIQUE(user_id)
 );
 
+-- =============================================
+-- Salud Tecnologica
+-- =============================================
+
+CREATE TABLE tech_health_config (
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id     UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    app_package TEXT NOT NULL,
+    app_name    TEXT NOT NULL,
+    limit_hours DECIMAL(4,1) NOT NULL,
+    is_active   BOOLEAN NOT NULL DEFAULT true,
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE(user_id, app_package)
+);
 
 -- =============================================
 -- HISTORIAL DIARIO
@@ -562,6 +576,7 @@ SELECT cron.schedule(
 CREATE VIEW friends_ranking WITH (security_invoker = true) AS
 SELECT
     u.id,
+    u.name,
     u.username,
     u.photo_url,
     u.level,
@@ -575,7 +590,7 @@ LEFT JOIN user_daily_log udl
     AND udl.date >= CURRENT_DATE - INTERVAL '30 days'
 LEFT JOIN daily_progress dp
     ON dp.user_id = u.id
-GROUP BY u.id, u.username, u.photo_url, u.level, us.current_streak;
+GROUP BY u.id, u.name, u.username, u.photo_url, u.level, us.current_streak;
 
 -- Resumen del día actual para la card del inicio
 CREATE VIEW daily_summary WITH (security_invoker = true) AS
@@ -647,6 +662,7 @@ ALTER TABLE points_log           ENABLE ROW LEVEL SECURITY;
 ALTER TABLE friend_requests      ENABLE ROW LEVEL SECURITY;
 ALTER TABLE friends              ENABLE ROW LEVEL SECURITY;
 ALTER TABLE reactions            ENABLE ROW LEVEL SECURITY;
+ALTER TABLE tech_health_config   ENABLE ROW LEVEL SECURITY;
 
 -- CORREGIDO — Antes solo se podía leer el propio perfil, lo que bloqueaba
 -- por completo la búsqueda de amigos y el ranking (friends_ranking necesita
@@ -685,6 +701,10 @@ USING (auth.uid() = user_id);
 -- Hábitos
 CREATE POLICY "habits_daily_own"
 ON habits_daily FOR ALL
+USING (auth.uid() = user_id);
+
+CREATE POLICY "tech_health_config_own"
+ON tech_health_config FOR ALL
 USING (auth.uid() = user_id);
 
 -- CORREGIDO — El comentario original decía "los amigos pueden leer" pero la

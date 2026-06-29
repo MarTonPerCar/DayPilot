@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class FriendsRankingDto(
     val id: String,
+    val name: String = "",
     val username: String,
     @SerialName("photo_url") val photoUrl: String? = null,
     val level: Int = 1,
