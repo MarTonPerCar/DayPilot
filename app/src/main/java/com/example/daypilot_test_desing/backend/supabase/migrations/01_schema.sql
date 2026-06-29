@@ -580,7 +580,7 @@ SELECT
     u.username,
     u.photo_url,
     u.level,
-    us.current_streak,
+    COALESCE(us.current_streak, 0) AS current_streak,
     COALESCE(SUM(udl.total_points), 0) + COALESCE(MAX(dp.total_points), 0) AS points_last_30_days
 FROM users u
 LEFT JOIN user_streaks us
@@ -590,7 +590,7 @@ LEFT JOIN user_daily_log udl
     AND udl.date >= CURRENT_DATE - INTERVAL '30 days'
 LEFT JOIN daily_progress dp
     ON dp.user_id = u.id
-GROUP BY u.id, u.name, u.username, u.photo_url, u.level, us.current_streak;
+GROUP BY u.id, u.name, u.username, u.photo_url, u.level, COALESCE(us.current_streak, 0);
 
 -- Resumen del día actual para la card del inicio
 CREATE VIEW daily_summary WITH (security_invoker = true) AS
@@ -684,9 +684,29 @@ CREATE POLICY "users_delete_own"
 ON users FOR DELETE
 USING (auth.uid() = id);
 
--- Rachas
-CREATE POLICY "streaks_own"
-ON user_streaks FOR ALL
+-- Rachas: lectura propia + amigos (friends_ranking VIEW necesita leer el streak
+-- de los amigos con security_invoker=true); escritura solo propia.
+CREATE POLICY "streaks_select"
+ON user_streaks FOR SELECT
+USING (
+    auth.uid() = user_id
+    OR EXISTS (
+        SELECT 1 FROM friends
+        WHERE (requester_id = auth.uid() AND receiver_id = user_id)
+        OR    (receiver_id = auth.uid() AND requester_id = user_id)
+    )
+);
+
+CREATE POLICY "streaks_insert_own"
+ON user_streaks FOR INSERT
+WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "streaks_update_own"
+ON user_streaks FOR UPDATE
+USING (auth.uid() = user_id);
+
+CREATE POLICY "streaks_delete_own"
+ON user_streaks FOR DELETE
 USING (auth.uid() = user_id);
 
 -- Tareas

@@ -47,7 +47,7 @@ class SupabaseRankingRepository : RankingRepository {
                 id        = dto.id,
                 name      = dto.name.ifBlank { dto.username },
                 points    = dto.pointsLast30Days,
-                streak    = dto.currentStreak,
+                streak    = dto.currentStreak ?: 0,
                 level     = dto.level,
                 avatarUrl = dto.photoUrl
             )
