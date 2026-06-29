@@ -210,23 +210,26 @@ fun DayPilotNavGraph(
 
             // ── Home ─────────────────────────────────────────────
             composable(DayPilotDestinations.HOME) {
-                val s by homeVM.uiState.collectAsState()
+                val s      by homeVM.uiState.collectAsState()
+                val notifs by notificationsVM.uiState.collectAsState()
                 HomeScreen(
-                    userName              = s.userName,
-                    streak                = s.streak,
-                    stepsToday            = s.stepsToday,
-                    stepsGoal             = s.stepsGoal,
-                    tasksCompleted        = s.tasksCompleted,
-                    tasksTotal            = s.tasksTotal,
-                    progressData          = s.progressData,
-                    pointsToday           = s.pointsToday,
-                    rankingPosition       = s.rankingPosition,
-                    friendCount           = s.friendCount,
-                    timerCompletedToday   = s.timerCompletedToday,
-                    onNavigateToCalendar  = { navController.navigate(DayPilotDestinations.CALENDAR) },
-                    onNavigateToHabits    = { navController.navigate(DayPilotDestinations.HABITS) },
-                    onNavigateToProgress  = { navController.navigate(DayPilotDestinations.PROGRESS) },
-                    onNavigateToRivalry   = { navController.navigate(DayPilotDestinations.RIVALRY) }
+                    userName                  = s.userName,
+                    streak                    = s.streak,
+                    stepsToday                = s.stepsToday,
+                    stepsGoal                 = s.stepsGoal,
+                    tasksCompleted            = s.tasksCompleted,
+                    tasksTotal                = s.tasksTotal,
+                    progressData              = s.progressData,
+                    pointsToday               = s.pointsToday,
+                    rankingPosition           = s.rankingPosition,
+                    friendCount               = s.friendCount,
+                    timerCompletedToday       = s.timerCompletedToday,
+                    unreadCount               = notifs.unreadCount,
+                    onNavigateToCalendar      = { navController.navigate(DayPilotDestinations.CALENDAR) },
+                    onNavigateToHabits        = { navController.navigate(DayPilotDestinations.HABITS) },
+                    onNavigateToProgress      = { navController.navigate(DayPilotDestinations.PROGRESS) },
+                    onNavigateToRivalry       = { navController.navigate(DayPilotDestinations.RIVALRY) },
+                    onNavigateToNotifications = { navController.navigate(DayPilotDestinations.NOTIFICATIONS) }
                 )
             }
 
@@ -282,8 +285,9 @@ fun DayPilotNavGraph(
             composable(DayPilotDestinations.NOTIFICATIONS) {
                 val s by notificationsVM.uiState.collectAsState()
                 NotificationsScreen(
-                    notifications    = s.notifications,
-                    onTapNotification= notificationsVM::markAsRead
+                    notifications     = s.notifications,
+                    onTapNotification = notificationsVM::markAsRead,
+                    onBack            = { navController.popBackStack() }
                 )
             }
 

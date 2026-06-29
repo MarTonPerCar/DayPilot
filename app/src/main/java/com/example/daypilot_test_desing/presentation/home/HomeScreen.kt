@@ -24,10 +24,12 @@ fun HomeScreen(
     rankingPosition: Int,
     friendCount: Int,
     timerCompletedToday: Boolean,
+    unreadCount: Int = 0,
     onNavigateToCalendar: () -> Unit,
     onNavigateToHabits: () -> Unit,
     onNavigateToProgress: () -> Unit,
-    onNavigateToRivalry: () -> Unit
+    onNavigateToRivalry: () -> Unit,
+    onNavigateToNotifications: () -> Unit = {}
 ) {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background
@@ -48,15 +50,17 @@ fun HomeScreen(
             ) {
                 // ── Resumen diario ───────────────────────────────
                 DailySummaryCard(
-                    userName        = userName,
-                    streak          = streak,
-                    stepsToday      = stepsToday,
-                    stepsGoal       = stepsGoal,
-                    tasksCompleted  = tasksCompleted,
-                    tasksTotal      = tasksTotal,
-                    pointsToday     = pointsToday,
-                    rankingPosition = rankingPosition,
-                    modifier        = Modifier
+                    userName                  = userName,
+                    streak                    = streak,
+                    stepsToday                = stepsToday,
+                    stepsGoal                 = stepsGoal,
+                    tasksCompleted            = tasksCompleted,
+                    tasksTotal                = tasksTotal,
+                    pointsToday               = pointsToday,
+                    rankingPosition           = rankingPosition,
+                    unreadCount               = unreadCount,
+                    onNavigateToNotifications = onNavigateToNotifications,
+                    modifier                  = Modifier
                         .fillMaxWidth()
                         .height(summaryHeight)
                 )

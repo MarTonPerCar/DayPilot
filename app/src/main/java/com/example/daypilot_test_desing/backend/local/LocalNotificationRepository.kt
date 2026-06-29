@@ -3,24 +3,24 @@ package com.example.daypilot_test_desing.backend.local
 import com.example.daypilot_test_desing.backend.model.NotificationData
 import com.example.daypilot_test_desing.backend.repository.NotificationRepository
 
-/**
- * In-memory notification list for the current session.
- * Notifications are ephemeral events (friend reactions, step milestones, etc.)
- * that do not have a dedicated server-side table. They start empty and are
- * populated as the user interacts with the app.
- */
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+
 class LocalNotificationRepository : NotificationRepository {
 
-    private val notifications = mutableListOf<NotificationData>()
+    private val _notifications = MutableStateFlow<List<NotificationData>>(emptyList())
+    val notificationsFlow: StateFlow<List<NotificationData>> = _notifications.asStateFlow()
 
-    override fun getNotifications(): List<NotificationData> = notifications.toList()
+    override fun getNotifications(): List<NotificationData> = _notifications.value
 
     override fun markAsRead(id: String) {
-        val idx = notifications.indexOfFirst { it.id == id }
-        if (idx >= 0) notifications[idx] = notifications[idx].copy(isRead = true)
+        _notifications.value = _notifications.value.map {
+            if (it.id == id) it.copy(isRead = true) else it
+        }
     }
 
     fun add(notification: NotificationData) {
-        notifications.add(0, notification)
+        _notifications.value = listOf(notification) + _notifications.value
     }
 }

@@ -23,7 +23,8 @@ import com.example.daypilot_test_desing.backend.model.NotificationType
 @Composable
 fun NotificationsScreen(
     notifications: List<NotificationData>,
-    onTapNotification: (String) -> Unit
+    onTapNotification: (String) -> Unit,
+    onBack: () -> Unit = {}
 ) {
     var selectedFilter by remember { mutableStateOf<NotificationType?>(null) }
 
@@ -45,7 +46,8 @@ fun NotificationsScreen(
     Scaffold(
         topBar = {
             DayPilotTopBar(
-                title = stringResource(R.string.notifications_title)
+                title  = stringResource(R.string.notifications_title),
+                onBack = onBack
             )
         },
         containerColor = MaterialTheme.colorScheme.background

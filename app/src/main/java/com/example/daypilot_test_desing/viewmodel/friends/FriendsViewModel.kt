@@ -3,6 +3,8 @@ package com.example.daypilot_test_desing.viewmodel.friends
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.daypilot_test_desing.backend.local.NotificationHub
+import com.example.daypilot_test_desing.backend.model.NotificationType
 import com.example.daypilot_test_desing.backend.model.ReactionType
 import com.example.daypilot_test_desing.backend.repository.FriendRepository
 import kotlinx.coroutines.Job
@@ -38,6 +40,14 @@ class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
             repo.acceptRequest(userId)
             load()
             _uiState.update { it.copy(acceptingUserId = null, justAcceptedRequest = true) }
+            val name = _uiState.value.friends.firstOrNull { it.id == userId }?.name
+            if (name != null) {
+                NotificationHub.add(
+                    title   = "Nueva amistad 🤝",
+                    message = "$name es ahora tu amigo",
+                    type    = NotificationType.SOCIAL
+                )
+            }
         }
     }
 
@@ -56,6 +66,20 @@ class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
         viewModelScope.launch {
             repo.reactToFriend(userId, reaction)
             load()
+            val name = _uiState.value.friends.firstOrNull { it.id == userId }?.name
+            val emoji = when (reaction) {
+                ReactionType.FIRE   -> "🔥"
+                ReactionType.CLAP   -> "👏"
+                ReactionType.STRONG -> "💪"
+                ReactionType.STAR   -> "⭐"
+            }
+            if (name != null) {
+                NotificationHub.add(
+                    title   = "Reacción enviada $emoji",
+                    message = "Reaccionaste a la semana de $name",
+                    type    = NotificationType.SOCIAL
+                )
+            }
         }
     }
 
