@@ -1,14 +1,21 @@
 package com.example.daypilot_test_desing.presentation.techhealth
 
+import android.content.Intent
+import android.provider.Settings
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.R
@@ -23,6 +30,8 @@ import com.example.daypilot_test_desing.backend.model.GroupRestriction
 fun TechHealthScreen(
     appRestrictions: List<AppRestriction>,
     groupRestrictions: List<GroupRestriction>,
+    hasUsagePermission: Boolean = true,
+    techHealthPointEarned: Boolean = false,
     onSaveApp: (AppRestriction, isEdit: Boolean) -> Unit,
     onSaveGroup: (GroupRestriction, isEdit: Boolean) -> Unit,
     onToggleRestriction: (String, Boolean) -> Unit,
@@ -31,6 +40,7 @@ fun TechHealthScreen(
     onDeleteGroup: (String) -> Unit,
     onBack: () -> Unit
 ) {
+    val context = LocalContext.current
     var showAddSheet   by remember { mutableStateOf(false) }
     var editingAppId   by remember { mutableStateOf<String?>(null) }
     var editingGroupId by remember { mutableStateOf<String?>(null) }
@@ -102,6 +112,100 @@ fun TechHealthScreen(
             contentPadding      = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
+            // ── Permission warning ────────────────────────────────
+            if (!hasUsagePermission) {
+                item {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors   = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.errorContainer
+                        ),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(12.dp),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            verticalAlignment = Alignment.Top
+                        ) {
+                            Icon(
+                                imageVector        = Icons.Default.Lock,
+                                contentDescription = null,
+                                tint               = MaterialTheme.colorScheme.onErrorContainer,
+                                modifier           = Modifier.size(20.dp)
+                            )
+                            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                Text(
+                                    text  = stringResource(R.string.tech_health_no_permission_title),
+                                    style = MaterialTheme.typography.labelLarge,
+                                    color = MaterialTheme.colorScheme.onErrorContainer
+                                )
+                                Text(
+                                    text  = stringResource(R.string.tech_health_no_permission_body),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onErrorContainer
+                                )
+                                TextButton(
+                                    onClick = {
+                                        context.startActivity(
+                                            Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)
+                                        )
+                                    },
+                                    contentPadding = PaddingValues(0.dp)
+                                ) {
+                                    Text(
+                                        text  = stringResource(R.string.tech_health_open_settings),
+                                        style = MaterialTheme.typography.labelMedium,
+                                        color = MaterialTheme.colorScheme.onErrorContainer
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // ── Daily point indicator ─────────────────────────────
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors   = CardDefaults.cardColors(
+                        containerColor = if (techHealthPointEarned)
+                            MaterialTheme.colorScheme.primaryContainer
+                        else
+                            MaterialTheme.colorScheme.secondaryContainer
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Row(
+                        modifier              = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        verticalAlignment     = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector        = if (techHealthPointEarned)
+                                Icons.Default.CheckCircle else Icons.Default.Info,
+                            contentDescription = null,
+                            tint               = if (techHealthPointEarned)
+                                MaterialTheme.colorScheme.onPrimaryContainer
+                            else
+                                MaterialTheme.colorScheme.onSecondaryContainer,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Text(
+                            text  = stringResource(
+                                if (techHealthPointEarned) R.string.tech_health_point_earned
+                                else R.string.tech_health_point_pending
+                            ),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = if (techHealthPointEarned)
+                                MaterialTheme.colorScheme.onPrimaryContainer
+                            else
+                                MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+                    }
+                }
+            }
+
             item {
                 DayPilotSectionHeader(title = stringResource(R.string.tech_health_restrictions_title))
                 Text(

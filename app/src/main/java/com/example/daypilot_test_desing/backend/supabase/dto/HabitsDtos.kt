@@ -48,6 +48,38 @@ data class DailyLogDto(
 )
 
 /**
+ * Upsert payload for `tech_health_config`.
+ * Uses UNIQUE(user_id, app_package) as the conflict target.
+ */
+@Serializable
+data class TechHealthConfigDto(
+    @SerialName("user_id")     val userId: String,
+    @SerialName("app_package") val appPackage: String,
+    @SerialName("app_name")    val appName: String,
+    @SerialName("limit_hours") val limitHours: Double,
+    @SerialName("is_active")   val isActive: Boolean = true
+)
+
+/**
+ * Minimal read DTO for checking tech_health_point_earned in `habits_daily`.
+ */
+@Serializable
+data class HabitsDailyReadTechDto(
+    @SerialName("tech_health_point_earned") val techHealthPointEarned: Boolean = false
+)
+
+/**
+ * Upsert payload to write tech_health_point_earned into `habits_daily`.
+ * Uses UNIQUE(user_id, date) — only overwrites the tech_health_point_earned column.
+ */
+@Serializable
+data class HabitsDailyTechDto(
+    @SerialName("user_id")                  val userId: String,
+    val date: String,
+    @SerialName("tech_health_point_earned") val techHealthPointEarned: Boolean
+)
+
+/**
  * Row from `daily_progress` — the live in-progress counter for today.
  */
 @Serializable

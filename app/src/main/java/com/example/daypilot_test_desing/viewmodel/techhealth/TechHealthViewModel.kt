@@ -7,7 +7,10 @@ import com.example.daypilot_test_desing.backend.model.AppRestriction
 import com.example.daypilot_test_desing.backend.model.GroupRestriction
 import com.example.daypilot_test_desing.backend.preferences.AppPreferences
 import com.example.daypilot_test_desing.backend.sharedprefs.SharedPrefsTechHealthRepository
+import com.example.daypilot_test_desing.backend.supabase.dto.HabitsDailyReadTechDto
+import com.example.daypilot_test_desing.backend.supabase.dto.HabitsDailyTechDto
 import com.example.daypilot_test_desing.backend.supabase.dto.InsertPointsLogDto
+import com.example.daypilot_test_desing.backend.supabase.dto.TechHealthConfigDto
 import com.example.daypilot_test_desing.backend.supabase.supabase
 import com.example.daypilot_test_desing.reminders.AppUsageTracker
 import com.example.daypilot_test_desing.reminders.TechHealthNotificationManager
@@ -29,27 +32,41 @@ class TechHealthViewModel(application: Application) : AndroidViewModel(applicati
     private val _uiState = MutableStateFlow(buildState())
     val uiState: StateFlow<TechHealthUiState> = _uiState.asStateFlow()
 
-    private fun buildState() = TechHealthUiState(
-        appRestrictions   = repository.getAppRestrictions(),
-        groupRestrictions = repository.getGroupRestrictions()
-    )
+    init {
+        viewModelScope.launch {
+            loadFromSupabase()
+            refreshUsageInternal()
+        }
+    }
 
     fun refreshUsage() {
-        val context = getApplication<Application>()
-        if (AppUsageTracker.hasPermission(context)) {
-            val usageMap = AppUsageTracker.getTodayUsage(context)
+        viewModelScope.launch { refreshUsageInternal() }
+    }
+
+    private suspend fun refreshUsageInternal() {
+        val ctx = getApplication<Application>()
+        val hasPermission = AppUsageTracker.hasPermission(ctx)
+        if (hasPermission) {
+            val usageMap = AppUsageTracker.getTodayUsage(ctx)
             repository.getAppRestrictions().forEach { r ->
                 val used = usageMap[r.packageName] ?: 0
                 if (used != r.usedMinutesToday) repository.updateUsage(r.id, used)
             }
         }
         scheduleNotificationsForOverLimit()
-        checkAndAwardDailyBonus()
-        _uiState.value = buildState()
+        val pointEarned = appPrefs.techHealthBonusDate == today() || readPointEarnedFromDb()
+        if (!pointEarned) checkAndAwardDailyBonus()
+        _uiState.value = TechHealthUiState(
+            appRestrictions       = repository.getAppRestrictions(),
+            groupRestrictions     = repository.getGroupRestrictions(),
+            hasUsagePermission    = hasPermission,
+            techHealthPointEarned = pointEarned || appPrefs.techHealthBonusDate == today()
+        )
     }
 
     fun saveApp(restriction: AppRestriction) {
         repository.saveApp(restriction)
+        viewModelScope.launch { upsertAppToSupabase(restriction) }
         scheduleNotificationsForOverLimit()
         _uiState.value = buildState()
     }
@@ -60,15 +77,19 @@ class TechHealthViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     fun toggleRestriction(id: String, enabled: Boolean) {
+        val pkg = repository.getAppRestrictions().find { it.id == id }?.packageName
         repository.toggleRestriction(id, enabled)
         if (!enabled) TechHealthNotificationManager.cancel(getApplication(), id)
         else scheduleNotificationsForOverLimit()
+        if (pkg != null) viewModelScope.launch { updateIsActiveInSupabase(pkg, enabled) }
         _uiState.value = buildState()
     }
 
     fun deleteRestriction(id: String) {
         TechHealthNotificationManager.cancel(getApplication(), id)
+        val pkg = repository.getAppRestrictions().find { it.id == id }?.packageName
         repository.deleteRestriction(id)
+        if (pkg != null) viewModelScope.launch { deleteFromSupabase(pkg) }
         _uiState.value = buildState()
     }
 
@@ -82,16 +103,107 @@ class TechHealthViewModel(application: Application) : AndroidViewModel(applicati
         _uiState.value = buildState()
     }
 
-    // +10 pts when ALL restrictions are under their daily limit and at least 2 exist
+    // ── Supabase ops ─────────────────────────────────────────────────────────
+
+    private suspend fun loadFromSupabase() {
+        val uid = supabase.auth.currentUserOrNull()?.id ?: return
+        try {
+            val configs = supabase.from("tech_health_config").select {
+                filter {
+                    eq("user_id", uid)
+                    eq("is_active", true)
+                }
+            }.decodeList<TechHealthConfigDto>()
+            configs.forEach { dto ->
+                val limitMinutes = (dto.limitHours * 60).toInt()
+                val existing = repository.getAppRestrictions().find { it.packageName == dto.appPackage }
+                repository.saveApp(AppRestriction(
+                    id                        = existing?.id ?: dto.appPackage,
+                    appName                   = dto.appName,
+                    packageName               = dto.appPackage,
+                    dailyLimitMinutes         = limitMinutes,
+                    notificationIntervalSeconds = existing?.notificationIntervalSeconds ?: 3600,
+                    isEnabled                 = dto.isActive,
+                    usedMinutesToday          = existing?.usedMinutesToday ?: 0
+                ))
+            }
+        } catch (_: Exception) { }
+        _uiState.value = buildState()
+    }
+
+    private suspend fun upsertAppToSupabase(restriction: AppRestriction) {
+        val uid = supabase.auth.currentUserOrNull()?.id ?: return
+        try {
+            supabase.from("tech_health_config").upsert(TechHealthConfigDto(
+                userId     = uid,
+                appPackage = restriction.packageName,
+                appName    = restriction.appName,
+                limitHours = restriction.dailyLimitMinutes / 60.0,
+                isActive   = restriction.isEnabled
+            ))
+        } catch (_: Exception) { }
+    }
+
+    private suspend fun deleteFromSupabase(packageName: String) {
+        val uid = supabase.auth.currentUserOrNull()?.id ?: return
+        try {
+            supabase.from("tech_health_config").delete {
+                filter {
+                    eq("user_id", uid)
+                    eq("app_package", packageName)
+                }
+            }
+        } catch (_: Exception) { }
+    }
+
+    private suspend fun updateIsActiveInSupabase(packageName: String, isActive: Boolean) {
+        val uid = supabase.auth.currentUserOrNull()?.id ?: return
+        try {
+            supabase.from("tech_health_config").update({
+                set("is_active", isActive)
+            }) {
+                filter {
+                    eq("user_id", uid)
+                    eq("app_package", packageName)
+                }
+            }
+        } catch (_: Exception) { }
+    }
+
+    private suspend fun readPointEarnedFromDb(): Boolean {
+        val uid = supabase.auth.currentUserOrNull()?.id ?: return false
+        return try {
+            supabase.from("habits_daily").select {
+                filter { eq("user_id", uid); eq("date", today()) }
+                limit(1)
+            }.decodeList<HabitsDailyReadTechDto>()
+                .firstOrNull()?.techHealthPointEarned ?: false
+        } catch (_: Exception) { false }
+    }
+
+    // ── Point logic ──────────────────────────────────────────────────────────
+
     private fun checkAndAwardDailyBonus() {
-        val today = today()
-        if (appPrefs.techHealthBonusDate == today) return
-        val all = repository.getAppRestrictions() +
-                  repository.getGroupRestrictions().flatMap { it.apps }
-        if (all.size >= 2 && all.all { it.usedMinutesToday < it.dailyLimitMinutes }) {
-            appPrefs.techHealthBonusDate = today
-            viewModelScope.launch { logPointsToDb(10, "TECH_HEALTH") }
+        val todayStr = today()
+        if (appPrefs.techHealthBonusDate == todayStr) return
+        val active = repository.getAppRestrictions().filter { it.isEnabled }
+        if (active.isEmpty()) return
+        if (active.all { it.usedMinutesToday < it.dailyLimitMinutes }) {
+            appPrefs.techHealthBonusDate = todayStr
+            viewModelScope.launch {
+                logPointsToDb(10, "TECH_HEALTH")
+                writeTechHealthEarned(true)
+            }
         }
+    }
+
+    private suspend fun writeTechHealthEarned(earned: Boolean) {
+        val uid = supabase.auth.currentUserOrNull()?.id ?: return
+        try {
+            supabase.from("habits_daily").upsert(
+                HabitsDailyTechDto(userId = uid, date = today(), techHealthPointEarned = earned)
+            )
+        } catch (_: Exception) { }
     }
 
     private suspend fun logPointsToDb(points: Int, source: String) {
@@ -102,6 +214,8 @@ class TechHealthViewModel(application: Application) : AndroidViewModel(applicati
             )
         } catch (_: Exception) { }
     }
+
+    // ── Notifications ────────────────────────────────────────────────────────
 
     private fun scheduleNotificationsForOverLimit() {
         val context = getApplication<Application>()
@@ -118,6 +232,13 @@ class TechHealthViewModel(application: Application) : AndroidViewModel(applicati
             }
         }
     }
+
+    private fun buildState() = TechHealthUiState(
+        appRestrictions       = repository.getAppRestrictions(),
+        groupRestrictions     = repository.getGroupRestrictions(),
+        hasUsagePermission    = AppUsageTracker.hasPermission(getApplication()),
+        techHealthPointEarned = appPrefs.techHealthBonusDate == today()
+    )
 
     private fun today() = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
 }

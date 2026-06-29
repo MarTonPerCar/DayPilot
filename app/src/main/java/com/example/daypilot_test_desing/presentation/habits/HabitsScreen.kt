@@ -24,7 +24,6 @@ fun HabitsScreen(
     goalChangedToday: Boolean = false,
     pendingGoal: Int? = null,
     onBack: () -> Unit,
-    onNavigateToSteps: () -> Unit,
     onNavigateToTimer: () -> Unit,
     onNavigateToReminders: () -> Unit,
     onNavigateToTechHealth: () -> Unit,
@@ -48,11 +47,7 @@ fun HabitsScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             // ── Pasos ────────────────────────────────────────────
-            DayPilotSectionHeader(
-                title      = stringResource(R.string.steps_title),
-                actionText = stringResource(R.string.steps_see_details),
-                onAction   = onNavigateToSteps
-            )
+            DayPilotSectionHeader(title = stringResource(R.string.steps_title))
 
             StepsCard(
                 currentSteps    = currentSteps,

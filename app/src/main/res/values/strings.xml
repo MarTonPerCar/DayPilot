@@ -154,6 +154,10 @@
     <string name="tech_health_used_minutes">%1$d min usados</string>
     <string name="tech_health_limit_minutes">límite %1$d min</string>
     <string name="tech_health_point_earned">Punto del día conseguido</string>
+    <string name="tech_health_point_pending">Cumple todos tus límites hoy para ganar 1 punto</string>
+    <string name="tech_health_no_permission_title">Permiso de uso de apps necesario</string>
+    <string name="tech_health_no_permission_body">Para rastrear el tiempo de pantalla, ve a Ajustes → Acceso al uso de apps y activa DayPilot.</string>
+    <string name="tech_health_open_settings">Abrir Ajustes</string>
     <string name="tech_health_daily_limit">Límite diario</string>
     <string name="tech_health_app_limits">Límites por aplicación</string>
 

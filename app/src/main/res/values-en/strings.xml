@@ -154,6 +154,10 @@
     <string name="tech_health_used_minutes">%1$d min used</string>
     <string name="tech_health_limit_minutes">limit %1$d min</string>
     <string name="tech_health_point_earned">Daily point earned</string>
+    <string name="tech_health_point_pending">Stay within all your limits today to earn 1 point</string>
+    <string name="tech_health_no_permission_title">App usage permission required</string>
+    <string name="tech_health_no_permission_body">To track screen time, go to Settings → Usage data access and enable DayPilot.</string>
+    <string name="tech_health_open_settings">Open Settings</string>
     <string name="tech_health_daily_limit">Daily limit</string>
     <string name="tech_health_app_limits">App limits</string>
 

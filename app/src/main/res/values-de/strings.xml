@@ -154,6 +154,10 @@
     <string name="tech_health_used_minutes">%1$d Min. genutzt</string>
     <string name="tech_health_limit_minutes">Limit %1$d Min.</string>
     <string name="tech_health_point_earned">Tagespunkt verdient</string>
+    <string name="tech_health_point_pending">Halte alle deine Limits heute ein, um 1 Punkt zu verdienen</string>
+    <string name="tech_health_no_permission_title">Zugriff auf App-Nutzung erforderlich</string>
+    <string name="tech_health_no_permission_body">Um die Bildschirmzeit zu verfolgen, gehe zu Einstellungen → Datenzugang zu Apps und aktiviere DayPilot.</string>
+    <string name="tech_health_open_settings">Einstellungen öffnen</string>
     <string name="tech_health_daily_limit">Tageslimit</string>
     <string name="tech_health_app_limits">App-Limits</string>
 

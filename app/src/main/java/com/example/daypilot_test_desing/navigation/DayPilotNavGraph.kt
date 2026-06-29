@@ -369,6 +369,7 @@ fun DayPilotNavGraph(
                 val s by calendarVM.uiState.collectAsState()
                 CalendarScreen(
                     tasks         = s.tasks,
+                    isProcessing  = s.isProcessing,
                     onBack        = { homeVM.refresh(); navController.popBackStack() },
                     onCreateTask  = calendarVM::addTask,
                     onTapTask     = {},
@@ -400,7 +401,6 @@ fun DayPilotNavGraph(
                     goalChangedToday      = s.goalChangedToday,
                     pendingGoal           = s.pendingGoal,
                     onBack                = { navController.popBackStack() },
-                    onNavigateToSteps     = { navController.navigate(DayPilotDestinations.STEPS) },
                     onNavigateToTimer     = { navController.navigate(DayPilotDestinations.TIMER_HUB) },
                     onNavigateToReminders = { navController.navigate(DayPilotDestinations.REMINDERS) },
                     onNavigateToTechHealth= { navController.navigate(DayPilotDestinations.TECH_HEALTH) },
@@ -443,12 +443,14 @@ fun DayPilotNavGraph(
                 LaunchedEffect(Unit) { rivalryVM.refresh() }
                 val s by rivalryVM.uiState.collectAsState()
                 RivalryScreen(
-                    currentUserName    = s.currentUserName,
-                    currentUserPosition= s.currentUserPosition,
-                    currentUserPoints  = s.currentUserPoints,
-                    currentUserStreak  = s.currentUserStreak,
-                    ranking            = s.ranking,
-                    onBack             = { navController.popBackStack() }
+                    currentUserName     = s.currentUserName,
+                    currentUserId       = s.currentUserId,
+                    currentUserPosition = s.currentUserPosition,
+                    currentUserPoints   = s.currentUserPoints,
+                    currentUserStreak   = s.currentUserStreak,
+                    currentUserLevel    = s.currentUserLevel,
+                    ranking             = s.ranking,
+                    onBack              = { navController.popBackStack() }
                 )
             }
 
@@ -523,9 +525,11 @@ fun DayPilotNavGraph(
                 LaunchedEffect(Unit) { techHealthVM.refreshUsage() }
                 val s by techHealthVM.uiState.collectAsState()
                 TechHealthScreen(
-                    appRestrictions   = s.appRestrictions,
-                    groupRestrictions = s.groupRestrictions,
-                    onSaveApp         = { restriction, _ -> techHealthVM.saveApp(restriction) },
+                    appRestrictions       = s.appRestrictions,
+                    groupRestrictions     = s.groupRestrictions,
+                    hasUsagePermission    = s.hasUsagePermission,
+                    techHealthPointEarned = s.techHealthPointEarned,
+                    onSaveApp             = { restriction, _ -> techHealthVM.saveApp(restriction) },
                     onSaveGroup       = { group, _        -> techHealthVM.saveGroup(group) },
                     onToggleRestriction = techHealthVM::toggleRestriction,
                     onDeleteRestriction = techHealthVM::deleteRestriction,
