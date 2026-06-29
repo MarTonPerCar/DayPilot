@@ -42,8 +42,10 @@ data class NewTaskDto(
     val category: String,
     val difficulty: String,
     @SerialName("estimated_minutes") val estimatedMinutes: Int,
-    @SerialName("reminder_enabled") val reminderEnabled: Boolean = false,
-    @SerialName("is_recurring") val isRecurring: Boolean = false
+    // No default values: supabase-kt uses encodeDefaults=false so Boolean = false would be omitted
+    // and the DB would store NULL instead of false. Always serialize these explicitly.
+    @SerialName("reminder_enabled") val reminderEnabled: Boolean,
+    @SerialName("is_recurring") val isRecurring: Boolean
 )
 
 /**

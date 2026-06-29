@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.daypilot_test_desing.backend.model.DayProgress
 import com.example.daypilot_test_desing.backend.repository.FriendRepository
+import java.util.Calendar
 import com.example.daypilot_test_desing.backend.repository.ProgressRepository
 import com.example.daypilot_test_desing.backend.repository.StepsRepository
 import com.example.daypilot_test_desing.backend.repository.TaskRepository
@@ -29,8 +30,16 @@ class HomeViewModel(
 
     fun refresh(): Job = viewModelScope.launch {
             try {
+                val cal       = Calendar.getInstance()
+                val todayDay  = cal.get(Calendar.DAY_OF_MONTH)
+                val todayMon  = cal.get(Calendar.MONTH) + 1
+                val todayYear = cal.get(Calendar.YEAR)
+
                 val user     = userRepo.getCurrentUser()
-                val tasks    = taskRepo.getTasks()
+                val allTasks = taskRepo.getTasks()
+                val todayTasks = allTasks.filter {
+                    it.day == todayDay && it.month == todayMon && it.year == todayYear
+                }
                 val today    = progressRepo.getTodayProgress()
                 val history  = progressRepo.getHistory(7)
                 val ranking  = progressRepo.getRankingPosition()
@@ -44,8 +53,8 @@ class HomeViewModel(
                     streak              = user.currentStreak,
                     stepsToday          = stepsRepo.getCurrentSteps(),
                     stepsGoal           = stepsRepo.getGoalSteps(),
-                    tasksCompleted      = tasks.count { it.isDone },
-                    tasksTotal          = tasks.size,
+                    tasksCompleted      = todayTasks.count { it.isDone },
+                    tasksTotal          = todayTasks.size,
                     progressData        = progressData,
                     pointsToday         = today.totalPoints,
                     rankingPosition     = ranking,
