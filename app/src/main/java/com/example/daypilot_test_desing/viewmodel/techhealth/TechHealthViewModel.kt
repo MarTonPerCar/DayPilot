@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -28,6 +29,9 @@ class TechHealthViewModel(application: Application) : AndroidViewModel(applicati
 
     private val repository = SharedPrefsTechHealthRepository(application)
     private val appPrefs   = AppPreferences(application)
+
+    // Cached value from the last DB read so buildState() reflects DB truth synchronously.
+    private var cachedPointEarned = false
 
     private val _uiState = MutableStateFlow(buildState())
     val uiState: StateFlow<TechHealthUiState> = _uiState.asStateFlow()
@@ -43,6 +47,13 @@ class TechHealthViewModel(application: Application) : AndroidViewModel(applicati
         viewModelScope.launch { refreshUsageInternal() }
     }
 
+    /** Call on logout to prevent the next user seeing this user's cached restrictions. */
+    fun clearLocalData() {
+        repository.clearAll()
+        cachedPointEarned = false
+        _uiState.value = buildState()
+    }
+
     private suspend fun refreshUsageInternal() {
         val ctx = getApplication<Application>()
         val hasPermission = AppUsageTracker.hasPermission(ctx)
@@ -56,11 +67,13 @@ class TechHealthViewModel(application: Application) : AndroidViewModel(applicati
         scheduleNotificationsForOverLimit()
         val pointEarned = appPrefs.techHealthBonusDate == today() || readPointEarnedFromDb()
         if (!pointEarned) checkAndAwardDailyBonus()
+        cachedPointEarned = pointEarned || (appPrefs.techHealthBonusDate == today())
         _uiState.value = TechHealthUiState(
             appRestrictions       = repository.getAppRestrictions(),
             groupRestrictions     = repository.getGroupRestrictions(),
             hasUsagePermission    = hasPermission,
-            techHealthPointEarned = pointEarned || appPrefs.techHealthBonusDate == today()
+            techHealthPointEarned = cachedPointEarned,
+            activeRestrictionCount = repository.getAppRestrictions().count { it.isEnabled }
         )
     }
 
@@ -114,17 +127,19 @@ class TechHealthViewModel(application: Application) : AndroidViewModel(applicati
                     eq("is_active", true)
                 }
             }.decodeList<TechHealthConfigDto>()
+
+            // REPLACE local data — never merge, so the wrong-user bug can't occur.
+            repository.clearAll()
             configs.forEach { dto ->
                 val limitMinutes = (dto.limitHours * 60).toInt()
-                val existing = repository.getAppRestrictions().find { it.packageName == dto.appPackage }
                 repository.saveApp(AppRestriction(
-                    id                        = existing?.id ?: dto.appPackage,
-                    appName                   = dto.appName,
-                    packageName               = dto.appPackage,
-                    dailyLimitMinutes         = limitMinutes,
-                    notificationIntervalSeconds = existing?.notificationIntervalSeconds ?: 3600,
-                    isEnabled                 = dto.isActive,
-                    usedMinutesToday          = existing?.usedMinutesToday ?: 0
+                    id                          = dto.appPackage,
+                    appName                     = dto.appName,
+                    packageName                 = dto.appPackage,
+                    dailyLimitMinutes           = limitMinutes,
+                    notificationIntervalSeconds = 3600,
+                    isEnabled                   = dto.isActive,
+                    usedMinutesToday            = 0
                 ))
             }
         } catch (_: Exception) { }
@@ -187,11 +202,11 @@ class TechHealthViewModel(application: Application) : AndroidViewModel(applicati
         val todayStr = today()
         if (appPrefs.techHealthBonusDate == todayStr) return
         val active = repository.getAppRestrictions().filter { it.isEnabled }
-        if (active.isEmpty()) return
+        if (active.size < 3) return   // need at least 3 active restrictions
         if (active.all { it.usedMinutesToday < it.dailyLimitMinutes }) {
             appPrefs.techHealthBonusDate = todayStr
             viewModelScope.launch {
-                logPointsToDb(10, "TECH_HEALTH")
+                logPointsToDb(10, "TECH_HEALTH", tomorrow())
                 writeTechHealthEarned(true)
             }
         }
@@ -206,11 +221,11 @@ class TechHealthViewModel(application: Application) : AndroidViewModel(applicati
         } catch (_: Exception) { }
     }
 
-    private suspend fun logPointsToDb(points: Int, source: String) {
+    private suspend fun logPointsToDb(points: Int, source: String, dayKey: String = today()) {
         val uid = supabase.auth.currentUserOrNull()?.id ?: return
         try {
             supabase.from("points_log").insert(
-                InsertPointsLogDto(userId = uid, points = points, source = source, dayKey = today())
+                InsertPointsLogDto(userId = uid, points = points, source = source, dayKey = dayKey)
             )
         } catch (_: Exception) { }
     }
@@ -233,12 +248,19 @@ class TechHealthViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-    private fun buildState() = TechHealthUiState(
-        appRestrictions       = repository.getAppRestrictions(),
-        groupRestrictions     = repository.getGroupRestrictions(),
-        hasUsagePermission    = AppUsageTracker.hasPermission(getApplication()),
-        techHealthPointEarned = appPrefs.techHealthBonusDate == today()
-    )
+    private fun buildState(): TechHealthUiState {
+        val apps = repository.getAppRestrictions()
+        return TechHealthUiState(
+            appRestrictions        = apps,
+            groupRestrictions      = repository.getGroupRestrictions(),
+            hasUsagePermission     = AppUsageTracker.hasPermission(getApplication()),
+            techHealthPointEarned  = cachedPointEarned,
+            activeRestrictionCount = apps.count { it.isEnabled }
+        )
+    }
 
-    private fun today() = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
+    private fun today()    = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
+    private fun tomorrow() = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(
+        Calendar.getInstance().also { it.add(Calendar.DAY_OF_YEAR, 1) }.time
+    )
 }

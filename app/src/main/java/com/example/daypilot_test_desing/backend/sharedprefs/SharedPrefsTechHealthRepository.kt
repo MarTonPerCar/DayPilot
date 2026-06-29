@@ -90,4 +90,8 @@ class SharedPrefsTechHealthRepository(context: Context) : TechHealthRepository {
         val idx  = apps.indexOfFirst { it.id == id }
         if (idx >= 0) { apps[idx] = apps[idx].copy(usedMinutesToday = usedMinutes); saveApps(apps) }
     }
+
+    fun clearAll() {
+        prefs.edit().remove("apps").remove("groups").apply()
+    }
 }

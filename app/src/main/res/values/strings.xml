@@ -153,8 +153,11 @@
     <string name="tech_health_screen_usage">Uso de pantalla hoy</string>
     <string name="tech_health_used_minutes">%1$d min usados</string>
     <string name="tech_health_limit_minutes">límite %1$d min</string>
-    <string name="tech_health_point_earned">Punto del día conseguido</string>
-    <string name="tech_health_point_pending">Cumple todos tus límites hoy para ganar 1 punto</string>
+    <string name="tech_health_point_earned">Punto del día conseguido ✓</string>
+    <string name="tech_health_point_pending">Punto obtenible — toca para saber más</string>
+    <string name="tech_health_point_warning">Necesitas al menos 3 restricciones activas para ganar el punto</string>
+    <string name="tech_health_point_info_title">Punto de salud tecnológica</string>
+    <string name="tech_health_point_info_body">Activa al menos 3 restricciones y no superes ningún límite durante el día. Si lo consigues, ganarás 1 punto extra que se sumará a tus puntos de mañana.</string>
     <string name="tech_health_no_permission_title">Permiso de uso de apps necesario</string>
     <string name="tech_health_no_permission_body">Para rastrear el tiempo de pantalla, ve a Ajustes → Acceso al uso de apps y activa DayPilot.</string>
     <string name="tech_health_open_settings">Abrir Ajustes</string>
@@ -548,5 +551,23 @@
     <string name="tech_health_channel_desc">Alertas cuando se alcanza el límite de uso de una app</string>
     <string name="tech_health_notif_title">Límite alcanzado: %s</string>
     <string name="tech_health_notif_body">Has usado %1$d min de %2$d min permitidos</string>
+
+    <!-- Daily phone notifications -->
+    <string name="daily_channel_name">Recordatorios diarios</string>
+    <string name="daily_channel_desc">Recordatorios de tareas y racha</string>
+    <string name="notif_task_reminder_title">Tareas de hoy</string>
+    <string name="notif_task_reminder_count">Tienes %1$d tareas pendientes hoy</string>
+    <string name="notif_task_reminder_none">No tienes tareas para hoy ✓</string>
+    <string name="notif_task_reminder_generic">Revisa tus tareas para hoy</string>
+    <string name="notif_streak_danger_title">¡Racha en peligro! 🔥</string>
+    <string name="notif_streak_danger_body">Abre la app antes de medianoche para mantener tu racha</string>
+
+    <string name="notifications_mark_all_read">Leer todo</string>
+
+    <!-- Settings: notification sub-toggles -->
+    <string name="settings_task_reminders">Recordatorio de tareas</string>
+    <string name="settings_task_reminders_description">Aviso diario con tus tareas pendientes</string>
+    <string name="settings_streak_alerts">Alerta de racha</string>
+    <string name="settings_streak_alerts_description">Aviso a las 22h si no has abierto la app</string>
 
 </resources>

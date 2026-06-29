@@ -7,5 +7,6 @@ data class TechHealthUiState(
     val appRestrictions: List<AppRestriction> = emptyList(),
     val groupRestrictions: List<GroupRestriction> = emptyList(),
     val hasUsagePermission: Boolean = true,
-    val techHealthPointEarned: Boolean = false
+    val techHealthPointEarned: Boolean = false,
+    val activeRestrictionCount: Int = 0
 )

@@ -399,6 +399,7 @@ fun DayPilotNavGraph(
                     onToggleStreakAlerts    = settingsVM::toggleStreakAlerts,
                     onNavigateToEditProfile = { navController.navigate(DayPilotDestinations.EDIT_PROFILE) },
                     onLogout                = {
+                        techHealthVM.clearLocalData()
                         sessionVM.signOut()
                     },
                     onBack                  = { navController.popBackStack() }
@@ -598,17 +599,18 @@ fun DayPilotNavGraph(
                 LaunchedEffect(Unit) { techHealthVM.refreshUsage() }
                 val s by techHealthVM.uiState.collectAsState()
                 TechHealthScreen(
-                    appRestrictions       = s.appRestrictions,
-                    groupRestrictions     = s.groupRestrictions,
-                    hasUsagePermission    = s.hasUsagePermission,
-                    techHealthPointEarned = s.techHealthPointEarned,
-                    onSaveApp             = { restriction, _ -> techHealthVM.saveApp(restriction) },
-                    onSaveGroup       = { group, _        -> techHealthVM.saveGroup(group) },
-                    onToggleRestriction = techHealthVM::toggleRestriction,
-                    onDeleteRestriction = techHealthVM::deleteRestriction,
-                    onToggleGroup       = techHealthVM::toggleGroup,
-                    onDeleteGroup       = techHealthVM::deleteGroup,
-                    onBack            = { navController.popBackStack() }
+                    appRestrictions        = s.appRestrictions,
+                    groupRestrictions      = s.groupRestrictions,
+                    hasUsagePermission     = s.hasUsagePermission,
+                    techHealthPointEarned  = s.techHealthPointEarned,
+                    activeRestrictionCount = s.activeRestrictionCount,
+                    onSaveApp              = { restriction, _ -> techHealthVM.saveApp(restriction) },
+                    onSaveGroup            = { group, _       -> techHealthVM.saveGroup(group) },
+                    onToggleRestriction    = techHealthVM::toggleRestriction,
+                    onDeleteRestriction    = techHealthVM::deleteRestriction,
+                    onToggleGroup          = techHealthVM::toggleGroup,
+                    onDeleteGroup          = techHealthVM::deleteGroup,
+                    onBack                 = { navController.popBackStack() }
                 )
             }
         }

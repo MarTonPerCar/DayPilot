@@ -2,6 +2,7 @@ package com.example.daypilot_test_desing.presentation.techhealth
 
 import android.content.Intent
 import android.provider.Settings
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -11,6 +12,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -32,6 +34,7 @@ fun TechHealthScreen(
     groupRestrictions: List<GroupRestriction>,
     hasUsagePermission: Boolean = true,
     techHealthPointEarned: Boolean = false,
+    activeRestrictionCount: Int = 0,
     onSaveApp: (AppRestriction, isEdit: Boolean) -> Unit,
     onSaveGroup: (GroupRestriction, isEdit: Boolean) -> Unit,
     onToggleRestriction: (String, Boolean) -> Unit,
@@ -44,8 +47,23 @@ fun TechHealthScreen(
     var showAddSheet   by remember { mutableStateOf(false) }
     var editingAppId   by remember { mutableStateOf<String?>(null) }
     var editingGroupId by remember { mutableStateOf<String?>(null) }
+    var showInfoDialog by remember { mutableStateOf(false) }
     val sheetState     = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val total          = appRestrictions.size + groupRestrictions.size
+
+    // Info popup: explains how to earn the daily bonus point
+    if (showInfoDialog) {
+        AlertDialog(
+            onDismissRequest = { showInfoDialog = false },
+            title = { Text(stringResource(R.string.tech_health_point_info_title)) },
+            text  = { Text(stringResource(R.string.tech_health_point_info_body)) },
+            confirmButton = {
+                TextButton(onClick = { showInfoDialog = false }) {
+                    Text(stringResource(android.R.string.ok))
+                }
+            }
+        )
+    }
 
     if (showAddSheet || editingAppId != null || editingGroupId != null) {
         ModalBottomSheet(
@@ -164,17 +182,42 @@ fun TechHealthScreen(
                 }
             }
 
-            // ── Daily point indicator ─────────────────────────────
+            // ── Daily point indicator (3 states) ──────────────────
             item {
+                val earned  = techHealthPointEarned && activeRestrictionCount >= 3
+                val warning = activeRestrictionCount < 3
+
+                val containerColor = when {
+                    earned  -> MaterialTheme.colorScheme.primaryContainer
+                    warning -> MaterialTheme.colorScheme.errorContainer
+                    else    -> MaterialTheme.colorScheme.secondaryContainer
+                }
+                val contentColor = when {
+                    earned  -> MaterialTheme.colorScheme.onPrimaryContainer
+                    warning -> MaterialTheme.colorScheme.onErrorContainer
+                    else    -> MaterialTheme.colorScheme.onSecondaryContainer
+                }
+                val icon = when {
+                    earned  -> Icons.Default.CheckCircle
+                    warning -> Icons.Default.Warning
+                    else    -> Icons.Default.Info
+                }
+                val label = when {
+                    earned  -> R.string.tech_health_point_earned
+                    warning -> R.string.tech_health_point_warning
+                    else    -> R.string.tech_health_point_pending
+                }
+
                 Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors   = CardDefaults.cardColors(
-                        containerColor = if (techHealthPointEarned)
-                            MaterialTheme.colorScheme.primaryContainer
-                        else
-                            MaterialTheme.colorScheme.secondaryContainer
-                    ),
-                    shape = RoundedCornerShape(12.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .then(
+                            if (!earned && !warning)
+                                Modifier.clickable { showInfoDialog = true }
+                            else Modifier
+                        ),
+                    colors = CardDefaults.cardColors(containerColor = containerColor),
+                    shape  = RoundedCornerShape(12.dp)
                 ) {
                     Row(
                         modifier              = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
@@ -182,25 +225,15 @@ fun TechHealthScreen(
                         verticalAlignment     = Alignment.CenterVertically
                     ) {
                         Icon(
-                            imageVector        = if (techHealthPointEarned)
-                                Icons.Default.CheckCircle else Icons.Default.Info,
+                            imageVector        = icon,
                             contentDescription = null,
-                            tint               = if (techHealthPointEarned)
-                                MaterialTheme.colorScheme.onPrimaryContainer
-                            else
-                                MaterialTheme.colorScheme.onSecondaryContainer,
-                            modifier = Modifier.size(20.dp)
+                            tint               = contentColor,
+                            modifier           = Modifier.size(20.dp)
                         )
                         Text(
-                            text  = stringResource(
-                                if (techHealthPointEarned) R.string.tech_health_point_earned
-                                else R.string.tech_health_point_pending
-                            ),
+                            text  = stringResource(label),
                             style = MaterialTheme.typography.bodySmall,
-                            color = if (techHealthPointEarned)
-                                MaterialTheme.colorScheme.onPrimaryContainer
-                            else
-                                MaterialTheme.colorScheme.onSecondaryContainer
+                            color = contentColor
                         )
                     }
                 }
