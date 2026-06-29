@@ -1,5 +1,6 @@
 package com.example.daypilot_test_desing.ui.components.basic
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
@@ -9,6 +10,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -23,6 +25,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -200,6 +203,7 @@ fun DayPilotReactionButton(
     onReact: (ReactionType) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
+    val alreadyReacted = selectedReaction != null
     var expanded by remember { mutableStateOf(false) }
 
     val rotation by animateFloatAsState(
@@ -209,32 +213,47 @@ fun DayPilotReactionButton(
     )
 
     Box(modifier = modifier) {
-        // ── Botón + ──────────────────────────────────────────
+        // ── Botón principal ───────────────────────────────────
         Box(
             modifier = Modifier
                 .size(28.dp)
                 .clip(CircleShape)
-                .background(
-                    if (selectedReaction != null)
-                        MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
-                    else
-                        MaterialTheme.colorScheme.primary
-                )
-                .clickable { expanded = !expanded },
+                .background(MaterialTheme.colorScheme.primary)
+                .clickable(enabled = !alreadyReacted) { expanded = !expanded },
             contentAlignment = Alignment.Center
         ) {
-            Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier
-                    .size(16.dp)
-                    .rotate(rotation)
-            )
+            // Animates from "+" to checkmark once a reaction is sent
+            AnimatedContent(
+                targetState = alreadyReacted,
+                transitionSpec = {
+                    (fadeIn(spring(stiffness = Spring.StiffnessMedium)) +
+                     scaleIn(spring(dampingRatio = Spring.DampingRatioMediumBouncy))) togetherWith
+                    (fadeOut(tween(80)) + scaleOut(tween(80)))
+                },
+                label = "reaction_icon"
+            ) { reacted ->
+                if (reacted) {
+                    Icon(
+                        imageVector = Icons.Default.Check,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onPrimary,
+                        modifier = Modifier.size(16.dp)
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onPrimary,
+                        modifier = Modifier
+                            .size(16.dp)
+                            .rotate(rotation)
+                    )
+                }
+            }
         }
 
-        // ── Panel flotante ────────────────────────────────────
-        if (expanded) {
+        // ── Panel flotante (only when not yet reacted) ────────
+        if (expanded && !alreadyReacted) {
             Popup(
                 alignment = Alignment.TopEnd,
                 offset = IntOffset(0, -120)
@@ -283,12 +302,7 @@ fun DayPilotReactionButton(
                                 modifier = Modifier
                                     .size(36.dp)
                                     .clip(CircleShape)
-                                    .background(
-                                        if (selectedReaction == reaction)
-                                            MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
-                                        else
-                                            Color.Transparent
-                                    )
+                                    .background(Color.Transparent)
                                     .clickable { pressed = true },
                                 contentAlignment = Alignment.Center
                             ) {

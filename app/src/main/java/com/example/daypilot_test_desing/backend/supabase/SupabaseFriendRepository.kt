@@ -208,23 +208,36 @@ class SupabaseFriendRepository : FriendRepository {
                 )
             )
 
-            // Notify the recipient
-            val myName = supabase.from("users").select {
-                filter { eq("id", uid) }
-                limit(1)
-            }.decodeList<UserDto>().firstOrNull()?.name ?: return
+            // Fetch both names in one query
+            val users = getUsersForIds(listOf(uid, userId))
+            val myName     = users.firstOrNull { it.id == uid }?.name     ?: ""
+            val targetName = users.firstOrNull { it.id == userId }?.name  ?: ""
+
             val emoji = when (reaction) {
                 ReactionType.FIRE   -> "🔥"
                 ReactionType.CLAP   -> "👏"
                 ReactionType.STRONG -> "💪"
                 ReactionType.STAR   -> "⭐"
             }
-            SupabaseNotificationRepository.insert(
-                userId = userId,
-                type   = "REACTION",
-                title  = "Nueva reacción $emoji",
-                body   = "$myName reaccionó a tu semana con $emoji"
-            )
+
+            // Notification for the recipient (requires INSERT policy for any authenticated user)
+            if (targetName.isNotEmpty()) {
+                SupabaseNotificationRepository.insert(
+                    userId = userId,
+                    type   = "REACTION",
+                    title  = "Nueva reacción $emoji",
+                    body   = "${myName.ifEmpty { "Un amigo" }} reaccionó a tu semana con $emoji"
+                )
+            }
+
+            // Notification for the sender (always succeeds — inserting for self)
+            if (targetName.isNotEmpty()) {
+                SupabaseNotificationRepository.insertForCurrentUser(
+                    type  = "REACTION",
+                    title = "Reacción enviada $emoji",
+                    body  = "Reaccionaste a la semana de $targetName con $emoji"
+                )
+            }
         } catch (_: Exception) { }
     }
 

@@ -17,6 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.daypilot_test_desing.backend.model.ReactionType
+import com.example.daypilot_test_desing.backend.model.ReceivedReaction
 import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
 
 @Composable
@@ -56,7 +57,7 @@ fun DayPilotReactionBadge(
 
 @Composable
 fun DayPilotReactionBadgeRow(
-    reactions: List<Pair<String, ReactionType>>,
+    reactions: List<ReceivedReaction>,
     modifier: Modifier = Modifier
 ) {
     if (reactions.isEmpty()) return
@@ -66,10 +67,11 @@ fun DayPilotReactionBadgeRow(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        reactions.forEach { (name, reaction) ->
+        reactions.forEach { r ->
             DayPilotReactionBadge(
-                name = name,
-                reaction = reaction
+                name      = r.fromName,
+                reaction  = r.reaction,
+                avatarUrl = r.avatarUrl
             )
         }
     }
@@ -84,9 +86,9 @@ fun DayPilotReactionBadgePreview() {
             .padding(16.dp)) {
             DayPilotReactionBadgeRow(
                 reactions = listOf(
-                    "Ana" to ReactionType.CLAP,
-                    "Carlos" to ReactionType.FIRE,
-                    "Laura" to ReactionType.STAR
+                    ReceivedReaction("Ana",    ReactionType.CLAP),
+                    ReceivedReaction("Carlos", ReactionType.FIRE),
+                    ReceivedReaction("Laura",  ReactionType.STAR)
                 )
             )
         }

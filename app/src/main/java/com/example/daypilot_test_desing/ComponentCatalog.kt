@@ -135,7 +135,7 @@ fun CatalogBasicMisc() {
                 var selected by remember { mutableStateOf<ReactionType?>(null) }
                 DayPilotReactionBar(selectedReaction = selected, onReact = { selected = it })
                 DayPilotReactionSummary(reactions = mapOf(ReactionType.FIRE to 3, ReactionType.CLAP to 1, ReactionType.STRONG to 5))
-                DayPilotReactionBadgeRow(reactions = listOf("Ana" to ReactionType.CLAP, "Carlos" to ReactionType.FIRE))
+                DayPilotReactionBadgeRow(reactions = listOf(ReceivedReaction("Ana", ReactionType.CLAP), ReceivedReaction("Carlos", ReactionType.FIRE)))
             }
             CatalogSection("Filter Selector") {
                 var selected by remember { mutableStateOf(FilterOption("all", "All")) }

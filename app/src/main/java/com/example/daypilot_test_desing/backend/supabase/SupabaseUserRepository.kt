@@ -1,9 +1,12 @@
 package com.example.daypilot_test_desing.backend.supabase
 
+import com.example.daypilot_test_desing.backend.model.ReactionType
+import com.example.daypilot_test_desing.backend.model.ReceivedReaction
 import com.example.daypilot_test_desing.backend.model.TimeZoneRegion
 import com.example.daypilot_test_desing.backend.model.UserProfile
 import com.example.daypilot_test_desing.backend.model.WeeklySummaryData
 import com.example.daypilot_test_desing.backend.repository.UserRepository
+import com.example.daypilot_test_desing.backend.supabase.dto.ReactionDto
 import com.example.daypilot_test_desing.backend.supabase.dto.UpdateUserDto
 import com.example.daypilot_test_desing.backend.supabase.dto.UserDto
 import com.example.daypilot_test_desing.backend.supabase.dto.UserStreakDto
@@ -62,12 +65,35 @@ class SupabaseUserRepository : UserRepository {
             }.decodeList<WeeklySummaryRowDto>().firstOrNull()
                 ?: return WeeklySummaryData(0, 0, 0, 0)
 
+            // Load reactions received on this summary
+            val reactionRows = try {
+                supabase.from("reactions").select {
+                    filter { eq("weekly_summary_id", row.id) }
+                }.decodeList<ReactionDto>()
+            } catch (_: Exception) { emptyList() }
+
+            val reactions = if (reactionRows.isNotEmpty()) {
+                val senderIds = reactionRows.map { it.fromUserId }
+                val senders = try {
+                    supabase.from("users").select {
+                        filter { isIn("id", senderIds) }
+                    }.decodeList<UserDto>()
+                } catch (_: Exception) { emptyList() }
+                val senderById = senders.associateBy { it.id }
+                reactionRows.mapNotNull { r ->
+                    val name = senderById[r.fromUserId]?.name ?: return@mapNotNull null
+                    val type = ReactionType.entries.firstOrNull { it.name.lowercase() == r.type }
+                        ?: return@mapNotNull null
+                    ReceivedReaction(fromName = name, reaction = type, avatarUrl = senderById[r.fromUserId]?.photoUrl)
+                }
+            } else emptyList()
+
             WeeklySummaryData(
                 totalPoints    = row.totalPoints,
                 tasksCompleted = row.totalTasksCompleted,
                 totalSteps     = row.totalSteps,
                 bestStreak     = row.bestStreak,
-                reactions      = emptyList()  // reactions added in Piece 5
+                reactions      = reactions
             )
         } catch (_: Exception) {
             WeeklySummaryData(0, 0, 0, 0)

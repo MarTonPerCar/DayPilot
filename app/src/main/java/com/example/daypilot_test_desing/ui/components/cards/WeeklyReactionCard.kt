@@ -108,11 +108,7 @@ fun WeeklyReactionCard(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
 
-                    DayPilotReactionBadgeRow(
-                        reactions = summary.reactions.map {
-                            Pair(it.fromName, it.reaction)
-                        }
-                    )
+                    DayPilotReactionBadgeRow(reactions = summary.reactions)
                 }
             }
         }

@@ -63,9 +63,19 @@ class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
     }
 
     fun reactToFriend(userId: String, reaction: ReactionType) {
+        // Optimistic update: show checkmark immediately before the DB round-trip
+        _uiState.update { state ->
+            state.copy(
+                friends = state.friends.map { friend ->
+                    if (friend.id == userId)
+                        friend.copy(weeklySummary = friend.weeklySummary?.copy(myReaction = reaction))
+                    else
+                        friend
+                }
+            )
+        }
         viewModelScope.launch {
             repo.reactToFriend(userId, reaction)
-            load()
             val name = _uiState.value.friends.firstOrNull { it.id == userId }?.name
             val emoji = when (reaction) {
                 ReactionType.FIRE   -> "🔥"
@@ -80,6 +90,7 @@ class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
                     type    = NotificationType.SOCIAL
                 )
             }
+            load() // re-sync with DB after sending
         }
     }
 
