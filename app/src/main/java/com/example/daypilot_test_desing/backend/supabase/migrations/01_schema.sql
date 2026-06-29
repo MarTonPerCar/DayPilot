@@ -935,3 +935,15 @@ CREATE POLICY "notifications_delete_own"  ON notifications FOR DELETE USING (aut
 
 DROP INDEX IF EXISTS idx_notifications_user;
 CREATE INDEX IF NOT EXISTS idx_notifications_user_unread ON notifications(user_id, is_read, created_at DESC);
+
+-- 4. Add default_steps_goal to users
+ALTER TABLE users
+ADD COLUMN IF NOT EXISTS default_steps_goal INTEGER NOT NULL DEFAULT 2000;
+
+-- 5. Profile photo upload
+-- Create a PUBLIC Storage bucket named "avatars" in the Supabase dashboard:
+--   Storage → New bucket → name: "avatars", Public: ON
+-- RLS: enable it, then add a policy allowing authenticated users to upload to their own folder:
+--   CREATE POLICY "avatars_own" ON storage.objects
+--     FOR ALL USING (bucket_id = 'avatars' AND auth.uid()::text = (storage.foldername(name))[1])
+--     WITH CHECK (bucket_id = 'avatars' AND auth.uid()::text = (storage.foldername(name))[1]);

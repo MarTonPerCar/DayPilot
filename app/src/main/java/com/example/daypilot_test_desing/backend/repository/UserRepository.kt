@@ -8,4 +8,5 @@ interface UserRepository {
     suspend fun getCurrentUser(): UserProfile
     suspend fun getWeeklySummary(): WeeklySummaryData
     suspend fun updateProfile(name: String, username: String, region: TimeZoneRegion)
+    suspend fun uploadAvatar(bytes: ByteArray, extension: String): String?
 }

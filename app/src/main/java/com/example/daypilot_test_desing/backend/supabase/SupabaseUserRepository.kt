@@ -14,6 +14,8 @@ import com.example.daypilot_test_desing.backend.supabase.dto.WeeklySummaryRowDto
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Order
+import io.github.jan.supabase.storage.storage
+import io.github.jan.supabase.storage.upload
 
 class SupabaseUserRepository : UserRepository {
 
@@ -114,5 +116,18 @@ class SupabaseUserRepository : UserRepository {
                 filter { eq("id", uid) }
             }
         } catch (_: Exception) { }
+    }
+
+    override suspend fun uploadAvatar(bytes: ByteArray, extension: String): String? {
+        val uid = userId() ?: return null
+        return try {
+            val path = "$uid/${System.currentTimeMillis()}.$extension"
+            supabase.storage.from("avatars").upload(path, bytes) { upsert = true }
+            val url = supabase.storage.from("avatars").publicUrl(path)
+            supabase.from("users").update({ set("photo_url", url) }) {
+                filter { eq("id", uid) }
+            }
+            url
+        } catch (_: Exception) { null }
     }
 }

@@ -17,6 +17,8 @@ data class ProfileUiState(
     val pointsFromSteps: Int = 0,
     val pointsFromHabits: Int = 0,
     val pointsFromTimers: Int = 0,
+    val stepsToday: Int = 0,
+    val tasksCompletedToday: Int = 0,
     val avatarUrl: String? = null,
     val weeklySummary: WeeklySummaryData = WeeklySummaryData(0, 0, 0, 0)
 )

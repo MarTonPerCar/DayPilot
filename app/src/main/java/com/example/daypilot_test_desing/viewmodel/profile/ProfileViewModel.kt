@@ -1,5 +1,7 @@
 package com.example.daypilot_test_desing.viewmodel.profile
 
+import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -31,22 +33,24 @@ class ProfileViewModel(
             val today   = progressRepo.getTodayProgress()
             val ranking = progressRepo.getRankingPosition()
             _uiState.value = ProfileUiState(
-                name             = user.name,
-                username         = user.username,
-                email            = user.email,
-                memberSince      = user.memberSince,
-                level            = user.level,
-                totalPoints      = user.totalPoints,
-                currentStreak    = user.currentStreak,
-                longestStreak    = user.longestStreak,
-                rankingPosition  = ranking,
-                pointsToday      = today.totalPoints,
-                pointsFromTasks  = today.tasksPoints,
-                pointsFromSteps  = today.stepsPoints,
-                pointsFromHabits = today.techHealthPoints + today.wellnessPoints,
-                pointsFromTimers = today.timerPoints,
-                avatarUrl        = user.avatarUrl,
-                weeklySummary    = summary
+                name                 = user.name,
+                username             = user.username,
+                email                = user.email,
+                memberSince          = user.memberSince,
+                level                = user.level,
+                totalPoints          = user.totalPoints,
+                currentStreak        = user.currentStreak,
+                longestStreak        = user.longestStreak,
+                rankingPosition      = ranking,
+                pointsToday          = today.totalPoints,
+                pointsFromTasks      = today.tasksPoints,
+                pointsFromSteps      = today.stepsPoints,
+                pointsFromHabits     = today.techHealthPoints + today.wellnessPoints,
+                pointsFromTimers     = today.timerPoints,
+                stepsToday           = today.steps,
+                tasksCompletedToday  = today.tasksCompleted,
+                avatarUrl            = user.avatarUrl,
+                weeklySummary        = summary
             )
         } catch (_: Exception) { }
     }
@@ -56,6 +60,16 @@ class ProfileViewModel(
             userRepo.updateProfile(name, username, region)
             load()
         }
+    }
+
+    fun uploadAvatar(uri: Uri, context: Context): Job = viewModelScope.launch {
+        try {
+            val bytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() } ?: return@launch
+            val mimeType = context.contentResolver.getType(uri) ?: "image/jpeg"
+            val ext = mimeType.substringAfterLast("/").replace("jpeg", "jpg").take(4)
+            userRepo.uploadAvatar(bytes, ext)
+            load()
+        } catch (_: Exception) { }
     }
 
     companion object {

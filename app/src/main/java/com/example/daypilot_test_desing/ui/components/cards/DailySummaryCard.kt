@@ -13,15 +13,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.EmojiEvents
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.Badge
-import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -45,11 +41,9 @@ fun DailySummaryCard(
     stepsToday: Int,
     stepsGoal: Int,
     tasksCompleted: Int,
-    tasksTotal: Int,
+    tasksTotal: Int = 0,
     pointsToday: Int,
     rankingPosition: Int,
-    unreadCount: Int = 0,
-    onNavigateToNotifications: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -97,29 +91,6 @@ fun DailySummaryCard(
                         horizontalArrangement = Arrangement.spacedBy(6.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // Campana de notificaciones con badge
-                        BadgedBox(
-                            badge = {
-                                if (unreadCount > 0) {
-                                    Badge {
-                                        Text(if (unreadCount > 9) "9+" else "$unreadCount")
-                                    }
-                                }
-                            }
-                        ) {
-                            IconButton(
-                                onClick  = onNavigateToNotifications,
-                                modifier = Modifier.size(36.dp)
-                            ) {
-                                Icon(
-                                    imageVector        = Icons.Default.Notifications,
-                                    contentDescription = null,
-                                    tint               = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier           = Modifier.size(22.dp)
-                                )
-                            }
-                        }
-
                         // Racha
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
@@ -157,7 +128,7 @@ fun DailySummaryCard(
                     DailySummaryStat(
                         icon = Icons.Default.CheckCircle,
                         label = stringResource(R.string.daily_summary_label_tasks),
-                        value = "$tasksCompleted/$tasksTotal",
+                        value = if (tasksTotal > 0) "$tasksCompleted/$tasksTotal" else tasksCompleted.toString(),
                         subValue = stringResource(R.string.daily_summary_tasks_completed),
                         modifier = Modifier.weight(1f)
                     )

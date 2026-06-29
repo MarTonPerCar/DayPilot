@@ -1,5 +1,8 @@
 package com.example.daypilot_test_desing.presentation.profile
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -12,11 +15,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.content.FileProvider
 import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.ui.components.basic.*
 import com.example.daypilot_test_desing.backend.model.TimeZoneRegion
+import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,22 +33,45 @@ fun EditProfileScreen(
     avatarUrl: String? = null,
     onSave: (name: String, username: String, region: TimeZoneRegion) -> Unit,
     onNavigateToResetPassword: () -> Unit,
-    onPickFromCamera: () -> Unit,
-    onPickFromGallery: () -> Unit,
+    onPhotoSelected: (Uri) -> Unit,
     onBack: () -> Unit
 ) {
+    val context         = LocalContext.current
     var name            by remember { mutableStateOf(currentName) }
     var username        by remember { mutableStateOf(currentUsername) }
     var region          by remember { mutableStateOf(currentRegion) }
     var showPhotoDialog by remember { mutableStateOf(false) }
+
+    // Camera: write to a temp file in cache, then upload on result
+    var cameraUri by remember { mutableStateOf<Uri?>(null) }
+    val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+        if (success) cameraUri?.let { onPhotoSelected(it) }
+    }
+
+    val galleryLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        uri?.let { onPhotoSelected(it) }
+    }
 
     val regions = TimeZoneRegion.entries
 
     if (showPhotoDialog) {
         DayPilotPhotoPickerDialog(
             onDismiss         = { showPhotoDialog = false },
-            onPickFromCamera  = onPickFromCamera,
-            onPickFromGallery = onPickFromGallery
+            onPickFromCamera  = {
+                showPhotoDialog = false
+                val tempFile = File(context.cacheDir, "avatar_temp.jpg")
+                val uri = FileProvider.getUriForFile(
+                    context,
+                    "${context.packageName}.fileprovider",
+                    tempFile
+                )
+                cameraUri = uri
+                cameraLauncher.launch(uri)
+            },
+            onPickFromGallery = {
+                showPhotoDialog = false
+                galleryLauncher.launch("image/*")
+            }
         )
     }
 

@@ -352,24 +352,23 @@ fun DayPilotNavGraph(
 
             // ── Profile ───────────────────────────────────────────
             composable(DayPilotDestinations.PROFILE) {
+                LaunchedEffect(Unit) { profileVM.refresh() }
                 val s by profileVM.uiState.collectAsState()
                 ProfileScreen(
-                    name             = s.name,
-                    username         = s.username,
-                    email            = s.email,
-                    memberSince      = s.memberSince,
-                    level            = s.level,
-                    totalPoints      = s.totalPoints,
-                    currentStreak    = s.currentStreak,
-                    longestStreak    = s.longestStreak,
-                    rankingPosition  = s.rankingPosition,
-                    pointsToday      = s.pointsToday,
-                    pointsFromTasks  = s.pointsFromTasks,
-                    pointsFromSteps  = s.pointsFromSteps,
-                    pointsFromHabits = s.pointsFromHabits,
-                    pointsFromTimers = s.pointsFromTimers,
-                    avatarUrl        = s.avatarUrl,
-                    weeklySummary    = s.weeklySummary,
+                    name                = s.name,
+                    username            = s.username,
+                    email               = s.email,
+                    memberSince         = s.memberSince,
+                    level               = s.level,
+                    totalPoints         = s.totalPoints,
+                    currentStreak       = s.currentStreak,
+                    longestStreak       = s.longestStreak,
+                    rankingPosition     = s.rankingPosition,
+                    pointsToday         = s.pointsToday,
+                    stepsToday          = s.stepsToday,
+                    tasksCompletedToday = s.tasksCompletedToday,
+                    avatarUrl           = s.avatarUrl,
+                    weeklySummary       = s.weeklySummary,
                     onNavigateToSettings = { navController.navigate(DayPilotDestinations.SETTINGS) }
                 )
             }
@@ -419,9 +418,8 @@ fun DayPilotNavGraph(
                     onNavigateToResetPassword = {
                         navController.navigate(DayPilotDestinations.RESET_PASSWORD)
                     },
-                    onPickFromCamera  = {},
-                    onPickFromGallery = {},
-                    onBack            = { navController.popBackStack() }
+                    onPhotoSelected = { uri -> profileVM.uploadAvatar(uri, context) },
+                    onBack          = { navController.popBackStack() }
                 )
             }
 
