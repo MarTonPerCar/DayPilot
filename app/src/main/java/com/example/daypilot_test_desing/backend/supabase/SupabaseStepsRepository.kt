@@ -73,8 +73,10 @@ class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepos
         (if (milestone2Awarded) 20 else 0) +
         (if (milestone3Awarded) 30 else 0)
 
-    override fun canChangeGoal(): Boolean =
-        (prefs.getString("goal_change_date", "") ?: "") != today()
+    // The active goal for today is always locked via the pending-goal mechanism.
+    // Users can update the pending goal as many times as they want; the change
+    // only takes effect the next day via applyPendingGoalIfNewDay().
+    override fun canChangeGoal(): Boolean = true
 
     override fun configureGoal(newGoal: Int) {
         prefs.edit()
@@ -129,6 +131,15 @@ class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepos
     }
 
     // ── Suspend (DB-backed) ───────────────────────────────────────────
+
+    override suspend fun syncSteps(steps: Int, goal: Int) {
+        val uid = supabase.auth.currentUserOrNull()?.id ?: return
+        try {
+            supabase.from("habits_daily").upsert(
+                HabitsDailyUpsertDto(userId = uid, date = today(), steps = steps, stepsGoal = goal)
+            )
+        } catch (_: Exception) { }
+    }
 
     override suspend fun getWeeklyStats(): StepsWeeklyStats {
         val uid = supabase.auth.currentUserOrNull()?.id ?: return StepsWeeklyStats()

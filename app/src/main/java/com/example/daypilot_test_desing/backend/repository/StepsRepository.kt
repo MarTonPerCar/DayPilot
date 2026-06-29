@@ -19,5 +19,6 @@ interface StepsRepository {
     fun resetMilestones()
 
     // ── DB-backed (suspend) ────────────────────────────────────────
+    suspend fun syncSteps(steps: Int, goal: Int)
     suspend fun getWeeklyStats(): StepsWeeklyStats
 }

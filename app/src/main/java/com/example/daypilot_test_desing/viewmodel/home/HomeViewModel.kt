@@ -53,7 +53,7 @@ class HomeViewModel(
                 _uiState.value = HomeUiState(
                     userName            = user.name,
                     streak              = user.currentStreak,
-                    stepsToday          = today.steps,
+                    stepsToday          = stepsRepo.getCurrentSteps(),
                     stepsGoal           = stepsRepo.getGoalSteps(),
                     tasksCompleted      = uniqueTasks.count { it.isDone },
                     tasksTotal          = uniqueTasks.size,

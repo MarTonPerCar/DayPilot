@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.daypilot_test_desing.backend.repository.StepsRepository
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -33,6 +34,7 @@ class StepsViewModel(
     private val stepSensor    = sensorManager?.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
 
     private var baseline: Int = -1
+    private var lastSyncedSteps: Int = -1
 
     private val sensorListener = object : SensorEventListener {
         override fun onSensorChanged(event: SensorEvent) {
@@ -54,6 +56,10 @@ class StepsViewModel(
             val dailySteps = maxOf(0, totalSinceBoot - baseline)
             stepsRepo.setSteps(dailySteps)
             updateLocalState()
+            // Stage 1: sync to DB whenever 100+ steps accumulated since last write
+            if (lastSyncedSteps < 0 || dailySteps - lastSyncedSteps >= 100) {
+                triggerSync(dailySteps)
+            }
         }
         override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
     }
@@ -65,6 +71,14 @@ class StepsViewModel(
         viewModelScope.launch { loadWeeklyStats() }
         updateLocalState()
         _uiState.update { it.copy(sensorAvailable = stepSensor != null) }
+        // Stage 2: periodic sync every 10 minutes
+        viewModelScope.launch {
+            while (true) {
+                delay(10 * 60_000L)
+                val steps = stepsRepo.getCurrentSteps()
+                if (steps != lastSyncedSteps) triggerSync(steps)
+            }
+        }
     }
 
     override fun onCleared() {
@@ -72,8 +86,17 @@ class StepsViewModel(
     }
 
     fun refresh() {
+        // Stage 3: sync on app open / foreground return
+        triggerSync()
         updateLocalState()
         viewModelScope.launch { loadWeeklyStats() }
+    }
+
+    // Writes current steps to habits_daily; DB trigger propagates to daily_progress.
+    private fun triggerSync(steps: Int = stepsRepo.getCurrentSteps()) {
+        lastSyncedSteps = steps
+        val goal = stepsRepo.getGoalSteps()
+        viewModelScope.launch { stepsRepo.syncSteps(steps, goal) }
     }
 
     fun configureGoal(newGoal: Int) {

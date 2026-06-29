@@ -425,6 +425,7 @@ fun DayPilotNavGraph(
 
             // ── Progress ─────────────────────────────────────────
             composable(DayPilotDestinations.PROGRESS) {
+                LaunchedEffect(Unit) { progressVM.refresh() }
                 val s by progressVM.uiState.collectAsState()
                 ProgressScreen(
                     progressData    = s.progressData,
