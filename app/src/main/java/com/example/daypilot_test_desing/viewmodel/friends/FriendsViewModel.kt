@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.daypilot_test_desing.backend.model.ReactionType
 import com.example.daypilot_test_desing.backend.repository.FriendRepository
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,7 +18,7 @@ class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
 
     init { viewModelScope.launch { load() } }
 
-    fun refresh() { viewModelScope.launch { load() } }
+    fun refresh(): Job = viewModelScope.launch { load() }
 
     private suspend fun load() {
         try {

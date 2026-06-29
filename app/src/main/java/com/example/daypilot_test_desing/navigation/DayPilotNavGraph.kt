@@ -22,6 +22,7 @@ import androidx.navigation.navArgument
 import android.app.Application
 import android.content.Context
 import androidx.compose.runtime.remember
+import kotlinx.coroutines.joinAll
 import com.example.daypilot_test_desing.backend.supabase.SupabaseFriendRepository
 import com.example.daypilot_test_desing.backend.supabase.SupabaseProgressRepository
 import com.example.daypilot_test_desing.backend.supabase.SupabaseRankingRepository
@@ -115,9 +116,24 @@ fun DayPilotNavGraph(
     LaunchedEffect(sessionState) {
         val current = navController.currentBackStackEntry?.destination?.route
         when (sessionState) {
+            AppSessionViewModel.State.DataLoading -> {
+                // Refresh all data in parallel while the LoadingScreen is still visible.
+                // joinAll() waits for every Job to complete before marking data as ready.
+                // There is no offline queue to flush first — all Supabase writes in this
+                // app are fire-and-immediate, so the fresh load below is always authoritative.
+                listOf(
+                    homeVM.refresh(),
+                    calendarVM.refresh(),
+                    profileVM.refresh(),
+                    progressVM.refresh(),
+                    friendsVM.refresh(),
+                    rivalryVM.refresh(),
+                    settingsVM.refresh(),
+                ).joinAll()
+                sessionVM.markDataLoaded()
+            }
             AppSessionViewModel.State.Authenticated -> {
-                sessionVM.loadAll(calendarVM::refresh, homeVM::refresh)
-                // From LOADING or AUTH go to HOME; never navigate if already inside the app.
+                // Data is already loaded; just navigate to HOME.
                 if (current == DayPilotDestinations.LOADING ||
                     current == DayPilotDestinations.AUTH   ||
                     current == null) {

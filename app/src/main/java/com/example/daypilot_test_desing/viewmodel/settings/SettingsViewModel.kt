@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.daypilot_test_desing.backend.preferences.AppPreferences
 import com.example.daypilot_test_desing.backend.repository.UserRepository
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,6 +24,8 @@ class SettingsViewModel(
     val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
 
     init { viewModelScope.launch { loadUserName() } }
+
+    fun refresh(): Job = viewModelScope.launch { loadUserName() }
 
     private fun loadPrefsState() = SettingsUiState(
         isDarkMode           = prefs.isDarkMode,

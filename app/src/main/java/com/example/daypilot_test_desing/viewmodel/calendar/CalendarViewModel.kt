@@ -8,6 +8,7 @@ import com.example.daypilot_test_desing.backend.model.TaskCategory
 import com.example.daypilot_test_desing.backend.model.TaskDifficulty
 import com.example.daypilot_test_desing.backend.repository.ProgressRepository
 import com.example.daypilot_test_desing.backend.repository.TaskRepository
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,21 +23,19 @@ class CalendarViewModel(
     private val _uiState = MutableStateFlow(CalendarUiState(isLoading = true))
     val uiState: StateFlow<CalendarUiState> = _uiState.asStateFlow()
 
-    init { load() }
+    init { refresh() }
 
-    private fun load() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
-            try {
-                val tasks = taskRepo.getTasks()
-                _uiState.update { it.copy(tasks = tasks, isLoading = false) }
-            } catch (e: Exception) {
-                _uiState.update { it.copy(isLoading = false, error = e.message) }
-            }
+    private suspend fun load() {
+        _uiState.update { it.copy(isLoading = true, error = null) }
+        try {
+            val tasks = taskRepo.getTasks()
+            _uiState.update { it.copy(tasks = tasks, isLoading = false) }
+        } catch (e: Exception) {
+            _uiState.update { it.copy(isLoading = false, error = e.message) }
         }
     }
 
-    fun refresh() { load() }
+    fun refresh(): Job = viewModelScope.launch { load() }
 
     fun addTask(data: NewTaskData) {
         viewModelScope.launch {

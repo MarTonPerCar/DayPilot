@@ -9,6 +9,7 @@ import com.example.daypilot_test_desing.backend.repository.ProgressRepository
 import com.example.daypilot_test_desing.backend.repository.StepsRepository
 import com.example.daypilot_test_desing.backend.repository.TaskRepository
 import com.example.daypilot_test_desing.backend.repository.UserRepository
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,8 +27,7 @@ class HomeViewModel(
 
     init { refresh() }
 
-    fun refresh() {
-        viewModelScope.launch {
+    fun refresh(): Job = viewModelScope.launch {
             try {
                 val user     = userRepo.getCurrentUser()
                 val tasks    = taskRepo.getTasks()
@@ -53,7 +53,6 @@ class HomeViewModel(
                     timerCompletedToday = today.timerPoints > 0
                 )
             } catch (_: Exception) { }
-        }
     }
 
     companion object {

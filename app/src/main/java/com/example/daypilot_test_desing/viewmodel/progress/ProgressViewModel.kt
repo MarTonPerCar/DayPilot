@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.daypilot_test_desing.backend.model.DayProgress
 import com.example.daypilot_test_desing.backend.preferences.AppPreferences
 import com.example.daypilot_test_desing.backend.repository.ProgressRepository
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,7 +29,7 @@ class ProgressViewModel(
 
     init { viewModelScope.launch { load() } }
 
-    fun refresh() { viewModelScope.launch { load() } }
+    fun refresh(): Job = viewModelScope.launch { load() }
 
     private suspend fun load() {
         try {

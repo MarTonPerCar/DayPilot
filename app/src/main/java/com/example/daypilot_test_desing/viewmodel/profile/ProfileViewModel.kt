@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.daypilot_test_desing.backend.model.TimeZoneRegion
 import com.example.daypilot_test_desing.backend.repository.ProgressRepository
 import com.example.daypilot_test_desing.backend.repository.UserRepository
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,7 +22,7 @@ class ProfileViewModel(
 
     init { viewModelScope.launch { load() } }
 
-    fun refresh() { viewModelScope.launch { load() } }
+    fun refresh(): Job = viewModelScope.launch { load() }
 
     private suspend fun load() {
         try {

@@ -25,6 +25,7 @@ class AppSessionViewModel : ViewModel() {
 
     sealed class State {
         data object Loading : State()
+        data object DataLoading : State()  // session confirmed, waiting for data fetch
         data object Authenticated : State()
         data object Unauthenticated : State()
     }
@@ -40,7 +41,7 @@ class AppSessionViewModel : ViewModel() {
                 // Without this, currentUserOrNull() always returns null on a cold start
                 // because the async storage load hasn't completed yet.
                 supabase.auth.awaitInitialization()
-                if (supabase.auth.currentUserOrNull() != null) State.Authenticated
+                if (supabase.auth.currentUserOrNull() != null) State.DataLoading
                 else State.Unauthenticated
             } catch (_: Exception) {
                 State.Unauthenticated
@@ -50,15 +51,12 @@ class AppSessionViewModel : ViewModel() {
 
     /** Call immediately after a successful login or registration. */
     fun notifyAuthenticated() {
-        _state.value = State.Authenticated
+        _state.value = State.DataLoading
     }
 
-    /**
-     * Triggers all user-data loaders. Pass each ViewModel's refresh function.
-     * Example: loadAll(calendarVM::refresh, homeVM::refresh)
-     */
-    fun loadAll(vararg loaders: () -> Unit) {
-        loaders.forEach { it() }
+    /** Call after all ViewModel data has been loaded; triggers navigation to HOME. */
+    fun markDataLoaded() {
+        _state.value = State.Authenticated
     }
 
     /** Signs the user out of Supabase and marks the session as gone. */
