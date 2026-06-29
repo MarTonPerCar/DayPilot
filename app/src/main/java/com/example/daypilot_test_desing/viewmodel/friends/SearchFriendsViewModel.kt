@@ -30,6 +30,8 @@ class SearchFriendsViewModel(private val repo: FriendRepository) : ViewModel() {
         _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
             try {
+                // Refresh friend IDs on every search so removed friends appear again immediately.
+                friendIds = try { repo.getFriendIds() } catch (_: Exception) { emptyList() }.toSet()
                 val results = repo.searchUsers(query)
                 val sentIds = _uiState.value.sentRequestUserIds
                 _uiState.update {
