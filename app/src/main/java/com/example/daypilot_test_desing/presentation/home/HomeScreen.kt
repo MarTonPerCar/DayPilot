@@ -116,7 +116,7 @@ fun HomeScreen(
                             section  = HomeSection.RIVALRY,
                             data     = HomeSectionData.Rivalry(
                                 position     = rankingPosition,
-                                totalFriends = friendCount
+                                totalFriends = if (friendCount > 0) friendCount + 1 else 0
                             ),
                             onClick  = onNavigateToRivalry,
                             modifier = Modifier

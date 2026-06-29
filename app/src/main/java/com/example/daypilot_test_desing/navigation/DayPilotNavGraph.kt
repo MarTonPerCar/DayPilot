@@ -110,6 +110,13 @@ fun DayPilotNavGraph(
         homeVM.refresh()
     }
 
+    // Refresh home data every time the user lands on HOME so friend/ranking
+    // counts are always up-to-date (avoids race conditions with accept/remove
+    // friend callbacks that fire before the Supabase write completes).
+    LaunchedEffect(currentRoute) {
+        if (currentRoute == DayPilotDestinations.HOME) homeVM.refresh()
+    }
+
     // Session restoration: on startup, skip AUTH if a saved session exists;
     // on logout, return to AUTH from wherever the user is.
     val sessionState by sessionVM.state.collectAsState()

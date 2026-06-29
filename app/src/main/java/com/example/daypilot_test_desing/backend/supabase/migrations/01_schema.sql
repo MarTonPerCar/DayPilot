@@ -818,3 +818,62 @@ USING (
     auth.uid() = from_user_id
     OR auth.uid() = to_user_id
 );
+
+
+-- =============================================
+-- MIGRATION PATCH (apply to existing databases)
+-- Run this section in Supabase SQL Editor if the
+-- schema was deployed before this fix was added.
+-- =============================================
+
+-- 1. Recreate friends_ranking VIEW with COALESCE so current_streak is never
+--    NULL (was causing FriendsRankingDto deserialization to fail silently).
+CREATE OR REPLACE VIEW friends_ranking WITH (security_invoker = true) AS
+SELECT
+    u.id,
+    u.name,
+    u.username,
+    u.photo_url,
+    u.level,
+    COALESCE(us.current_streak, 0) AS current_streak,
+    COALESCE(SUM(udl.total_points), 0) + COALESCE(MAX(dp.total_points), 0) AS points_last_30_days
+FROM users u
+LEFT JOIN user_streaks us
+    ON us.user_id = u.id
+LEFT JOIN user_daily_log udl
+    ON udl.user_id = u.id
+    AND udl.date >= CURRENT_DATE - INTERVAL '30 days'
+LEFT JOIN daily_progress dp
+    ON dp.user_id = u.id
+GROUP BY u.id, u.name, u.username, u.photo_url, u.level, COALESCE(us.current_streak, 0);
+
+-- 2. Split streaks_own FOR ALL into a friends-readable SELECT + own-only writes,
+--    so the VIEW can read friends' actual streak values via security_invoker=true.
+DROP POLICY IF EXISTS "streaks_own"        ON user_streaks;
+DROP POLICY IF EXISTS "streaks_select"     ON user_streaks;
+DROP POLICY IF EXISTS "streaks_insert_own" ON user_streaks;
+DROP POLICY IF EXISTS "streaks_update_own" ON user_streaks;
+DROP POLICY IF EXISTS "streaks_delete_own" ON user_streaks;
+
+CREATE POLICY "streaks_select"
+ON user_streaks FOR SELECT
+USING (
+    auth.uid() = user_id
+    OR EXISTS (
+        SELECT 1 FROM friends
+        WHERE (requester_id = auth.uid() AND receiver_id = user_id)
+        OR    (receiver_id = auth.uid() AND requester_id = user_id)
+    )
+);
+
+CREATE POLICY "streaks_insert_own"
+ON user_streaks FOR INSERT
+WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "streaks_update_own"
+ON user_streaks FOR UPDATE
+USING (auth.uid() = user_id);
+
+CREATE POLICY "streaks_delete_own"
+ON user_streaks FOR DELETE
+USING (auth.uid() = user_id);
