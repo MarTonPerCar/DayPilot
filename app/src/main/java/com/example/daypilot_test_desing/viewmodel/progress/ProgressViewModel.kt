@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.daypilot_test_desing.backend.model.DayProgress
 import com.example.daypilot_test_desing.backend.preferences.AppPreferences
+import java.util.Calendar
 import com.example.daypilot_test_desing.backend.repository.ProgressRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,21 +34,30 @@ class ProgressViewModel(
 
     private suspend fun load() {
         try {
-            val today   = repo.getTodayProgress()
-            val history = repo.getHistory(7)
+            val todayProgress = repo.getTodayProgress()
+            // Closed days descending → reverse to chronological, then append today
+            val history = repo.getHistory(30)
             val ranking = repo.getRankingPosition()
-            val progressData = history.map { log ->
+            val closedData = history.reversed().map { log ->
                 val day = log.date.substringAfterLast("-").toIntOrNull() ?: 0
                 DayProgress(day = day, points = log.totalPoints, steps = log.steps, tasksCompleted = log.tasksCompleted)
             }
+            val todayDayNum = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
+            val progressData = closedData + DayProgress(
+                day            = todayDayNum,
+                points         = todayProgress.totalPoints,
+                steps          = todayProgress.steps,
+                tasksCompleted = todayProgress.tasksCompleted,
+                isToday        = true
+            )
             _uiState.value = ProgressUiState(
                 progressData        = progressData,
                 rankingPosition     = ranking,
-                pointsToday         = today.totalPoints,
-                pointsFromTasks     = today.tasksPoints,
-                pointsFromSteps     = today.stepsPoints,
-                pointsFromHabits    = today.techHealthPoints + today.wellnessPoints,
-                pointsFromTimers    = today.timerPoints,
+                pointsToday         = todayProgress.totalPoints,
+                pointsFromTasks     = todayProgress.tasksPoints,
+                pointsFromSteps     = todayProgress.stepsPoints,
+                pointsFromHabits    = todayProgress.techHealthPoints + todayProgress.wellnessPoints,
+                pointsFromTimers    = todayProgress.timerPoints,
                 timerCompletedToday = appPrefs.timerPointsDate == today()
             )
         } catch (_: Exception) { }

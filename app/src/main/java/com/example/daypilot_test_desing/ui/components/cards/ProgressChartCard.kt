@@ -76,6 +76,8 @@ fun ProgressChartCard(
     val best = values.maxOrNull()?.toInt() ?: 0
 
     val textMeasurer = rememberTextMeasurer()
+    val todayIndex   = data.indexOfFirst { it.isToday }
+    val dayLabels    = data.map { it.day }
 
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -240,13 +242,31 @@ fun ProgressChartCard(
                         }
                     }
 
-                    // ── Eje X — etiquetas días ────────────────────
+                    // ── Línea vertical "hoy" ─────────────────────
+                    if (todayIndex >= 0) {
+                        val todayX = yAxisWidth + todayIndex * barWidth + barWidth / 2
+                        drawLine(
+                            color       = Color.Black,
+                            start       = Offset(todayX, 0f),
+                            end         = Offset(todayX, chartHeight),
+                            strokeWidth = 2.5.dp.toPx()
+                        )
+                    }
+
+                    // ── Eje X — etiquetas en múltiplos de 5 + hoy ─
                     animValues.forEachIndexed { index, _ ->
-                        if (index % 5 == 0 || index == animValues.lastIndex) {
+                        val showLabel = (index < dayLabels.size && dayLabels[index] % 5 == 0)
+                                || index == todayIndex
+                        if (showLabel) {
                             val x = yAxisWidth + index * barWidth + barWidth / 2
+                            val label = if (index < dayLabels.size) dayLabels[index].toString()
+                                        else (index + 1).toString()
+                            val labelColor = if (index == todayIndex) Color.Black else Color.Gray
                             val textLayout = textMeasurer.measure(
-                                text = AnnotatedString((index + 1).toString()),
-                                style = TextStyle(fontSize = 8.sp, color = Color.Gray)
+                                text = AnnotatedString(label),
+                                style = TextStyle(fontSize = 8.sp, color = labelColor,
+                                    fontWeight = if (index == todayIndex) FontWeight.Bold
+                                                 else FontWeight.Normal)
                             )
                             drawText(
                                 textLayoutResult = textLayout,

@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.daypilot_test_desing.backend.model.DayProgress
-import com.example.daypilot_test_desing.backend.repository.FriendRepository
 import java.util.Calendar
+import com.example.daypilot_test_desing.backend.repository.FriendRepository
 import com.example.daypilot_test_desing.backend.repository.ProgressRepository
 import com.example.daypilot_test_desing.backend.repository.StepsRepository
 import com.example.daypilot_test_desing.backend.repository.TaskRepository
@@ -30,31 +30,33 @@ class HomeViewModel(
 
     fun refresh(): Job = viewModelScope.launch {
             try {
-                val cal       = Calendar.getInstance()
-                val todayDay  = cal.get(Calendar.DAY_OF_MONTH)
-                val todayMon  = cal.get(Calendar.MONTH) + 1
-                val todayYear = cal.get(Calendar.YEAR)
-
-                val user     = userRepo.getCurrentUser()
-                val allTasks = taskRepo.getTasks()
-                val todayTasks = allTasks.filter {
-                    it.day == todayDay && it.month == todayMon && it.year == todayYear
-                }
+                val user        = userRepo.getCurrentUser()
+                val allTasks    = taskRepo.getTasks()
+                // Count unique tasks (by id) to avoid inflating count with recurring task_days
+                val uniqueTasks = allTasks.distinctBy { it.id }
                 val today    = progressRepo.getTodayProgress()
-                val history  = progressRepo.getHistory(7)
+                val history  = progressRepo.getHistory(30)
                 val ranking  = progressRepo.getRankingPosition()
                 val friends  = friendRepo.getFriends()
-                val progressData = history.map { log ->
+                val closedData = history.reversed().map { log ->
                     val day = log.date.substringAfterLast("-").toIntOrNull() ?: 0
                     DayProgress(day = day, points = log.totalPoints, steps = log.steps, tasksCompleted = log.tasksCompleted)
                 }
+                val todayDayNum = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
+                val progressData = closedData + DayProgress(
+                    day            = todayDayNum,
+                    points         = today.totalPoints,
+                    steps          = today.steps,
+                    tasksCompleted = today.tasksCompleted,
+                    isToday        = true
+                )
                 _uiState.value = HomeUiState(
                     userName            = user.name,
                     streak              = user.currentStreak,
-                    stepsToday          = stepsRepo.getCurrentSteps(),
+                    stepsToday          = today.steps,
                     stepsGoal           = stepsRepo.getGoalSteps(),
-                    tasksCompleted      = todayTasks.count { it.isDone },
-                    tasksTotal          = todayTasks.size,
+                    tasksCompleted      = uniqueTasks.count { it.isDone },
+                    tasksTotal          = uniqueTasks.size,
                     progressData        = progressData,
                     pointsToday         = today.totalPoints,
                     rankingPosition     = ranking,

@@ -7,7 +7,8 @@ data class DayProgress(
     val day: Int,
     val points: Int,
     val steps: Int,
-    val tasksCompleted: Int
+    val tasksCompleted: Int,
+    val isToday: Boolean = false
 )
 
 enum class ProgressFilter(@StringRes val labelRes: Int) {
