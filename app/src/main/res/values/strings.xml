@@ -420,6 +420,11 @@
     <string name="user_add_friend">Añadir amigo</string>
     <string name="user_accept_request">Aceptar</string>
     <string name="user_reject_request">Rechazar</string>
+    <string name="user_request_sent">Solicitud enviada</string>
+    <string name="user_request_sent_dialog_title">Solicitud enviada</string>
+    <string name="user_request_sent_dialog_message">Tu solicitud de amistad fue enviada correctamente.</string>
+    <string name="user_request_sent_dialog_button">Entendido</string>
+    <string name="weekly_summary_no_data">Sin resumen semanal disponible aún</string>
 
 
     <!-- App Limit Form -->

@@ -13,4 +13,5 @@ interface FriendRepository {
     suspend fun searchUsers(query: String): List<SearchUserData>
     suspend fun addFriend(userId: String)
     suspend fun removeFriend(userId: String)
+    suspend fun getPendingSentRequestUserIds(): List<String>
 }

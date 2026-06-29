@@ -74,3 +74,16 @@ data class InsertReactionDto(
     @SerialName("weekly_summary_id") val weeklySummaryId: String,
     val type: String
 )
+
+@Serializable
+data class ReactionDto(
+    @SerialName("from_user_id") val fromUserId: String,
+    @SerialName("to_user_id") val toUserId: String,
+    @SerialName("weekly_summary_id") val weeklySummaryId: String,
+    val type: String
+)
+
+@Serializable
+data class SentRequestDto(
+    @SerialName("to_user_id") val toUserId: String
+)

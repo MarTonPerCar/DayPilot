@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.R
@@ -94,7 +95,8 @@ fun UserSearchCard(
     streak: Int,
     onAddFriend: () -> Unit,
     modifier: Modifier = Modifier,
-    avatarUrl: String? = null
+    avatarUrl: String? = null,
+    hasPendingRequest: Boolean = false
 ) {
     UserCardBase(
         name = name,
@@ -104,19 +106,46 @@ fun UserSearchCard(
         avatarUrl = avatarUrl,
         modifier = modifier,
         action = {
-            Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primary),
-                contentAlignment = Alignment.Center
-            ) {
-                DayPilotIconButton(
-                    icon = Icons.Default.Add,
-                    onClick = onAddFriend,
-                    contentDescription = stringResource(R.string.user_add_friend),
-                    tint = MaterialTheme.colorScheme.onPrimary
-                )
+            if (hasPendingRequest) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(36.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.4f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        DayPilotIconButton(
+                            icon = Icons.Default.Check,
+                            onClick = {},
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Text(
+                        text = stringResource(R.string.user_request_sent),
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            } else {
+                Box(
+                    modifier = Modifier
+                        .size(36.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primary),
+                    contentAlignment = Alignment.Center
+                ) {
+                    DayPilotIconButton(
+                        icon = Icons.Default.Add,
+                        onClick = onAddFriend,
+                        contentDescription = stringResource(R.string.user_add_friend),
+                        tint = MaterialTheme.colorScheme.onPrimary
+                    )
+                }
             }
         }
     )

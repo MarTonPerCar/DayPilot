@@ -1,6 +1,7 @@
 package com.example.daypilot_test_desing.backend.supabase
 
 import com.example.daypilot_test_desing.backend.model.FriendData
+import com.example.daypilot_test_desing.backend.model.FriendWeeklySummary
 import com.example.daypilot_test_desing.backend.model.ReactionType
 import com.example.daypilot_test_desing.backend.model.SearchUserData
 import com.example.daypilot_test_desing.backend.repository.FriendRepository
@@ -9,6 +10,8 @@ import com.example.daypilot_test_desing.backend.supabase.dto.FriendRowDto
 import com.example.daypilot_test_desing.backend.supabase.dto.InsertFriendDto
 import com.example.daypilot_test_desing.backend.supabase.dto.InsertFriendRequestDto
 import com.example.daypilot_test_desing.backend.supabase.dto.InsertReactionDto
+import com.example.daypilot_test_desing.backend.supabase.dto.ReactionDto
+import com.example.daypilot_test_desing.backend.supabase.dto.SentRequestDto
 import com.example.daypilot_test_desing.backend.supabase.dto.UserDto
 import com.example.daypilot_test_desing.backend.supabase.dto.UserStreakDto
 import com.example.daypilot_test_desing.backend.supabase.dto.WeeklySummaryRowDto
@@ -41,32 +44,76 @@ class SupabaseFriendRepository : FriendRepository {
         } catch (_: Exception) { emptyMap() }
     }
 
+    // Two separate queries to avoid OR-filter PostgREST issues.
+    private suspend fun getFriendIds(uid: String): List<String> {
+        val asRequester = try {
+            supabase.from("friends").select {
+                filter { eq("requester_id", uid) }
+            }.decodeList<FriendRowDto>().map { it.receiverId }
+        } catch (_: Exception) { emptyList() }
+
+        val asReceiver = try {
+            supabase.from("friends").select {
+                filter { eq("receiver_id", uid) }
+            }.decodeList<FriendRowDto>().map { it.requesterId }
+        } catch (_: Exception) { emptyList() }
+
+        return (asRequester + asReceiver).distinct()
+    }
+
     override suspend fun getFriends(): List<FriendData> {
         val uid = userId() ?: return emptyList()
         return try {
-            val rows = supabase.from("friends").select {
-                filter {
-                    or {
-                        eq("requester_id", uid)
-                        eq("receiver_id", uid)
-                    }
-                }
-            }.decodeList<FriendRowDto>()
-
-            val friendIds = rows.map { if (it.requesterId == uid) it.receiverId else it.requesterId }
+            val friendIds = getFriendIds(uid)
             if (friendIds.isEmpty()) return emptyList()
 
             val users   = getUsersForIds(friendIds)
             val streaks = getStreaksForIds(friendIds)
 
+            // Most-recent weekly summary per friend
+            val allSummaries = try {
+                supabase.from("user_weekly_summary").select {
+                    filter { isIn("user_id", friendIds) }
+                    order("week_start", Order.DESCENDING)
+                }.decodeList<WeeklySummaryRowDto>()
+            } catch (_: Exception) { emptyList() }
+            val summaryByUser = allSummaries.groupBy { it.userId }.mapValues { it.value.first() }
+
+            // My reactions to those summaries
+            val summaryIds = summaryByUser.values.map { it.id }
+            val myReactions = if (summaryIds.isNotEmpty()) {
+                try {
+                    supabase.from("reactions").select {
+                        filter {
+                            eq("from_user_id", uid)
+                            isIn("weekly_summary_id", summaryIds)
+                        }
+                    }.decodeList<ReactionDto>()
+                } catch (_: Exception) { emptyList() }
+            } else emptyList()
+            val reactionBySummaryId = myReactions.associate { it.weeklySummaryId to it.type }
+
             users.map { user ->
+                val summary = summaryByUser[user.id]
+                val weeklySummary = summary?.let {
+                    FriendWeeklySummary(
+                        totalPoints    = it.totalPoints,
+                        tasksCompleted = it.totalTasksCompleted,
+                        totalSteps     = it.totalSteps,
+                        bestStreak     = it.bestStreak,
+                        myReaction     = reactionBySummaryId[it.id]?.let { typeName ->
+                            ReactionType.entries.firstOrNull { rt -> rt.name.lowercase() == typeName }
+                        }
+                    )
+                }
                 FriendData(
-                    id        = user.id,
-                    name      = user.name,
-                    email     = user.email,
-                    points    = user.totalPointsHistorical,
-                    streak    = streaks[user.id] ?: 0,
-                    avatarUrl = user.photoUrl
+                    id            = user.id,
+                    name          = user.name,
+                    email         = user.email,
+                    points        = user.totalPointsHistorical,
+                    streak        = streaks[user.id] ?: 0,
+                    avatarUrl     = user.photoUrl,
+                    weeklySummary = weeklySummary
                 )
             }
         } catch (_: Exception) { emptyList() }
@@ -148,9 +195,16 @@ class SupabaseFriendRepository : FriendRepository {
     override suspend fun searchUsers(query: String): List<SearchUserData> {
         if (query.isBlank()) return emptyList()
         val uid = userId()
+        val q = query.lowercase()
         return try {
+            // Search by username_lower OR email
             supabase.from("users").select {
-                filter { ilike("username_lower", "%${query.lowercase()}%") }
+                filter {
+                    or {
+                        ilike("username_lower", "%$q%")
+                        ilike("email", "%$q%")
+                    }
+                }
                 limit(20)
             }.decodeList<UserDto>()
                 .filter { it.id != uid }
@@ -178,13 +232,26 @@ class SupabaseFriendRepository : FriendRepository {
 
     override suspend fun removeFriend(userId: String) {
         val uid = this.userId() ?: return
+        // Try both directions — exactly one will match the stored friendship row.
         try {
             supabase.from("friends").delete {
                 filter { eq("requester_id", uid); eq("receiver_id", userId) }
             }
+        } catch (_: Exception) { }
+        try {
             supabase.from("friends").delete {
                 filter { eq("requester_id", userId); eq("receiver_id", uid) }
             }
         } catch (_: Exception) { }
+    }
+
+    override suspend fun getPendingSentRequestUserIds(): List<String> {
+        val uid = userId() ?: return emptyList()
+        return try {
+            supabase.from("friend_requests").select {
+                filter { eq("from_user_id", uid) }
+            }.decodeList<SentRequestDto>()
+                .map { it.toUserId }
+        } catch (_: Exception) { emptyList() }
     }
 }

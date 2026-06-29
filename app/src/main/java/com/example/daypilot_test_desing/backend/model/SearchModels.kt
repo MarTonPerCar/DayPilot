@@ -6,5 +6,6 @@ data class SearchUserData(
     val email: String,
     val points: Int,
     val streak: Int,
-    val avatarUrl: String? = null
+    val avatarUrl: String? = null,
+    val hasPendingRequest: Boolean = false
 )

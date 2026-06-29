@@ -59,10 +59,17 @@ class SupabaseProgressRepository : ProgressRepository {
     override suspend fun getRankingPosition(): Int {
         val uid = userId() ?: return 0
         return try {
-            val friendIds = supabase.from("friends").select {
-                filter { or { eq("requester_id", uid); eq("receiver_id", uid) } }
-            }.decodeList<FriendRowDto>()
-                .map { if (it.requesterId == uid) it.receiverId else it.requesterId }
+            val asRequester = try {
+                supabase.from("friends").select {
+                    filter { eq("requester_id", uid) }
+                }.decodeList<FriendRowDto>().map { it.receiverId }
+            } catch (_: Exception) { emptyList() }
+            val asReceiver = try {
+                supabase.from("friends").select {
+                    filter { eq("receiver_id", uid) }
+                }.decodeList<FriendRowDto>().map { it.requesterId }
+            } catch (_: Exception) { emptyList() }
+            val friendIds = (asRequester + asReceiver).distinct()
             val allIds = (friendIds + uid).distinct()
             val ranking = supabase.from("friends_ranking").select {
                 filter { isIn("id", allIds) }

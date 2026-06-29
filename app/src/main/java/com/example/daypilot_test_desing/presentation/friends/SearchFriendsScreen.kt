@@ -24,11 +24,33 @@ import com.example.daypilot_test_desing.backend.model.SearchUserData
 fun SearchFriendsScreen(
     searchResults: List<SearchUserData>,
     isLoading: Boolean = false,
+    requestJustSent: Boolean = false,
     onSearch: (query: String) -> Unit,
     onAddFriend: (userId: String) -> Unit,
+    onConfirmationDismissed: () -> Unit = {},
     onBack: () -> Unit
 ) {
     var query by remember { mutableStateOf("") }
+
+    // Confirmation dialog after sending a request
+    if (requestJustSent) {
+        AlertDialog(
+            onDismissRequest = {
+                onConfirmationDismissed()
+                onBack()
+            },
+            title = { Text(stringResource(R.string.user_request_sent_dialog_title)) },
+            text  = { Text(stringResource(R.string.user_request_sent_dialog_message)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    onConfirmationDismissed()
+                    onBack()
+                }) {
+                    Text(stringResource(R.string.user_request_sent_dialog_button))
+                }
+            }
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -46,7 +68,6 @@ fun SearchFriendsScreen(
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // ── Campo de búsqueda ────────────────────────────────
             OutlinedTextField(
                 value         = query,
                 onValueChange = {
@@ -90,16 +111,13 @@ fun SearchFriendsScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // ── Resultados ───────────────────────────────────────
             when {
                 isLoading -> {
                     Box(
                         modifier         = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        CircularProgressIndicator(
-                            color = MaterialTheme.colorScheme.primary
-                        )
+                        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                     }
                 }
 
@@ -118,16 +136,15 @@ fun SearchFriendsScreen(
                 }
 
                 else -> {
-                    LazyColumn(
-                        verticalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
+                    LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                         items(searchResults) { user ->
                             UserSearchCard(
-                                name        = user.name,
-                                email       = user.email,
-                                points      = user.points,
-                                streak      = user.streak,
-                                onAddFriend = { onAddFriend(user.id) }
+                                name               = user.name,
+                                email              = user.email,
+                                points             = user.points,
+                                streak             = user.streak,
+                                hasPendingRequest  = user.hasPendingRequest,
+                                onAddFriend        = { onAddFriend(user.id) }
                             )
                         }
                     }
@@ -136,4 +153,3 @@ fun SearchFriendsScreen(
         }
     }
 }
-

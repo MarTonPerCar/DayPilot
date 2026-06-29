@@ -12,12 +12,19 @@ class SupabaseRankingRepository : RankingRepository {
 
     private fun userId() = supabase.auth.currentUserOrNull()?.id ?: ""
 
-    private suspend fun getFriendIds(uid: String): List<String> = try {
-        supabase.from("friends").select {
-            filter { or { eq("requester_id", uid); eq("receiver_id", uid) } }
-        }.decodeList<FriendRowDto>()
-            .map { if (it.requesterId == uid) it.receiverId else it.requesterId }
-    } catch (_: Exception) { emptyList() }
+    private suspend fun getFriendIds(uid: String): List<String> {
+        val asRequester = try {
+            supabase.from("friends").select {
+                filter { eq("requester_id", uid) }
+            }.decodeList<FriendRowDto>().map { it.receiverId }
+        } catch (_: Exception) { emptyList() }
+        val asReceiver = try {
+            supabase.from("friends").select {
+                filter { eq("receiver_id", uid) }
+            }.decodeList<FriendRowDto>().map { it.requesterId }
+        } catch (_: Exception) { emptyList() }
+        return (asRequester + asReceiver).distinct()
+    }
 
     // Returns me + friends sorted by 30-day points descending.
     private suspend fun buildRanking(uid: String): List<FriendsRankingDto> {

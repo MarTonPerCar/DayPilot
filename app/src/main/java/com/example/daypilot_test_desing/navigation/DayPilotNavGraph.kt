@@ -249,16 +249,19 @@ fun DayPilotNavGraph(
             composable(DayPilotDestinations.SEARCH_FRIENDS) {
                 val s by searchVM.uiState.collectAsState()
                 SearchFriendsScreen(
-                    searchResults = s.searchResults,
-                    isLoading     = s.isLoading,
-                    onSearch      = searchVM::search,
-                    onAddFriend   = { userId ->
-                        searchVM.addFriend(userId)
+                    searchResults        = s.searchResults,
+                    isLoading            = s.isLoading,
+                    requestJustSent      = s.requestJustSent,
+                    onSearch             = searchVM::search,
+                    onAddFriend          = searchVM::addFriend,
+                    onConfirmationDismissed = {
+                        searchVM.dismissConfirmation()
                         friendsVM.refresh()
                         rivalryVM.refresh()
                         homeVM.refresh()
+                        navController.popBackStack()
                     },
-                    onBack        = { navController.popBackStack() }
+                    onBack               = { navController.popBackStack() }
                 )
             }
 

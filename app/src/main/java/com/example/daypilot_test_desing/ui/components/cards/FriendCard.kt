@@ -83,15 +83,13 @@ fun FriendCard(
         }
 
         // ── Resumen semanal ──────────────────────────────────
+        DayPilotDivider()
         if (weeklySummary != null) {
-            DayPilotDivider()
-
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
             ) {
-                // Stats + botón +/-
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -129,13 +127,19 @@ fun FriendCard(
                         )
                     }
 
-                    // Botón +/-
                     DayPilotReactionButton(
                         selectedReaction = weeklySummary.myReaction,
                         onReact = onReact
                     )
                 }
             }
+        } else {
+            Text(
+                text = stringResource(R.string.weekly_summary_no_data),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)
+            )
         }
     }
 }
