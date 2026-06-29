@@ -159,6 +159,21 @@ fun ProgressChartCard(
                         )
                     }
 
+                    // ── Marca vertical "hoy" (detrás de la curva) ─
+                    if (todayIndex >= 0 && todayIndex < animValues.size) {
+                        val todayX    = yAxisWidth + todayIndex * barWidth + barWidth / 2
+                        val todayVal  = animValues[todayIndex]
+                        val topY      = if (chartMax > 0)
+                            chartHeight - (todayVal / chartMax) * chartHeight
+                        else chartHeight
+                        drawLine(
+                            color       = lineColor.copy(alpha = 0.75f),
+                            start       = Offset(todayX, chartHeight),
+                            end         = Offset(todayX, topY),
+                            strokeWidth = 2.5.dp.toPx()
+                        )
+                    }
+
                     // ── Puntos de la línea ────────────────────────
                     val points = animValues.mapIndexed { index, value ->
                         Offset(
@@ -242,17 +257,6 @@ fun ProgressChartCard(
                         }
                     }
 
-                    // ── Línea vertical "hoy" ─────────────────────
-                    if (todayIndex >= 0) {
-                        val todayX = yAxisWidth + todayIndex * barWidth + barWidth / 2
-                        drawLine(
-                            color       = Color.Black,
-                            start       = Offset(todayX, 0f),
-                            end         = Offset(todayX, chartHeight),
-                            strokeWidth = 2.5.dp.toPx()
-                        )
-                    }
-
                     // ── Eje X — etiquetas en múltiplos de 5 + hoy ─
                     animValues.forEachIndexed { index, _ ->
                         val showLabel = (index < dayLabels.size && dayLabels[index] % 5 == 0)
@@ -261,7 +265,7 @@ fun ProgressChartCard(
                             val x = yAxisWidth + index * barWidth + barWidth / 2
                             val label = if (index < dayLabels.size) dayLabels[index].toString()
                                         else (index + 1).toString()
-                            val labelColor = if (index == todayIndex) Color.Black else Color.Gray
+                            val labelColor = if (index == todayIndex) lineColor else Color.Gray
                             val textLayout = textMeasurer.measure(
                                 text = AnnotatedString(label),
                                 style = TextStyle(fontSize = 8.sp, color = labelColor,
