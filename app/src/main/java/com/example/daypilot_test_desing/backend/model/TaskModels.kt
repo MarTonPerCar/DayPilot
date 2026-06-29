@@ -38,7 +38,10 @@ data class CalendarTaskData(
     val category: TaskCategory,
     val difficulty: TaskDifficulty,
     val duration: Int,
-    val isDone: Boolean
+    val isDone: Boolean,
+    val description: String? = null,
+    val isRecurring: Boolean = false,
+    val hasReminder: Boolean = false
 )
 
 data class NewTaskData(
@@ -48,7 +51,11 @@ data class NewTaskData(
     val title: String,
     val category: TaskCategory,
     val difficulty: TaskDifficulty,
-    val duration: Int
+    val duration: Int,
+    val description: String = "",
+    val isRecurring: Boolean = false,
+    val hasReminder: Boolean = false,
+    val recurrenceDays: Int = 1
 )
 
 data class CalendarTaskDot(

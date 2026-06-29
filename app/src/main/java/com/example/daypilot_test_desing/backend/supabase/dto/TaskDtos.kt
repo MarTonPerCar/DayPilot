@@ -38,9 +38,12 @@ data class NewTaskDto(
     val id: String,
     @SerialName("user_id") val userId: String,
     val title: String,
+    val description: String? = null,
     val category: String,
     val difficulty: String,
-    @SerialName("estimated_minutes") val estimatedMinutes: Int
+    @SerialName("estimated_minutes") val estimatedMinutes: Int,
+    @SerialName("reminder_enabled") val reminderEnabled: Boolean = false,
+    @SerialName("is_recurring") val isRecurring: Boolean = false
 )
 
 /**

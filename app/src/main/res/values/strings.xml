@@ -406,6 +406,11 @@
 
     <!-- Task Cards -->
     <string name="task_reminder_icon">Recordatorio</string>
+    <string name="task_detail_description">Descripción</string>
+    <string name="task_detail_recurring">Tarea recurrente</string>
+    <string name="task_detail_reminder">Recordatorio activado</string>
+    <string name="task_mark_done">Marcar como completada</string>
+    <string name="task_mark_pending">Marcar como pendiente</string>
     <string name="task_delete_title">Eliminar tarea</string>
     <string name="task_delete_message">¿Seguro que quieres eliminar \"%1$s\"?</string>
 

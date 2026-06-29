@@ -48,10 +48,10 @@ class CalendarViewModel(
         }
     }
 
-    fun updateTask(id: String, title: String, category: TaskCategory, difficulty: TaskDifficulty, duration: Int) {
+    fun updateTask(id: String, title: String, category: TaskCategory, difficulty: TaskDifficulty, duration: Int, description: String = "") {
         viewModelScope.launch {
             try {
-                taskRepo.updateTask(id, title, category, difficulty, duration)
+                taskRepo.updateTask(id, title, category, difficulty, duration, description)
                 load()
             } catch (e: Exception) {
                 _uiState.update { it.copy(error = e.message) }

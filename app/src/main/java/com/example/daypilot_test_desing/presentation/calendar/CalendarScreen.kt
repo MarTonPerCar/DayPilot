@@ -38,29 +38,27 @@ fun CalendarScreen(
     onToggleTask: (String, Boolean) -> Unit,
     onDeleteTask: (String) -> Unit = {},
     onEditTask: (String) -> Unit = {},
-    onUpdateTask: (id: String, title: String, category: TaskCategory, difficulty: TaskDifficulty, duration: Int) -> Unit = { _, _, _, _, _ -> }
+    onUpdateTask: (id: String, title: String, category: TaskCategory, difficulty: TaskDifficulty, duration: Int, description: String) -> Unit = { _, _, _, _, _, _ -> }
 ) {
-    val now         = remember { Calendar.getInstance() }
-    val todayDay    = remember { now.get(Calendar.DAY_OF_MONTH) }
-    val todayMonth  = remember { now.get(Calendar.MONTH) + 1 }
-    val todayYear   = remember { now.get(Calendar.YEAR) }
+    val now        = remember { Calendar.getInstance() }
+    val todayDay   = remember { now.get(Calendar.DAY_OF_MONTH) }
+    val todayMonth = remember { now.get(Calendar.MONTH) + 1 }
+    val todayYear  = remember { now.get(Calendar.YEAR) }
 
     var currentMonth by remember { mutableIntStateOf(todayMonth) }
     var currentYear  by remember { mutableIntStateOf(todayYear) }
     var selectedDay  by remember { mutableStateOf<Int?>(todayDay) }
 
-    // Filtros
     var selectedDifficulty by remember { mutableStateOf<TaskDifficulty?>(null) }
     var selectedCategory   by remember { mutableStateOf<TaskCategory?>(null) }
 
-    // BottomSheet
     var showAddSheet  by remember { mutableStateOf(false) }
     var editingTaskId by remember { mutableStateOf<String?>(null) }
+    var detailTaskId  by remember { mutableStateOf<String?>(null) }
     var dayForNewTask by remember { mutableStateOf(1) }
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    // Helper: given a new month+year, pick the day to auto-select
     fun autoSelectDay(newMonth: Int, newYear: Int): Int = when {
         newYear > todayYear || (newYear == todayYear && newMonth > todayMonth) -> 1
         newYear < todayYear || (newYear == todayYear && newMonth < todayMonth) -> {
@@ -72,7 +70,6 @@ fun CalendarScreen(
         else -> todayDay
     }
 
-    // Memoised derived values — recompute only when their actual dependencies change
     val taskDots by remember(tasks) {
         derivedStateOf {
             tasks.map { CalendarTaskDot(day = it.day, month = it.month, year = it.year, color = it.category.color) }
@@ -94,7 +91,124 @@ fun CalendarScreen(
         derivedStateOf { editingTaskId?.let { id -> tasks.find { it.id == id } } }
     }
 
-    // BottomSheet para añadir/editar
+    val detailTask = detailTaskId?.let { id -> tasks.find { it.id == id } }
+
+    // ── Task detail bottom sheet ──────────────────────────────────
+    detailTask?.let { task ->
+        ModalBottomSheet(
+            onDismissRequest = { detailTaskId = null },
+            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+            shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
+            containerColor = MaterialTheme.colorScheme.background
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp)
+                    .padding(bottom = 32.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                // Title + done badge
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = task.title,
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        modifier = Modifier.weight(1f)
+                    )
+                    if (task.isDone) {
+                        Icon(
+                            imageVector = Icons.Default.CheckCircle,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                }
+
+                // Description
+                if (!task.description.isNullOrBlank()) {
+                    Text(
+                        text = task.description,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant)
+                }
+
+                // Chips
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    DifficultyChip(difficulty = task.difficulty)
+                    CategoryChip(category = task.category)
+                    DurationChip(minutes = task.duration)
+                }
+
+                // Badges: recurring + reminder
+                if (task.isRecurring || task.hasReminder) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        if (task.isRecurring) {
+                            SuggestionChip(
+                                onClick = {},
+                                label = { Text(stringResource(R.string.task_detail_recurring), style = MaterialTheme.typography.labelSmall) },
+                                icon = { Icon(Icons.Default.Refresh, contentDescription = null, modifier = Modifier.size(14.dp)) }
+                            )
+                        }
+                        if (task.hasReminder) {
+                            SuggestionChip(
+                                onClick = {},
+                                label = { Text(stringResource(R.string.task_detail_reminder), style = MaterialTheme.typography.labelSmall) },
+                                icon = { Icon(Icons.Default.Notifications, contentDescription = null, modifier = Modifier.size(14.dp)) }
+                            )
+                        }
+                    }
+                }
+
+                // Action buttons
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    OutlinedButton(
+                        onClick = {
+                            onToggleTask(task.id, !task.isDone)
+                        },
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(
+                            text = if (task.isDone) stringResource(R.string.task_mark_pending)
+                                   else stringResource(R.string.task_mark_done)
+                        )
+                    }
+                    Button(
+                        onClick = {
+                            detailTaskId = null
+                            editingTaskId = task.id
+                        },
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary
+                        )
+                    ) {
+                        Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(16.dp))
+                        Spacer(Modifier.width(6.dp))
+                        Text(stringResource(R.string.task_edit))
+                    }
+                }
+            }
+        }
+    }
+
+    // ── Add / Edit bottom sheet ───────────────────────────────────
     if (showAddSheet || editingTaskId != null) {
         ModalBottomSheet(
             onDismissRequest = {
@@ -107,26 +221,31 @@ fun CalendarScreen(
         ) {
             TaskFormCard(
                 isEditing         = editingTaskId != null,
-                initialTitle      = editingTask?.title      ?: "",
-                initialCategory   = editingTask?.category   ?: TaskCategory.PERSONAL,
-                initialDifficulty = editingTask?.difficulty ?: TaskDifficulty.EASY,
-                initialDuration   = editingTask?.duration   ?: 30,
-                onSave = { title, category, difficulty, duration ->
+                initialTitle      = editingTask?.title       ?: "",
+                initialDescription= editingTask?.description ?: "",
+                initialCategory   = editingTask?.category    ?: TaskCategory.PERSONAL,
+                initialDifficulty = editingTask?.difficulty  ?: TaskDifficulty.EASY,
+                initialDuration   = editingTask?.duration    ?: 30,
+                onSave = { title, category, difficulty, duration, description, isRecurring, hasReminder, recurrenceDays ->
                     val currentEditId = editingTaskId
                     if (currentEditId == null) {
                         onCreateTask(
                             NewTaskData(
-                                day        = dayForNewTask,
-                                month      = currentMonth,
-                                year       = currentYear,
-                                title      = title,
-                                category   = category,
-                                difficulty = difficulty,
-                                duration   = duration
+                                day           = dayForNewTask,
+                                month         = currentMonth,
+                                year          = currentYear,
+                                title         = title,
+                                category      = category,
+                                difficulty    = difficulty,
+                                duration      = duration,
+                                description   = description,
+                                isRecurring   = isRecurring,
+                                hasReminder   = hasReminder,
+                                recurrenceDays= recurrenceDays
                             )
                         )
                     } else {
-                        onUpdateTask(currentEditId, title, category, difficulty, duration)
+                        onUpdateTask(currentEditId, title, category, difficulty, duration, description)
                     }
                     showAddSheet = false
                     editingTaskId = null
@@ -156,7 +275,6 @@ fun CalendarScreen(
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // ── Calendario ───────────────────────────────────────
             DayPilotCalendar(
                 month = currentMonth,
                 year = currentYear,
@@ -183,13 +301,12 @@ fun CalendarScreen(
                 }
             )
 
-            // ── Filtros ──────────────────────────────────────────
             selectedDay?.let {
+                // ── Filters ──────────────────────────────────────
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    // Filtro dificultad
                     var showDifficultyMenu by remember { mutableStateOf(false) }
                     Box(modifier = Modifier.weight(1f)) {
                         OutlinedButton(
@@ -199,8 +316,7 @@ fun CalendarScreen(
                             colors = ButtonDefaults.outlinedButtonColors(
                                 containerColor = if (selectedDifficulty != null)
                                     selectedDifficulty!!.color.copy(alpha = 0.12f)
-                                else
-                                    MaterialTheme.colorScheme.surface
+                                else MaterialTheme.colorScheme.surface
                             )
                         ) {
                             Row(
@@ -212,15 +328,13 @@ fun CalendarScreen(
                                     text = selectedDifficulty?.let { stringResource(it.labelRes) }
                                         ?: stringResource(R.string.task_difficulty_label),
                                     style = MaterialTheme.typography.labelMedium,
-                                    color = selectedDifficulty?.color
-                                        ?: MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = selectedDifficulty?.color ?: MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                                 Icon(
                                     imageVector = Icons.Default.KeyboardArrowDown,
                                     contentDescription = null,
                                     modifier = Modifier.size(16.dp),
-                                    tint = selectedDifficulty?.color
-                                        ?: MaterialTheme.colorScheme.onSurfaceVariant
+                                    tint = selectedDifficulty?.color ?: MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                         }
@@ -230,49 +344,28 @@ fun CalendarScreen(
                         ) {
                             DropdownMenuItem(
                                 text = { Text(stringResource(R.string.calendar_filter_all)) },
-                                onClick = {
-                                    selectedDifficulty = null
-                                    showDifficultyMenu = false
-                                },
-                                leadingIcon = {
-                                    Icon(
-                                        imageVector = Icons.Default.List,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(16.dp)
-                                    )
-                                }
+                                onClick = { selectedDifficulty = null; showDifficultyMenu = false },
+                                leadingIcon = { Icon(Icons.Default.List, contentDescription = null, modifier = Modifier.size(16.dp)) }
                             )
                             TaskDifficulty.entries.forEach { diff ->
                                 DropdownMenuItem(
                                     text = {
                                         Text(
-                                            text = stringResource(diff.labelRes),
+                                            stringResource(diff.labelRes),
                                             color = diff.color,
-                                            fontWeight = if (selectedDifficulty == diff)
-                                                FontWeight.Bold else FontWeight.Normal
+                                            fontWeight = if (selectedDifficulty == diff) FontWeight.Bold else FontWeight.Normal
                                         )
                                     },
                                     onClick = {
-                                        selectedDifficulty =
-                                            if (selectedDifficulty == diff) null else diff
+                                        selectedDifficulty = if (selectedDifficulty == diff) null else diff
                                         showDifficultyMenu = false
                                     },
                                     leadingIcon = {
-                                        Box(
-                                            modifier = Modifier
-                                                .size(12.dp)
-                                                .clip(CircleShape)
-                                                .background(diff.color)
-                                        )
+                                        Box(modifier = Modifier.size(12.dp).clip(CircleShape).background(diff.color))
                                     },
                                     trailingIcon = {
                                         if (selectedDifficulty == diff) {
-                                            Icon(
-                                                imageVector = Icons.Default.Check,
-                                                contentDescription = null,
-                                                tint = diff.color,
-                                                modifier = Modifier.size(14.dp)
-                                            )
+                                            Icon(Icons.Default.Check, contentDescription = null, tint = diff.color, modifier = Modifier.size(14.dp))
                                         }
                                     }
                                 )
@@ -280,7 +373,6 @@ fun CalendarScreen(
                         }
                     }
 
-                    // Filtro categoría
                     var showCategoryMenu by remember { mutableStateOf(false) }
                     Box(modifier = Modifier.weight(1f)) {
                         OutlinedButton(
@@ -290,8 +382,7 @@ fun CalendarScreen(
                             colors = ButtonDefaults.outlinedButtonColors(
                                 containerColor = if (selectedCategory != null)
                                     selectedCategory!!.color.copy(alpha = 0.12f)
-                                else
-                                    MaterialTheme.colorScheme.surface
+                                else MaterialTheme.colorScheme.surface
                             )
                         ) {
                             Row(
@@ -315,16 +406,14 @@ fun CalendarScreen(
                                         text = selectedCategory?.let { stringResource(it.labelRes) }
                                             ?: stringResource(R.string.task_category_label),
                                         style = MaterialTheme.typography.labelMedium,
-                                        color = selectedCategory?.color
-                                            ?: MaterialTheme.colorScheme.onSurfaceVariant
+                                        color = selectedCategory?.color ?: MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 }
                                 Icon(
                                     imageVector = Icons.Default.KeyboardArrowDown,
                                     contentDescription = null,
                                     modifier = Modifier.size(16.dp),
-                                    tint = selectedCategory?.color
-                                        ?: MaterialTheme.colorScheme.onSurfaceVariant
+                                    tint = selectedCategory?.color ?: MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                         }
@@ -334,49 +423,28 @@ fun CalendarScreen(
                         ) {
                             DropdownMenuItem(
                                 text = { Text(stringResource(R.string.calendar_filter_all)) },
-                                onClick = {
-                                    selectedCategory = null
-                                    showCategoryMenu = false
-                                },
-                                leadingIcon = {
-                                    Icon(
-                                        imageVector = Icons.Default.List,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(16.dp)
-                                    )
-                                }
+                                onClick = { selectedCategory = null; showCategoryMenu = false },
+                                leadingIcon = { Icon(Icons.Default.List, contentDescription = null, modifier = Modifier.size(16.dp)) }
                             )
                             TaskCategory.entries.forEach { cat ->
                                 DropdownMenuItem(
                                     text = {
                                         Text(
-                                            text = stringResource(cat.labelRes),
+                                            stringResource(cat.labelRes),
                                             color = cat.color,
-                                            fontWeight = if (selectedCategory == cat)
-                                                FontWeight.Bold else FontWeight.Normal
+                                            fontWeight = if (selectedCategory == cat) FontWeight.Bold else FontWeight.Normal
                                         )
                                     },
                                     onClick = {
-                                        selectedCategory =
-                                            if (selectedCategory == cat) null else cat
+                                        selectedCategory = if (selectedCategory == cat) null else cat
                                         showCategoryMenu = false
                                     },
                                     leadingIcon = {
-                                        Icon(
-                                            imageVector = cat.icon,
-                                            contentDescription = null,
-                                            tint = cat.color,
-                                            modifier = Modifier.size(16.dp)
-                                        )
+                                        Icon(cat.icon, contentDescription = null, tint = cat.color, modifier = Modifier.size(16.dp))
                                     },
                                     trailingIcon = {
                                         if (selectedCategory == cat) {
-                                            Icon(
-                                                imageVector = Icons.Default.Check,
-                                                contentDescription = null,
-                                                tint = cat.color,
-                                                modifier = Modifier.size(14.dp)
-                                            )
+                                            Icon(Icons.Default.Check, contentDescription = null, tint = cat.color, modifier = Modifier.size(14.dp))
                                         }
                                     }
                                 )
@@ -384,7 +452,8 @@ fun CalendarScreen(
                         }
                     }
                 }
-                // ── Tareas del día ───────────────────────────────
+
+                // ── Day tasks ─────────────────────────────────────
                 DayPilotSectionHeader(
                     title = stringResource(R.string.calendar_day_tasks_title, selectedDay ?: 0),
                     actionText = stringResource(R.string.calendar_add_task_action),
@@ -403,15 +472,17 @@ fun CalendarScreen(
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         tasksForSelectedDay.forEach { task ->
                             TaskDayCard(
-                                title = task.title,
-                                category = task.category,
-                                difficulty = task.difficulty,
-                                durationMinutes = task.duration,
-                                isCompleted = task.isDone,
+                                title          = task.title,
+                                category       = task.category,
+                                difficulty     = task.difficulty,
+                                durationMinutes= task.duration,
+                                isCompleted    = task.isDone,
+                                hasReminder    = task.hasReminder,
+                                isRecurring    = task.isRecurring,
                                 onToggleComplete = { onToggleTask(task.id, it) },
-                                onTap = { onTapTask(task.id) },
-                                onEdit = { editingTaskId = task.id },
-                                onDelete = { onDeleteTask(task.id) }
+                                onTap          = { detailTaskId = task.id },
+                                onEdit         = { editingTaskId = task.id },
+                                onDelete       = { onDeleteTask(task.id) }
                             )
                         }
                     }

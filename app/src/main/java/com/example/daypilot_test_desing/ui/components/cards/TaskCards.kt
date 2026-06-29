@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -202,6 +203,8 @@ fun TaskDayCard(
     difficulty: TaskDifficulty,
     durationMinutes: Int,
     isCompleted: Boolean = false,
+    hasReminder: Boolean = false,
+    isRecurring: Boolean = false,
     onToggleComplete: (Boolean) -> Unit,
     onTap: () -> Unit,
     onEdit: () -> Unit,
@@ -315,6 +318,22 @@ fun TaskDayCard(
                 ) {
                     CategoryChip(category = category)
                     DurationChip(minutes = durationMinutes)
+                    if (hasReminder) {
+                        Icon(
+                            imageVector = Icons.Default.Notifications,
+                            contentDescription = null,
+                            modifier = Modifier.size(14.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    if (isRecurring) {
+                        Icon(
+                            imageVector = Icons.Default.Refresh,
+                            contentDescription = null,
+                            modifier = Modifier.size(14.dp),
+                            tint = MaterialTheme.colorScheme.secondary
+                        )
+                    }
                 }
             }
 

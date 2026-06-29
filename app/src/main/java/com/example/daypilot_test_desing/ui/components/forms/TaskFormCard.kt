@@ -70,17 +70,18 @@ import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
 
 @Composable
 fun TaskFormCard(
-    onSave: (title: String, category: TaskCategory, difficulty: TaskDifficulty, duration: Int) -> Unit,
+    onSave: (title: String, category: TaskCategory, difficulty: TaskDifficulty, duration: Int, description: String, isRecurring: Boolean, hasReminder: Boolean, recurrenceDays: Int) -> Unit,
     onCancel: () -> Unit,
     modifier: Modifier = Modifier,
     isEditing: Boolean = false,
     initialTitle: String = "",
+    initialDescription: String = "",
     initialCategory: TaskCategory = TaskCategory.PERSONAL,
     initialDifficulty: TaskDifficulty = TaskDifficulty.EASY,
     initialDuration: Int = 30
 ) {
     var title by remember(initialTitle) { mutableStateOf(initialTitle) }
-    var description by remember { mutableStateOf("") }
+    var description by remember(initialDescription) { mutableStateOf(initialDescription) }
     var category by remember(initialCategory) { mutableStateOf(initialCategory) }
     var difficulty by remember(initialDifficulty) { mutableStateOf(initialDifficulty) }
     var duration by remember(initialDuration) { mutableStateOf(initialDuration) }
@@ -247,7 +248,7 @@ fun TaskFormCard(
                 Text(stringResource(R.string.common_cancel))
             }
             Button(
-                onClick = { if (title.isNotBlank()) onSave(title.trim(), category, difficulty, duration) },
+                onClick = { if (title.isNotBlank()) onSave(title.trim(), category, difficulty, duration, description.trim(), recurring, reminder, recurrenceDays) },
                 enabled = title.isNotBlank(),
                 modifier = Modifier
                     .weight(1f)
@@ -448,7 +449,7 @@ fun DurationSelector(
 fun TaskFormCardPreview() {
     DayPilotTheme(theme = DayPilotTheme.SAGE_GREEN, darkMode = true) {
         Box(Modifier.background(MaterialTheme.colorScheme.background)) {
-            TaskFormCard(onSave = { _, _, _, _ -> }, onCancel = {})
+            TaskFormCard(onSave = { _, _, _, _, _, _, _, _ -> }, onCancel = {})
         }
     }
 }

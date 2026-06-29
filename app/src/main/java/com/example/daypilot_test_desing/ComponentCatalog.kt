@@ -354,7 +354,7 @@ fun CatalogForms() {
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             CatalogSection("Task Form") {
-                TaskFormCard(onSave = { _, _, _, _ -> }, onCancel = {})
+                TaskFormCard(onSave = { _, _, _, _, _, _, _, _ -> }, onCancel = {})
             }
             CatalogSection("Reminder Form") {
                 ReminderFormCard(onSave = {}, onCancel = {})
