@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.daypilot_test_desing.backend.model.DayProgress
 import com.example.daypilot_test_desing.backend.preferences.AppPreferences
+import com.example.daypilot_test_desing.backend.supabase.SupabaseNotificationRepository
 import java.util.Calendar
 import com.example.daypilot_test_desing.backend.repository.ProgressRepository
 import kotlinx.coroutines.Job
@@ -70,6 +71,11 @@ class ProgressViewModel(
         viewModelScope.launch {
             repo.logPoints(10, "TIMER")
             load()
+            SupabaseNotificationRepository.insertForCurrentUser(
+                type  = "TIMER_DONE",
+                title = "¡Temporizador completado! ⏱",
+                body  = "Has completado una sesión de concentración y ganado 10 pts"
+            )
         }
     }
 

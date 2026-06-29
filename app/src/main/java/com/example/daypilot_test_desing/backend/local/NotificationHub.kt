@@ -19,4 +19,8 @@ object NotificationHub {
             )
         )
     }
+
+    fun clear() {
+        repo.clear()
+    }
 }

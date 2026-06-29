@@ -23,7 +23,16 @@ import android.app.Application
 import android.content.Context
 import androidx.compose.runtime.remember
 import kotlinx.coroutines.joinAll
+import com.example.daypilot_test_desing.backend.local.NotificationHub
+import com.example.daypilot_test_desing.backend.model.NotificationType
+import com.example.daypilot_test_desing.backend.preferences.AppPreferences
+import com.example.daypilot_test_desing.reminders.createDailyChannel
+import com.example.daypilot_test_desing.reminders.DailyNotificationScheduler
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import com.example.daypilot_test_desing.backend.supabase.SupabaseFriendRepository
+import com.example.daypilot_test_desing.backend.supabase.SupabaseNotificationRepository
 import com.example.daypilot_test_desing.backend.supabase.SupabaseProgressRepository
 import com.example.daypilot_test_desing.backend.supabase.SupabaseRankingRepository
 import com.example.daypilot_test_desing.backend.supabase.SupabaseStepsRepository
@@ -82,6 +91,7 @@ fun DayPilotNavGraph(
 
     val context = LocalContext.current
     val application = context.applicationContext as Application
+    val appPrefs = remember { AppPreferences(context) }
 
     // Shared repository instances — created once, passed to all ViewModels that need them.
     val stepsRepo    = remember { SupabaseStepsRepository(application.getSharedPreferences("daypilot_steps", Context.MODE_PRIVATE)) }
@@ -117,6 +127,41 @@ fun DayPilotNavGraph(
         if (currentRoute == DayPilotDestinations.HOME) homeVM.refresh()
     }
 
+    // Track that the app was opened today (for streak-danger alarm check).
+    LaunchedEffect(Unit) {
+        val today = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
+        appPrefs.lastOpenDate = today
+        createDailyChannel(context)
+    }
+
+    // Level-up in-app notification: fire when profileVM.level increases.
+    val profileStateForLevel by profileVM.uiState.collectAsState()
+    LaunchedEffect(profileStateForLevel.level) {
+        val newLevel = profileStateForLevel.level
+        if (newLevel < 1) return@LaunchedEffect
+        val lastLevel = appPrefs.lastKnownLevel
+        if (lastLevel > 0 && newLevel > lastLevel) {
+            val title = "¡Subiste de nivel! 🏆"
+            val msg   = "Ahora eres nivel $newLevel. ¡Sigue así!"
+            NotificationHub.add(title = title, message = msg, type = NotificationType.ACHIEVEMENT)
+            SupabaseNotificationRepository.insertForCurrentUser(
+                type  = "LEVEL_UP",
+                title = title,
+                body  = msg
+            )
+        }
+        appPrefs.lastKnownLevel = newLevel
+    }
+
+    // Cache today's pending task count so DailyNotificationsReceiver can read it.
+    val calendarStateForCache by calendarVM.uiState.collectAsState()
+    LaunchedEffect(calendarStateForCache.tasks) {
+        val today = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
+        val pending = calendarStateForCache.tasks.count { !it.isDone }
+        appPrefs.pendingTaskCount     = pending
+        appPrefs.pendingTaskCountDate = today
+    }
+
     // Session restoration: on startup, skip AUTH if a saved session exists;
     // on logout, return to AUTH from wherever the user is.
     val sessionState by sessionVM.state.collectAsState()
@@ -136,7 +181,16 @@ fun DayPilotNavGraph(
                     friendsVM.refresh(),
                     rivalryVM.refresh(),
                     settingsVM.refresh(),
+                    notificationsVM.load(),
                 ).joinAll()
+                // Schedule or cancel daily alarms based on current settings.
+                val s = settingsVM.uiState.value
+                DailyNotificationScheduler.scheduleAll(
+                    context              = context,
+                    notificationsEnabled = s.notificationsEnabled,
+                    taskOn               = s.taskRemindersEnabled,
+                    streakOn             = s.streakAlertsEnabled
+                )
                 sessionVM.markDataLoaded()
             }
             AppSessionViewModel.State.Authenticated -> {
@@ -166,7 +220,11 @@ fun DayPilotNavGraph(
             if (currentRoute != DayPilotDestinations.LOADING &&
                 currentRoute != DayPilotDestinations.AUTH &&
                 currentRoute != DayPilotDestinations.RESET_PASSWORD) {
-                DayPilotBottomBar(navController = navController)
+                val notifState by notificationsVM.uiState.collectAsState()
+                DayPilotBottomBar(
+                    navController        = navController,
+                    unreadNotifications  = notifState.unreadCount
+                )
             }
         }
     ) { innerPadding ->
@@ -210,26 +268,23 @@ fun DayPilotNavGraph(
 
             // ── Home ─────────────────────────────────────────────
             composable(DayPilotDestinations.HOME) {
-                val s      by homeVM.uiState.collectAsState()
-                val notifs by notificationsVM.uiState.collectAsState()
+                val s by homeVM.uiState.collectAsState()
                 HomeScreen(
-                    userName                  = s.userName,
-                    streak                    = s.streak,
-                    stepsToday                = s.stepsToday,
-                    stepsGoal                 = s.stepsGoal,
-                    tasksCompleted            = s.tasksCompleted,
-                    tasksTotal                = s.tasksTotal,
-                    progressData              = s.progressData,
-                    pointsToday               = s.pointsToday,
-                    rankingPosition           = s.rankingPosition,
-                    friendCount               = s.friendCount,
-                    timerCompletedToday       = s.timerCompletedToday,
-                    unreadCount               = notifs.unreadCount,
-                    onNavigateToCalendar      = { navController.navigate(DayPilotDestinations.CALENDAR) },
-                    onNavigateToHabits        = { navController.navigate(DayPilotDestinations.HABITS) },
-                    onNavigateToProgress      = { navController.navigate(DayPilotDestinations.PROGRESS) },
-                    onNavigateToRivalry       = { navController.navigate(DayPilotDestinations.RIVALRY) },
-                    onNavigateToNotifications = { navController.navigate(DayPilotDestinations.NOTIFICATIONS) }
+                    userName            = s.userName,
+                    streak              = s.streak,
+                    stepsToday          = s.stepsToday,
+                    stepsGoal           = s.stepsGoal,
+                    tasksCompleted      = s.tasksCompleted,
+                    tasksTotal          = s.tasksTotal,
+                    progressData        = s.progressData,
+                    pointsToday         = s.pointsToday,
+                    rankingPosition     = s.rankingPosition,
+                    friendCount         = s.friendCount,
+                    timerCompletedToday = s.timerCompletedToday,
+                    onNavigateToCalendar= { navController.navigate(DayPilotDestinations.CALENDAR) },
+                    onNavigateToHabits  = { navController.navigate(DayPilotDestinations.HABITS) },
+                    onNavigateToProgress= { navController.navigate(DayPilotDestinations.PROGRESS) },
+                    onNavigateToRivalry = { navController.navigate(DayPilotDestinations.RIVALRY) }
                 )
             }
 
@@ -284,10 +339,14 @@ fun DayPilotNavGraph(
             // ── Notifications ─────────────────────────────────────
             composable(DayPilotDestinations.NOTIFICATIONS) {
                 val s by notificationsVM.uiState.collectAsState()
+                LaunchedEffect(Unit) {
+                    notificationsVM.markAllAsRead()
+                }
                 NotificationsScreen(
-                    notifications     = s.notifications,
-                    onTapNotification = notificationsVM::markAsRead,
-                    onBack            = { navController.popBackStack() }
+                    notifications    = s.notifications,
+                    onTapNotification= notificationsVM::markAsRead,
+                    onMarkAllAsRead  = notificationsVM::markAllAsRead,
+                    onBack           = { navController.popBackStack() }
                 )
             }
 
@@ -319,28 +378,30 @@ fun DayPilotNavGraph(
             composable(DayPilotDestinations.SETTINGS) {
                 val s by settingsVM.uiState.collectAsState()
                 SettingsScreen(
-                    name                 = s.name,
-                    isDarkMode           = s.isDarkMode,
-                    selectedThemeId      = s.selectedThemeId,
-                    selectedLanguage     = s.selectedLanguage,
-                    notificationsEnabled = s.notificationsEnabled,
-                    onToggleDarkMode     = settingsVM::toggleDarkMode,
-                    onThemeSelect        = settingsVM::selectTheme,
-                    onLanguageSelect     = { code ->
+                    name                    = s.name,
+                    isDarkMode              = s.isDarkMode,
+                    selectedThemeId         = s.selectedThemeId,
+                    selectedLanguage        = s.selectedLanguage,
+                    notificationsEnabled    = s.notificationsEnabled,
+                    taskRemindersEnabled    = s.taskRemindersEnabled,
+                    streakAlertsEnabled     = s.streakAlertsEnabled,
+                    onToggleDarkMode        = settingsVM::toggleDarkMode,
+                    onThemeSelect           = settingsVM::selectTheme,
+                    onLanguageSelect        = { code ->
                         settingsVM.selectLanguage(code)
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                             context.getSystemService(LocaleManager::class.java)
                                 .applicationLocales = LocaleList.forLanguageTags(code)
                         }
                     },
-                    onToggleNotifications= settingsVM::toggleNotifications,
+                    onToggleNotifications   = settingsVM::toggleNotifications,
+                    onToggleTaskReminders   = settingsVM::toggleTaskReminders,
+                    onToggleStreakAlerts    = settingsVM::toggleStreakAlerts,
                     onNavigateToEditProfile = { navController.navigate(DayPilotDestinations.EDIT_PROFILE) },
-                    onLogout = {
-                        // signOut() signs out of Supabase and flips the session
-                        // state to Unauthenticated; the LaunchedEffect handles navigation.
+                    onLogout                = {
                         sessionVM.signOut()
                     },
-                    onBack = { navController.popBackStack() }
+                    onBack                  = { navController.popBackStack() }
                 )
             }
 

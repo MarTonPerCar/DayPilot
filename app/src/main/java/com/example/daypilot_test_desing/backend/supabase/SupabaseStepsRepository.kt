@@ -3,6 +3,7 @@ package com.example.daypilot_test_desing.backend.supabase
 import android.content.SharedPreferences
 import com.example.daypilot_test_desing.backend.local.NotificationHub
 import com.example.daypilot_test_desing.backend.model.NotificationType
+import com.example.daypilot_test_desing.backend.supabase.SupabaseNotificationRepository
 import com.example.daypilot_test_desing.backend.repository.StepsRepository
 import com.example.daypilot_test_desing.backend.repository.StepsWeeklyStats
 import com.example.daypilot_test_desing.backend.supabase.dto.DailyLogDto
@@ -100,11 +101,11 @@ class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepos
 
     private fun checkMilestones() {
         val goal = getGoalSteps()
-        if (!milestone1Awarded && currentSteps >= goal / 3) {
+        if (!milestone1Awarded && currentSteps >= goal / 2) {
             milestone1Awarded = true
             scope.launch { logMilestone(10) }
         }
-        if (!milestone2Awarded && currentSteps >= (goal * 2) / 3) {
+        if (!milestone2Awarded && currentSteps >= (goal * 3) / 4) {
             milestone2Awarded = true
             scope.launch { logMilestone(20) }
         }
@@ -131,11 +132,18 @@ class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepos
             )
         } catch (_: Exception) { }
         val (title, msg) = when (points) {
-            10   -> "Sigue así 🏃" to "Has completado 1/3 de tu objetivo de pasos (+10 pts)"
-            20   -> "A mitad de camino 💪" to "Has completado 2/3 de tu objetivo de pasos (+20 pts)"
+            10   -> "A mitad de camino 🏃" to "Has completado el 50% de tu objetivo de pasos (+10 pts)"
+            20   -> "¡Ya casi! 💪" to "Has completado el 75% de tu objetivo de pasos (+20 pts)"
             else -> "¡Objetivo completado! 🎉" to "Has alcanzado tu objetivo de pasos (+30 pts)"
         }
         NotificationHub.add(title, msg, NotificationType.STEPS)
+        if (points == 30) {
+            SupabaseNotificationRepository.insertForCurrentUser(
+                type  = "STEPS_GOAL",
+                title = title,
+                body  = msg
+            )
+        }
     }
 
     // ── Suspend (DB-backed) ───────────────────────────────────────────

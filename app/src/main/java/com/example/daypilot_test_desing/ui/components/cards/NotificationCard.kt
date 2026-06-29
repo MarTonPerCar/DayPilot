@@ -42,7 +42,7 @@ fun NotificationCard(
             .clip(RoundedCornerShape(16.dp))
             .background(
                 if (isRead) MaterialTheme.colorScheme.surface
-                else MaterialTheme.colorScheme.surface
+                else MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.25f)
             )
             .clickable { onClick() }
             .padding(14.dp),

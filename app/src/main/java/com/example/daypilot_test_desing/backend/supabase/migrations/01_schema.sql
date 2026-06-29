@@ -258,6 +258,29 @@ CREATE TABLE reactions (
 CREATE INDEX idx_reactions_to ON reactions(to_user_id);
 CREATE INDEX idx_reactions_summary ON reactions(weekly_summary_id);
 
+CREATE TABLE notifications (
+    id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id    UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    type       TEXT NOT NULL CHECK (type IN (
+                   'FRIEND_REQUEST', 'FRIEND_ACCEPTED', 'REACTION',
+                   'LEVEL_UP', 'STREAK_RISK', 'STEPS_GOAL',
+                   'TIMER_DONE', 'TASK_REMINDER', 'DAILY_SUMMARY'
+               )),
+    title      TEXT NOT NULL,
+    body       TEXT NOT NULL,
+    is_read    BOOLEAN NOT NULL DEFAULT false,
+    metadata   JSONB,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
+-- Users see/update/delete their own rows; any authenticated user can INSERT (needed for cross-user events)
+CREATE POLICY "notifications_own"         ON notifications FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "notifications_insert_auth" ON notifications FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+CREATE POLICY "notifications_update_own"  ON notifications FOR UPDATE USING (auth.uid() = user_id);
+CREATE POLICY "notifications_delete_own"  ON notifications FOR DELETE USING (auth.uid() = user_id);
+CREATE INDEX idx_notifications_user_unread ON notifications(user_id, is_read, created_at DESC);
+
 
 -- =============================================
 -- TRIGGERS
@@ -877,3 +900,38 @@ USING (auth.uid() = user_id);
 CREATE POLICY "streaks_delete_own"
 ON user_streaks FOR DELETE
 USING (auth.uid() = user_id);
+
+-- 3. Notifications table (new in this patch)
+CREATE TABLE IF NOT EXISTS notifications (
+    id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id    UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    type       TEXT NOT NULL CHECK (type IN (
+                   'FRIEND_REQUEST', 'FRIEND_ACCEPTED', 'REACTION',
+                   'LEVEL_UP', 'STREAK_RISK', 'STEPS_GOAL',
+                   'TIMER_DONE', 'TASK_REMINDER', 'DAILY_SUMMARY'
+               )),
+    title      TEXT NOT NULL,
+    body       TEXT NOT NULL,
+    is_read    BOOLEAN NOT NULL DEFAULT false,
+    metadata   JSONB,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "notifications_own"         ON notifications;
+DROP POLICY IF EXISTS "notifications_insert_auth"  ON notifications;
+DROP POLICY IF EXISTS "notifications_update_own"   ON notifications;
+DROP POLICY IF EXISTS "notifications_delete_own"   ON notifications;
+DROP POLICY IF EXISTS "notif_select_own"           ON notifications;
+DROP POLICY IF EXISTS "notif_insert_auth"          ON notifications;
+DROP POLICY IF EXISTS "notif_update_own"           ON notifications;
+DROP POLICY IF EXISTS "notif_delete_own"           ON notifications;
+
+CREATE POLICY "notifications_own"         ON notifications FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "notifications_insert_auth" ON notifications FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+CREATE POLICY "notifications_update_own"  ON notifications FOR UPDATE USING (auth.uid() = user_id);
+CREATE POLICY "notifications_delete_own"  ON notifications FOR DELETE USING (auth.uid() = user_id);
+
+DROP INDEX IF EXISTS idx_notifications_user;
+CREATE INDEX IF NOT EXISTS idx_notifications_user_unread ON notifications(user_id, is_read, created_at DESC);

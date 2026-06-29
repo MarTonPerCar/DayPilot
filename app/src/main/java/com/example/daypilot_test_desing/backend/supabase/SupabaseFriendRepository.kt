@@ -11,6 +11,7 @@ import com.example.daypilot_test_desing.backend.supabase.dto.InsertFriendDto
 import com.example.daypilot_test_desing.backend.supabase.dto.InsertFriendRequestDto
 import com.example.daypilot_test_desing.backend.supabase.dto.InsertReactionDto
 import com.example.daypilot_test_desing.backend.supabase.dto.ReactionDto
+import com.example.daypilot_test_desing.backend.supabase.SupabaseNotificationRepository
 import com.example.daypilot_test_desing.backend.supabase.dto.SentRequestDto
 import com.example.daypilot_test_desing.backend.supabase.dto.UserDto
 import com.example.daypilot_test_desing.backend.supabase.dto.UserStreakDto
@@ -162,6 +163,18 @@ class SupabaseFriendRepository : FriendRepository {
             supabase.from("friends").insert(
                 InsertFriendDto(requesterId = userId, receiverId = uid)
             )
+            // Notify the requester that their request was accepted
+            val myName = supabase.from("users").select {
+                filter { eq("id", uid) }
+                limit(1)
+            }.decodeList<UserDto>().firstOrNull()?.name ?: ""
+            SupabaseNotificationRepository.insert(
+                userId = userId,
+                type   = "FRIEND_ACCEPTED",
+                title  = "Solicitud aceptada",
+                body   = if (myName.isNotEmpty()) "$myName aceptó tu solicitud de amistad"
+                         else "Tu solicitud de amistad fue aceptada"
+            )
         } catch (_: Exception) { }
     }
 
@@ -193,6 +206,24 @@ class SupabaseFriendRepository : FriendRepository {
                     weeklySummaryId = summaryId,
                     type            = reaction.toDbString()
                 )
+            )
+
+            // Notify the recipient
+            val myName = supabase.from("users").select {
+                filter { eq("id", uid) }
+                limit(1)
+            }.decodeList<UserDto>().firstOrNull()?.name ?: return
+            val emoji = when (reaction) {
+                ReactionType.FIRE   -> "🔥"
+                ReactionType.CLAP   -> "👏"
+                ReactionType.STRONG -> "💪"
+                ReactionType.STAR   -> "⭐"
+            }
+            SupabaseNotificationRepository.insert(
+                userId = userId,
+                type   = "REACTION",
+                title  = "Nueva reacción $emoji",
+                body   = "$myName reaccionó a tu semana con $emoji"
             )
         } catch (_: Exception) { }
     }
@@ -231,6 +262,18 @@ class SupabaseFriendRepository : FriendRepository {
         try {
             supabase.from("friend_requests").insert(
                 InsertFriendRequestDto(fromUserId = uid, toUserId = userId)
+            )
+            // Notify the recipient about the request
+            val myName = supabase.from("users").select {
+                filter { eq("id", uid) }
+                limit(1)
+            }.decodeList<UserDto>().firstOrNull()?.name ?: ""
+            SupabaseNotificationRepository.insert(
+                userId = userId,
+                type   = "FRIEND_REQUEST",
+                title  = "Nueva solicitud de amistad",
+                body   = if (myName.isNotEmpty()) "$myName quiere ser tu amigo"
+                         else "Tienes una nueva solicitud de amistad"
             )
         } catch (_: Exception) { }
     }

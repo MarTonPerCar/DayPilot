@@ -20,6 +20,9 @@ EXCEPTION WHEN OTHERS THEN
     NULL;
 END $$;
 
+-- Notificaciones
+DROP TABLE IF EXISTS notifications CASCADE;
+
 -- Reacciones
 DROP TABLE IF EXISTS reactions CASCADE;
 
