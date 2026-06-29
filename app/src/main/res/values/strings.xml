@@ -420,6 +420,8 @@
     <string name="user_add_friend">Añadir amigo</string>
     <string name="user_accept_request">Aceptar</string>
     <string name="user_reject_request">Rechazar</string>
+    <string name="friends_remove_confirm_title">¿Eliminar amigo?</string>
+    <string name="friends_remove_confirm_message">¿Seguro que quieres eliminar a %1$s de tu lista de amigos?</string>
     <string name="user_request_sent">Solicitud enviada</string>
     <string name="user_request_sent_dialog_title">Solicitud enviada</string>
     <string name="user_request_sent_dialog_message">Tu solicitud de amistad fue enviada correctamente.</string>

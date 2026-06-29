@@ -15,13 +15,15 @@ class SearchFriendsViewModel(private val repo: FriendRepository) : ViewModel() {
     private val _uiState = MutableStateFlow(SearchFriendsUiState())
     val uiState: StateFlow<SearchFriendsUiState> = _uiState.asStateFlow()
 
-    init {
-        viewModelScope.launch { loadSentRequests() }
-    }
+    private var friendIds: Set<String> = emptySet()
 
-    private suspend fun loadSentRequests() {
-        val ids = try { repo.getPendingSentRequestUserIds() } catch (_: Exception) { emptyList() }
-        _uiState.update { it.copy(sentRequestUserIds = ids.toSet()) }
+    init {
+        viewModelScope.launch {
+            val sentIds = try { repo.getPendingSentRequestUserIds() } catch (_: Exception) { emptyList() }
+            val fIds    = try { repo.getFriendIds() }                 catch (_: Exception) { emptyList() }
+            friendIds = fIds.toSet()
+            _uiState.update { it.copy(sentRequestUserIds = sentIds.toSet()) }
+        }
     }
 
     fun search(query: String) {
@@ -32,7 +34,9 @@ class SearchFriendsViewModel(private val repo: FriendRepository) : ViewModel() {
                 val sentIds = _uiState.value.sentRequestUserIds
                 _uiState.update {
                     it.copy(
-                        searchResults = results.map { r -> r.copy(hasPendingRequest = r.id in sentIds) },
+                        searchResults = results
+                            .filter { r -> r.id !in friendIds }
+                            .map { r -> r.copy(hasPendingRequest = r.id in sentIds) },
                         isLoading = false
                     )
                 }

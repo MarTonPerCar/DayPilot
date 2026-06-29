@@ -32,20 +32,15 @@ fun SearchFriendsScreen(
 ) {
     var query by remember { mutableStateOf("") }
 
-    // Confirmation dialog after sending a request
+    // Confirmation dialog after sending a request.
+    // onConfirmationDismissed handles both state reset and navigation — don't also call onBack().
     if (requestJustSent) {
         AlertDialog(
-            onDismissRequest = {
-                onConfirmationDismissed()
-                onBack()
-            },
+            onDismissRequest = { onConfirmationDismissed() },
             title = { Text(stringResource(R.string.user_request_sent_dialog_title)) },
             text  = { Text(stringResource(R.string.user_request_sent_dialog_message)) },
             confirmButton = {
-                TextButton(onClick = {
-                    onConfirmationDismissed()
-                    onBack()
-                }) {
+                TextButton(onClick = { onConfirmationDismissed() }) {
                     Text(stringResource(R.string.user_request_sent_dialog_button))
                 }
             }

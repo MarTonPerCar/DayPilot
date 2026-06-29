@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -161,7 +162,8 @@ fun FriendRequestCard(
     onAccept: () -> Unit,
     onReject: () -> Unit,
     modifier: Modifier = Modifier,
-    avatarUrl: String? = null
+    avatarUrl: String? = null,
+    isAccepting: Boolean = false
 ) {
     UserCardBase(
         name = name,
@@ -171,34 +173,42 @@ fun FriendRequestCard(
         avatarUrl = avatarUrl,
         modifier = modifier,
         action = {
-            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Box(
-                    modifier = Modifier
-                        .size(36.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primary),
-                    contentAlignment = Alignment.Center
-                ) {
-                    DayPilotIconButton(
-                        icon = Icons.Default.Check,
-                        onClick = onAccept,
-                        contentDescription = stringResource(R.string.user_accept_request),
-                        tint = MaterialTheme.colorScheme.onPrimary
-                    )
-                }
-                Box(
-                    modifier = Modifier
-                        .size(36.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.error),
-                    contentAlignment = Alignment.Center
-                ) {
-                    DayPilotIconButton(
-                        icon = Icons.Default.Close,
-                        onClick = onReject,
-                        contentDescription = stringResource(R.string.user_reject_request),
-                        tint = MaterialTheme.colorScheme.onError
-                    )
+            if (isAccepting) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(36.dp),
+                    color = MaterialTheme.colorScheme.primary,
+                    strokeWidth = 3.dp
+                )
+            } else {
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Box(
+                        modifier = Modifier
+                            .size(36.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.primary),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        DayPilotIconButton(
+                            icon = Icons.Default.Check,
+                            onClick = onAccept,
+                            contentDescription = stringResource(R.string.user_accept_request),
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
+                    Box(
+                        modifier = Modifier
+                            .size(36.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.error),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        DayPilotIconButton(
+                            icon = Icons.Default.Close,
+                            onClick = onReject,
+                            contentDescription = stringResource(R.string.user_reject_request),
+                            tint = MaterialTheme.colorScheme.onError
+                        )
+                    }
                 }
             }
         }

@@ -227,22 +227,25 @@ fun DayPilotNavGraph(
             composable(DayPilotDestinations.FRIENDS) {
                 val s by friendsVM.uiState.collectAsState()
                 FriendsScreen(
-                    friends            = s.friends,
-                    friendRequests     = s.friendRequests,
-                    onAcceptRequest    = { userId ->
+                    friends             = s.friends,
+                    friendRequests      = s.friendRequests,
+                    acceptingUserId     = s.acceptingUserId,
+                    justAcceptedRequest = s.justAcceptedRequest,
+                    onAcceptedNavigated = { friendsVM.clearJustAccepted() },
+                    onAcceptRequest     = { userId ->
                         friendsVM.acceptRequest(userId)
                         rivalryVM.refresh()
                         homeVM.refresh()
                     },
-                    onRejectRequest    = friendsVM::rejectRequest,
-                    onTapFriend        = {},
-                    onRemoveFriend     = { userId ->
+                    onRejectRequest     = friendsVM::rejectRequest,
+                    onTapFriend         = {},
+                    onRemoveFriend      = { userId ->
                         friendsVM.removeFriend(userId)
                         rivalryVM.refresh()
                         homeVM.refresh()
                     },
-                    onReactToFriend    = friendsVM::reactToFriend,
-                    onNavigateToSearch = { navController.navigate(DayPilotDestinations.SEARCH_FRIENDS) }
+                    onReactToFriend     = friendsVM::reactToFriend,
+                    onNavigateToSearch  = { navController.navigate(DayPilotDestinations.SEARCH_FRIENDS) }
                 )
             }
 
@@ -259,7 +262,10 @@ fun DayPilotNavGraph(
                         friendsVM.refresh()
                         rivalryVM.refresh()
                         homeVM.refresh()
-                        navController.popBackStack()
+                        // Navigate to a fresh Friends screen (tab 0) and clear search from the stack.
+                        navController.navigate(DayPilotDestinations.FRIENDS) {
+                            popUpTo(DayPilotDestinations.FRIENDS) { inclusive = true }
+                        }
                     },
                     onBack               = { navController.popBackStack() }
                 )

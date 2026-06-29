@@ -6,6 +6,7 @@ import com.example.daypilot_test_desing.backend.model.SearchUserData
 
 interface FriendRepository {
     suspend fun getFriends(): List<FriendData>
+    suspend fun getFriendIds(): List<String>
     suspend fun getFriendRequests(): List<FriendData>
     suspend fun acceptRequest(userId: String)
     suspend fun rejectRequest(userId: String)

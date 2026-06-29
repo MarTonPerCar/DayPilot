@@ -61,6 +61,11 @@ class SupabaseFriendRepository : FriendRepository {
         return (asRequester + asReceiver).distinct()
     }
 
+    override suspend fun getFriendIds(): List<String> {
+        val uid = userId() ?: return emptyList()
+        return getFriendIds(uid)
+    }
+
     override suspend fun getFriends(): List<FriendData> {
         val uid = userId() ?: return emptyList()
         return try {

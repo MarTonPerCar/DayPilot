@@ -9,6 +9,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
@@ -22,18 +23,26 @@ class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
 
     private suspend fun load() {
         try {
-            _uiState.value = FriendsUiState(
-                friends        = repo.getFriends(),
-                friendRequests = repo.getFriendRequests()
-            )
+            _uiState.update { current ->
+                current.copy(
+                    friends        = repo.getFriends(),
+                    friendRequests = repo.getFriendRequests()
+                )
+            }
         } catch (_: Exception) { }
     }
 
     fun acceptRequest(userId: String) {
+        _uiState.update { it.copy(acceptingUserId = userId) }
         viewModelScope.launch {
             repo.acceptRequest(userId)
             load()
+            _uiState.update { it.copy(acceptingUserId = null, justAcceptedRequest = true) }
         }
+    }
+
+    fun clearJustAccepted() {
+        _uiState.update { it.copy(justAcceptedRequest = false) }
     }
 
     fun rejectRequest(userId: String) {
