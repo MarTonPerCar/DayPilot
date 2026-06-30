@@ -5,4 +5,13 @@
     <style name="Theme.DayPilotTestDesing.Splash" parent="Theme.DayPilotTestDesing">
         <item name="android:windowBackground">@color/splash_bg</item>
     </style>
+
+    <!-- UCrop theme: keeps toolbar and confirm button inside system bar insets -->
+    <style name="UCropTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:windowTranslucentNavigation">false</item>
+        <item name="android:fitsSystemWindows">true</item>
+        <item name="android:statusBarColor">@android:color/black</item>
+        <item name="android:navigationBarColor">@android:color/black</item>
+    </style>
 </resources>
