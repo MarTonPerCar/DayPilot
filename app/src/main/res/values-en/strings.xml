@@ -505,6 +505,20 @@
     <string name="tech_health_empty">No restrictions\nTap + to create one.</string>
     <string name="tech_health_groups_title">Groups</string>
 
+    <!-- Tech Health permission screen -->
+    <string name="tech_health_perm_title">Set up permissions</string>
+    <string name="tech_health_perm_subtitle">DayPilot needs two permissions to work properly. Don\'t worry — they\'re only used for what\'s explained here.</string>
+    <string name="tech_health_perm_note">⚠ These are important permissions, but there\'s nothing to worry about. The app only uses them to measure your daily app usage and block apps when you hit your limit.</string>
+    <string name="tech_health_perm_granted">Granted</string>
+    <string name="tech_health_perm_usage_title">Usage access</string>
+    <string name="tech_health_perm_usage_desc">Measures how many minutes per day you use each app. Without this, time limits cannot be enforced.</string>
+    <string name="tech_health_perm_usage_steps">Settings → Apps → Special app access → Usage access</string>
+    <string name="tech_health_perm_usage_button">Open usage settings</string>
+    <string name="tech_health_perm_a11y_title">Accessibility service</string>
+    <string name="tech_health_perm_a11y_desc">Detects which app is in the foreground and closes it when you\'ve exceeded the limit. It does not read text or interact with any app.</string>
+    <string name="tech_health_perm_a11y_steps">Settings → Accessibility → Installed services → DayPilot</string>
+    <string name="tech_health_perm_a11y_button">Open accessibility</string>
+
 
     <!-- Timer Hub Screen -->
     <string name="timer_hub_title">Timers</string>

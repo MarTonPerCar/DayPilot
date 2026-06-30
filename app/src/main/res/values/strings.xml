@@ -522,6 +522,20 @@
     <string name="tech_health_empty">No hay restricciones\nPulsa + para crear una.</string>
     <string name="tech_health_groups_title">Grupos</string>
 
+    <!-- Pantalla de permisos de Tech Health -->
+    <string name="tech_health_perm_title">Configurar permisos</string>
+    <string name="tech_health_perm_subtitle">Para funcionar correctamente, DayPilot necesita dos permisos. No se preocupe: solo se usan para lo que se explica aquí.</string>
+    <string name="tech_health_perm_note">⚠ Estos son permisos importantes, pero no hay nada de qué preocuparse. La app solo los usa para medir el uso de tus apps y bloquearlas cuando superas el límite.</string>
+    <string name="tech_health_perm_granted">Concedido</string>
+    <string name="tech_health_perm_usage_title">Acceso a estadísticas de uso</string>
+    <string name="tech_health_perm_usage_desc">Mide cuántos minutos al día usas cada aplicación. Sin esto no es posible controlar los límites de tiempo.</string>
+    <string name="tech_health_perm_usage_steps">Ajustes → Apps → Acceso especial → Acceso a datos de uso</string>
+    <string name="tech_health_perm_usage_button">Abrir ajustes de uso</string>
+    <string name="tech_health_perm_a11y_title">Servicio de accesibilidad</string>
+    <string name="tech_health_perm_a11y_desc">Detecta qué app está en primer plano y la cierra si has superado el límite. No lee texto ni interactúa con ninguna app.</string>
+    <string name="tech_health_perm_a11y_steps">Ajustes → Accesibilidad → Servicios instalados → DayPilot</string>
+    <string name="tech_health_perm_a11y_button">Abrir accesibilidad</string>
+
 
     <!-- Timer Hub Screen -->
     <string name="timer_hub_title">Cronómetros</string>

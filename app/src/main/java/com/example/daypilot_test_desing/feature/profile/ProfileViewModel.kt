@@ -80,6 +80,7 @@ class ProfileViewModel(
 
         if (success) {
             load()  // re-reads from cache, picks up new avatarUrl
+            _uiState.value = _uiState.value.copy(isUploadingAvatar = false)
         } else {
             _uiState.value = _uiState.value.copy(isUploadingAvatar = false, avatarUploadError = true)
         }

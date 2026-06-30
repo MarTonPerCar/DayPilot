@@ -107,6 +107,7 @@ class SupabaseTaskRepository : TaskRepository {
         duration: Int,
         description: String
     ) {
+        val uid = userId() ?: return
         supabase.from("tasks").update({
             set("title", title)
             set("description", description.ifBlank { null })
@@ -114,8 +115,9 @@ class SupabaseTaskRepository : TaskRepository {
             set("difficulty", difficulty.name)
             set("estimated_minutes", duration)
         }) {
-            filter { eq("id", id) }
+            filter { eq("id", id); eq("user_id", uid) }
         }
+        SessionCache.tasks.value = null
     }
 
     override suspend fun toggleTask(id: String, isDone: Boolean) {
@@ -130,12 +132,15 @@ class SupabaseTaskRepository : TaskRepository {
                 eq("user_id", uid)
             }
         }
+        SessionCache.tasks.value = null
     }
 
     override suspend fun deleteTask(id: String) {
+        val uid = userId() ?: return
         supabase.from("tasks").delete {
-            filter { eq("id", id) }
+            filter { eq("id", id); eq("user_id", uid) }
         }
+        SessionCache.tasks.value = null
     }
 }
 

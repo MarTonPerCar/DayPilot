@@ -29,8 +29,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Slider
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -94,13 +92,6 @@ fun AppLimitFormCard(
                 .toFloat().coerceAtMost(maxMinutes)
         )
     }
-    var notifSeconds by remember {
-        mutableFloatStateOf(
-            (initialApp?.notificationIntervalSeconds
-                ?: initialGroup?.notificationIntervalSeconds ?: 60).toFloat()
-        )
-    }
-    var notifEnabled by remember { mutableStateOf(true) }
     var showAppPicker by remember { mutableStateOf(false) }
     var showGroupAppPicker by remember { mutableStateOf(false) }
 
@@ -229,7 +220,7 @@ fun AppLimitFormCard(
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                text = selectedApp!!.name.first().uppercase(),
+                                text = selectedApp!!.name.firstOrNull()?.uppercase() ?: "?",
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.primary
@@ -307,7 +298,7 @@ fun AppLimitFormCard(
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text(
-                                        text = app.name.first().uppercase(),
+                                        text = app.name.firstOrNull()?.uppercase() ?: "?",
                                         fontSize = 11.sp,
                                         fontWeight = FontWeight.Bold,
                                         color = MaterialTheme.colorScheme.primary
@@ -352,74 +343,6 @@ fun AppLimitFormCard(
                         ),
                         style = MaterialTheme.typography.labelMedium
                     )
-                }
-            }
-
-            // ── Notificaciones ────────────────────────────────────
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(14.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column {
-                            Text(
-                                text = stringResource(R.string.app_limit_form_notif_title),
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.SemiBold,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                            Text(
-                                text = stringResource(R.string.app_limit_form_notif_description),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                        Switch(
-                            checked = notifEnabled,
-                            onCheckedChange = { notifEnabled = it },
-                            colors = SwitchDefaults.colors(
-                                checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
-                                checkedTrackColor = MaterialTheme.colorScheme.primary
-                            )
-                        )
-                    }
-                    if (notifEnabled) {
-                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            Text(
-                                text = stringResource(R.string.app_limit_form_notif_interval_label),
-                                style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            Text(
-                                text = stringResource(
-                                    R.string.app_limit_form_notif_selected,
-                                    notifSeconds.toInt()
-                                ),
-                                style = MaterialTheme.typography.labelSmall,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                            Slider(
-                                value = notifSeconds,
-                                onValueChange = { notifSeconds = it },
-                                valueRange = 5f..60f,
-                                steps = 10,
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        }
-                    }
                 }
             }
 
@@ -513,12 +436,12 @@ fun AppLimitFormCard(
                                                 appName = it.name,
                                                 packageName = it.packageName,
                                                 dailyLimitMinutes = limitMinutes.toInt(),
-                                                notificationIntervalSeconds = if (notifEnabled) notifSeconds.toInt() else 0,
+                                                notificationIntervalSeconds = 0,
                                                 isEnabled = true
                                             )
                                         },
                                         dailyLimitMinutes = limitMinutes.toInt(),
-                                        notificationIntervalSeconds = if (notifEnabled) notifSeconds.toInt() else 0,
+                                        notificationIntervalSeconds = 0,
                                         isEnabled = true
                                     )
                                 )
@@ -530,7 +453,7 @@ fun AppLimitFormCard(
                                         appName = selectedApp!!.name,
                                         packageName = selectedApp!!.packageName,
                                         dailyLimitMinutes = limitMinutes.toInt(),
-                                        notificationIntervalSeconds = if (notifEnabled) notifSeconds.toInt() else 0,
+                                        notificationIntervalSeconds = 0,
                                         isEnabled = true
                                     )
                                 )

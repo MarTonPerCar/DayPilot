@@ -505,6 +505,20 @@
     <string name="tech_health_empty">Keine Einschränkungen\nTippe + um eine zu erstellen.</string>
     <string name="tech_health_groups_title">Gruppen</string>
 
+    <!-- Tech Health Berechtigungsbildschirm -->
+    <string name="tech_health_perm_title">Berechtigungen einrichten</string>
+    <string name="tech_health_perm_subtitle">DayPilot benötigt zwei Berechtigungen. Keine Sorge – sie werden nur für die hier erklärten Zwecke verwendet.</string>
+    <string name="tech_health_perm_note">⚠ Das sind wichtige Berechtigungen, aber es gibt keinen Grund zur Sorge. Die App nutzt sie nur, um deine tägliche App-Nutzung zu messen und Apps zu sperren, wenn du dein Limit überschreitest.</string>
+    <string name="tech_health_perm_granted">Erteilt</string>
+    <string name="tech_health_perm_usage_title">Nutzungszugriff</string>
+    <string name="tech_health_perm_usage_desc">Misst, wie viele Minuten du täglich jede App nutzt. Ohne diese Berechtigung können Zeitlimits nicht durchgesetzt werden.</string>
+    <string name="tech_health_perm_usage_steps">Einstellungen → Apps → Spezieller App-Zugriff → Nutzungszugriff</string>
+    <string name="tech_health_perm_usage_button">Nutzungseinstellungen öffnen</string>
+    <string name="tech_health_perm_a11y_title">Barrierefreiheitsdienst</string>
+    <string name="tech_health_perm_a11y_desc">Erkennt, welche App im Vordergrund ist, und schließt sie, wenn das Limit überschritten wurde. Liest keinen Text und interagiert nicht mit Apps.</string>
+    <string name="tech_health_perm_a11y_steps">Einstellungen → Barrierefreiheit → Installierte Dienste → DayPilot</string>
+    <string name="tech_health_perm_a11y_button">Barrierefreiheit öffnen</string>
+
 
     <!-- Timer Hub Screen -->
     <string name="timer_hub_title">Timer</string>
