@@ -1,10 +1,10 @@
-package com.example.daypilot_test_desing.backend.supabase
+package com.example.daypilot_test_desing.data.supabase
 
-import com.example.daypilot_test_desing.backend.model.NotificationData
-import com.example.daypilot_test_desing.backend.model.NotificationType
-import com.example.daypilot_test_desing.backend.repository.NotificationRepository
-import com.example.daypilot_test_desing.backend.supabase.dto.InsertNotificationDto
-import com.example.daypilot_test_desing.backend.supabase.dto.NotificationDto
+import com.example.daypilot_test_desing.core.data.model.NotificationData
+import com.example.daypilot_test_desing.core.data.model.NotificationType
+import com.example.daypilot_test_desing.core.data.repository.NotificationRepository
+import com.example.daypilot_test_desing.data.supabase.dto.InsertNotificationDto
+import com.example.daypilot_test_desing.data.supabase.dto.NotificationDto
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Order
@@ -74,6 +74,10 @@ object SupabaseNotificationRepository : NotificationRepository {
     }
 
     suspend fun insertForCurrentUser(type: String, title: String, body: String) {
+        // awaitInitialization() is a no-op when the session is already loaded (normal
+        // in-app path), but is essential when called from a BroadcastReceiver where
+        // the Auth plugin may still be restoring the session from SharedPreferences.
+        supabase.auth.awaitInitialization()
         val uid = supabase.auth.currentUserOrNull()?.id ?: return
         insert(uid, type, title, body)
     }

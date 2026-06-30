@@ -26,7 +26,7 @@ import kotlinx.coroutines.joinAll
 import com.example.daypilot_test_desing.core.data.local.NotificationHub
 import com.example.daypilot_test_desing.core.data.model.NotificationType
 import com.example.daypilot_test_desing.core.data.preferences.AppPreferences
-import com.example.daypilot_test_desing.core.reminders.createDailyChannel
+
 import com.example.daypilot_test_desing.core.reminders.DailyNotificationScheduler
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -132,7 +132,6 @@ fun DayPilotNavGraph(
     LaunchedEffect(Unit) {
         val today = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
         appPrefs.lastOpenDate = today
-        createDailyChannel(context)
     }
 
     // After any task toggle or delete that writes points, refresh all score-related
@@ -172,8 +171,17 @@ fun DayPilotNavGraph(
     // Cache today's pending task count so DailyNotificationsReceiver can read it.
     val calendarStateForCache by calendarVM.uiState.collectAsState()
     LaunchedEffect(calendarStateForCache.tasks) {
-        val today = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
-        val pending = calendarStateForCache.tasks.count { !it.isDone }
+        val cal        = java.util.Calendar.getInstance()
+        val todayDay   = cal.get(java.util.Calendar.DAY_OF_MONTH)
+        val todayMonth = cal.get(java.util.Calendar.MONTH) + 1
+        val todayYear  = cal.get(java.util.Calendar.YEAR)
+        val today      = "%04d-%02d-%02d".format(todayYear, todayMonth, todayDay)
+        val pending    = calendarStateForCache.tasks.count { task ->
+            !task.isDone &&
+            task.day   == todayDay   &&
+            task.month == todayMonth &&
+            task.year  == todayYear
+        }
         appPrefs.pendingTaskCount     = pending
         appPrefs.pendingTaskCountDate = today
     }

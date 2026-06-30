@@ -7,8 +7,16 @@ import android.content.Intent
 import androidx.core.app.NotificationCompat
 import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.core.data.local.SharedPrefsReminderRepository
+import com.example.daypilot_test_desing.data.supabase.SupabaseNotificationRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 
 class ReminderReceiver : BroadcastReceiver() {
+
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
     override fun onReceive(context: Context, intent: Intent) {
         val title      = intent.getStringExtra("title") ?: return
         val notifId    = intent.getIntExtra("notif_id", 0)
@@ -33,6 +41,18 @@ class ReminderReceiver : BroadcastReceiver() {
 
         if (isOneTime && reminderId != null) {
             SharedPrefsReminderRepository(context).deleteReminder(reminderId)
+        }
+
+        // Insert into the in-app notification center for the actual firing only
+        // (skip the early "10 minutes before" warning to avoid duplicate entries).
+        if (!isEarly) {
+            scope.launch {
+                SupabaseNotificationRepository.insertForCurrentUser(
+                    type  = "REMINDER",
+                    title = contentTitle,
+                    body  = contentText
+                )
+            }
         }
     }
 }

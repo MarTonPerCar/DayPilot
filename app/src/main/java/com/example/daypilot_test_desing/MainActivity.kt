@@ -15,6 +15,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.daypilot_test_desing.data.supabase.SupabaseUserRepository
 import com.example.daypilot_test_desing.core.navigation.DayPilotNavGraph
 import com.example.daypilot_test_desing.feature.settings.SettingsViewModel
+import com.example.daypilot_test_desing.core.reminders.createDailyChannel
 import com.example.daypilot_test_desing.core.reminders.createNotificationChannel
 import com.example.daypilot_test_desing.core.reminders.createTechHealthChannel
 import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
@@ -27,6 +28,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         createNotificationChannel(this)
+        createDailyChannel(this)
         createTechHealthChannel(this)
 
         val toRequest = mutableListOf<String>()
