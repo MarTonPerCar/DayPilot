@@ -206,7 +206,7 @@ class TechHealthViewModel(application: Application) : AndroidViewModel(applicati
         if (active.all { it.usedMinutesToday < it.dailyLimitMinutes }) {
             appPrefs.techHealthBonusDate = todayStr
             viewModelScope.launch {
-                logPointsToDb(10, "TECH_HEALTH", tomorrow())
+                logPointsToDb(10, "TECH_HEALTH", today()) // TODO: was tomorrow() — was crediting to the wrong day
                 writeTechHealthEarned(true)
             }
         }

@@ -40,7 +40,6 @@ fun CalendarScreen(
     onTapTask: (String) -> Unit,
     onToggleTask: (String, Boolean) -> Unit,
     onDeleteTask: (String) -> Unit = {},
-    onEditTask: (String) -> Unit = {},
     onUpdateTask: (id: String, title: String, category: TaskCategory, difficulty: TaskDifficulty, duration: Int, description: String) -> Unit = { _, _, _, _, _, _ -> }
 ) {
     val now        = remember { Calendar.getInstance() }

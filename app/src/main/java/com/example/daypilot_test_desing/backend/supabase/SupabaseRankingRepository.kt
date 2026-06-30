@@ -92,29 +92,4 @@ class SupabaseRankingRepository : RankingRepository {
         } catch (_: Exception) { null }
     }
 
-    // These are no longer called by RivalryViewModel (everything is derived from getRanking()),
-    // kept for interface compliance.
-    override suspend fun getCurrentUserPosition(): Int {
-        val uid = userId()
-        val ranking = buildRanking(uid)
-        val idx = ranking.indexOfFirst { it.id == uid }
-        return if (idx >= 0) idx + 1 else ranking.size + 1
-    }
-
-    override suspend fun getCurrentUserPoints(): Int {
-        val uid = userId()
-        return try {
-            buildRanking(uid).firstOrNull { it.id == uid }?.pointsLast30Days ?: 0
-        } catch (_: Exception) { 0 }
-    }
-
-    override suspend fun getCurrentUserStreak(): Int {
-        val uid = userId()
-        return try {
-            supabase.from("user_streaks").select {
-                filter { eq("user_id", uid) }
-                limit(1)
-            }.decodeList<UserStreakDto>().firstOrNull()?.currentStreak ?: 0
-        } catch (_: Exception) { 0 }
-    }
 }

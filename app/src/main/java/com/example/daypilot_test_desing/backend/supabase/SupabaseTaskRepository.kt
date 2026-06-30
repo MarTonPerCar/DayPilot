@@ -69,7 +69,7 @@ class SupabaseTaskRepository : TaskRepository {
             NewTaskDayDto(taskId = taskId, userId = uid, date = date)
         )
 
-        // For recurring tasks, generate day entries for the next 90 days
+        // TODO: replace with a single batch insert or a DB function — currently one round-trip per day
         if (data.isRecurring && data.recurrenceDays >= 1) {
             val cal = Calendar.getInstance()
             cal.set(data.year, data.month - 1, data.day)
@@ -133,8 +133,6 @@ class SupabaseTaskRepository : TaskRepository {
             filter { eq("id", id) }
         }
     }
-
-    override suspend fun editTask(id: String) { /* handled locally in UI */ }
 }
 
 // ── DB ↔ App mappings ─────────────────────────────────────────────

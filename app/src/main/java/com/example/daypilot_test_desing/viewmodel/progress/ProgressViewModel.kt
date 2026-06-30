@@ -79,6 +79,8 @@ class ProgressViewModel(
             repo.logPoints(10, "TIMER")
             invalidate()
             load()
+            // TODO: move notification sending to NotificationRepository so ProgressViewModel
+            //       doesn't depend on a concrete Supabase class
             SupabaseNotificationRepository.insertForCurrentUser(
                 type  = "TIMER_DONE",
                 title = "¡Temporizador completado! ⏱",

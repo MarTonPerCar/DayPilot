@@ -73,6 +73,7 @@ import com.example.daypilot_test_desing.presentation.habits.StepsScreen
 import com.example.daypilot_test_desing.presentation.techhealth.TechHealthScreen
 import com.example.daypilot_test_desing.presentation.timer.TimerHubScreen
 import com.example.daypilot_test_desing.presentation.timer.TimerScreen
+import com.example.daypilot_test_desing.ui.components.DayPilotBottomBar
 
 
 @Composable
@@ -468,7 +469,6 @@ fun DayPilotNavGraph(
                         profileVM.invalidate()
                         homeVM.invalidate()
                     },
-                    onEditTask     = calendarVM::editTask,
                     onUpdateTask   = calendarVM::updateTask
                 )
             }

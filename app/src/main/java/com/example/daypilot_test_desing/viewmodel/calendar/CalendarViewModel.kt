@@ -149,10 +149,6 @@ class CalendarViewModel(
         }
     }
 
-    fun editTask(id: String) {
-        viewModelScope.launch { taskRepo.editTask(id) }
-    }
-
     fun clearUserMessage() {
         _uiState.update { it.copy(userMessage = null) }
     }

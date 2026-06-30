@@ -11,7 +11,6 @@ import com.example.daypilot_test_desing.backend.supabase.dto.UpdateUserDto
 import com.example.daypilot_test_desing.backend.supabase.dto.UserDto
 import com.example.daypilot_test_desing.backend.supabase.dto.UserStreakDto
 import com.example.daypilot_test_desing.backend.supabase.dto.WeeklySummaryRowDto
-import android.util.Log
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Order
@@ -120,29 +119,21 @@ class SupabaseUserRepository : UserRepository {
     }
 
     override suspend fun uploadAvatar(bytes: ByteArray, mimeType: String): String? {
-        val uid = userId() ?: run {
-            Log.e("AvatarUpload", "uploadAvatar: no authenticated user")
-            return null
-        }
+        val uid = userId() ?: return null
         val ext = mimeType.substringAfterLast("/").replace("jpeg", "jpg").take(4)
-        Log.d("AvatarUpload", "Starting upload: uid=$uid, mimeType=$mimeType, ext=$ext, bytes=${bytes.size}")
+        // Path includes timestamp so re-uploads get a fresh URL (Coil doesn't re-fetch same-URL images)
+        val path = "$uid/${System.currentTimeMillis()}.$ext"
         return try {
-            val path = "$uid/${System.currentTimeMillis()}.$ext"
-            Log.d("AvatarUpload", "Uploading to storage path: $path")
             supabase.storage.from("avatars").upload(path, bytes) {
                 upsert = true
                 contentType = ContentType.parse(mimeType)
             }
-            Log.d("AvatarUpload", "Storage upload succeeded")
             val url = supabase.storage.from("avatars").publicUrl(path)
-            Log.d("AvatarUpload", "Public URL: $url")
             supabase.from("users").update({ set("photo_url", url) }) {
                 filter { eq("id", uid) }
             }
-            Log.d("AvatarUpload", "photo_url updated in DB")
             url
-        } catch (e: Exception) {
-            Log.e("AvatarUpload", "Upload failed", e)
+        } catch (_: Exception) {
             null
         }
     }

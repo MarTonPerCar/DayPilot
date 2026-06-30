@@ -6,7 +6,4 @@ interface RankingRepository {
     suspend fun getRanking(): List<RankingData>
     suspend fun getCurrentUserId(): String
     suspend fun getCurrentUserData(): RankingData?
-    suspend fun getCurrentUserPosition(): Int
-    suspend fun getCurrentUserPoints(): Int
-    suspend fun getCurrentUserStreak(): Int
 }
