@@ -30,6 +30,7 @@ fun ProfileScreen(
     rankingPosition: Int,
     pointsToday: Int,
     stepsToday: Int,
+    stepsGoal: Int,
     tasksCompletedToday: Int,
     avatarUrl: String? = null,
     weeklySummary: WeeklySummaryData,
@@ -101,7 +102,7 @@ fun ProfileScreen(
                 userName       = name,
                 streak         = currentStreak,
                 stepsToday     = stepsToday,
-                stepsGoal      = 2000,
+                stepsGoal      = stepsGoal,
                 tasksCompleted = tasksCompletedToday,
                 pointsToday    = pointsToday,
                 rankingPosition = rankingPosition

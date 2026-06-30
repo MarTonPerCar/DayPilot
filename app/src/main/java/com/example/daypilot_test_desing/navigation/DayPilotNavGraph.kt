@@ -100,8 +100,9 @@ fun DayPilotNavGraph(
     val userRepo     = remember { SupabaseUserRepository() }
     val friendRepo   = remember { SupabaseFriendRepository() }
     val rankingRepo  = remember { SupabaseRankingRepository() }
+    val taskRepo     = remember { SupabaseTaskRepository() }
 
-    val homeVM: HomeViewModel            = viewModel(factory = HomeViewModel.factory(stepsRepo, progressRepo, userRepo, friendRepo, SupabaseTaskRepository()))
+    val homeVM: HomeViewModel            = viewModel(factory = HomeViewModel.factory(stepsRepo, progressRepo, userRepo, friendRepo, taskRepo))
     val friendsVM: FriendsViewModel      = viewModel(factory = FriendsViewModel.factory(friendRepo))
     val searchVM: SearchFriendsViewModel = viewModel(factory = SearchFriendsViewModel.factory(friendRepo))
     val rivalryVM: RivalryViewModel      = viewModel(factory = RivalryViewModel.factory(rankingRepo))
@@ -110,9 +111,7 @@ fun DayPilotNavGraph(
     val progressVM: ProgressViewModel = viewModel(factory = ProgressViewModel.factory(application, progressRepo))
     val profileVM: ProfileViewModel   = viewModel(factory = ProfileViewModel.factory(userRepo, progressRepo))
     val settingsVM: SettingsViewModel = viewModel(factory = SettingsViewModel.factory(application, userRepo))
-    val calendarVM: CalendarViewModel = viewModel(
-        factory = CalendarViewModel.factory(SupabaseTaskRepository(), progressRepo)
-    )
+    val calendarVM: CalendarViewModel = viewModel(factory = CalendarViewModel.factory(taskRepo, progressRepo))
 
     // Propagate sensor step updates to HabitsScreen (local read, fast)
     // homeVM is NOT refreshed here — the sensor fires many times per second
@@ -348,9 +347,6 @@ fun DayPilotNavGraph(
             // ── Notifications ─────────────────────────────────────
             composable(DayPilotDestinations.NOTIFICATIONS) {
                 val s by notificationsVM.uiState.collectAsState()
-                LaunchedEffect(Unit) {
-                    notificationsVM.markAllAsRead()
-                }
                 NotificationsScreen(
                     notifications    = s.notifications,
                     onTapNotification= notificationsVM::markAsRead,
@@ -375,6 +371,7 @@ fun DayPilotNavGraph(
                     rankingPosition     = s.rankingPosition,
                     pointsToday         = s.pointsToday,
                     stepsToday          = s.stepsToday,
+                    stepsGoal           = stepsState.goalSteps,
                     tasksCompletedToday = s.tasksCompletedToday,
                     avatarUrl           = s.avatarUrl,
                     weeklySummary       = s.weeklySummary,

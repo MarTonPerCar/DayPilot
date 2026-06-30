@@ -104,7 +104,7 @@ fun HomeScreen(
                         HomeMenuCardInline(
                             section  = HomeSection.HABITS,
                             data     = HomeSectionData.Habits(
-                                stepsProgress = stepsToday.toFloat() / stepsGoal,
+                                stepsProgress = if (stepsGoal > 0) stepsToday.toFloat() / stepsGoal else 0f,
                                 timerDone     = timerCompletedToday
                             ),
                             onClick  = onNavigateToHabits,
