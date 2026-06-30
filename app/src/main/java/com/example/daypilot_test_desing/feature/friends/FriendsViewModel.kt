@@ -1,13 +1,14 @@
-package com.example.daypilot_test_desing.viewmodel.friends
+package com.example.daypilot_test_desing.feature.friends
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.daypilot_test_desing.R
-import com.example.daypilot_test_desing.backend.local.NotificationHub
-import com.example.daypilot_test_desing.backend.model.NotificationType
-import com.example.daypilot_test_desing.backend.model.ReactionType
-import com.example.daypilot_test_desing.backend.repository.FriendRepository
+import com.example.daypilot_test_desing.core.cache.SessionCache
+import com.example.daypilot_test_desing.core.data.local.NotificationHub
+import com.example.daypilot_test_desing.core.data.model.NotificationType
+import com.example.daypilot_test_desing.core.data.model.ReactionType
+import com.example.daypilot_test_desing.core.data.repository.FriendRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,8 +29,8 @@ class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
         try {
             _uiState.update { current ->
                 current.copy(
-                    friends        = repo.getFriends(),
-                    friendRequests = repo.getFriendRequests()
+                    friends        = repo.getFriends(),         // cache-first with 5min TTL
+                    friendRequests = repo.getFriendRequests()   // always fresh
                 )
             }
         } catch (_: Exception) { }
@@ -49,6 +50,12 @@ class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
         viewModelScope.launch {
             try {
                 repo.acceptRequest(userId)
+                // Propagate updated friends list to SessionCache so HomeVM sees fresh count
+                SessionCache.friends.value    = _uiState.value.friends
+                SessionCache.friendsFetchedAt = System.currentTimeMillis()
+                // Ranking changes when a new friend is added
+                SessionCache.ranking.value    = null
+                SessionCache.rankingFetchedAt = 0L
                 NotificationHub.add(
                     title   = "Nueva amistad 🤝",
                     message = "${request.name} es ahora tu amigo",
@@ -100,6 +107,8 @@ class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
         viewModelScope.launch {
             try {
                 repo.reactToFriend(userId, reaction)
+                SessionCache.friends.value    = _uiState.value.friends
+                SessionCache.friendsFetchedAt = System.currentTimeMillis()
                 val name  = _uiState.value.friends.firstOrNull { it.id == userId }?.name
                 val emoji = when (reaction) {
                     ReactionType.FIRE   -> "🔥"
@@ -128,6 +137,11 @@ class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
         viewModelScope.launch {
             try {
                 repo.removeFriend(userId)
+                SessionCache.friends.value    = _uiState.value.friends
+                SessionCache.friendsFetchedAt = System.currentTimeMillis()
+                // Ranking changes when a friend is removed
+                SessionCache.ranking.value    = null
+                SessionCache.rankingFetchedAt = 0L
             } catch (e: Exception) {
                 _uiState.update { state ->
                     state.copy(friends = originalFriends, userMessage = R.string.error_remove_friend)

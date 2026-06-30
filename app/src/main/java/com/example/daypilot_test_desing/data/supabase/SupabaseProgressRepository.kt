@@ -1,11 +1,13 @@
-package com.example.daypilot_test_desing.backend.supabase
+package com.example.daypilot_test_desing.data.supabase
 
-import com.example.daypilot_test_desing.backend.repository.ProgressRepository
-import com.example.daypilot_test_desing.backend.supabase.dto.DailyLogDto
-import com.example.daypilot_test_desing.backend.supabase.dto.DailyProgressDto
-import com.example.daypilot_test_desing.backend.supabase.dto.FriendRowDto
-import com.example.daypilot_test_desing.backend.supabase.dto.FriendsRankingDto
-import com.example.daypilot_test_desing.backend.supabase.dto.InsertPointsLogDto
+import com.example.daypilot_test_desing.core.cache.SessionCache
+import com.example.daypilot_test_desing.core.data.model.RankingData
+import com.example.daypilot_test_desing.core.data.repository.ProgressRepository
+import com.example.daypilot_test_desing.data.supabase.dto.DailyLogDto
+import com.example.daypilot_test_desing.data.supabase.dto.DailyProgressDto
+import com.example.daypilot_test_desing.data.supabase.dto.FriendRowDto
+import com.example.daypilot_test_desing.data.supabase.dto.FriendsRankingDto
+import com.example.daypilot_test_desing.data.supabase.dto.InsertPointsLogDto
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Order
@@ -19,9 +21,10 @@ class SupabaseProgressRepository : ProgressRepository {
     private fun userId() = supabase.auth.currentUserOrNull()?.id
 
     override suspend fun getTodayProgress(): DailyProgressDto {
+        SessionCache.todayProgress.value?.let { return it }
         val uid = userId() ?: return DailyProgressDto(userId = "", date = today())
         return try {
-            supabase.from("daily_progress").select {
+            val result = supabase.from("daily_progress").select {
                 filter {
                     eq("user_id", uid)
                     eq("date", today())
@@ -29,19 +32,28 @@ class SupabaseProgressRepository : ProgressRepository {
                 limit(1)
             }.decodeList<DailyProgressDto>().firstOrNull()
                 ?: DailyProgressDto(userId = uid, date = today())
+            SessionCache.todayProgress.value = result
+            result
         } catch (_: Exception) {
             DailyProgressDto(userId = "", date = today())
         }
     }
 
     override suspend fun getHistory(days: Int): List<DailyLogDto> {
+        val now = System.currentTimeMillis()
+        SessionCache.weeklyHistory.value?.let { cached ->
+            if (now - SessionCache.weeklyHistoryFetchedAt < SessionCache.HISTORY_TTL_MS) return cached
+        }
         val uid = userId() ?: return emptyList()
         return try {
-            supabase.from("user_daily_log").select {
+            val result = supabase.from("user_daily_log").select {
                 filter { eq("user_id", uid) }
                 order("date", Order.DESCENDING)
                 limit(days.toLong())
             }.decodeList<DailyLogDto>()
+            SessionCache.weeklyHistory.value    = result
+            SessionCache.weeklyHistoryFetchedAt = now
+            result
         } catch (_: Exception) {
             emptyList()
         }
@@ -53,10 +65,17 @@ class SupabaseProgressRepository : ProgressRepository {
             supabase.from("points_log").insert(
                 InsertPointsLogDto(userId = uid, points = points, source = source, dayKey = today())
             )
+            SessionCache.todayProgress.value = null
         } catch (_: Exception) { }
     }
 
     override suspend fun getRankingPosition(): Int {
+        // Fast path: compute position from cached ranking list (populated by RivalryVM)
+        SessionCache.ranking.value?.let { cached ->
+            val uid = userId() ?: return 0
+            val idx = cached.indexOfFirst { it.id == uid }
+            return if (idx >= 0) idx + 1 else cached.size + 1
+        }
         val uid = userId() ?: return 0
         return try {
             val asRequester = try {
@@ -70,11 +89,23 @@ class SupabaseProgressRepository : ProgressRepository {
                 }.decodeList<FriendRowDto>().map { it.requesterId }
             } catch (_: Exception) { emptyList() }
             val friendIds = (asRequester + asReceiver).distinct()
-            val allIds = (friendIds + uid).distinct()
+            val allIds    = (friendIds + uid).distinct()
             val ranking = supabase.from("friends_ranking").select {
                 filter { isIn("id", allIds) }
             }.decodeList<FriendsRankingDto>()
                 .sortedByDescending { it.pointsLast30Days }
+            // Populate ranking cache as a side effect so subsequent calls are instant
+            SessionCache.ranking.value       = ranking.map { dto ->
+                RankingData(
+                    id        = dto.id,
+                    name      = dto.name.ifBlank { dto.username },
+                    points    = dto.pointsLast30Days,
+                    streak    = dto.currentStreak ?: 0,
+                    level     = dto.level,
+                    avatarUrl = dto.photoUrl
+                )
+            }
+            SessionCache.rankingFetchedAt    = System.currentTimeMillis()
             val idx = ranking.indexOfFirst { it.id == uid }
             if (idx >= 0) idx + 1 else ranking.size + 1
         } catch (_: Exception) { 0 }

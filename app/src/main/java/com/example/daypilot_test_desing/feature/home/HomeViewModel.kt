@@ -1,15 +1,15 @@
-package com.example.daypilot_test_desing.viewmodel.home
+package com.example.daypilot_test_desing.feature.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.daypilot_test_desing.backend.model.DayProgress
+import com.example.daypilot_test_desing.core.data.model.DayProgress
 import java.util.Calendar
-import com.example.daypilot_test_desing.backend.repository.FriendRepository
-import com.example.daypilot_test_desing.backend.repository.ProgressRepository
-import com.example.daypilot_test_desing.backend.repository.StepsRepository
-import com.example.daypilot_test_desing.backend.repository.TaskRepository
-import com.example.daypilot_test_desing.backend.repository.UserRepository
+import com.example.daypilot_test_desing.core.data.repository.FriendRepository
+import com.example.daypilot_test_desing.core.data.repository.ProgressRepository
+import com.example.daypilot_test_desing.core.data.repository.StepsRepository
+import com.example.daypilot_test_desing.core.data.repository.TaskRepository
+import com.example.daypilot_test_desing.core.data.repository.UserRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -28,21 +28,16 @@ class HomeViewModel(
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
-    private var loadedAt = 0L
-
     init { refresh() }
 
-    fun refresh(): Job = viewModelScope.launch {
-        if (System.currentTimeMillis() - loadedAt < CACHE_TTL_MS) return@launch
-        load()
-    }
+    fun refresh(): Job = viewModelScope.launch { load() }
 
-    fun invalidate() { loadedAt = 0L }
+    fun invalidate() { /* cache freshness is managed at the repo/SessionCache layer */ }
 
     private suspend fun load() {
         try {
             coroutineScope {
-                // All DB calls are independent — run them in parallel
+                // All repo calls are cache-first; only the first caller fetches from Supabase
                 val userD    = async { userRepo.getCurrentUser() }
                 val tasksD   = async { taskRepo.getTasks() }
                 val todayD   = async { progressRepo.getTodayProgress() }
@@ -83,14 +78,11 @@ class HomeViewModel(
                     friendCount         = friends.size,
                     timerCompletedToday = today.timerPoints > 0
                 )
-                loadedAt = System.currentTimeMillis()
             }
         } catch (_: Exception) { }
     }
 
     companion object {
-        private const val CACHE_TTL_MS = 2 * 60_000L
-
         fun factory(
             stepsRepo: StepsRepository,
             progressRepo: ProgressRepository,

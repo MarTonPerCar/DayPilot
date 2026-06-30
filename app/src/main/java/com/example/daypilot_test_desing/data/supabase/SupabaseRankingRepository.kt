@@ -1,12 +1,13 @@
-package com.example.daypilot_test_desing.backend.supabase
+package com.example.daypilot_test_desing.data.supabase
 
-import com.example.daypilot_test_desing.backend.model.RankingData
-import com.example.daypilot_test_desing.backend.repository.RankingRepository
-import com.example.daypilot_test_desing.backend.supabase.dto.DailyProgressDto
-import com.example.daypilot_test_desing.backend.supabase.dto.FriendRowDto
-import com.example.daypilot_test_desing.backend.supabase.dto.FriendsRankingDto
-import com.example.daypilot_test_desing.backend.supabase.dto.UserDto
-import com.example.daypilot_test_desing.backend.supabase.dto.UserStreakDto
+import com.example.daypilot_test_desing.core.cache.SessionCache
+import com.example.daypilot_test_desing.core.data.model.RankingData
+import com.example.daypilot_test_desing.core.data.repository.RankingRepository
+import com.example.daypilot_test_desing.data.supabase.dto.DailyProgressDto
+import com.example.daypilot_test_desing.data.supabase.dto.FriendRowDto
+import com.example.daypilot_test_desing.data.supabase.dto.FriendsRankingDto
+import com.example.daypilot_test_desing.data.supabase.dto.UserDto
+import com.example.daypilot_test_desing.data.supabase.dto.UserStreakDto
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
 
@@ -41,8 +42,12 @@ class SupabaseRankingRepository : RankingRepository {
     }
 
     override suspend fun getRanking(): List<RankingData> {
+        val now = System.currentTimeMillis()
+        SessionCache.ranking.value?.let { cached ->
+            if (now - SessionCache.rankingFetchedAt < SessionCache.SOCIAL_TTL_MS) return cached
+        }
         val uid = userId()
-        return buildRanking(uid).map { dto ->
+        val result = buildRanking(uid).map { dto ->
             RankingData(
                 id        = dto.id,
                 name      = dto.name.ifBlank { dto.username },
@@ -52,6 +57,9 @@ class SupabaseRankingRepository : RankingRepository {
                 avatarUrl = dto.photoUrl
             )
         }
+        SessionCache.ranking.value    = result
+        SessionCache.rankingFetchedAt = now
+        return result
     }
 
     override suspend fun getCurrentUserId(): String = userId()

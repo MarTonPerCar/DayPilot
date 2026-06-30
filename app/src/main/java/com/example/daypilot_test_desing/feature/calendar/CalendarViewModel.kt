@@ -1,21 +1,20 @@
-package com.example.daypilot_test_desing.viewmodel.calendar
+package com.example.daypilot_test_desing.feature.calendar
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.daypilot_test_desing.R
-import com.example.daypilot_test_desing.backend.local.NotificationHub
-import com.example.daypilot_test_desing.backend.model.CalendarTaskData
-import com.example.daypilot_test_desing.backend.model.NewTaskData
-import com.example.daypilot_test_desing.backend.model.NotificationType
-import com.example.daypilot_test_desing.backend.model.TaskCategory
-import com.example.daypilot_test_desing.backend.model.TaskDifficulty
-import com.example.daypilot_test_desing.backend.repository.ProgressRepository
-import com.example.daypilot_test_desing.backend.repository.TaskRepository
+import com.example.daypilot_test_desing.core.cache.SessionCache
+import com.example.daypilot_test_desing.core.data.local.NotificationHub
+import com.example.daypilot_test_desing.core.data.model.CalendarTaskData
+import com.example.daypilot_test_desing.core.data.model.NewTaskData
+import com.example.daypilot_test_desing.core.data.model.NotificationType
+import com.example.daypilot_test_desing.core.data.model.TaskCategory
+import com.example.daypilot_test_desing.core.data.model.TaskDifficulty
+import com.example.daypilot_test_desing.core.data.repository.ProgressRepository
+import com.example.daypilot_test_desing.core.data.repository.TaskRepository
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -29,17 +28,12 @@ class CalendarViewModel(
     private val _uiState = MutableStateFlow(CalendarUiState(isLoading = true))
     val uiState: StateFlow<CalendarUiState> = _uiState.asStateFlow()
 
-    // Emits whenever a points-affecting write completes so the NavGraph can
-    // trigger score refreshes without polling or guessing at the write timing.
-    private val _pointsChanged = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
-    val pointsChanged: SharedFlow<Unit> = _pointsChanged
-
     init { refresh() }
 
     private suspend fun load() {
         _uiState.update { it.copy(isLoading = true) }
         try {
-            val tasks = taskRepo.getTasks()
+            val tasks = taskRepo.getTasks()  // cache-first
             _uiState.update { it.copy(tasks = tasks, isLoading = false) }
         } catch (e: Exception) {
             _uiState.update { it.copy(isLoading = false) }
@@ -69,8 +63,9 @@ class CalendarViewModel(
 
         viewModelScope.launch {
             try {
-                taskRepo.addTask(data)
-                load() // replace placeholder with real server ID
+                taskRepo.addTask(data)          // invalidates SessionCache.tasks
+                load()                           // re-fetches from Supabase, repopulates cache
+                SessionCache.tasks.value = _uiState.value.tasks
             } catch (e: Exception) {
                 _uiState.update { state ->
                     state.copy(
@@ -98,6 +93,7 @@ class CalendarViewModel(
         viewModelScope.launch {
             try {
                 taskRepo.updateTask(id, title, category, difficulty, duration, description)
+                SessionCache.tasks.value = _uiState.value.tasks
             } catch (e: Exception) {
                 _uiState.update { state ->
                     state.copy(
@@ -121,8 +117,8 @@ class CalendarViewModel(
             try {
                 taskRepo.toggleTask(id, isDone)
                 val points = if (isDone) 20 else -20
-                progressRepo.logPoints(points, "TASKS")
-                _pointsChanged.tryEmit(Unit) // signal NavGraph to refresh score VMs
+                progressRepo.logPoints(points, "TASKS")  // clears SessionCache.todayProgress
+                SessionCache.tasks.value = _uiState.value.tasks
                 if (isDone && taskTitle != null) {
                     NotificationHub.add(
                         title   = "✓ $taskTitle",
@@ -131,7 +127,6 @@ class CalendarViewModel(
                     )
                 }
             } catch (e: Exception) {
-                // Revert the flip
                 _uiState.update { state ->
                     state.copy(
                         tasks = state.tasks.map { if (it.id == id) it.copy(isDone = !isDone) else it },
@@ -149,10 +144,10 @@ class CalendarViewModel(
             try {
                 val task = snapshot.find { it.id == id }
                 if (task?.isDone == true) {
-                    progressRepo.logPoints(-20, "TASKS")
-                    _pointsChanged.tryEmit(Unit)
+                    progressRepo.logPoints(-20, "TASKS")  // clears SessionCache.todayProgress
                 }
                 taskRepo.deleteTask(id)
+                SessionCache.tasks.value = _uiState.value.tasks
             } catch (e: Exception) {
                 _uiState.update { it.copy(tasks = snapshot, userMessage = R.string.error_task_delete) }
             }

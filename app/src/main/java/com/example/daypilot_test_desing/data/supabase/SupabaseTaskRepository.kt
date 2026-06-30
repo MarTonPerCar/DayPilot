@@ -1,13 +1,14 @@
-package com.example.daypilot_test_desing.backend.supabase
+package com.example.daypilot_test_desing.data.supabase
 
-import com.example.daypilot_test_desing.backend.model.CalendarTaskData
-import com.example.daypilot_test_desing.backend.model.NewTaskData
-import com.example.daypilot_test_desing.backend.model.TaskCategory
-import com.example.daypilot_test_desing.backend.model.TaskDifficulty
-import com.example.daypilot_test_desing.backend.repository.TaskRepository
-import com.example.daypilot_test_desing.backend.supabase.dto.CalendarTaskDto
-import com.example.daypilot_test_desing.backend.supabase.dto.NewTaskDayDto
-import com.example.daypilot_test_desing.backend.supabase.dto.NewTaskDto
+import com.example.daypilot_test_desing.core.cache.SessionCache
+import com.example.daypilot_test_desing.core.data.model.CalendarTaskData
+import com.example.daypilot_test_desing.core.data.model.NewTaskData
+import com.example.daypilot_test_desing.core.data.model.TaskCategory
+import com.example.daypilot_test_desing.core.data.model.TaskDifficulty
+import com.example.daypilot_test_desing.core.data.repository.TaskRepository
+import com.example.daypilot_test_desing.data.supabase.dto.CalendarTaskDto
+import com.example.daypilot_test_desing.data.supabase.dto.NewTaskDayDto
+import com.example.daypilot_test_desing.data.supabase.dto.NewTaskDto
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
 import kotlinx.serialization.json.buildJsonObject
@@ -20,12 +21,15 @@ class SupabaseTaskRepository : TaskRepository {
     private fun userId(): String? = supabase.auth.currentUserOrNull()?.id
 
     override suspend fun getTasks(): List<CalendarTaskData> {
+        SessionCache.tasks.value?.let { return it }
         val uid = userId() ?: return emptyList()
         return try {
-            supabase.from("calendar_tasks")
+            val result = supabase.from("calendar_tasks")
                 .select { filter { eq("user_id", uid) } }
                 .decodeList<CalendarTaskDto>()
                 .map { it.toModel() }
+            SessionCache.tasks.value = result
+            result
         } catch (e: Exception) {
             emptyList()
         }
@@ -36,7 +40,6 @@ class SupabaseTaskRepository : TaskRepository {
         val taskId = UUID.randomUUID().toString()
         val date = "%04d-%02d-%02d".format(data.year, data.month, data.day)
 
-        // Compute recurrence end date (start + 90 days) to match the task_days window
         val endCal = Calendar.getInstance().also {
             it.set(data.year, data.month - 1, data.day)
             it.add(Calendar.DAY_OF_YEAR, 90)
@@ -47,8 +50,6 @@ class SupabaseTaskRepository : TaskRepository {
             endCal.get(Calendar.DAY_OF_MONTH)
         )
 
-        // Use buildJsonObject so Boolean/nullable values go directly into the JSON payload
-        // as JsonPrimitive — no kotlinx.serialization encoder in between, no encodeDefaults risk.
         supabase.from("tasks").insert(buildJsonObject {
             put("id",                taskId)
             put("user_id",           uid)
@@ -93,6 +94,9 @@ class SupabaseTaskRepository : TaskRepository {
                 cal.add(Calendar.DAY_OF_YEAR, data.recurrenceDays)
             }
         }
+
+        // Invalidate so the next getTasks() fetches the real server-side row
+        SessionCache.tasks.value = null
     }
 
     override suspend fun updateTask(

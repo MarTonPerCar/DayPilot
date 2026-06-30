@@ -23,6 +23,7 @@ import android.app.Application
 import android.content.Context
 import androidx.compose.runtime.remember
 import kotlinx.coroutines.joinAll
+
 import com.example.daypilot_test_desing.core.data.local.NotificationHub
 import com.example.daypilot_test_desing.core.data.model.NotificationType
 import com.example.daypilot_test_desing.core.data.preferences.AppPreferences
@@ -132,18 +133,6 @@ fun DayPilotNavGraph(
     LaunchedEffect(Unit) {
         val today = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
         appPrefs.lastOpenDate = today
-    }
-
-    // After any task toggle or delete that writes points, refresh all score-related
-    // VMs immediately. The write already completed when this fires (CalendarViewModel
-    // emits only after progressRepo.logPoints() returns), so the DB read sees correct data.
-    LaunchedEffect(Unit) {
-        calendarVM.pointsChanged.collect {
-            progressVM.invalidate(); progressVM.refresh()
-            homeVM.invalidate();     homeVM.refresh()
-            rivalryVM.invalidate();  rivalryVM.refresh()
-            profileVM.invalidate();  profileVM.refresh()
-        }
     }
 
     // Level-up in-app notification: fire when profileVM.level increases.
@@ -475,18 +464,8 @@ fun DayPilotNavGraph(
                     onBack         = { homeVM.refresh(); navController.popBackStack() },
                     onCreateTask   = calendarVM::addTask,
                     onTapTask      = {},
-                    onToggleTask   = { id, isDone ->
-                        calendarVM.toggleTask(id, isDone)
-                        progressVM.invalidate()
-                        profileVM.invalidate()
-                        homeVM.invalidate()
-                    },
-                    onDeleteTask   = { id ->
-                        calendarVM.deleteTask(id)
-                        progressVM.invalidate()
-                        profileVM.invalidate()
-                        homeVM.invalidate()
-                    },
+                    onToggleTask   = calendarVM::toggleTask,
+                    onDeleteTask   = calendarVM::deleteTask,
                     onUpdateTask   = calendarVM::updateTask
                 )
             }
@@ -591,11 +570,7 @@ fun DayPilotNavGraph(
                     timerMode        = mode,
                     customMinutes    = minutes,
                     pointEarnedToday = ps.timerCompletedToday,
-                    onTimerCompleted = {
-                        progressVM.recordTimerComplete()
-                        homeVM.invalidate()
-                        profileVM.invalidate()
-                    },
+                    onTimerCompleted = { progressVM.recordTimerComplete() },
                     onBack           = { navController.popBackStack() }
                 )
             }

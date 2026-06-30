@@ -1,9 +1,10 @@
-package com.example.daypilot_test_desing.viewmodel.rivalry
+package com.example.daypilot_test_desing.feature.rivalry
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.daypilot_test_desing.backend.repository.RankingRepository
+import com.example.daypilot_test_desing.core.cache.SessionCache
+import com.example.daypilot_test_desing.core.data.repository.RankingRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,24 +16,19 @@ class RivalryViewModel(private val repo: RankingRepository) : ViewModel() {
     private val _uiState = MutableStateFlow(RivalryUiState())
     val uiState: StateFlow<RivalryUiState> = _uiState.asStateFlow()
 
-    private var loadedAt = 0L
-
     init { viewModelScope.launch { load() } }
 
-    fun refresh(): Job = viewModelScope.launch {
-        if (System.currentTimeMillis() - loadedAt < CACHE_TTL_MS) return@launch
-        load()
-    }
+    fun refresh(): Job = viewModelScope.launch { load() }
 
-    fun invalidate() { loadedAt = 0L }
+    fun invalidate() {
+        SessionCache.ranking.value    = null
+        SessionCache.rankingFetchedAt = 0L
+    }
 
     private suspend fun load() {
         try {
-            val ranking  = repo.getRanking()
+            val ranking  = repo.getRanking()  // cache-first with 5min TTL
             val uid      = repo.getCurrentUserId()
-            // friends_ranking VIEW may not return the current user due to
-            // security_invoker + streaks_own RLS interaction; fall back to
-            // direct table queries which always work for the own user.
             val me       = ranking.firstOrNull { it.id == uid }
                            ?: repo.getCurrentUserData()
             val position = ranking.indexOfFirst { it.id == uid }
@@ -46,13 +42,10 @@ class RivalryViewModel(private val repo: RankingRepository) : ViewModel() {
                 currentUserLevel    = me?.level ?: 1,
                 ranking             = ranking
             )
-            loadedAt = System.currentTimeMillis()
         } catch (_: Exception) { }
     }
 
     companion object {
-        private const val CACHE_TTL_MS = 2 * 60_000L
-
         fun factory(repo: RankingRepository): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")

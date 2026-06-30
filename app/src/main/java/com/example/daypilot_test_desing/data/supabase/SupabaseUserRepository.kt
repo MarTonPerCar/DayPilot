@@ -1,16 +1,17 @@
-package com.example.daypilot_test_desing.backend.supabase
+package com.example.daypilot_test_desing.data.supabase
 
-import com.example.daypilot_test_desing.backend.model.ReactionType
-import com.example.daypilot_test_desing.backend.model.ReceivedReaction
-import com.example.daypilot_test_desing.backend.model.TimeZoneRegion
-import com.example.daypilot_test_desing.backend.model.UserProfile
-import com.example.daypilot_test_desing.backend.model.WeeklySummaryData
-import com.example.daypilot_test_desing.backend.repository.UserRepository
-import com.example.daypilot_test_desing.backend.supabase.dto.ReactionDto
-import com.example.daypilot_test_desing.backend.supabase.dto.UpdateUserDto
-import com.example.daypilot_test_desing.backend.supabase.dto.UserDto
-import com.example.daypilot_test_desing.backend.supabase.dto.UserStreakDto
-import com.example.daypilot_test_desing.backend.supabase.dto.WeeklySummaryRowDto
+import com.example.daypilot_test_desing.core.cache.SessionCache
+import com.example.daypilot_test_desing.core.data.model.ReactionType
+import com.example.daypilot_test_desing.core.data.model.ReceivedReaction
+import com.example.daypilot_test_desing.core.data.model.TimeZoneRegion
+import com.example.daypilot_test_desing.core.data.model.UserProfile
+import com.example.daypilot_test_desing.core.data.model.WeeklySummaryData
+import com.example.daypilot_test_desing.core.data.repository.UserRepository
+import com.example.daypilot_test_desing.data.supabase.dto.ReactionDto
+import com.example.daypilot_test_desing.data.supabase.dto.UpdateUserDto
+import com.example.daypilot_test_desing.data.supabase.dto.UserDto
+import com.example.daypilot_test_desing.data.supabase.dto.UserStreakDto
+import com.example.daypilot_test_desing.data.supabase.dto.WeeklySummaryRowDto
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Order
@@ -22,6 +23,7 @@ class SupabaseUserRepository : UserRepository {
     private fun userId() = supabase.auth.currentUserOrNull()?.id
 
     override suspend fun getCurrentUser(): UserProfile {
+        SessionCache.userProfile.value?.let { return it }
         val uid = userId() ?: return UserProfile(id = "", name = "", username = "", email = "")
         return try {
             val dto = supabase.from("users").select {
@@ -39,7 +41,7 @@ class SupabaseUserRepository : UserRepository {
                 ?: TimeZoneRegion.EUROPE_MADRID
             val memberSince = dto.createdAt.take(4)
 
-            UserProfile(
+            val profile = UserProfile(
                 id            = dto.id,
                 name          = dto.name,
                 username      = dto.username,
@@ -52,6 +54,8 @@ class SupabaseUserRepository : UserRepository {
                 currentStreak = streak?.currentStreak ?: 0,
                 longestStreak = streak?.longestStreak ?: 0
             )
+            SessionCache.userProfile.value = profile
+            profile
         } catch (_: Exception) {
             UserProfile(id = uid, name = "", username = "", email = "")
         }
@@ -67,7 +71,6 @@ class SupabaseUserRepository : UserRepository {
             }.decodeList<WeeklySummaryRowDto>().firstOrNull()
                 ?: return WeeklySummaryData(0, 0, 0, 0)
 
-            // Load reactions received on this summary
             val reactionRows = try {
                 supabase.from("reactions").select {
                     filter { eq("weekly_summary_id", row.id) }
@@ -115,6 +118,11 @@ class SupabaseUserRepository : UserRepository {
             ) {
                 filter { eq("id", uid) }
             }
+            SessionCache.userProfile.value = SessionCache.userProfile.value?.copy(
+                name     = name,
+                username = username,
+                region   = region
+            )
         } catch (_: Exception) { }
     }
 
@@ -132,6 +140,7 @@ class SupabaseUserRepository : UserRepository {
             supabase.from("users").update({ set("photo_url", url) }) {
                 filter { eq("id", uid) }
             }
+            SessionCache.userProfile.value = SessionCache.userProfile.value?.copy(avatarUrl = url)
             url
         } catch (_: Exception) {
             null

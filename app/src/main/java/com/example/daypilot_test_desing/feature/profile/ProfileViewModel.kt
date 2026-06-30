@@ -1,13 +1,13 @@
-package com.example.daypilot_test_desing.viewmodel.profile
+package com.example.daypilot_test_desing.feature.profile
 
 import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.daypilot_test_desing.backend.model.TimeZoneRegion
-import com.example.daypilot_test_desing.backend.repository.ProgressRepository
-import com.example.daypilot_test_desing.backend.repository.UserRepository
+import com.example.daypilot_test_desing.core.data.model.TimeZoneRegion
+import com.example.daypilot_test_desing.core.data.repository.ProgressRepository
+import com.example.daypilot_test_desing.core.data.repository.UserRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,23 +24,18 @@ class ProfileViewModel(
     private val _uiState = MutableStateFlow(ProfileUiState())
     val uiState: StateFlow<ProfileUiState> = _uiState.asStateFlow()
 
-    private var loadedAt = 0L
-
     init { viewModelScope.launch { load() } }
 
-    fun refresh(): Job = viewModelScope.launch {
-        if (System.currentTimeMillis() - loadedAt < CACHE_TTL_MS) return@launch
-        load()
-    }
+    fun refresh(): Job = viewModelScope.launch { load() }
 
-    fun invalidate() { loadedAt = 0L }
+    fun invalidate() { /* cache freshness is managed at the repo/SessionCache layer */ }
 
     private suspend fun load() {
         try {
-            val user    = userRepo.getCurrentUser()
+            val user    = userRepo.getCurrentUser()    // cache-first
             val summary = userRepo.getWeeklySummary()
-            val today   = progressRepo.getTodayProgress()
-            val ranking = progressRepo.getRankingPosition()
+            val today   = progressRepo.getTodayProgress()  // cache-first
+            val ranking = progressRepo.getRankingPosition()  // uses cached ranking if available
             _uiState.value = ProfileUiState(
                 name                 = user.name,
                 username             = user.username,
@@ -61,15 +56,13 @@ class ProfileViewModel(
                 avatarUrl            = user.avatarUrl,
                 weeklySummary        = summary
             )
-            loadedAt = System.currentTimeMillis()
         } catch (_: Exception) { }
     }
 
     fun updateProfile(name: String, username: String, region: TimeZoneRegion) {
         viewModelScope.launch {
-            userRepo.updateProfile(name, username, region)
-            invalidate()
-            load()
+            userRepo.updateProfile(name, username, region)  // updates SessionCache.userProfile
+            load()  // re-reads from cache (instant), refreshes UiState
         }
     }
 
@@ -82,12 +75,11 @@ class ProfileViewModel(
                 Pair(b, m)
             }
             if (bytes == null) false
-            else userRepo.uploadAvatar(bytes, mimeType) != null
+            else userRepo.uploadAvatar(bytes, mimeType) != null  // updates SessionCache.userProfile.avatarUrl
         } catch (_: Exception) { false }
 
         if (success) {
-            invalidate()
-            load()
+            load()  // re-reads from cache, picks up new avatarUrl
         } else {
             _uiState.value = _uiState.value.copy(isUploadingAvatar = false, avatarUploadError = true)
         }
@@ -98,8 +90,6 @@ class ProfileViewModel(
     }
 
     companion object {
-        private const val CACHE_TTL_MS = 2 * 60_000L
-
         fun factory(userRepo: UserRepository, progressRepo: ProgressRepository): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")

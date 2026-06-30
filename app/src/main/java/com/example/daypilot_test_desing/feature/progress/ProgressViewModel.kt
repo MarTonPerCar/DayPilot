@@ -1,15 +1,15 @@
-package com.example.daypilot_test_desing.viewmodel.progress
+package com.example.daypilot_test_desing.feature.progress
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.daypilot_test_desing.backend.model.DayProgress
-import com.example.daypilot_test_desing.backend.preferences.AppPreferences
-import com.example.daypilot_test_desing.backend.supabase.SupabaseNotificationRepository
+import com.example.daypilot_test_desing.core.data.model.DayProgress
+import com.example.daypilot_test_desing.core.data.preferences.AppPreferences
+import com.example.daypilot_test_desing.data.supabase.SupabaseNotificationRepository
 import java.util.Calendar
-import com.example.daypilot_test_desing.backend.repository.ProgressRepository
+import com.example.daypilot_test_desing.core.data.repository.ProgressRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -29,22 +29,17 @@ class ProgressViewModel(
     private val _uiState = MutableStateFlow(ProgressUiState())
     val uiState: StateFlow<ProgressUiState> = _uiState.asStateFlow()
 
-    private var loadedAt = 0L
-
     init { viewModelScope.launch { load() } }
 
-    fun refresh(): Job = viewModelScope.launch {
-        if (System.currentTimeMillis() - loadedAt < CACHE_TTL_MS) return@launch
-        load()
-    }
+    fun refresh(): Job = viewModelScope.launch { load() }
 
-    fun invalidate() { loadedAt = 0L }
+    fun invalidate() { /* cache freshness is managed at the repo/SessionCache layer */ }
 
     private suspend fun load() {
         try {
-            val todayProgress = repo.getTodayProgress()
-            val history       = repo.getHistory(30)
-            val ranking       = repo.getRankingPosition()
+            val todayProgress = repo.getTodayProgress()   // cache-first
+            val history       = repo.getHistory(30)        // cache-first with 1h TTL
+            val ranking       = repo.getRankingPosition()  // uses cached ranking if available
             val closedData    = history.reversed().map { log ->
                 val day = log.date.substringAfterLast("-").toIntOrNull() ?: 0
                 DayProgress(day = day, points = log.totalPoints, steps = log.steps, tasksCompleted = log.tasksCompleted)
@@ -67,7 +62,6 @@ class ProgressViewModel(
                 pointsFromTimers    = todayProgress.timerPoints,
                 timerCompletedToday = appPrefs.timerPointsDate == today()
             )
-            loadedAt = System.currentTimeMillis()
         } catch (_: Exception) { }
     }
 
@@ -76,9 +70,8 @@ class ProgressViewModel(
         if (appPrefs.timerPointsDate == todayStr) return
         appPrefs.timerPointsDate = todayStr
         viewModelScope.launch {
-            repo.logPoints(10, "TIMER")
-            invalidate()
-            load()
+            repo.logPoints(10, "TIMER")  // clears SessionCache.todayProgress
+            load()  // re-fetches fresh todayProgress, updates UiState
             // TODO: move notification sending to NotificationRepository so ProgressViewModel
             //       doesn't depend on a concrete Supabase class
             SupabaseNotificationRepository.insertForCurrentUser(
@@ -92,8 +85,6 @@ class ProgressViewModel(
     private fun today() = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
 
     companion object {
-        private const val CACHE_TTL_MS = 2 * 60_000L
-
         fun factory(application: Application, repo: ProgressRepository): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")

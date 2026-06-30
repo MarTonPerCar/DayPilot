@@ -1,21 +1,22 @@
-package com.example.daypilot_test_desing.backend.supabase
+package com.example.daypilot_test_desing.data.supabase
 
-import com.example.daypilot_test_desing.backend.model.FriendData
-import com.example.daypilot_test_desing.backend.model.FriendWeeklySummary
-import com.example.daypilot_test_desing.backend.model.ReactionType
-import com.example.daypilot_test_desing.backend.model.SearchUserData
-import com.example.daypilot_test_desing.backend.repository.FriendRepository
-import com.example.daypilot_test_desing.backend.supabase.dto.FriendRequestDto
-import com.example.daypilot_test_desing.backend.supabase.dto.FriendRowDto
-import com.example.daypilot_test_desing.backend.supabase.dto.InsertFriendDto
-import com.example.daypilot_test_desing.backend.supabase.dto.InsertFriendRequestDto
-import com.example.daypilot_test_desing.backend.supabase.dto.InsertReactionDto
-import com.example.daypilot_test_desing.backend.supabase.dto.ReactionDto
-import com.example.daypilot_test_desing.backend.supabase.SupabaseNotificationRepository
-import com.example.daypilot_test_desing.backend.supabase.dto.SentRequestDto
-import com.example.daypilot_test_desing.backend.supabase.dto.UserDto
-import com.example.daypilot_test_desing.backend.supabase.dto.UserStreakDto
-import com.example.daypilot_test_desing.backend.supabase.dto.WeeklySummaryRowDto
+import com.example.daypilot_test_desing.core.cache.SessionCache
+import com.example.daypilot_test_desing.core.data.model.FriendData
+import com.example.daypilot_test_desing.core.data.model.FriendWeeklySummary
+import com.example.daypilot_test_desing.core.data.model.ReactionType
+import com.example.daypilot_test_desing.core.data.model.SearchUserData
+import com.example.daypilot_test_desing.core.data.repository.FriendRepository
+import com.example.daypilot_test_desing.data.supabase.dto.FriendRequestDto
+import com.example.daypilot_test_desing.data.supabase.dto.FriendRowDto
+import com.example.daypilot_test_desing.data.supabase.dto.InsertFriendDto
+import com.example.daypilot_test_desing.data.supabase.dto.InsertFriendRequestDto
+import com.example.daypilot_test_desing.data.supabase.dto.InsertReactionDto
+import com.example.daypilot_test_desing.data.supabase.dto.ReactionDto
+import com.example.daypilot_test_desing.data.supabase.SupabaseNotificationRepository
+import com.example.daypilot_test_desing.data.supabase.dto.SentRequestDto
+import com.example.daypilot_test_desing.data.supabase.dto.UserDto
+import com.example.daypilot_test_desing.data.supabase.dto.UserStreakDto
+import com.example.daypilot_test_desing.data.supabase.dto.WeeklySummaryRowDto
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Order
@@ -68,6 +69,10 @@ class SupabaseFriendRepository : FriendRepository {
     }
 
     override suspend fun getFriends(): List<FriendData> {
+        val now = System.currentTimeMillis()
+        SessionCache.friends.value?.let { cached ->
+            if (now - SessionCache.friendsFetchedAt < SessionCache.SOCIAL_TTL_MS) return cached
+        }
         val uid = userId() ?: return emptyList()
         return try {
             val friendIds = getFriendIds(uid)
@@ -121,6 +126,9 @@ class SupabaseFriendRepository : FriendRepository {
                     avatarUrl     = user.photoUrl,
                     weeklySummary = weeklySummary
                 )
+            }.also { result ->
+                SessionCache.friends.value    = result
+                SessionCache.friendsFetchedAt = now
             }
         } catch (_: Exception) { emptyList() }
     }
