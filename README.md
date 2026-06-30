@@ -1,121 +1,138 @@
-# DayPilot — Rama `Incremento-Android-TestFinal`
+# Incremento 1
 
-> **Estado:** Incremento completado  
-> **Base:** `Incremento-Android` (arquitectura MVVM + Supabase integrado)  
-> **Propósito:** Testing intensivo del primer incremento funcional completo
+## Índice
+
+1. [Funcionalidades implementadas](#1-funcionalidades-implementadas)
+2. [Deuda técnica resuelta](#2-deuda-técnica-resuelta)
+3. [Funcionalidades en desarrollo](#3-funcionalidades-en-desarrollo)
+4. [Final del incremento](#4-final-del-incremento)
+
+## 1. Funcionalidades implementadas
+
+### Gestión de tareas y calendario
+
+El usuario puede crear, editar y eliminar tareas asignándoles título, dificultad, categoría, duración estimada y días asignados. Las tareas se presentan en un listado visual con filtros por dificultad y categoría, y pueden ordenarse por estado, fecha, nombre, duración o proximidad. Complementando el listado, existe un calendario mensual donde se visualizan todas las tareas de forma organizada por día, permitiendo consultar sus detalles, marcarlas como completadas y añadir nuevas directamente desde la vista de calendario.
+
+### Sistema de puntos
+
+El sistema de puntos actúa como motor de motivación transversal a toda la aplicación. El usuario obtiene 2 puntos por cada tarea completada, independientemente de su dificultad, incentivando la organización como hábito. Por el contador de pasos se pueden obtener hasta 6 puntos diarios, conseguidos progresivamente al alcanzar el 50%, 75% y 100% de la meta diaria establecida. Para equilibrar la competencia entre usuarios que empezaron en momentos distintos, los puntos se mantienen activos durante una ventana de exactamente 30 días, de modo que el ranking refleja el esfuerzo reciente y no la antigüedad en la aplicación.
+
+### Hábitos
+
+La sección de hábitos agrupa tres subsecciones diferenciadas que cubren aspectos distintos del bienestar diario.
+
+El **contador de pasos** permite al usuario establecer una meta diaria configurable. El progreso se guarda en local y se sincroniza con la base de datos al alcanzar cada uno de los hitos establecidos (50%, 75%, 100%). La meta es modificable pero solo aplicable al día siguiente, evitando que el usuario la ajuste para obtener puntos de forma artificial.
+
+Los **recordatorios** permiten configurar alarmas para días y horas específicas, con opción de repetición diaria o semanal y aviso anticipado configurable antes de la hora señalada.
+
+La **salud tecnológica** permite establecer restricciones de uso sobre aplicaciones concretas del dispositivo. Cuando el usuario supera la cuota diaria, el sistema de accesibilidad bloquea la app mostrando una pantalla de aviso. Las aplicaciones pueden restringirse de forma individual o agrupadas, con cuotas independientes por grupo. Las restricciones eliminadas no se borran de inmediato sino que entran en un estado de eliminación diferida, aplicándose al día siguiente para no interrumpir el uso en curso.
+
+### Social y rivalidad
+
+La vertiente social se articula en torno a un sistema de amistades y competencia por puntos. El usuario puede enviar y aceptar solicitudes de amistad, y una vez conectados acceder a la sección de rivalidad, donde se muestra un ranking de puntos de los últimos 30 días entre todos sus amigos. El ranking se presenta con un pódium para los tres primeros puestos y un listado para el resto. Desde el perfil de cada amigo es posible consultar su progreso individual, viendo sus puntos y el origen de los mismos.
+
+### Perfil y configuración
+
+El perfil del usuario centraliza su información personal junto con un desglose del progreso de puntos de los últimos 30 días, mostrando de qué actividades provienen. La configuración ofrece opciones de modo oscuro, activación de notificaciones, idioma y región, y selección de tema de color de la interfaz.
+
+### Infraestructura
+
+La aplicación cuenta con un pipeline CI/CD mediante GitHub Actions que automatiza la construcción de APKs y la publicación de releases. Se emplea persistencia local para mantener la sesión, las preferencias del usuario y la caché de datos sin depender de conexión a red.
 
 ---
 
-## ¿Qué es esta rama?
+## 2. Deuda técnica resuelta
 
-Esta es la rama de trabajo del primer incremento funcional de DayPilot. Parte de la arquitectura MVVM con repositorios conectados a Supabase y añade las funcionalidades que faltaban para que la aplicación sea completa: sistema de puntos real, salud tecnológica con bloqueo de apps, social con reacciones, notificaciones centralizadas y cronómetros. Es también donde se realizó el testing exhaustivo, la revisión de código y la corrección de errores antes de consolidar en `Incremento-Android`.
+El análisis del código de la primera iteración identificó un conjunto de problemas estructurales que se abordan de forma prioritaria antes de incorporar nuevas funcionalidades. Estos no son errores puntuales sino decisiones de diseño acumuladas que dificultaban el mantenimiento y la expansión del proyecto.
+
+### Arquitectura uniforme MVVM
+
+La primera iteración mezclaba dos enfoques sin consistencia: algunos módulos usaban ViewModel con StateFlow correctamente, mientras que otros realizaban llamadas a repositorios directamente desde las vistas mediante corrutinas. Esta inconsistencia se resuelve adoptando el patrón MVVM de forma uniforme en toda la aplicación. Cada pantalla tiene ahora su ViewModel correspondiente y ninguna vista contiene lógica de negocio ni acceso directo a datos.
+
+### Inyección de dependencias
+
+Los repositorios se instanciaban directamente en cada pantalla sin ningún sistema centralizado. Esto impedía compartir instancias entre pantallas y hacía el testing inviable. Se introduce un contenedor de dependencias que centraliza la creación y el ciclo de vida de los repositorios, permitiendo su reutilización y sustitución para pruebas.
+
+### Navegación centralizada
+
+La navegación entre pantallas se realizaba mediante Intents con strings hardcodeados como claves de extras, sin un grafo de navegación centralizado. Se reemplaza por Navigation Component con rutas tipadas, gestión automática de la pila de retroceso y paso de argumentos con seguridad de tipos.
+
+### Lógica de hitos de pasos duplicada
+
+La detección de si el usuario alcanzaba el 50%, 75% o 100% de su meta de pasos estaba duplicada en dos componentes distintos, lo que podía provocar en determinadas condiciones que el usuario recibiese puntos dobles por el mismo hito. Esta lógica se centraliza en un único punto, garantizando que cada hito se registra exactamente una vez.
+
+### Persistencia local unificada
+
+Coexistían tres sistemas de persistencia local simultáneos: SharedPreferences para preferencias generales, DataStore en algunos módulos y una caché adicional dentro del módulo de pasos. Además, los almacenes de restricciones de salud tecnológica y recordatorios usaban serialización manual con strings delimitados por el carácter `|`, un sistema frágil ante cualquier cambio de modelo. Todo se unifica bajo DataStore con serialización JSON tipada.
+
+### Gestión de sesión unificada
+
+Coexistían dos sistemas de sesión en paralelo sin garantía de sincronización entre ambos, con un componente adicional que intentaba reconciliarlos en cada arranque de la aplicación. Se unifica la gestión de sesión en un único punto coherente con el SDK de autenticación utilizado.
+
+### Datos de usuario desactualizados en amistades
+
+El nombre y el username del amigo se almacenaban duplicados dentro del registro de la relación de amistad. Si un usuario modificaba su nombre, los registros de amistad quedaban desactualizados sin ningún mecanismo de propagación. Se refactoriza para que las relaciones referencien al usuario por identificador, obteniendo siempre el nombre del registro actualizado.
 
 ---
 
-## Punto de partida
-
-La rama base entregó:
-
-- Arquitectura MVVM completa con ViewModels y StateFlow
-- Repositorios Supabase para tareas, usuarios, progreso y ranking
-- 19 pantallas funcionales con navegación real (no maqueta)
-- Sistema de pasos con hitos y sincronización con Supabase
-- Sistema de recordatorios con AlarmManager
-- Autenticación con Supabase Auth
-- CI/CD con GitHub Actions
-
----
-
-## Funcionalidades implementadas en este incremento
-
-### Salud tecnológica (TechHealth)
-
-Sistema de restricciones de uso de apps basado en dos permisos del sistema: estadísticas de uso y accesibilidad. El usuario puede crear restricciones individuales o por grupo, cada una con un límite diario en minutos. Cuando el usuario supera el límite, `DayPilotAccessibilityService` detecta la app en primer plano y lanza `TechHealthBlockActivity`, que ocupa toda la pantalla y obliga al usuario a volver al inicio. Las restricciones eliminadas o desactivadas se aplican de forma diferida al día siguiente para no interrumpir el uso en curso.
-
-La pantalla de configuración muestra una pasarela de permisos a pantalla completa si alguno no está concedido, con instrucciones paso a paso para cada permiso, indicadores de estado y botones directos a los ajustes del sistema.
-
-Los datos de uso se actualizan mediante un `PeriodicWorkRequest` de WorkManager cada 15 minutos y también en tiempo real cada 60 segundos mientras la app está en primer plano. Si el usuario completa el día sin violar ningún límite (con al menos 3 restricciones activas), gana un punto de bonificación diario.
-
-### Notificaciones
-
-Sistema centralizado de notificaciones almacenadas en Supabase. Cada evento relevante (solicitud de amistad, reacción recibida, alerta de nivel, etc.) genera una fila en la tabla `notifications`. La pantalla de notificaciones las carga, agrupa por tipo y permite marcarlas como leídas. Se utiliza un `Hub` local para evitar duplicados y reducir llamadas a la red en cada apertura.
-
-### Social — Amigos y reacciones
-
-El usuario puede buscar otros usuarios por nombre de usuario, enviar solicitudes de amistad, aceptarlas o rechazarlas y ver el perfil individual de cada amigo. Las reacciones permiten valorar el resumen semanal de un amigo con un emoji; cada usuario solo puede reaccionar una vez por resumen y la reacción llega al destinatario como notificación.
-
-### Rivalidad y ranking
-
-Tabla de clasificación de los últimos 30 días entre el usuario y sus amigos, con pódium para los tres primeros puestos. El ranking se calcula agregando los puntos del log de puntos y se refresca con caché para evitar llamadas repetidas a la red.
-
-### Perfil
-
-Pantalla de perfil con desglose de puntos del día actual por fuente (tareas, pasos, hábitos, cronómetros), posición en el ranking y resumen semanal generado automáticamente por Supabase cada lunes. Incluye subida de foto de perfil al bucket de Supabase Storage con vista previa inmediata.
+## 3. Funcionalidades en desarrollo
 
 ### Cronómetros y temporizadores
 
-Módulo de temporizadores con tres modalidades: Pomodoro (25 min trabajo / 5 min descanso, número de sesiones configurable), modos predefinidos (entrenamiento, meditación, cocina) y modo libre con duración entre 5 y 180 minutos. La finalización de una sesión otorga puntos según la duración.
+Se incorpora un módulo de cronómetros accesible desde la sección de hábitos que permite al usuario realizar actividades temporizadas de forma guiada. Las modalidades disponibles son el método Pomodoro — con fases de trabajo de 25 minutos y descanso de 5 minutos, número de sesiones configurable y posibilidad de saltar fase — y modos predefinidos para entrenamiento, meditación y cocina. Existe también un modo personalizado con duración libre entre 5 y 180 minutos. La finalización de cada sesión otorga puntos al usuario, añadiendo una nueva fuente al sistema de puntuación.
+
+### Tareas recurrentes
+
+La gestión de tareas se amplía con soporte para recurrencia. Al crear o editar una tarea, el usuario puede indicar que se repita automáticamente cada cierto número de días, evitando la creación manual repetitiva. Esto resulta especialmente útil para hábitos periódicos como repasar apuntes o realizar ejercicio en días concretos de la semana.
+
+### Resumen diario al abrir la aplicación
+
+Al acceder a la pantalla principal se mostrará una tarjeta de resumen diario con las tareas pendientes del día, el progreso de pasos respecto a la meta y la posición actual en el ranking de amigos. Esta tarjeta proporciona de un vistazo el estado del día sin necesidad de navegar entre secciones.
+
+### Sistema de niveles
+
+Se implementará un sistema de niveles basado en los puntos acumulados históricamente, de forma independiente al ciclo de 30 días que rige el ranking de rivalidad. Cada nivel representa un umbral de puntos totales y se mostrará en el perfil y en la tabla de rivalidad junto al nombre del usuario, proporcionando una sensación de progresión a largo plazo que complementa la competencia periódica con amigos.
+
+### Rachas diarias
+
+Se añadirán rachas diarias visibles en el perfil, reflejando cuántos días consecutivos el usuario ha cumplido al menos una de sus metas. La racha se mostrará también en el pódium de rivalidad como indicador secundario junto a los puntos, añadiendo un elemento de constancia a la competencia.
+
+### Reacciones al progreso de amigos
+
+Los usuarios podrán reaccionar con un emoji al resumen semanal de sus amigos. Cada usuario puede reaccionar una vez por resumen; la reacción llega al destinatario como notificación y se muestra en su pantalla de perfil.
 
 ---
 
-## Retos técnicos y decisiones relevantes
+## 4. Final del incremento
 
-### AccessibilityService y bloqueo de apps
+**Estado:** Completado.
 
-El bloqueo de apps en Android moderno requiere un `AccessibilityService` que escuche `TYPE_WINDOW_STATE_CHANGED`. La actividad de bloqueo (`TechHealthBlockActivity`) necesita los flags `FLAG_SHOW_WHEN_LOCKED` y `FLAG_TURN_SCREEN_ON` para aparecer encima del lockscreen en algunos fabricantes. El botón de atrás está completamente bloqueado (`onBackPressed` vacío); la única salida es el botón de "Ir al inicio". Para evitar relanzar la pantalla en bucle al pulsar Home o Recientes, se usa `onUserLeaveHint` con un flag `intentionalExit`.
+El incremento se cerró con todas las funcionalidades planificadas implementadas y revisadas. A continuación se resume qué cambios tuvieron que realizarse durante el proceso de testing y revisión final:
 
-El debounce en el servicio (2.500 ms) evita que la pantalla de bloqueo se remuestre mil veces para la misma app durante el tiempo que tarda en procesarse el intent.
+### Cambios introducidos durante el testing
 
-### Permisos con pasarela a pantalla completa
+**Bloqueo real de apps (AccessibilityService)**
+El planteamiento inicial contemplaba notificaciones periódicas cuando el usuario superaba el límite. Durante el testing se comprobó que este enfoque no era efectivo: las notificaciones eran ignorables y no cambiaban el comportamiento del usuario. Se sustituyó por un bloqueo efectivo mediante `DayPilotAccessibilityService` que lanza una pantalla de bloqueo (`TechHealthBlockActivity`) a pantalla completa, sin posibilidad de usar el botón de atrás y que obliga al usuario a volver al inicio del sistema.
 
-El patrón `if (!permiso) { MostrarGate(); return }` al inicio del composable funciona correctamente en Compose y evita mostrar contenido de la pantalla principal antes de que los permisos estén concedidos. El `return` en un composable finaliza la composición de la función sin afectar al árbol de composición superior.
+**Pasarela de permisos a pantalla completa**
+La pantalla de salud tecnológica mostraba un aviso inline cuando los permisos no estaban concedidos, pero el usuario podía ignorarlo y seguir viendo el resto de la pantalla. Se rediseñó como una pasarela que ocupa toda la pantalla con instrucciones paso a paso (incluyendo texto en negrita y los pasos exactos para cada permiso) y no permite avanzar hasta que ambos permisos están concedidos.
 
-### Caché de sesión y consistencia
+**Eliminación del sistema de notificaciones de Tech Health**
+Las notificaciones periódicas de salud tecnológica ("llevas X minutos en esta app") se eliminaron completamente. El bloqueo activo por AccessibilityService hace innecesario avisar al usuario: o no ha llegado al límite y puede usar la app, o lo ha superado y la app se cierra. Las notificaciones en este contexto solo generaban ruido.
 
-`SessionCache` usa `MutableStateFlow<T?>` donde `null` significa "no cargado" y cualquier valor no nulo es la versión cacheada. El patrón estándar es: si hay valor cacheado, devolverlo; si no, cargar desde Supabase y guardar. Tras cualquier escritura (añadir, editar, borrar, togglear tarea) se invalida el caché poniendo el valor a `null`, garantizando que la siguiente lectura vaya a la base de datos. Este patrón se aplica de forma consistente en `SupabaseTaskRepository`.
+**Corrección de bugs identificados en revisión de código**
 
-### WorkManager y límites del sistema
-
-WorkManager impone un intervalo mínimo de 15 minutos para trabajo periódico en Android. Para el polling más frecuente (actualización de uso de apps mientras la app está en primer plano) se usa un bucle de corrutinas en el ViewModel con `delay(60_000L)`, que el sistema puede cancelar libremente cuando la app pasa a segundo plano.
-
-### Resumen semanal
-
-La tabla `user_weekly_summary` se puebla automáticamente mediante un job de `pg_cron` en Supabase que se ejecuta cada lunes a las 00:05 UTC, justo después de que el job diario cierre el día anterior. El lado Android solo lee de esta tabla; nunca escribe en ella.
-
-### Tema y modo oscuro en actividades independientes
-
-`TechHealthBlockActivity` es una `Activity` independiente (fuera del NavGraph), por lo que no hereda el tema del árbol de Compose principal. Hay que leer `AppPreferences` manualmente, resolver el `DayPilotTheme` enum por nombre y pasar tanto el tema como el `darkMode` al `setContent`. Sin esto, la pantalla de bloqueo siempre renderizaría el tema por defecto (SAGE_GREEN) independientemente de lo que el usuario haya configurado.
-
----
-
-## Errores encontrados y corregidos
-
-Durante la revisión de código se identificaron y corrigieron los siguientes problemas:
-
-| Severidad | Archivo | Descripción |
-|---|---|---|
-| Alta | `SupabaseTaskRepository` | `updateTask`, `toggleTask` y `deleteTask` no invalidaban `SessionCache.tasks` tras escribir en BD, devolviendo datos obsoletos en la siguiente lectura |
-| Alta | `ProfileViewModel` | `isUploadingAvatar` quedaba `true` permanentemente si `load()` fallaba silenciosamente tras una subida exitosa de foto |
-| Media | `AppLimitFormCard` | `name.first()` lanzaba `NoSuchElementException` con nombres de app vacíos |
-| Media | `DayPilotAccessibilityService` | `SharedPrefsTechHealthRepository` se instanciaba en cada evento de accesibilidad (hilo principal), potencial ANR con cambio de apps rápido |
-| Media | `TechHealthBlockActivity` | La pantalla de bloqueo siempre renderizaba el tema SAGE_GREEN ignorando la preferencia del usuario |
-
----
-
-## Estructura de ramas relacionadas
-
-| Rama | Propósito |
+| Severidad | Descripción |
 |---|---|
-| `Incremento-Android` | Versión de producción del incremento, base para el siguiente |
-| `Incremento-Android-TestFinal` | Esta rama — trabajo y testing |
-| `Intensive-Android-Testing` | Misma app con timings acelerados para pruebas exhaustivas |
-| `Supabase-Information` | Ficheros de migración SQL (schema, seed, drop) |
+| Alta | `SupabaseTaskRepository`: `updateTask`, `toggleTask` y `deleteTask` no invalidaban `SessionCache.tasks`, devolviendo datos obsoletos tras cualquier modificación |
+| Alta | `ProfileViewModel`: `isUploadingAvatar` quedaba `true` permanentemente si la recarga de perfil fallaba silenciosamente tras una subida exitosa de foto |
+| Media | `AppLimitFormCard`: `name.first()` lanzaba excepción con nombres de app vacíos |
+| Media | `DayPilotAccessibilityService`: el repositorio se instanciaba en cada evento de accesibilidad (hilo principal), con riesgo de ANR en cambios de app rápidos |
+| Media | `TechHealthBlockActivity`: siempre renderizaba el tema SAGE_GREEN ignorando la preferencia del usuario |
 
----
+**Humanización del código**
+Como parte del proceso de revisión final se realizó un pase de humanización del código: comentarios en español mezclados con inglés, valores de debounce ajustados (3.000 ms → 2.500 ms), TODOs y FIXMEs en lugares relevantes y un log de debug comentado que refleja el proceso real de desarrollo.
 
-## Convenciones de esta rama
+### Rama de continuación
 
-- Commits por bloque funcional, no por archivo
-- Mensajes de commit en inglés con prefijo descriptivo
-- Las pantallas no conocen los repositorios — solo hablan con el ViewModel
-- `SessionCache` es la única fuente de verdad en memoria; la BD es la fuente de verdad persistente
+Esta rama (`Incremento-Android`) queda como base para el siguiente incremento. Para testing exhaustivo con tiempos acelerados existe la rama `Intensive-Android-Testing`. Los ficheros de migración de Supabase están disponibles en la rama `Supabase-Information`.
