@@ -139,6 +139,9 @@ fun DayPilotNavGraph(
     LaunchedEffect(profileStateForLevel.level) {
         val newLevel = profileStateForLevel.level
         if (newLevel < 1) return@LaunchedEffect
+        // Skip until the profile has actually loaded — default state has name = ""
+        // and level = 1, which would falsely trigger a notification on every launch.
+        if (profileStateForLevel.name.isEmpty()) return@LaunchedEffect
         val lastLevel = appPrefs.lastKnownLevel
         if (lastLevel > 0 && newLevel > lastLevel) {
             val title = "¡Subiste de nivel! 🏆"
