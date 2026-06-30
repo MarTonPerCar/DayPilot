@@ -1,11 +1,11 @@
-package com.example.daypilot_test_desing.viewmodel.reminders
+package com.example.daypilot_test_desing.feature.reminders
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import com.example.daypilot_test_desing.backend.model.ReminderFormDataInfo
-import com.example.daypilot_test_desing.backend.preferences.AppPreferences
-import com.example.daypilot_test_desing.backend.sharedprefs.SharedPrefsReminderRepository
-import com.example.daypilot_test_desing.reminders.ReminderScheduler
+import com.example.daypilot_test_desing.core.data.model.ReminderFormDataInfo
+import com.example.daypilot_test_desing.core.data.preferences.AppPreferences
+import com.example.daypilot_test_desing.core.data.local.SharedPrefsReminderRepository
+import com.example.daypilot_test_desing.core.reminders.ReminderScheduler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -31,8 +31,9 @@ class RemindersViewModel(application: Application) : AndroidViewModel(applicatio
         val enriched = form.copy(triggerAtMillis = triggerAtMillis)
         val reminder = repository.addReminder(enriched)
         val ctx = getApplication<Application>()
+        val isOneTime = form.frequencyType == com.example.daypilot_test_desing.core.data.model.FrequencyType.ONCE
         if (appPrefs.notificationsEnabled) {
-            ReminderScheduler.schedule(ctx, reminder.id, reminder.title, triggerAtMillis)
+            ReminderScheduler.schedule(ctx, reminder.id, reminder.title, triggerAtMillis, isOneTime = isOneTime)
             if (form.earlyWarning && triggerAtMillis - System.currentTimeMillis() > 10 * 60_000L) {
                 ReminderScheduler.schedule(
                     ctx, reminder.id, reminder.title,

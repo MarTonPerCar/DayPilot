@@ -1,10 +1,10 @@
-package com.example.daypilot_test_desing.backend.sharedprefs
+package com.example.daypilot_test_desing.core.data.local
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.example.daypilot_test_desing.backend.model.ReminderData
-import com.example.daypilot_test_desing.backend.model.ReminderFormDataInfo
-import com.example.daypilot_test_desing.backend.repository.ReminderRepository
+import com.example.daypilot_test_desing.core.data.model.ReminderData
+import com.example.daypilot_test_desing.core.data.model.ReminderFormDataInfo
+import com.example.daypilot_test_desing.core.data.repository.ReminderRepository
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 import java.util.UUID
@@ -50,7 +50,8 @@ class SharedPrefsReminderRepository(context: Context) : ReminderRepository {
             title           = form.title,
             time            = time,
             triggerAtMillis = form.triggerAtMillis,
-            isEnabled       = true
+            isEnabled       = true,
+            frequencyType   = form.frequencyType
         )
         val list = load()
         list.add(reminder)

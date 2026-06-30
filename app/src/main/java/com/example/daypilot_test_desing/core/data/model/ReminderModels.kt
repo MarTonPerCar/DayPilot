@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.backend.model
+package com.example.daypilot_test_desing.core.data.model
 
 import androidx.annotation.StringRes
 import com.example.daypilot_test_desing.R
@@ -10,7 +10,8 @@ data class ReminderData(
     val time: String,
     val triggerAtMillis: Long = 0L,
     val description: String = "",
-    val isEnabled: Boolean = true
+    val isEnabled: Boolean = true,
+    val frequencyType: FrequencyType = FrequencyType.ONCE
 )
 
 enum class FrequencyType(@StringRes val labelRes: Int) {

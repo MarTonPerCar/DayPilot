@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.viewmodel.habits
+package com.example.daypilot_test_desing.feature.habits
 
 import android.app.Application
 import android.content.Context
@@ -13,7 +13,7 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.daypilot_test_desing.backend.repository.StepsRepository
+import com.example.daypilot_test_desing.core.data.repository.StepsRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -38,10 +38,28 @@ class StepsViewModel(
 
     private var baseline: Int = -1
     private var lastSyncedSteps: Int = -1
+    private var prevTotalSinceBoot: Int = -1
+    private var prevEventNs: Long = 0L
 
     private val sensorListener = object : SensorEventListener {
         override fun onSensorChanged(event: SensorEvent) {
             val totalSinceBoot = event.values[0].toInt()
+
+            // Reject physiologically impossible spikes: if more than 10 steps/sec
+            // arrived since the last event and the gap is under 30 s, it's sensor
+            // noise (emulator artifact or aggressive software step detection).
+            // Gaps > 30 s are ignored — the app may have been backgrounded.
+            if (prevTotalSinceBoot >= 0 && prevEventNs > 0) {
+                val stepDelta  = totalSinceBoot - prevTotalSinceBoot
+                val timeDeltaS = (event.timestamp - prevEventNs) / 1_000_000_000.0
+                if (stepDelta > 0 && timeDeltaS in 0.001..30.0 && stepDelta / timeDeltaS > 10.0) {
+                    prevEventNs = event.timestamp
+                    return
+                }
+            }
+            prevTotalSinceBoot = totalSinceBoot
+            prevEventNs        = event.timestamp
+
             if (baseline < 0) {
                 val today = todayStr()
                 val savedDate = prefs.getString("baseline_date", "")
@@ -57,8 +75,9 @@ class StepsViewModel(
                 }
             }
             val dailySteps = maxOf(0, totalSinceBoot - baseline)
+            val prevSteps  = stepsRepo.getCurrentSteps()
             stepsRepo.setSteps(dailySteps)
-            updateLocalState()
+            if (dailySteps != prevSteps) updateLocalState()
             if (lastSyncedSteps < 0 || dailySteps - lastSyncedSteps >= STEP_SYNC_THRESHOLD) {
                 triggerSync(dailySteps)
             }

@@ -333,6 +333,11 @@
     <string name="daily_summary_label_tasks">Aufgaben</string>
     <string name="daily_summary_label_points">Punkte</string>
     <string name="daily_summary_label_ranking">Rangliste</string>
+    <string name="daily_summary_breakdown_title">Punkte-Aufschlüsselung</string>
+    <string name="daily_summary_breakdown_tasks">Aufgaben</string>
+    <string name="daily_summary_breakdown_steps">Schritte</string>
+    <string name="daily_summary_breakdown_habits">Gewohnheiten</string>
+    <string name="daily_summary_breakdown_timer">Timer</string>
 
 
     <!-- Group Limit Card -->

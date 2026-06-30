@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.presentation.profile
+package com.example.daypilot_test_desing.feature.profile
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -12,9 +12,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.R
-import com.example.daypilot_test_desing.ui.components.basic.*
-import com.example.daypilot_test_desing.ui.components.cards.*
-import com.example.daypilot_test_desing.backend.model.WeeklySummaryData
+import com.example.daypilot_test_desing.core.ui.components.basic.*
+import com.example.daypilot_test_desing.core.ui.components.cards.*
+import com.example.daypilot_test_desing.core.data.model.WeeklySummaryData
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -29,6 +29,10 @@ fun ProfileScreen(
     longestStreak: Int,
     rankingPosition: Int,
     pointsToday: Int,
+    pointsFromTasks: Int,
+    pointsFromSteps: Int,
+    pointsFromHabits: Int,
+    pointsFromTimers: Int,
     stepsToday: Int,
     stepsGoal: Int,
     tasksCompletedToday: Int,
@@ -99,13 +103,17 @@ fun ProfileScreen(
 
             // ── Resumen del día ──────────────────────────────────
             DailySummaryCard(
-                userName       = name,
-                streak         = currentStreak,
-                stepsToday     = stepsToday,
-                stepsGoal      = stepsGoal,
-                tasksCompleted = tasksCompletedToday,
-                pointsToday    = pointsToday,
-                rankingPosition = rankingPosition
+                userName        = name,
+                streak          = currentStreak,
+                stepsToday      = stepsToday,
+                stepsGoal       = stepsGoal,
+                tasksCompleted  = tasksCompletedToday,
+                pointsToday     = pointsToday,
+                rankingPosition = rankingPosition,
+                pointsFromTasks  = pointsFromTasks,
+                pointsFromSteps  = pointsFromSteps,
+                pointsFromHabits = pointsFromHabits,
+                pointsFromTimers = pointsFromTimers
             )
 
             Spacer(Modifier.height(8.dp))

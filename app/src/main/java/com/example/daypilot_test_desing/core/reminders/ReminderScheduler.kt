@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.reminders
+package com.example.daypilot_test_desing.core.reminders
 
 import android.app.AlarmManager
 import android.app.NotificationChannel
@@ -32,15 +32,18 @@ object ReminderScheduler {
         reminderId: String,
         title: String,
         triggerAtMillis: Long,
-        isEarly: Boolean = false
+        isEarly: Boolean = false,
+        isOneTime: Boolean = false
     ) {
         if (triggerAtMillis <= System.currentTimeMillis()) return
 
         val notifId     = notificationId(reminderId, isEarly)
         val intent      = Intent(context, ReminderReceiver::class.java).apply {
-            putExtra("title",    title)
-            putExtra("notif_id", notifId)
-            putExtra("is_early", isEarly)
+            putExtra("title",       title)
+            putExtra("notif_id",    notifId)
+            putExtra("is_early",    isEarly)
+            putExtra("reminder_id", reminderId)
+            putExtra("is_one_time", isOneTime && !isEarly)
         }
         val pendingIntent = PendingIntent.getBroadcast(
             context, notifId, intent,

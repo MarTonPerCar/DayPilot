@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.reminders
+package com.example.daypilot_test_desing.core.reminders
 
 import android.app.NotificationManager
 import android.content.BroadcastReceiver
@@ -6,12 +6,15 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
 import com.example.daypilot_test_desing.R
+import com.example.daypilot_test_desing.core.data.local.SharedPrefsReminderRepository
 
 class ReminderReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        val title   = intent.getStringExtra("title") ?: return
-        val notifId = intent.getIntExtra("notif_id", 0)
-        val isEarly = intent.getBooleanExtra("is_early", false)
+        val title      = intent.getStringExtra("title") ?: return
+        val notifId    = intent.getIntExtra("notif_id", 0)
+        val isEarly    = intent.getBooleanExtra("is_early", false)
+        val reminderId = intent.getStringExtra("reminder_id")
+        val isOneTime  = intent.getBooleanExtra("is_one_time", false)
 
         val contentTitle = if (isEarly) "En 10 minutos: $title" else title
         val contentText  = if (isEarly) context.getString(R.string.reminder_early_body)
@@ -27,5 +30,9 @@ class ReminderReceiver : BroadcastReceiver() {
 
         context.getSystemService(NotificationManager::class.java)
             ?.notify(notifId, notification)
+
+        if (isOneTime && reminderId != null) {
+            SharedPrefsReminderRepository(context).deleteReminder(reminderId)
+        }
     }
 }

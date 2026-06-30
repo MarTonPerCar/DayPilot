@@ -373,13 +373,18 @@ CREATE TRIGGER trg_sync_points_to_progress
 AFTER INSERT ON points_log
 FOR EACH ROW EXECUTE FUNCTION fn_sync_points_to_progress();
 
--- Actualiza el nivel al acumular puntos históricos
+-- Actualiza el nivel al acumular puntos históricos.
+-- Coste por nivel: 20 + 10*(nivel_actual - 1)  → nivel 1→2: 20 pts, 2→3: 30 pts, etc.
+-- Puntos acumulados para nivel N: 5*(N-1)*(N+2)
+-- Inversa: N = floor((-1 + sqrt(1 + 4*(2 + pts/5))) / 2)
 CREATE OR REPLACE FUNCTION fn_update_level()
 RETURNS TRIGGER AS $$
 DECLARE
     new_level INTEGER;
 BEGIN
-    new_level := GREATEST(1, FLOOR(NEW.total_points_historical / 50) + 1);
+    new_level := GREATEST(1,
+        FLOOR((-1.0 + SQRT(1.0 + 4.0 * (2.0 + NEW.total_points_historical::FLOAT / 5.0))) / 2.0)::INTEGER
+    );
     IF new_level <> OLD.level THEN
         NEW.level := new_level;
     END IF;
