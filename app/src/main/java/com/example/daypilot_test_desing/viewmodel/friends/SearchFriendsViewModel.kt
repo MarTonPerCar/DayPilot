@@ -3,6 +3,7 @@ package com.example.daypilot_test_desing.viewmodel.friends
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.backend.repository.FriendRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,7 +31,7 @@ class SearchFriendsViewModel(private val repo: FriendRepository) : ViewModel() {
         _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
             try {
-                // Refresh friend IDs on every search so removed friends appear again immediately.
+                // Refresh friend IDs so removed friends appear again immediately
                 friendIds = try { repo.getFriendIds() } catch (_: Exception) { emptyList() }.toSet()
                 val results = repo.searchUsers(query)
                 val sentIds = _uiState.value.sentRequestUserIds
@@ -49,25 +50,41 @@ class SearchFriendsViewModel(private val repo: FriendRepository) : ViewModel() {
     }
 
     fun addFriend(userId: String) {
+        val originalResults = _uiState.value.searchResults
+        val originalSentIds = _uiState.value.sentRequestUserIds
+        val newSentIds = originalSentIds + userId
+        // Mark pending and show confirmation before the API responds
+        _uiState.update { state ->
+            state.copy(
+                requestJustSent    = true,
+                sentRequestUserIds = newSentIds,
+                searchResults      = state.searchResults.map { r ->
+                    if (r.id == userId) r.copy(hasPendingRequest = true) else r
+                }
+            )
+        }
         viewModelScope.launch {
             try {
                 repo.addFriend(userId)
-                val newSentIds = _uiState.value.sentRequestUserIds + userId
+            } catch (e: Exception) {
                 _uiState.update { state ->
                     state.copy(
-                        requestJustSent = true,
-                        sentRequestUserIds = newSentIds,
-                        searchResults = state.searchResults.map { r ->
-                            if (r.id == userId) r.copy(hasPendingRequest = true) else r
-                        }
+                        requestJustSent    = false,
+                        sentRequestUserIds = originalSentIds,
+                        searchResults      = originalResults,
+                        userMessage        = R.string.error_add_friend
                     )
                 }
-            } catch (_: Exception) { }
+            }
         }
     }
 
     fun dismissConfirmation() {
         _uiState.update { it.copy(requestJustSent = false) }
+    }
+
+    fun clearUserMessage() {
+        _uiState.update { it.copy(userMessage = null) }
     }
 
     companion object {

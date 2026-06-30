@@ -313,7 +313,9 @@ fun DayPilotNavGraph(
                         homeVM.refresh()
                     },
                     onReactToFriend     = friendsVM::reactToFriend,
-                    onNavigateToSearch  = { navController.navigate(DayPilotDestinations.SEARCH_FRIENDS) }
+                    onNavigateToSearch  = { navController.navigate(DayPilotDestinations.SEARCH_FRIENDS) },
+                    userMessage         = s.userMessage,
+                    onMessageShown      = friendsVM::clearUserMessage
                 )
             }
 
@@ -335,7 +337,9 @@ fun DayPilotNavGraph(
                             popUpTo(DayPilotDestinations.FRIENDS) { inclusive = true }
                         }
                     },
-                    onBack               = { navController.popBackStack() }
+                    onBack               = { navController.popBackStack() },
+                    userMessage          = s.userMessage,
+                    onMessageShown       = searchVM::clearUserMessage
                 )
             }
 
@@ -445,25 +449,26 @@ fun DayPilotNavGraph(
             composable(DayPilotDestinations.CALENDAR) {
                 val s by calendarVM.uiState.collectAsState()
                 CalendarScreen(
-                    tasks         = s.tasks,
-                    isProcessing  = s.isProcessing,
-                    onBack        = { homeVM.refresh(); navController.popBackStack() },
-                    onCreateTask  = calendarVM::addTask,
-                    onTapTask     = {},
-                    onToggleTask  = { id, isDone ->
+                    tasks          = s.tasks,
+                    userMessage    = s.userMessage,
+                    onMessageShown = calendarVM::clearUserMessage,
+                    onBack         = { homeVM.refresh(); navController.popBackStack() },
+                    onCreateTask   = calendarVM::addTask,
+                    onTapTask      = {},
+                    onToggleTask   = { id, isDone ->
                         calendarVM.toggleTask(id, isDone)
                         progressVM.refresh()
                         profileVM.refresh()
                         homeVM.refresh()
                     },
-                    onDeleteTask  = { id ->
+                    onDeleteTask   = { id ->
                         calendarVM.deleteTask(id)
                         progressVM.refresh()
                         profileVM.refresh()
                         homeVM.refresh()
                     },
-                    onEditTask    = calendarVM::editTask,
-                    onUpdateTask  = calendarVM::updateTask
+                    onEditTask     = calendarVM::editTask,
+                    onUpdateTask   = calendarVM::updateTask
                 )
             }
 

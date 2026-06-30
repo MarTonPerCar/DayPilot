@@ -554,4 +554,15 @@
     <string name="settings_streak_alerts">Serienalarm</string>
     <string name="settings_streak_alerts_description">Alarm um 22 Uhr, wenn du die App nicht geöffnet hast</string>
 
+    <!-- Optimistic-UI error snackbars -->
+    <string name="error_task_create">Aufgabe konnte nicht erstellt werden. Bitte erneut versuchen.</string>
+    <string name="error_task_toggle">Aufgabe konnte nicht aktualisiert werden. Bitte erneut versuchen.</string>
+    <string name="error_task_delete">Aufgabe konnte nicht gelöscht werden. Bitte erneut versuchen.</string>
+    <string name="error_task_update">Änderungen konnten nicht gespeichert werden. Bitte erneut versuchen.</string>
+    <string name="error_accept_request">Anfrage konnte nicht angenommen werden. Bitte erneut versuchen.</string>
+    <string name="error_reject_request">Anfrage konnte nicht abgelehnt werden. Bitte erneut versuchen.</string>
+    <string name="error_remove_friend">Freund konnte nicht entfernt werden. Bitte erneut versuchen.</string>
+    <string name="error_add_friend">Freundschaftsanfrage konnte nicht gesendet werden. Bitte erneut versuchen.</string>
+    <string name="error_react_friend">Reaktion konnte nicht gesendet werden. Bitte erneut versuchen.</string>
+
 </resources>

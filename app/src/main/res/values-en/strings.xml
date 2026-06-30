@@ -554,4 +554,15 @@
     <string name="settings_streak_alerts">Streak alert</string>
     <string name="settings_streak_alerts_description">Alert at 10 PM if you haven\'t opened the app</string>
 
+    <!-- Optimistic-UI error snackbars -->
+    <string name="error_task_create">Couldn\'t create task. Please try again.</string>
+    <string name="error_task_toggle">Couldn\'t update task. Please try again.</string>
+    <string name="error_task_delete">Couldn\'t delete task. Please try again.</string>
+    <string name="error_task_update">Couldn\'t save changes. Please try again.</string>
+    <string name="error_accept_request">Couldn\'t accept request. Please try again.</string>
+    <string name="error_reject_request">Couldn\'t reject request. Please try again.</string>
+    <string name="error_remove_friend">Couldn\'t remove friend. Please try again.</string>
+    <string name="error_add_friend">Couldn\'t send friend request. Please try again.</string>
+    <string name="error_react_friend">Couldn\'t send reaction. Please try again.</string>
+
 </resources>

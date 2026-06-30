@@ -3,6 +3,7 @@ package com.example.daypilot_test_desing.viewmodel.calendar
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.backend.local.NotificationHub
 import com.example.daypilot_test_desing.backend.model.CalendarTaskData
 import com.example.daypilot_test_desing.backend.model.NewTaskData
@@ -29,19 +30,18 @@ class CalendarViewModel(
     init { refresh() }
 
     private suspend fun load() {
-        _uiState.update { it.copy(isLoading = true, error = null) }
+        _uiState.update { it.copy(isLoading = true) }
         try {
             val tasks = taskRepo.getTasks()
             _uiState.update { it.copy(tasks = tasks, isLoading = false) }
         } catch (e: Exception) {
-            _uiState.update { it.copy(isLoading = false, error = e.message) }
+            _uiState.update { it.copy(isLoading = false) }
         }
     }
 
     fun refresh(): Job = viewModelScope.launch { load() }
 
     fun addTask(data: NewTaskData) {
-        // Optimistic: insert placeholder immediately so the user sees the task right away
         val fakeId = "pending_${System.currentTimeMillis()}"
         val placeholder = CalendarTaskData(
             id          = fakeId,
@@ -63,12 +63,12 @@ class CalendarViewModel(
         viewModelScope.launch {
             try {
                 taskRepo.addTask(data)
-                load()
+                load() // replace placeholder with real server ID
             } catch (e: Exception) {
                 _uiState.update { state ->
                     state.copy(
                         tasks = state.tasks.filter { it.id != fakeId },
-                        error = e.message
+                        userMessage = R.string.error_task_create
                     )
                 }
             }
@@ -76,15 +76,31 @@ class CalendarViewModel(
     }
 
     fun updateTask(id: String, title: String, category: TaskCategory, difficulty: TaskDifficulty, duration: Int, description: String = "") {
-        _uiState.update { it.copy(isProcessing = true) }
+        val original = _uiState.value.tasks.find { it.id == id }
+        _uiState.update { state ->
+            state.copy(tasks = state.tasks.map { task ->
+                if (task.id == id) task.copy(
+                    title       = title,
+                    category    = category,
+                    difficulty  = difficulty,
+                    duration    = duration,
+                    description = description.ifBlank { null }
+                ) else task
+            })
+        }
         viewModelScope.launch {
             try {
                 taskRepo.updateTask(id, title, category, difficulty, duration, description)
-                load()
             } catch (e: Exception) {
-                _uiState.update { it.copy(error = e.message) }
-            } finally {
-                _uiState.update { it.copy(isProcessing = false) }
+                _uiState.update { state ->
+                    state.copy(
+                        tasks = if (original != null)
+                            state.tasks.map { if (it.id == id) original else it }
+                        else
+                            state.tasks,
+                        userMessage = R.string.error_task_update
+                    )
+                }
             }
         }
     }
@@ -106,31 +122,39 @@ class CalendarViewModel(
                         type    = NotificationType.TASK
                     )
                 }
-                load()
+                // No reload — the optimistic flip is the truth
             } catch (e: Exception) {
-                load()
+                // Revert the flip
+                _uiState.update { state ->
+                    state.copy(
+                        tasks = state.tasks.map { if (it.id == id) it.copy(isDone = !isDone) else it },
+                        userMessage = R.string.error_task_toggle
+                    )
+                }
             }
         }
     }
 
     fun deleteTask(id: String) {
-        _uiState.update { it.copy(isProcessing = true) }
+        val snapshot = _uiState.value.tasks
+        _uiState.update { state -> state.copy(tasks = state.tasks.filter { it.id != id }) }
         viewModelScope.launch {
             try {
-                val task = _uiState.value.tasks.find { it.id == id }
+                val task = snapshot.find { it.id == id }
                 if (task?.isDone == true) progressRepo.logPoints(-20, "TASKS")
                 taskRepo.deleteTask(id)
-                load()
             } catch (e: Exception) {
-                _uiState.update { it.copy(error = e.message) }
-            } finally {
-                _uiState.update { it.copy(isProcessing = false) }
+                _uiState.update { it.copy(tasks = snapshot, userMessage = R.string.error_task_delete) }
             }
         }
     }
 
     fun editTask(id: String) {
         viewModelScope.launch { taskRepo.editTask(id) }
+    }
+
+    fun clearUserMessage() {
+        _uiState.update { it.copy(userMessage = null) }
     }
 
     companion object {

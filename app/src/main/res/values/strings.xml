@@ -571,4 +571,15 @@
     <string name="settings_streak_alerts">Alerta de racha</string>
     <string name="settings_streak_alerts_description">Aviso a las 22h si no has abierto la app</string>
 
+    <!-- Optimistic-UI error snackbars -->
+    <string name="error_task_create">No se pudo crear la tarea. Inténtalo de nuevo.</string>
+    <string name="error_task_toggle">No se pudo actualizar la tarea. Inténtalo de nuevo.</string>
+    <string name="error_task_delete">No se pudo eliminar la tarea. Inténtalo de nuevo.</string>
+    <string name="error_task_update">No se pudieron guardar los cambios. Inténtalo de nuevo.</string>
+    <string name="error_accept_request">No se pudo aceptar la solicitud. Inténtalo de nuevo.</string>
+    <string name="error_reject_request">No se pudo rechazar la solicitud. Inténtalo de nuevo.</string>
+    <string name="error_remove_friend">No se pudo eliminar al amigo. Inténtalo de nuevo.</string>
+    <string name="error_add_friend">No se pudo enviar la solicitud de amistad. Inténtalo de nuevo.</string>
+    <string name="error_react_friend">No se pudo enviar la reacción. Inténtalo de nuevo.</string>
+
 </resources>

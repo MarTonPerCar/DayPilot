@@ -3,6 +3,7 @@ package com.example.daypilot_test_desing.viewmodel.friends
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.backend.local.NotificationHub
 import com.example.daypilot_test_desing.backend.model.NotificationType
 import com.example.daypilot_test_desing.backend.model.ReactionType
@@ -35,18 +36,33 @@ class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
     }
 
     fun acceptRequest(userId: String) {
-        _uiState.update { it.copy(acceptingUserId = userId) }
+        val request = _uiState.value.friendRequests.find { it.id == userId } ?: return
+        val originalRequests = _uiState.value.friendRequests
+        val originalFriends  = _uiState.value.friends
+        _uiState.update { state ->
+            state.copy(
+                friendRequests      = state.friendRequests.filter { it.id != userId },
+                friends             = state.friends + request,
+                justAcceptedRequest = true
+            )
+        }
         viewModelScope.launch {
-            repo.acceptRequest(userId)
-            load()
-            _uiState.update { it.copy(acceptingUserId = null, justAcceptedRequest = true) }
-            val name = _uiState.value.friends.firstOrNull { it.id == userId }?.name
-            if (name != null) {
+            try {
+                repo.acceptRequest(userId)
                 NotificationHub.add(
                     title   = "Nueva amistad 🤝",
-                    message = "$name es ahora tu amigo",
+                    message = "${request.name} es ahora tu amigo",
                     type    = NotificationType.SOCIAL
                 )
+            } catch (e: Exception) {
+                _uiState.update { state ->
+                    state.copy(
+                        friendRequests      = originalRequests,
+                        friends             = originalFriends,
+                        justAcceptedRequest = false,
+                        userMessage         = R.string.error_accept_request
+                    )
+                }
             }
         }
     }
@@ -56,14 +72,21 @@ class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
     }
 
     fun rejectRequest(userId: String) {
+        val originalRequests = _uiState.value.friendRequests
+        _uiState.update { state -> state.copy(friendRequests = state.friendRequests.filter { it.id != userId }) }
         viewModelScope.launch {
-            repo.rejectRequest(userId)
-            load()
+            try {
+                repo.rejectRequest(userId)
+            } catch (e: Exception) {
+                _uiState.update { state ->
+                    state.copy(friendRequests = originalRequests, userMessage = R.string.error_reject_request)
+                }
+            }
         }
     }
 
     fun reactToFriend(userId: String, reaction: ReactionType) {
-        // Optimistic update: show checkmark immediately before the DB round-trip
+        val originalFriends = _uiState.value.friends
         _uiState.update { state ->
             state.copy(
                 friends = state.friends.map { friend ->
@@ -75,30 +98,46 @@ class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
             )
         }
         viewModelScope.launch {
-            repo.reactToFriend(userId, reaction)
-            val name = _uiState.value.friends.firstOrNull { it.id == userId }?.name
-            val emoji = when (reaction) {
-                ReactionType.FIRE   -> "🔥"
-                ReactionType.CLAP   -> "👏"
-                ReactionType.STRONG -> "💪"
-                ReactionType.STAR   -> "⭐"
+            try {
+                repo.reactToFriend(userId, reaction)
+                val name  = _uiState.value.friends.firstOrNull { it.id == userId }?.name
+                val emoji = when (reaction) {
+                    ReactionType.FIRE   -> "🔥"
+                    ReactionType.CLAP   -> "👏"
+                    ReactionType.STRONG -> "💪"
+                    ReactionType.STAR   -> "⭐"
+                }
+                if (name != null) {
+                    NotificationHub.add(
+                        title   = "Reacción enviada $emoji",
+                        message = "Reaccionaste a la semana de $name",
+                        type    = NotificationType.SOCIAL
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.update { state ->
+                    state.copy(friends = originalFriends, userMessage = R.string.error_react_friend)
+                }
             }
-            if (name != null) {
-                NotificationHub.add(
-                    title   = "Reacción enviada $emoji",
-                    message = "Reaccionaste a la semana de $name",
-                    type    = NotificationType.SOCIAL
-                )
-            }
-            load() // re-sync with DB after sending
         }
     }
 
     fun removeFriend(userId: String) {
+        val originalFriends = _uiState.value.friends
+        _uiState.update { state -> state.copy(friends = state.friends.filter { it.id != userId }) }
         viewModelScope.launch {
-            repo.removeFriend(userId)
-            load()
+            try {
+                repo.removeFriend(userId)
+            } catch (e: Exception) {
+                _uiState.update { state ->
+                    state.copy(friends = originalFriends, userMessage = R.string.error_remove_friend)
+                }
+            }
         }
+    }
+
+    fun clearUserMessage() {
+        _uiState.update { it.copy(userMessage = null) }
     }
 
     companion object {

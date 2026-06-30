@@ -1,5 +1,6 @@
 package com.example.daypilot_test_desing.presentation.friends
 
+import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -28,9 +29,19 @@ fun SearchFriendsScreen(
     onSearch: (query: String) -> Unit,
     onAddFriend: (userId: String) -> Unit,
     onConfirmationDismissed: () -> Unit = {},
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    @StringRes userMessage: Int? = null,
+    onMessageShown: () -> Unit = {}
 ) {
     var query by remember { mutableStateOf("") }
+    val snackbarHost = remember { SnackbarHostState() }
+    val messageText  = userMessage?.let { stringResource(it) }
+    LaunchedEffect(messageText) {
+        if (messageText != null) {
+            snackbarHost.showSnackbar(messageText)
+            onMessageShown()
+        }
+    }
 
     // Confirmation dialog after sending a request.
     // onConfirmationDismissed handles both state reset and navigation — don't also call onBack().
@@ -54,6 +65,7 @@ fun SearchFriendsScreen(
                 onBack = onBack
             )
         },
+        snackbarHost   = { SnackbarHost(hostState = snackbarHost) },
         containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         Column(

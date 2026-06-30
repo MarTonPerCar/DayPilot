@@ -1,5 +1,6 @@
 package com.example.daypilot_test_desing.presentation.friends
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -15,6 +16,8 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
@@ -51,10 +54,20 @@ fun FriendsScreen(
     onReactToFriend: (userId: String, reaction: ReactionType) -> Unit = { _, _ -> },
     acceptingUserId: String? = null,
     justAcceptedRequest: Boolean = false,
-    onAcceptedNavigated: () -> Unit = {}
+    onAcceptedNavigated: () -> Unit = {},
+    @StringRes userMessage: Int? = null,
+    onMessageShown: () -> Unit = {}
 ) {
     var selectedTab by remember { mutableIntStateOf(0) }
     var friendToRemove by remember { mutableStateOf<FriendData?>(null) }
+    val snackbarHost = remember { SnackbarHostState() }
+    val messageText  = userMessage?.let { stringResource(it) }
+    LaunchedEffect(messageText) {
+        if (messageText != null) {
+            snackbarHost.showSnackbar(messageText)
+            onMessageShown()
+        }
+    }
 
     val tabs = listOf(
         stringResource(R.string.friends_tab_friends),
@@ -103,6 +116,7 @@ fun FriendsScreen(
                 onAction = onNavigateToSearch
             )
         },
+        snackbarHost   = { SnackbarHost(hostState = snackbarHost) },
         containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         Column(
