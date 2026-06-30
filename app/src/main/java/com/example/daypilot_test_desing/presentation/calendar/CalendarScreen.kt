@@ -32,6 +32,7 @@ import java.util.Calendar
 @Composable
 fun CalendarScreen(
     tasks: List<CalendarTaskData>,
+    isProcessing: Boolean = false,
     onBack: () -> Unit,
     onCreateTask: (NewTaskData) -> Unit,
     onTapTask: (String) -> Unit,
@@ -258,6 +259,25 @@ fun CalendarScreen(
         }
     }
 
+    // Blocking dialog while delete / update is in progress
+    if (isProcessing) {
+        AlertDialog(
+            onDismissRequest = {},
+            confirmButton = {},
+            text = {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
+                    Text(stringResource(R.string.common_loading))
+                }
+            },
+            shape = RoundedCornerShape(16.dp)
+        )
+    }
+
     Scaffold(
         topBar = {
             DayPilotTopBar(
@@ -479,6 +499,7 @@ fun CalendarScreen(
                                 isCompleted    = task.isDone,
                                 hasReminder    = task.hasReminder,
                                 isRecurring    = task.isRecurring,
+                                isPending      = task.isPending,
                                 onToggleComplete = { onToggleTask(task.id, it) },
                                 onTap          = { detailTaskId = task.id },
                                 onEdit         = { editingTaskId = task.id },

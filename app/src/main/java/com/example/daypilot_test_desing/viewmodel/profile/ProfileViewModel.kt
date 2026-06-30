@@ -8,11 +8,13 @@ import androidx.lifecycle.viewModelScope
 import com.example.daypilot_test_desing.backend.model.TimeZoneRegion
 import com.example.daypilot_test_desing.backend.repository.ProgressRepository
 import com.example.daypilot_test_desing.backend.repository.UserRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ProfileViewModel(
     private val userRepo: UserRepository,
@@ -63,13 +65,26 @@ class ProfileViewModel(
     }
 
     fun uploadAvatar(uri: Uri, context: Context): Job = viewModelScope.launch {
-        try {
-            val bytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() } ?: return@launch
-            val mimeType = context.contentResolver.getType(uri) ?: "image/jpeg"
-            val ext = mimeType.substringAfterLast("/").replace("jpeg", "jpg").take(4)
-            userRepo.uploadAvatar(bytes, ext)
+        _uiState.value = _uiState.value.copy(isUploadingAvatar = true, avatarUploadError = false)
+        val success = try {
+            val (bytes, mimeType) = withContext(Dispatchers.IO) {
+                val b = context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+                val m = context.contentResolver.getType(uri) ?: "image/jpeg"
+                Pair(b, m)
+            }
+            if (bytes == null) false
+            else userRepo.uploadAvatar(bytes, mimeType) != null
+        } catch (_: Exception) { false }
+
+        if (success) {
             load()
-        } catch (_: Exception) { }
+        } else {
+            _uiState.value = _uiState.value.copy(isUploadingAvatar = false, avatarUploadError = true)
+        }
+    }
+
+    fun clearAvatarError() {
+        _uiState.value = _uiState.value.copy(avatarUploadError = false)
     }
 
     companion object {

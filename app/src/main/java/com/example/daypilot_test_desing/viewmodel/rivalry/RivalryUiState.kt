@@ -8,5 +8,6 @@ data class RivalryUiState(
     val currentUserPosition: Int = 0,
     val currentUserPoints: Int = 0,
     val currentUserStreak: Int = 0,
+    val currentUserLevel: Int = 1,
     val ranking: List<RankingData> = emptyList()
 )

@@ -26,10 +26,14 @@ fun SettingsScreen(
     selectedThemeId: String,
     selectedLanguage: String,
     notificationsEnabled: Boolean,
+    taskRemindersEnabled: Boolean,
+    streakAlertsEnabled: Boolean,
     onToggleDarkMode: (Boolean) -> Unit,
     onThemeSelect: (String) -> Unit,
     onLanguageSelect: (String) -> Unit,
     onToggleNotifications: (Boolean) -> Unit,
+    onToggleTaskReminders: (Boolean) -> Unit,
+    onToggleStreakAlerts: (Boolean) -> Unit,
     onNavigateToEditProfile: () -> Unit,
     onLogout: () -> Unit,
     onBack: () -> Unit
@@ -92,6 +96,24 @@ fun SettingsScreen(
                     icon            = Icons.Default.Notifications,
                     checked         = notificationsEnabled,
                     onCheckedChange = onToggleNotifications
+                )
+                HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
+                DayPilotSwitchRow(
+                    title           = stringResource(R.string.settings_task_reminders),
+                    description     = stringResource(R.string.settings_task_reminders_description),
+                    icon            = Icons.Default.CalendarMonth,
+                    checked         = notificationsEnabled && taskRemindersEnabled,
+                    onCheckedChange = onToggleTaskReminders,
+                    enabled         = notificationsEnabled
+                )
+                HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
+                DayPilotSwitchRow(
+                    title           = stringResource(R.string.settings_streak_alerts),
+                    description     = stringResource(R.string.settings_streak_alerts_description),
+                    icon            = Icons.Default.Whatshot,
+                    checked         = notificationsEnabled && streakAlertsEnabled,
+                    onCheckedChange = onToggleStreakAlerts,
+                    enabled         = notificationsEnabled
                 )
             }
 

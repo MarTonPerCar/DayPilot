@@ -15,7 +15,7 @@ import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Order
 import io.github.jan.supabase.storage.storage
-import io.github.jan.supabase.storage.upload
+import io.ktor.http.ContentType
 
 class SupabaseUserRepository : UserRepository {
 
@@ -118,11 +118,15 @@ class SupabaseUserRepository : UserRepository {
         } catch (_: Exception) { }
     }
 
-    override suspend fun uploadAvatar(bytes: ByteArray, extension: String): String? {
+    override suspend fun uploadAvatar(bytes: ByteArray, mimeType: String): String? {
         val uid = userId() ?: return null
+        val ext = mimeType.substringAfterLast("/").replace("jpeg", "jpg").take(4)
         return try {
-            val path = "$uid/${System.currentTimeMillis()}.$extension"
-            supabase.storage.from("avatars").upload(path, bytes) { upsert = true }
+            val path = "$uid/${System.currentTimeMillis()}.$ext"
+            supabase.storage.from("avatars").upload(path, bytes) {
+                upsert = true
+                contentType = ContentType.parse(mimeType)
+            }
             val url = supabase.storage.from("avatars").publicUrl(path)
             supabase.from("users").update({ set("photo_url", url) }) {
                 filter { eq("id", uid) }

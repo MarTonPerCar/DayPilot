@@ -23,16 +23,20 @@ class RivalryViewModel(private val repo: RankingRepository) : ViewModel() {
         try {
             val ranking  = repo.getRanking()
             val uid      = repo.getCurrentUserId()
-            val position = repo.getCurrentUserPosition()
-            val points   = repo.getCurrentUserPoints()
-            val streak   = repo.getCurrentUserStreak()
-            val name     = ranking.firstOrNull { it.id == uid }?.name ?: ""
+            // friends_ranking VIEW may not return the current user due to
+            // security_invoker + streaks_own RLS interaction; fall back to
+            // direct table queries which always work for the own user.
+            val me       = ranking.firstOrNull { it.id == uid }
+                           ?: repo.getCurrentUserData()
+            val position = ranking.indexOfFirst { it.id == uid }
+                           .let { if (it >= 0) it + 1 else ranking.size + 1 }
             _uiState.value = RivalryUiState(
-                currentUserName     = name,
+                currentUserName     = me?.name ?: "",
                 currentUserId       = uid,
                 currentUserPosition = position,
-                currentUserPoints   = points,
-                currentUserStreak   = streak,
+                currentUserPoints   = me?.points ?: 0,
+                currentUserStreak   = me?.streak ?: 0,
+                currentUserLevel    = me?.level ?: 1,
                 ranking             = ranking
             )
         } catch (_: Exception) { }

@@ -41,7 +41,8 @@ data class CalendarTaskData(
     val isDone: Boolean,
     val description: String? = null,
     val isRecurring: Boolean = false,
-    val hasReminder: Boolean = false
+    val hasReminder: Boolean = false,
+    val isPending: Boolean = false
 )
 
 data class NewTaskData(

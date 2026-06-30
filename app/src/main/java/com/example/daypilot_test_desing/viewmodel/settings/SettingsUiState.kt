@@ -5,5 +5,7 @@ data class SettingsUiState(
     val isDarkMode: Boolean = true,
     val selectedThemeId: String = "SAGE_GREEN",
     val selectedLanguage: String = "es",
-    val notificationsEnabled: Boolean = true
+    val notificationsEnabled: Boolean = true,
+    val taskRemindersEnabled: Boolean = true,
+    val streakAlertsEnabled: Boolean = true
 )

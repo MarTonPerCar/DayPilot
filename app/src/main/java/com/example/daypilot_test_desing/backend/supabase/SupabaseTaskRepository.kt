@@ -10,6 +10,8 @@ import com.example.daypilot_test_desing.backend.supabase.dto.NewTaskDayDto
 import com.example.daypilot_test_desing.backend.supabase.dto.NewTaskDto
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import java.util.Calendar
 import java.util.UUID
 
@@ -34,19 +36,35 @@ class SupabaseTaskRepository : TaskRepository {
         val taskId = UUID.randomUUID().toString()
         val date = "%04d-%02d-%02d".format(data.year, data.month, data.day)
 
-        supabase.from("tasks").insert(
-            NewTaskDto(
-                id               = taskId,
-                userId           = uid,
-                title            = data.title,
-                description      = data.description.ifBlank { null },
-                category         = data.category.toDbString(),
-                difficulty       = data.difficulty.name,
-                estimatedMinutes = data.duration,
-                reminderEnabled  = data.hasReminder,
-                isRecurring      = data.isRecurring
-            )
+        // Compute recurrence end date (start + 90 days) to match the task_days window
+        val endCal = Calendar.getInstance().also {
+            it.set(data.year, data.month - 1, data.day)
+            it.add(Calendar.DAY_OF_YEAR, 90)
+        }
+        val recurrenceEndDate = "%04d-%02d-%02d".format(
+            endCal.get(Calendar.YEAR),
+            endCal.get(Calendar.MONTH) + 1,
+            endCal.get(Calendar.DAY_OF_MONTH)
         )
+
+        // Use buildJsonObject so Boolean/nullable values go directly into the JSON payload
+        // as JsonPrimitive — no kotlinx.serialization encoder in between, no encodeDefaults risk.
+        supabase.from("tasks").insert(buildJsonObject {
+            put("id",                taskId)
+            put("user_id",           uid)
+            put("title",             data.title)
+            put("description",       data.description.ifBlank { null })
+            put("category",          data.category.toDbString())
+            put("difficulty",        data.difficulty.name)
+            put("estimated_minutes", data.duration)
+            put("reminder_enabled",  data.hasReminder)
+            put("is_recurring",      data.isRecurring)
+            if (data.isRecurring) {
+                put("recurrence_days",     data.recurrenceDays)
+                put("recurrence_end_date", recurrenceEndDate)
+            }
+        })
+
         supabase.from("task_days").insert(
             NewTaskDayDto(taskId = taskId, userId = uid, date = date)
         )

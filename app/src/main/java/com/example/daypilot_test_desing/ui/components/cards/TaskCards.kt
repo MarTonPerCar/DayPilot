@@ -27,6 +27,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -205,6 +206,7 @@ fun TaskDayCard(
     isCompleted: Boolean = false,
     hasReminder: Boolean = false,
     isRecurring: Boolean = false,
+    isPending: Boolean = false,
     onToggleComplete: (Boolean) -> Unit,
     onTap: () -> Unit,
     onEdit: () -> Unit,
@@ -256,7 +258,7 @@ fun TaskDayCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .clickable { onTap() },
+            .clickable(enabled = !isPending) { onTap() },
         shape = RoundedCornerShape(14.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -290,7 +292,7 @@ fun TaskDayCard(
         ) {
             Checkbox(
                 checked = isCompleted,
-                onCheckedChange = onToggleComplete,
+                onCheckedChange = if (isPending) null else onToggleComplete,
                 colors = CheckboxDefaults.colors(
                     checkedColor = MaterialTheme.colorScheme.primary,
                     uncheckedColor = MaterialTheme.colorScheme.outline
@@ -337,29 +339,35 @@ fun TaskDayCard(
                 }
             }
 
-            // Botones editar / eliminar
-            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                IconButton(
-                    onClick = onEdit,
-                    modifier = Modifier.size(32.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = stringResource(R.string.common_edit),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(16.dp)
-                    )
+            // Botones editar / eliminar (spinner while pending)
+            if (isPending) {
+                Box(modifier = Modifier.size(32.dp), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
                 }
-                IconButton(
-                    onClick = { showDeleteConfirm = true },
-                    modifier = Modifier.size(32.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = stringResource(R.string.common_delete),
-                        tint = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.size(16.dp)
-                    )
+            } else {
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    IconButton(
+                        onClick = onEdit,
+                        modifier = Modifier.size(32.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = stringResource(R.string.common_edit),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                    IconButton(
+                        onClick = { showDeleteConfirm = true },
+                        modifier = Modifier.size(32.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = stringResource(R.string.common_delete),
+                            tint = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
                 }
             }
         }

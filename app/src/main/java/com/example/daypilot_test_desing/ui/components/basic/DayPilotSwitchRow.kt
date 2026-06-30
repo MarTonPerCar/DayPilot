@@ -29,8 +29,10 @@ fun DayPilotSwitchRow(
     icon: ImageVector,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
+    enabled: Boolean = true,
     modifier: Modifier = Modifier
 ) {
+    val contentAlpha = if (enabled) 1f else 0.4f
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -47,13 +49,13 @@ fun DayPilotSwitchRow(
                 modifier = Modifier
                     .size(40.dp)
                     .clip(RoundedCornerShape(10.dp))
-                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)),
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f * contentAlpha)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
+                    tint = MaterialTheme.colorScheme.primary.copy(alpha = contentAlpha),
                     modifier = Modifier.size(20.dp)
                 )
             }
@@ -62,18 +64,19 @@ fun DayPilotSwitchRow(
                     text = title,
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = contentAlpha)
                 )
                 Text(
                     text = description,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = contentAlpha)
                 )
             }
         }
         Switch(
             checked = checked,
             onCheckedChange = onCheckedChange,
+            enabled = enabled,
             colors = SwitchDefaults.colors(
                 checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
                 checkedTrackColor = MaterialTheme.colorScheme.primary

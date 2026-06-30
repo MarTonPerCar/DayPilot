@@ -72,8 +72,9 @@ private fun rootTabFor(route: String?): String? = when (route) {
 }
 
 // ── Bottom Bar ───────────────────────────────────────────────────
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DayPilotBottomBar(navController: NavController) {
+fun DayPilotBottomBar(navController: NavController, unreadNotifications: Int = 0) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute   = backStackEntry?.destination?.route
     val activeTab      = rootTabFor(currentRoute)
@@ -114,11 +115,23 @@ fun DayPilotBottomBar(navController: NavController) {
                     }
                 },
                 icon = {
-                    Icon(
-                        imageVector = tab.icon,
-                        contentDescription = tab.label,
-                        modifier = Modifier.scale(iconScale)
-                    )
+                    val showBadge = tab.route == DayPilotDestinations.NOTIFICATIONS &&
+                        unreadNotifications > 0
+                    BadgedBox(
+                        badge = {
+                            if (showBadge) {
+                                Badge {
+                                    Text(if (unreadNotifications > 9) "9+" else "$unreadNotifications")
+                                }
+                            }
+                        }
+                    ) {
+                        Icon(
+                            imageVector        = tab.icon,
+                            contentDescription = tab.label,
+                            modifier           = Modifier.scale(iconScale)
+                        )
+                    }
                 },
                 label = {
                     Text(

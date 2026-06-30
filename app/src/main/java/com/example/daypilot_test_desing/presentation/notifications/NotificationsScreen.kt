@@ -24,6 +24,7 @@ import com.example.daypilot_test_desing.backend.model.NotificationType
 fun NotificationsScreen(
     notifications: List<NotificationData>,
     onTapNotification: (String) -> Unit,
+    onMarkAllAsRead: () -> Unit = {},
     onBack: () -> Unit = {}
 ) {
     var selectedFilter by remember { mutableStateOf<NotificationType?>(null) }
@@ -71,12 +72,13 @@ fun NotificationsScreen(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 if (unreadCount > 0) {
-                    Text(
-                        text  = "$unreadCount ${stringResource(R.string.notifications_unread)}",
-                        style = MaterialTheme.typography.labelSmall,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
+                    TextButton(onClick = onMarkAllAsRead) {
+                        Text(
+                            text  = stringResource(R.string.notifications_mark_all_read),
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
                 }
             }
 

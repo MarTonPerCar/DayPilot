@@ -69,6 +69,7 @@
     <string name="edit_profile_security">Sicherheit</string>
     <string name="edit_profile_change_password">Passwort ändern</string>
     <string name="edit_profile_save">Änderungen speichern</string>
+    <string name="edit_profile_photo_error">Foto konnte nicht hochgeladen werden. Bitte erneut versuchen.</string>
 
     <!-- Photo Picker -->
     <string name="photo_picker_title">Foto ändern</string>
@@ -534,5 +535,23 @@
     <string name="tech_health_channel_desc">Benachrichtigungen wenn das Nutzungslimit einer App erreicht wird</string>
     <string name="tech_health_notif_title">Limit erreicht: %s</string>
     <string name="tech_health_notif_body">Du hast %1$d Min. von %2$d Min. genutzt</string>
+
+    <!-- Daily phone notifications -->
+    <string name="daily_channel_name">Tägliche Erinnerungen</string>
+    <string name="daily_channel_desc">Aufgaben- und Serienerinnerungen</string>
+    <string name="notif_task_reminder_title">Heutige Aufgaben</string>
+    <string name="notif_task_reminder_count">Du hast %1$d Aufgaben für heute</string>
+    <string name="notif_task_reminder_none">Keine Aufgaben für heute ✓</string>
+    <string name="notif_task_reminder_generic">Überprüfe deine heutigen Aufgaben</string>
+    <string name="notif_streak_danger_title">Serie in Gefahr! 🔥</string>
+    <string name="notif_streak_danger_body">Öffne die App vor Mitternacht, um deine Serie zu halten</string>
+
+    <string name="notifications_mark_all_read">Alle lesen</string>
+
+    <!-- Settings: notification sub-toggles -->
+    <string name="settings_task_reminders">Aufgabenerinnerung</string>
+    <string name="settings_task_reminders_description">Tägliche Erinnerung mit deinen Aufgaben</string>
+    <string name="settings_streak_alerts">Serienalarm</string>
+    <string name="settings_streak_alerts_description">Alarm um 22 Uhr, wenn du die App nicht geöffnet hast</string>
 
 </resources>

@@ -20,5 +20,7 @@ data class ProfileUiState(
     val stepsToday: Int = 0,
     val tasksCompletedToday: Int = 0,
     val avatarUrl: String? = null,
-    val weeklySummary: WeeklySummaryData = WeeklySummaryData(0, 0, 0, 0)
+    val weeklySummary: WeeklySummaryData = WeeklySummaryData(0, 0, 0, 0),
+    val isUploadingAvatar: Boolean = false,
+    val avatarUploadError: Boolean = false
 )

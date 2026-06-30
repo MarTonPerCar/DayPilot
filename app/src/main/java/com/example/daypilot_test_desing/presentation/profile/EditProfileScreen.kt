@@ -31,16 +31,28 @@ fun EditProfileScreen(
     currentUsername: String,
     currentRegion: TimeZoneRegion = TimeZoneRegion.EUROPE_MADRID,
     avatarUrl: String? = null,
+    isUploadingAvatar: Boolean = false,
+    avatarUploadError: Boolean = false,
     onSave: (name: String, username: String, region: TimeZoneRegion) -> Unit,
     onNavigateToResetPassword: () -> Unit,
     onPhotoSelected: (Uri) -> Unit,
+    onAvatarErrorDismissed: () -> Unit = {},
     onBack: () -> Unit
 ) {
     val context         = LocalContext.current
+    val snackbarHost    = remember { SnackbarHostState() }
     var name            by remember { mutableStateOf(currentName) }
     var username        by remember { mutableStateOf(currentUsername) }
     var region          by remember { mutableStateOf(currentRegion) }
     var showPhotoDialog by remember { mutableStateOf(false) }
+
+    val photoErrorMsg = stringResource(R.string.edit_profile_photo_error)
+    LaunchedEffect(avatarUploadError) {
+        if (avatarUploadError) {
+            snackbarHost.showSnackbar(photoErrorMsg)
+            onAvatarErrorDismissed()
+        }
+    }
 
     // Camera: write to a temp file in cache, then upload on result
     var cameraUri by remember { mutableStateOf<Uri?>(null) }
@@ -82,6 +94,7 @@ fun EditProfileScreen(
                 onBack = onBack
             )
         },
+        snackbarHost = { SnackbarHost(hostState = snackbarHost) },
         containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         Column(
@@ -97,11 +110,20 @@ fun EditProfileScreen(
 
             // ── Avatar ───────────────────────────────────────────
             Box(contentAlignment = Alignment.BottomEnd) {
-                DayPilotAvatar(
-                    name      = name,
-                    avatarUrl = avatarUrl,
-                    size      = 90
-                )
+                Box(contentAlignment = Alignment.Center) {
+                    DayPilotAvatar(
+                        name      = name,
+                        avatarUrl = avatarUrl,
+                        size      = 90
+                    )
+                    if (isUploadingAvatar) {
+                        CircularProgressIndicator(
+                            modifier  = Modifier.size(90.dp),
+                            strokeWidth = 3.dp,
+                            color     = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
+                        )
+                    }
+                }
                 Box(
                     modifier = Modifier
                         .size(28.dp)
@@ -110,7 +132,7 @@ fun EditProfileScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     IconButton(
-                        onClick  = { showPhotoDialog = true },
+                        onClick  = { if (!isUploadingAvatar) showPhotoDialog = true },
                         modifier = Modifier.size(28.dp)
                     ) {
                         Icon(
@@ -123,7 +145,10 @@ fun EditProfileScreen(
                 }
             }
 
-            TextButton(onClick = { showPhotoDialog = true }) {
+            TextButton(
+                onClick  = { showPhotoDialog = true },
+                enabled  = !isUploadingAvatar
+            ) {
                 Text(
                     text  = stringResource(R.string.edit_profile_change_photo),
                     style = MaterialTheme.typography.labelMedium,

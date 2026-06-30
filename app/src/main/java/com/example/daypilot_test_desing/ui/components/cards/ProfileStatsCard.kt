@@ -43,10 +43,10 @@ fun ProfileStatsCard(
     modifier: Modifier = Modifier,
     avatarUrl: String? = null
 ) {
-    val pointsForCurrentLevel = (level - 1) * 50
-    val pointsForNextLevel = level * 50
-    val levelProgress = ((totalPoints - pointsForCurrentLevel).toFloat() /
-            (pointsForNextLevel - pointsForCurrentLevel)).coerceIn(0f, 1f)
+    // XP within the current level — independent of DB level to avoid mismatch
+    // if total_points_historical and level briefly diverge.
+    val xpInLevel = if (totalPoints > 0) totalPoints % 50 else 0
+    val levelProgress = (xpInLevel.toFloat() / 50f).coerceIn(0f, 1f)
 
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -119,8 +119,8 @@ fun ProfileStatsCard(
                         Text(
                             text = stringResource(
                                 R.string.profile_level_points,
-                                totalPoints,
-                                pointsForNextLevel
+                                xpInLevel,
+                                50
                             ),
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.SemiBold,

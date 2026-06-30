@@ -5,5 +5,6 @@ data class RankingData(
     val name: String,
     val points: Int,
     val streak: Int,
+    val level: Int = 1,
     val avatarUrl: String? = null
 )

@@ -2,6 +2,7 @@ package com.example.daypilot_test_desing.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.daypilot_test_desing.backend.local.NotificationHub
 import com.example.daypilot_test_desing.backend.supabase.supabase
 import io.github.jan.supabase.auth.auth
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -61,7 +62,7 @@ class AppSessionViewModel : ViewModel() {
 
     /** Signs the user out of Supabase and marks the session as gone. */
     fun signOut() {
-        // Update state immediately so the UI reacts without waiting for the network call.
+        NotificationHub.clear()
         _state.value = State.Unauthenticated
         viewModelScope.launch {
             try { supabase.auth.signOut() } catch (_: Exception) {}

@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.daypilot_test_desing.backend.preferences.AppPreferences
 import com.example.daypilot_test_desing.backend.repository.UserRepository
+import com.example.daypilot_test_desing.reminders.DailyNotificationScheduler
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -31,7 +32,9 @@ class SettingsViewModel(
         isDarkMode           = prefs.isDarkMode,
         selectedThemeId      = prefs.themeId,
         selectedLanguage     = prefs.language,
-        notificationsEnabled = prefs.notificationsEnabled
+        notificationsEnabled = prefs.notificationsEnabled,
+        taskRemindersEnabled = prefs.taskRemindersEnabled,
+        streakAlertsEnabled  = prefs.streakAlertsEnabled
     )
 
     private suspend fun loadUserName() {
@@ -59,6 +62,31 @@ class SettingsViewModel(
     fun toggleNotifications(enabled: Boolean) {
         prefs.notificationsEnabled = enabled
         _uiState.value = _uiState.value.copy(notificationsEnabled = enabled)
+        // Master switch: cancel or re-schedule daily phone alarms
+        if (enabled) {
+            val taskOn   = prefs.taskRemindersEnabled
+            val streakOn = prefs.streakAlertsEnabled
+            DailyNotificationScheduler.scheduleTaskReminder(getApplication(), taskOn)
+            DailyNotificationScheduler.scheduleStreakAlert(getApplication(), streakOn)
+        } else {
+            DailyNotificationScheduler.cancelAll(getApplication())
+        }
+    }
+
+    fun toggleTaskReminders(enabled: Boolean) {
+        prefs.taskRemindersEnabled = enabled
+        _uiState.value = _uiState.value.copy(taskRemindersEnabled = enabled)
+        if (prefs.notificationsEnabled) {
+            DailyNotificationScheduler.scheduleTaskReminder(getApplication(), enabled)
+        }
+    }
+
+    fun toggleStreakAlerts(enabled: Boolean) {
+        prefs.streakAlertsEnabled = enabled
+        _uiState.value = _uiState.value.copy(streakAlertsEnabled = enabled)
+        if (prefs.notificationsEnabled) {
+            DailyNotificationScheduler.scheduleStreakAlert(getApplication(), enabled)
+        }
     }
 
     companion object {

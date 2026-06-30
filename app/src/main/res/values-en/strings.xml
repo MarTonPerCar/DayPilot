@@ -69,6 +69,7 @@
     <string name="edit_profile_security">Security</string>
     <string name="edit_profile_change_password">Change password</string>
     <string name="edit_profile_save">Save changes</string>
+    <string name="edit_profile_photo_error">Could not upload photo. Please try again.</string>
 
     <!-- Photo Picker -->
     <string name="photo_picker_title">Change photo</string>
@@ -534,5 +535,23 @@
     <string name="tech_health_channel_desc">Alerts when an app\'s usage limit is reached</string>
     <string name="tech_health_notif_title">Limit reached: %s</string>
     <string name="tech_health_notif_body">You\'ve used %1$d min out of %2$d min allowed</string>
+
+    <!-- Daily phone notifications -->
+    <string name="daily_channel_name">Daily Reminders</string>
+    <string name="daily_channel_desc">Task and streak reminders</string>
+    <string name="notif_task_reminder_title">Today\'s Tasks</string>
+    <string name="notif_task_reminder_count">You have %1$d tasks due today</string>
+    <string name="notif_task_reminder_none">No tasks for today ✓</string>
+    <string name="notif_task_reminder_generic">Check your tasks for today</string>
+    <string name="notif_streak_danger_title">Streak in Danger! 🔥</string>
+    <string name="notif_streak_danger_body">Open the app before midnight to keep your streak</string>
+
+    <string name="notifications_mark_all_read">Read all</string>
+
+    <!-- Settings: notification sub-toggles -->
+    <string name="settings_task_reminders">Task reminder</string>
+    <string name="settings_task_reminders_description">Daily alert with your pending tasks</string>
+    <string name="settings_streak_alerts">Streak alert</string>
+    <string name="settings_streak_alerts_description">Alert at 10 PM if you haven\'t opened the app</string>
 
 </resources>

@@ -42,6 +42,7 @@ private fun RankingCardBase(
     position: Int,
     points: Int,
     streak: Int,
+    level: Int = 1,
     modifier: Modifier = Modifier,
     avatarUrl: String? = null,
     isCurrentUser: Boolean = false
@@ -106,13 +107,18 @@ private fun RankingCardBase(
             // ── Avatar ────────────────────────────────────────────
             DayPilotAvatar(name = name, avatarUrl = avatarUrl, size = 44)
 
-            // ── Nombre + racha ────────────────────────────────────
+            // ── Nombre + nivel + racha ────────────────────────────
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = name,
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = if (isCurrentUser) FontWeight.Bold else FontWeight.Normal,
                     color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = stringResource(R.string.profile_level_badge, level),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary
                 )
                 Text(
                     text = stringResource(R.string.ranking_streak, streak),
@@ -146,17 +152,20 @@ fun RankingCard(
     position: Int,
     points: Int,
     streak: Int,
+    level: Int = 1,
     modifier: Modifier = Modifier,
-    avatarUrl: String? = null
+    avatarUrl: String? = null,
+    isCurrentUser: Boolean = false
 ) {
     RankingCardBase(
-        name = name,
-        avatarUrl = avatarUrl,
-        position = position,
-        points = points,
-        streak = streak,
-        modifier = modifier,
-        isCurrentUser = false
+        name          = name,
+        avatarUrl     = avatarUrl,
+        position      = position,
+        points        = points,
+        streak        = streak,
+        level         = level,
+        modifier      = modifier,
+        isCurrentUser = isCurrentUser
     )
 }
 
@@ -167,16 +176,18 @@ fun CurrentUserRankingCard(
     position: Int,
     points: Int,
     streak: Int,
+    level: Int = 1,
     modifier: Modifier = Modifier,
     avatarUrl: String? = null
 ) {
     RankingCardBase(
-        name = name,
-        avatarUrl = avatarUrl,
-        position = position,
-        points = points,
-        streak = streak,
-        modifier = modifier,
+        name          = name,
+        avatarUrl     = avatarUrl,
+        position      = position,
+        points        = points,
+        streak        = streak,
+        level         = level,
+        modifier      = modifier,
         isCurrentUser = true
     )
 }

@@ -30,4 +30,28 @@ class AppPreferences(context: Context) {
     var timerPointsDate: String
         get() = prefs.getString("timer_points_date", "") ?: ""
         set(v) { prefs.edit().putString("timer_points_date", v).apply() }
+
+    var lastOpenDate: String
+        get() = prefs.getString("last_open_date", "") ?: ""
+        set(v) { prefs.edit().putString("last_open_date", v).apply() }
+
+    var pendingTaskCount: Int
+        get() = prefs.getInt("pending_task_count", 0)
+        set(v) { prefs.edit().putInt("pending_task_count", v).apply() }
+
+    var pendingTaskCountDate: String
+        get() = prefs.getString("pending_task_count_date", "") ?: ""
+        set(v) { prefs.edit().putString("pending_task_count_date", v).apply() }
+
+    var lastKnownLevel: Int
+        get() = prefs.getInt("last_known_level", 0)
+        set(v) { prefs.edit().putInt("last_known_level", v).apply() }
+
+    var taskRemindersEnabled: Boolean
+        get() = prefs.getBoolean("task_reminders_enabled", true)
+        set(v) { prefs.edit().putBoolean("task_reminders_enabled", v).apply() }
+
+    var streakAlertsEnabled: Boolean
+        get() = prefs.getBoolean("streak_alerts_enabled", true)
+        set(v) { prefs.edit().putBoolean("streak_alerts_enabled", v).apply() }
 }

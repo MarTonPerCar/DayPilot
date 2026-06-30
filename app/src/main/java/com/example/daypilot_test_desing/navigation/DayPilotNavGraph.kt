@@ -411,18 +411,21 @@ fun DayPilotNavGraph(
             composable(DayPilotDestinations.EDIT_PROFILE) {
                 val s by profileVM.uiState.collectAsState()
                 EditProfileScreen(
-                    currentName     = s.name,
-                    currentUsername = s.username,
-                    avatarUrl       = s.avatarUrl,
-                    onSave          = { name, username, region ->
+                    currentName          = s.name,
+                    currentUsername      = s.username,
+                    avatarUrl            = s.avatarUrl,
+                    isUploadingAvatar    = s.isUploadingAvatar,
+                    avatarUploadError    = s.avatarUploadError,
+                    onSave               = { name, username, region ->
                         profileVM.updateProfile(name, username, region)
                         navController.popBackStack()
                     },
                     onNavigateToResetPassword = {
                         navController.navigate(DayPilotDestinations.RESET_PASSWORD)
                     },
-                    onPhotoSelected = { uri -> profileVM.uploadAvatar(uri, context) },
-                    onBack          = { navController.popBackStack() }
+                    onPhotoSelected      = { uri -> profileVM.uploadAvatar(uri, context) },
+                    onAvatarErrorDismissed = { profileVM.clearAvatarError() },
+                    onBack               = { navController.popBackStack() }
                 )
             }
 
