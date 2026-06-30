@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.reminders
+package com.example.daypilot_test_desing.core.reminders
 
 import android.app.NotificationManager
 import android.content.BroadcastReceiver
@@ -6,8 +6,8 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
 import com.example.daypilot_test_desing.R
-import com.example.daypilot_test_desing.backend.preferences.AppPreferences
-import com.example.daypilot_test_desing.backend.supabase.SupabaseNotificationRepository
+import com.example.daypilot_test_desing.core.data.preferences.AppPreferences
+import com.example.daypilot_test_desing.data.supabase.SupabaseNotificationRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -77,7 +77,7 @@ class DailyNotificationsReceiver : BroadcastReceiver() {
 
     private fun notify(context: Context, id: Int, title: String, body: String) {
         val notification = NotificationCompat.Builder(context, DAILY_CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(title)
             .setContentText(body)
             .setStyle(NotificationCompat.BigTextStyle().bigText(body))

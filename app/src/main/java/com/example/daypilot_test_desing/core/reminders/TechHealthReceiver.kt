@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.reminders
+package com.example.daypilot_test_desing.core.reminders
 
 import android.app.NotificationManager
 import android.content.BroadcastReceiver
@@ -14,7 +14,7 @@ class TechHealthReceiver : BroadcastReceiver() {
         val limitMinutes = intent.getIntExtra("limit_minutes", 0)
 
         val notification = NotificationCompat.Builder(context, TECH_HEALTH_CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(context.getString(R.string.tech_health_notif_title, appName))
             .setContentText(context.getString(R.string.tech_health_notif_body, usedMinutes, limitMinutes))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
