@@ -135,6 +135,18 @@ fun DayPilotNavGraph(
         createDailyChannel(context)
     }
 
+    // After any task toggle or delete that writes points, refresh all score-related
+    // VMs immediately. The write already completed when this fires (CalendarViewModel
+    // emits only after progressRepo.logPoints() returns), so the DB read sees correct data.
+    LaunchedEffect(Unit) {
+        calendarVM.pointsChanged.collect {
+            progressVM.invalidate(); progressVM.refresh()
+            homeVM.invalidate();     homeVM.refresh()
+            rivalryVM.invalidate();  rivalryVM.refresh()
+            profileVM.invalidate();  profileVM.refresh()
+        }
+    }
+
     // Level-up in-app notification: fire when profileVM.level increases.
     val profileStateForLevel by profileVM.uiState.collectAsState()
     LaunchedEffect(profileStateForLevel.level) {

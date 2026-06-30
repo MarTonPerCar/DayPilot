@@ -13,7 +13,9 @@ import com.example.daypilot_test_desing.backend.model.TaskDifficulty
 import com.example.daypilot_test_desing.backend.repository.ProgressRepository
 import com.example.daypilot_test_desing.backend.repository.TaskRepository
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -26,6 +28,11 @@ class CalendarViewModel(
 
     private val _uiState = MutableStateFlow(CalendarUiState(isLoading = true))
     val uiState: StateFlow<CalendarUiState> = _uiState.asStateFlow()
+
+    // Emits whenever a points-affecting write completes so the NavGraph can
+    // trigger score refreshes without polling or guessing at the write timing.
+    private val _pointsChanged = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    val pointsChanged: SharedFlow<Unit> = _pointsChanged
 
     init { refresh() }
 
@@ -115,6 +122,7 @@ class CalendarViewModel(
                 taskRepo.toggleTask(id, isDone)
                 val points = if (isDone) 20 else -20
                 progressRepo.logPoints(points, "TASKS")
+                _pointsChanged.tryEmit(Unit) // signal NavGraph to refresh score VMs
                 if (isDone && taskTitle != null) {
                     NotificationHub.add(
                         title   = "✓ $taskTitle",
@@ -122,7 +130,6 @@ class CalendarViewModel(
                         type    = NotificationType.TASK
                     )
                 }
-                // No reload — the optimistic flip is the truth
             } catch (e: Exception) {
                 // Revert the flip
                 _uiState.update { state ->
@@ -141,7 +148,10 @@ class CalendarViewModel(
         viewModelScope.launch {
             try {
                 val task = snapshot.find { it.id == id }
-                if (task?.isDone == true) progressRepo.logPoints(-20, "TASKS")
+                if (task?.isDone == true) {
+                    progressRepo.logPoints(-20, "TASKS")
+                    _pointsChanged.tryEmit(Unit)
+                }
                 taskRepo.deleteTask(id)
             } catch (e: Exception) {
                 _uiState.update { it.copy(tasks = snapshot, userMessage = R.string.error_task_delete) }
