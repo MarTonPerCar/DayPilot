@@ -66,4 +66,10 @@ class SharedPrefsReminderRepository(context: Context) : ReminderRepository {
         val idx  = list.indexOfFirst { it.id == id }
         if (idx >= 0) { list[idx] = list[idx].copy(isEnabled = enabled); save(list) }
     }
+
+    fun updateTriggerTime(id: String, millis: Long) {
+        val list = load()
+        val idx  = list.indexOfFirst { it.id == id }
+        if (idx >= 0) { list[idx] = list[idx].copy(triggerAtMillis = millis); save(list) }
+    }
 }

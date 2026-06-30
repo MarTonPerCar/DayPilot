@@ -33,17 +33,20 @@ object ReminderScheduler {
         title: String,
         triggerAtMillis: Long,
         isEarly: Boolean = false,
-        isOneTime: Boolean = false
+        isOneTime: Boolean = false,
+        frequencyType: String = "ONCE"
     ) {
         if (triggerAtMillis <= System.currentTimeMillis()) return
 
         val notifId     = notificationId(reminderId, isEarly)
         val intent      = Intent(context, ReminderReceiver::class.java).apply {
-            putExtra("title",       title)
-            putExtra("notif_id",    notifId)
-            putExtra("is_early",    isEarly)
-            putExtra("reminder_id", reminderId)
-            putExtra("is_one_time", isOneTime && !isEarly)
+            putExtra("title",          title)
+            putExtra("notif_id",       notifId)
+            putExtra("is_early",       isEarly)
+            putExtra("reminder_id",    reminderId)
+            putExtra("is_one_time",    isOneTime && !isEarly)
+            putExtra("trigger_at",     triggerAtMillis)
+            putExtra("frequency_type", frequencyType)
         }
         val pendingIntent = PendingIntent.getBroadcast(
             context, notifId, intent,
