@@ -50,13 +50,13 @@
             android:theme="@style/UCropTheme"/>
 
         <receiver
-            android:name=".reminders.ReminderReceiver"
+            android:name=".core.reminders.ReminderReceiver"
             android:exported="false"/>
         <receiver
-            android:name=".reminders.TechHealthReceiver"
+            android:name=".core.reminders.TechHealthReceiver"
             android:exported="false"/>
         <receiver
-            android:name=".reminders.DailyNotificationsReceiver"
+            android:name=".core.reminders.DailyNotificationsReceiver"
             android:exported="false"/>
     </application>
 

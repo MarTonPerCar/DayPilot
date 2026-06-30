@@ -12,12 +12,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.daypilot_test_desing.backend.supabase.SupabaseUserRepository
-import com.example.daypilot_test_desing.navigation.DayPilotNavGraph
-import com.example.daypilot_test_desing.viewmodel.settings.SettingsViewModel
-import com.example.daypilot_test_desing.reminders.createNotificationChannel
-import com.example.daypilot_test_desing.reminders.createTechHealthChannel
-import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
+import com.example.daypilot_test_desing.data.supabase.SupabaseUserRepository
+import com.example.daypilot_test_desing.core.navigation.DayPilotNavGraph
+import com.example.daypilot_test_desing.feature.settings.SettingsViewModel
+import com.example.daypilot_test_desing.core.reminders.createNotificationChannel
+import com.example.daypilot_test_desing.core.reminders.createTechHealthChannel
+import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
 
 class MainActivity : ComponentActivity() {
 

@@ -1,7 +1,7 @@
 package com.example.daypilot_test_desing
 
-import com.example.daypilot_test_desing.ui.components.basic.DayPilotReactionBar
-import com.example.daypilot_test_desing.ui.components.basic.DayPilotReactionSummary
+import com.example.daypilot_test_desing.core.ui.components.basic.DayPilotReactionBar
+import com.example.daypilot_test_desing.core.ui.components.basic.DayPilotReactionSummary
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -13,12 +13,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.daypilot_test_desing.ui.components.DayPilotCalendar
-import com.example.daypilot_test_desing.ui.components.basic.*
-import com.example.daypilot_test_desing.ui.components.cards.*
-import com.example.daypilot_test_desing.ui.components.forms.*
-import com.example.daypilot_test_desing.backend.model.*
-import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
+import com.example.daypilot_test_desing.core.ui.components.DayPilotCalendar
+import com.example.daypilot_test_desing.core.ui.components.basic.*
+import com.example.daypilot_test_desing.core.ui.components.cards.*
+import com.example.daypilot_test_desing.core.ui.components.forms.*
+import com.example.daypilot_test_desing.core.data.model.*
+import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
 
 // ── Preview 1: Botones, Avatar, Chips, TextFields ─────────────────
 @Preview(showBackground = true)
