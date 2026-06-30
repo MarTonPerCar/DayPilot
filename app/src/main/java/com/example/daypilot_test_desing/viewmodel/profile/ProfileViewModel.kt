@@ -2,6 +2,7 @@ package com.example.daypilot_test_desing.viewmodel.profile
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -65,17 +66,27 @@ class ProfileViewModel(
     }
 
     fun uploadAvatar(uri: Uri, context: Context): Job = viewModelScope.launch {
+        Log.d("AvatarUpload", "uploadAvatar called: uri=$uri")
         _uiState.value = _uiState.value.copy(isUploadingAvatar = true, avatarUploadError = false)
         val success = try {
             val (bytes, mimeType) = withContext(Dispatchers.IO) {
                 val b = context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
                 val m = context.contentResolver.getType(uri) ?: "image/jpeg"
+                Log.d("AvatarUpload", "Read bytes=${b?.size}, mimeType=$m")
                 Pair(b, m)
             }
-            if (bytes == null) false
-            else userRepo.uploadAvatar(bytes, mimeType) != null
-        } catch (_: Exception) { false }
+            if (bytes == null) {
+                Log.e("AvatarUpload", "openInputStream returned null for uri=$uri")
+                false
+            } else {
+                userRepo.uploadAvatar(bytes, mimeType) != null
+            }
+        } catch (e: Exception) {
+            Log.e("AvatarUpload", "Exception in uploadAvatar VM", e)
+            false
+        }
 
+        Log.d("AvatarUpload", "Upload result: success=$success")
         if (success) {
             load()
         } else {

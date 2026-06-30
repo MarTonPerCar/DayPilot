@@ -22,6 +22,7 @@ import androidx.core.content.FileProvider
 import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.ui.components.basic.*
 import com.example.daypilot_test_desing.backend.model.TimeZoneRegion
+import com.yalantis.ucrop.UCrop
 import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -54,14 +55,31 @@ fun EditProfileScreen(
         }
     }
 
-    // Camera: write to a temp file in cache, then upload on result
+    // Crop result → upload
+    val cropLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        val croppedUri = UCrop.getOutput(result.data ?: return@rememberLauncherForActivityResult)
+        croppedUri?.let { onPhotoSelected(it) }
+    }
+
+    fun launchCrop(sourceUri: Uri) {
+        val destFile = File(context.cacheDir, "avatar_cropped_${System.currentTimeMillis()}.jpg")
+        val destUri  = Uri.fromFile(destFile)
+        UCrop.of(sourceUri, destUri)
+            .withAspectRatio(1f, 1f)
+            .withMaxResultSize(512, 512)
+            .getIntent(context)
+            .also { cropLauncher.launch(it) }
+    }
+
+    // Camera temp file
     var cameraUri by remember { mutableStateOf<Uri?>(null) }
+
     val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
-        if (success) cameraUri?.let { onPhotoSelected(it) }
+        if (success) cameraUri?.let { launchCrop(it) }
     }
 
     val galleryLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        uri?.let { onPhotoSelected(it) }
+        uri?.let { launchCrop(it) }
     }
 
     val regions = TimeZoneRegion.entries
@@ -118,9 +136,9 @@ fun EditProfileScreen(
                     )
                     if (isUploadingAvatar) {
                         CircularProgressIndicator(
-                            modifier  = Modifier.size(90.dp),
+                            modifier    = Modifier.size(90.dp),
                             strokeWidth = 3.dp,
-                            color     = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
+                            color       = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
                         )
                     }
                 }
