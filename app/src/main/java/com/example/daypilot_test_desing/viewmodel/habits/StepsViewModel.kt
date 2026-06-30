@@ -7,6 +7,9 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -56,8 +59,7 @@ class StepsViewModel(
             val dailySteps = maxOf(0, totalSinceBoot - baseline)
             stepsRepo.setSteps(dailySteps)
             updateLocalState()
-            // Stage 1: sync to DB whenever 100+ steps accumulated since last write
-            if (lastSyncedSteps < 0 || dailySteps - lastSyncedSteps >= 100) {
+            if (lastSyncedSteps < 0 || dailySteps - lastSyncedSteps >= STEP_SYNC_THRESHOLD) {
                 triggerSync(dailySteps)
             }
         }
@@ -71,14 +73,22 @@ class StepsViewModel(
         viewModelScope.launch { loadWeeklyStats() }
         updateLocalState()
         _uiState.update { it.copy(sensorAvailable = stepSensor != null) }
-        // Stage 2: periodic sync every 10 minutes
+
+        // Periodic sync every 5 minutes
         viewModelScope.launch {
             while (true) {
-                delay(10 * 60_000L)
+                delay(PERIODIC_SYNC_MS)
                 val steps = stepsRepo.getCurrentSteps()
                 if (steps != lastSyncedSteps) triggerSync(steps)
             }
         }
+
+        // Sync when the app goes to background so the latest step count is persisted
+        ProcessLifecycleOwner.get().lifecycle.addObserver(object : DefaultLifecycleObserver {
+            override fun onStop(owner: LifecycleOwner) {
+                triggerSync(stepsRepo.getCurrentSteps())
+            }
+        })
     }
 
     override fun onCleared() {
@@ -86,13 +96,11 @@ class StepsViewModel(
     }
 
     fun refresh() {
-        // Stage 3: sync on app open / foreground return
         triggerSync()
         updateLocalState()
         viewModelScope.launch { loadWeeklyStats() }
     }
 
-    // Writes current steps to habits_daily; DB trigger propagates to daily_progress.
     private fun triggerSync(steps: Int = stepsRepo.getCurrentSteps()) {
         lastSyncedSteps = steps
         val goal = stepsRepo.getGoalSteps()
@@ -133,6 +141,9 @@ class StepsViewModel(
     private fun todayStr() = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
 
     companion object {
+        private const val STEP_SYNC_THRESHOLD = 50
+        private const val PERIODIC_SYNC_MS    = 5 * 60_000L
+
         fun factory(application: Application, repo: StepsRepository): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")

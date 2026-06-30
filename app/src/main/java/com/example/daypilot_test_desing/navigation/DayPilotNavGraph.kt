@@ -113,11 +113,12 @@ fun DayPilotNavGraph(
         factory = CalendarViewModel.factory(SupabaseTaskRepository(), progressRepo)
     )
 
-    // Propagate sensor step updates to HabitsScreen and HomeScreen
+    // Propagate sensor step updates to HabitsScreen (local read, fast)
+    // homeVM is NOT refreshed here — the sensor fires many times per second
+    // and homeVM.refresh() makes 5+ DB calls. Home data refreshes on navigation.
     val stepsState by stepsVM.uiState.collectAsState()
     LaunchedEffect(stepsState.currentSteps) {
         habitsVM.refresh()
-        homeVM.refresh()
     }
 
     // Refresh home data every time the user lands on HOME so friend/ranking
@@ -302,15 +303,15 @@ fun DayPilotNavGraph(
                     onAcceptedNavigated = { friendsVM.clearJustAccepted() },
                     onAcceptRequest     = { userId ->
                         friendsVM.acceptRequest(userId)
-                        rivalryVM.refresh()
-                        homeVM.refresh()
+                        rivalryVM.invalidate()
+                        homeVM.invalidate()
                     },
                     onRejectRequest     = friendsVM::rejectRequest,
                     onTapFriend         = {},
                     onRemoveFriend      = { userId ->
                         friendsVM.removeFriend(userId)
-                        rivalryVM.refresh()
-                        homeVM.refresh()
+                        rivalryVM.invalidate()
+                        homeVM.invalidate()
                     },
                     onReactToFriend     = friendsVM::reactToFriend,
                     onNavigateToSearch  = { navController.navigate(DayPilotDestinations.SEARCH_FRIENDS) },
@@ -329,9 +330,9 @@ fun DayPilotNavGraph(
                     onAddFriend          = searchVM::addFriend,
                     onConfirmationDismissed = {
                         searchVM.dismissConfirmation()
-                        friendsVM.refresh()
-                        rivalryVM.refresh()
-                        homeVM.refresh()
+                        friendsVM.refresh()  // friends list may have new requests
+                        rivalryVM.invalidate()
+                        homeVM.invalidate()
                         // Navigate to a fresh Friends screen (tab 0) and clear search from the stack.
                         navController.navigate(DayPilotDestinations.FRIENDS) {
                             popUpTo(DayPilotDestinations.FRIENDS) { inclusive = true }
@@ -457,15 +458,15 @@ fun DayPilotNavGraph(
                     onTapTask      = {},
                     onToggleTask   = { id, isDone ->
                         calendarVM.toggleTask(id, isDone)
-                        progressVM.refresh()
-                        profileVM.refresh()
-                        homeVM.refresh()
+                        progressVM.invalidate()
+                        profileVM.invalidate()
+                        homeVM.invalidate()
                     },
                     onDeleteTask   = { id ->
                         calendarVM.deleteTask(id)
-                        progressVM.refresh()
-                        profileVM.refresh()
-                        homeVM.refresh()
+                        progressVM.invalidate()
+                        profileVM.invalidate()
+                        homeVM.invalidate()
                     },
                     onEditTask     = calendarVM::editTask,
                     onUpdateTask   = calendarVM::updateTask
@@ -574,7 +575,8 @@ fun DayPilotNavGraph(
                     pointEarnedToday = ps.timerCompletedToday,
                     onTimerCompleted = {
                         progressVM.recordTimerComplete()
-                        homeVM.refresh()
+                        homeVM.invalidate()
+                        profileVM.invalidate()
                     },
                     onBack           = { navController.popBackStack() }
                 )

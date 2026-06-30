@@ -29,21 +29,27 @@ class ProgressViewModel(
     private val _uiState = MutableStateFlow(ProgressUiState())
     val uiState: StateFlow<ProgressUiState> = _uiState.asStateFlow()
 
+    private var loadedAt = 0L
+
     init { viewModelScope.launch { load() } }
 
-    fun refresh(): Job = viewModelScope.launch { load() }
+    fun refresh(): Job = viewModelScope.launch {
+        if (System.currentTimeMillis() - loadedAt < CACHE_TTL_MS) return@launch
+        load()
+    }
+
+    fun invalidate() { loadedAt = 0L }
 
     private suspend fun load() {
         try {
             val todayProgress = repo.getTodayProgress()
-            // Closed days descending → reverse to chronological, then append today
-            val history = repo.getHistory(30)
-            val ranking = repo.getRankingPosition()
-            val closedData = history.reversed().map { log ->
+            val history       = repo.getHistory(30)
+            val ranking       = repo.getRankingPosition()
+            val closedData    = history.reversed().map { log ->
                 val day = log.date.substringAfterLast("-").toIntOrNull() ?: 0
                 DayProgress(day = day, points = log.totalPoints, steps = log.steps, tasksCompleted = log.tasksCompleted)
             }
-            val todayDayNum = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
+            val todayDayNum  = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
             val progressData = closedData + DayProgress(
                 day            = todayDayNum,
                 points         = todayProgress.totalPoints,
@@ -61,6 +67,7 @@ class ProgressViewModel(
                 pointsFromTimers    = todayProgress.timerPoints,
                 timerCompletedToday = appPrefs.timerPointsDate == today()
             )
+            loadedAt = System.currentTimeMillis()
         } catch (_: Exception) { }
     }
 
@@ -70,6 +77,7 @@ class ProgressViewModel(
         appPrefs.timerPointsDate = todayStr
         viewModelScope.launch {
             repo.logPoints(10, "TIMER")
+            invalidate()
             load()
             SupabaseNotificationRepository.insertForCurrentUser(
                 type  = "TIMER_DONE",
@@ -82,6 +90,8 @@ class ProgressViewModel(
     private fun today() = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
 
     companion object {
+        private const val CACHE_TTL_MS = 2 * 60_000L
+
         fun factory(application: Application, repo: ProgressRepository): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")

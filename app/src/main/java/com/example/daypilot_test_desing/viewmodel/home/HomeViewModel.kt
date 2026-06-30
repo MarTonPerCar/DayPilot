@@ -11,6 +11,8 @@ import com.example.daypilot_test_desing.backend.repository.StepsRepository
 import com.example.daypilot_test_desing.backend.repository.TaskRepository
 import com.example.daypilot_test_desing.backend.repository.UserRepository
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,19 +28,37 @@ class HomeViewModel(
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
+    private var loadedAt = 0L
+
     init { refresh() }
 
     fun refresh(): Job = viewModelScope.launch {
-            try {
-                val user        = userRepo.getCurrentUser()
-                val allTasks    = taskRepo.getTasks()
-                // Count unique tasks (by id) to avoid inflating count with recurring task_days
+        if (System.currentTimeMillis() - loadedAt < CACHE_TTL_MS) return@launch
+        load()
+    }
+
+    fun invalidate() { loadedAt = 0L }
+
+    private suspend fun load() {
+        try {
+            coroutineScope {
+                // All DB calls are independent — run them in parallel
+                val userD    = async { userRepo.getCurrentUser() }
+                val tasksD   = async { taskRepo.getTasks() }
+                val todayD   = async { progressRepo.getTodayProgress() }
+                val historyD = async { progressRepo.getHistory(30) }
+                val rankingD = async { progressRepo.getRankingPosition() }
+                val friendsD = async { friendRepo.getFriends() }
+
+                val user        = userD.await()
+                val allTasks    = tasksD.await()
+                val today       = todayD.await()
+                val history     = historyD.await()
+                val ranking     = rankingD.await()
+                val friends     = friendsD.await()
+
                 val uniqueTasks = allTasks.distinctBy { it.id }
-                val today    = progressRepo.getTodayProgress()
-                val history  = progressRepo.getHistory(30)
-                val ranking  = progressRepo.getRankingPosition()
-                val friends  = friendRepo.getFriends()
-                val closedData = history.reversed().map { log ->
+                val closedData  = history.reversed().map { log ->
                     val day = log.date.substringAfterLast("-").toIntOrNull() ?: 0
                     DayProgress(day = day, points = log.totalPoints, steps = log.steps, tasksCompleted = log.tasksCompleted)
                 }
@@ -63,10 +83,14 @@ class HomeViewModel(
                     friendCount         = friends.size,
                     timerCompletedToday = today.timerPoints > 0
                 )
-            } catch (_: Exception) { }
+                loadedAt = System.currentTimeMillis()
+            }
+        } catch (_: Exception) { }
     }
 
     companion object {
+        private const val CACHE_TTL_MS = 2 * 60_000L
+
         fun factory(
             stepsRepo: StepsRepository,
             progressRepo: ProgressRepository,

@@ -15,9 +15,16 @@ class RivalryViewModel(private val repo: RankingRepository) : ViewModel() {
     private val _uiState = MutableStateFlow(RivalryUiState())
     val uiState: StateFlow<RivalryUiState> = _uiState.asStateFlow()
 
+    private var loadedAt = 0L
+
     init { viewModelScope.launch { load() } }
 
-    fun refresh(): Job = viewModelScope.launch { load() }
+    fun refresh(): Job = viewModelScope.launch {
+        if (System.currentTimeMillis() - loadedAt < CACHE_TTL_MS) return@launch
+        load()
+    }
+
+    fun invalidate() { loadedAt = 0L }
 
     private suspend fun load() {
         try {
@@ -39,10 +46,13 @@ class RivalryViewModel(private val repo: RankingRepository) : ViewModel() {
                 currentUserLevel    = me?.level ?: 1,
                 ranking             = ranking
             )
+            loadedAt = System.currentTimeMillis()
         } catch (_: Exception) { }
     }
 
     companion object {
+        private const val CACHE_TTL_MS = 2 * 60_000L
+
         fun factory(repo: RankingRepository): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")

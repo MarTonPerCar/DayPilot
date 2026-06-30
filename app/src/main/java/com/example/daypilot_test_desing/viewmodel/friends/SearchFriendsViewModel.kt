@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.backend.repository.FriendRepository
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,7 +18,9 @@ class SearchFriendsViewModel(private val repo: FriendRepository) : ViewModel() {
     private val _uiState = MutableStateFlow(SearchFriendsUiState())
     val uiState: StateFlow<SearchFriendsUiState> = _uiState.asStateFlow()
 
+    // Cached once on init; accurate for the lifetime of this search session
     private var friendIds: Set<String> = emptySet()
+    private var searchJob: Job? = null
 
     init {
         viewModelScope.launch {
@@ -28,11 +32,11 @@ class SearchFriendsViewModel(private val repo: FriendRepository) : ViewModel() {
     }
 
     fun search(query: String) {
-        _uiState.update { it.copy(isLoading = true) }
-        viewModelScope.launch {
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch {
+            delay(400) // debounce: only fire after the user stops typing
+            _uiState.update { it.copy(isLoading = true) }
             try {
-                // Refresh friend IDs so removed friends appear again immediately
-                friendIds = try { repo.getFriendIds() } catch (_: Exception) { emptyList() }.toSet()
                 val results = repo.searchUsers(query)
                 val sentIds = _uiState.value.sentRequestUserIds
                 _uiState.update {
@@ -53,7 +57,6 @@ class SearchFriendsViewModel(private val repo: FriendRepository) : ViewModel() {
         val originalResults = _uiState.value.searchResults
         val originalSentIds = _uiState.value.sentRequestUserIds
         val newSentIds = originalSentIds + userId
-        // Mark pending and show confirmation before the API responds
         _uiState.update { state ->
             state.copy(
                 requestJustSent    = true,
