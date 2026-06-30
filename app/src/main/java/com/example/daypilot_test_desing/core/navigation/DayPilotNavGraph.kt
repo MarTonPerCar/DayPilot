@@ -386,9 +386,6 @@ fun DayPilotNavGraph(
                     pointsFromSteps     = s.pointsFromSteps,
                     pointsFromHabits    = s.pointsFromHabits,
                     pointsFromTimers    = s.pointsFromTimers,
-                    stepsToday          = s.stepsToday,
-                    stepsGoal           = stepsState.goalSteps,
-                    tasksCompletedToday = s.tasksCompletedToday,
                     avatarUrl           = s.avatarUrl,
                     weeklySummary       = s.weeklySummary,
                     onNavigateToSettings = { navController.navigate(DayPilotDestinations.SETTINGS) }

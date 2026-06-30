@@ -33,9 +33,6 @@ fun ProfileScreen(
     pointsFromSteps: Int,
     pointsFromHabits: Int,
     pointsFromTimers: Int,
-    stepsToday: Int,
-    stepsGoal: Int,
-    tasksCompletedToday: Int,
     avatarUrl: String? = null,
     weeklySummary: WeeklySummaryData,
     onNavigateToSettings: () -> Unit
@@ -102,14 +99,9 @@ fun ProfileScreen(
             }
 
             // ── Resumen del día ──────────────────────────────────
-            DailySummaryCard(
-                userName        = name,
-                streak          = currentStreak,
-                stepsToday      = stepsToday,
-                stepsGoal       = stepsGoal,
-                tasksCompleted  = tasksCompletedToday,
-                pointsToday     = pointsToday,
-                rankingPosition = rankingPosition,
+            StatsCard(
+                rankingPosition  = rankingPosition,
+                pointsToday      = pointsToday,
                 pointsFromTasks  = pointsFromTasks,
                 pointsFromSteps  = pointsFromSteps,
                 pointsFromHabits = pointsFromHabits,

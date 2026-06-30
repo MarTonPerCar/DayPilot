@@ -338,11 +338,7 @@
     <string name="daily_summary_label_tasks">Tareas</string>
     <string name="daily_summary_label_points">Puntos</string>
     <string name="daily_summary_label_ranking">Ranking</string>
-    <string name="daily_summary_breakdown_title">Desglose de puntos</string>
-    <string name="daily_summary_breakdown_tasks">Tareas</string>
-    <string name="daily_summary_breakdown_steps">Pasos</string>
-    <string name="daily_summary_breakdown_habits">Hábitos</string>
-    <string name="daily_summary_breakdown_timer">Temporizador</string>
+
 
 
     <!-- Group Limit Card -->
