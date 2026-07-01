@@ -109,7 +109,6 @@ Durante la revisión de código se identificaron y corrigieron los siguientes pr
 | `Incremento-Android` | Versión de producción del incremento, base para el siguiente |
 | `Incremento-Android-TestFinal` | Esta rama — trabajo y testing |
 | `Intensive-Android-Testing` | Misma app con timings acelerados para pruebas exhaustivas |
-| `Supabase-Information` | Ficheros de migración SQL (schema, seed, drop) |
 
 ---
 
