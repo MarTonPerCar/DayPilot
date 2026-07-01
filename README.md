@@ -135,4 +135,4 @@ Como parte del proceso de revisión final se realizó un pase de humanización d
 
 ### Rama de continuación
 
-Esta rama (`Incremento-Android`) queda como base para el siguiente incremento. Para testing exhaustivo con tiempos acelerados existe la rama `Intensive-Android-Testing`. Los ficheros de migración de Supabase están disponibles en la rama `Supabase-Information`.
+Esta rama (`Incremento-Android`) queda como base para el siguiente incremento. Para testing exhaustivo con tiempos acelerados existe la rama `Intensive-Android-Testing`.
