@@ -1,0 +1,26 @@
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+CLAUDE.md
+
+# Local Gradle Home cache (GRADLE_USER_HOME pointed at project dir)
+gradle/.tmp/
+gradle/android/
+gradle/caches/
+gradle/daemon/
+gradle/kotlin-profile/
+gradle/native/
+gradle/wrapper/dists/
+.kotlin/
