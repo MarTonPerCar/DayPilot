@@ -13,3 +13,13 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Local Gradle Home cache (GRADLE_USER_HOME pointed at project dir)
+gradle/.tmp/
+gradle/android/
+gradle/caches/
+gradle/daemon/
+gradle/kotlin-profile/
+gradle/native/
+gradle/wrapper/dists/
+.kotlin/
