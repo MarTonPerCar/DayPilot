@@ -130,9 +130,6 @@ Las notificaciones periódicas de salud tecnológica ("llevas X minutos en esta 
 | Media | `DayPilotAccessibilityService`: el repositorio se instanciaba en cada evento de accesibilidad (hilo principal), con riesgo de ANR en cambios de app rápidos |
 | Media | `TechHealthBlockActivity`: siempre renderizaba el tema SAGE_GREEN ignorando la preferencia del usuario |
 
-**Humanización del código**
-Como parte del proceso de revisión final se realizó un pase de humanización del código: comentarios en español mezclados con inglés, valores de debounce ajustados (3.000 ms → 2.500 ms), TODOs y FIXMEs en lugares relevantes y un log de debug comentado que refleja el proceso real de desarrollo.
-
 ### Rama de continuación
 
 Esta rama (`Incremento-Android`) queda como base para el siguiente incremento. Para testing exhaustivo con tiempos acelerados existe la rama `Intensive-Android-Testing`.
