@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'theme/app_theme.dart';
 
 void main() {
   runApp(const DayPilotApp());
@@ -12,20 +13,8 @@ class DayPilotApp extends StatelessWidget {
     return MaterialApp(
       title: 'DayPilot',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF4F6AF5),
-          brightness: Brightness.light,
-        ),
-      ),
-      darkTheme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF4F6AF5),
-          brightness: Brightness.dark,
-        ),
-      ),
+      theme:     buildTheme(DayPilotTheme.sageGreen),
+      darkTheme: buildTheme(DayPilotTheme.sageGreen, darkMode: true),
       themeMode: ThemeMode.system,
       home: const HomePage(),
     );
