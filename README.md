@@ -115,6 +115,5 @@ Durante la revisión de código se identificaron y corrigieron los siguientes pr
 ## Convenciones de esta rama
 
 - Commits por bloque funcional, no por archivo
-- Mensajes de commit en inglés con prefijo descriptivo
 - Las pantallas no conocen los repositorios — solo hablan con el ViewModel
 - `SessionCache` es la única fuente de verdad en memoria; la BD es la fuente de verdad persistente
