@@ -1,39 +1,19 @@
 import 'package:flutter/material.dart';
 import '../../components/basic/top_bar.dart';
 import '../../components/basic/avatar.dart';
-import '../../components/basic/task_dot.dart';
 import '../../components/cards/daily_summary_card.dart';
-import '../../components/cards/steps_card.dart';
-import '../../components/cards/habit_card.dart';
-import '../../components/cards/task_card.dart';
+import '../../components/cards/home_menu_card.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
-
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  bool _task1Done = false;
-  bool _task2Done = false;
-  bool _task3Done = false;
-
-  String get _greeting {
-    final h = DateTime.now().hour;
-    if (h < 12) return 'Buenos días';
-    if (h < 20) return 'Buenas tardes';
-    return 'Buenas noches';
-  }
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    final text = Theme.of(context).textTheme;
 
     return Scaffold(
       appBar: DayPilotTopBarWithActions(
-        title: '$_greeting, Mario',
+        title: 'DayPilot',
         actions: [
           IconButton(
             icon: Badge(
@@ -41,7 +21,6 @@ class _HomeScreenState extends State<HomeScreen> {
               child: const Icon(Icons.notifications_outlined),
             ),
             onPressed: () {},
-            tooltip: 'Notificaciones',
           ),
           Padding(
             padding: const EdgeInsets.only(right: 8),
@@ -52,112 +31,120 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
-        children: [
-          // ── Resumen del día
-          const DailySummaryCard(
-            pointsFromTasks: 120,
-            pointsFromSteps: 37,
-            pointsFromTimer: 80,
-            pointsFromHealth: 50,
-            pointsFromWellness: 30,
-          ),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final available = constraints.maxHeight - 32; // 16 top + 16 bottom
+          final summaryH = available * 0.38;
+          final gridH = available - summaryH - 10;
 
-          const SizedBox(height: 24),
-
-          // ── Pasos de hoy
-          const StepsCard(steps: 7432, goal: 10000, pointsEarned: 37),
-
-          const SizedBox(height: 24),
-
-          // ── Mis hábitos
-          Text(
-            'MIS HÁBITOS',
-            style: text.labelSmall?.copyWith(
-              color: colors.primary,
-              letterSpacing: 1.2,
-              fontWeight: FontWeight.w600,
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+            child: Column(
+              children: [
+                // ── Resumen del día (38%)
+                SizedBox(
+                  height: summaryH,
+                  child: const DailySummaryCard(
+                    userName: 'Mario',
+                    streak: 12,
+                    stepsToday: 7432,
+                    stepsGoal: 10000,
+                    tasksCompleted: 5,
+                    tasksTotal: 8,
+                    pointsToday: 237,
+                    rankingPosition: 4,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                // ── 2×2 menú principal (62%)
+                SizedBox(
+                  height: gridH,
+                  child: _HomeGrid(colors: colors),
+                ),
+              ],
             ),
-          ),
-          const SizedBox(height: 10),
-          HabitCard(
-            icon: Icons.task_alt_rounded,
-            title: 'Tareas',
-            subtitle: '3 pendientes · 5 completadas hoy',
-            progress: 0.63,
-            onTap: () {},
-          ),
-          const SizedBox(height: 8),
-          HabitCard(
-            icon: Icons.timer_rounded,
-            title: 'Temporizadores',
-            subtitle: '2 sesiones · 48 min totales',
-            progress: 0.48,
-            onTap: () {},
-          ),
-          const SizedBox(height: 8),
-          HabitCard(
-            icon: Icons.health_and_safety_rounded,
-            title: 'Salud tecnológica',
-            subtitle: '3 apps con límite · 0 superadas',
-            iconColor: colors.error,
-            onTap: () {},
-          ),
-          const SizedBox(height: 8),
-          HabitCard(
-            icon: Icons.self_improvement_rounded,
-            title: 'Bienestar',
-            subtitle: 'Racha de 12 días consecutivos',
-            iconColor: Colors.purple,
-            onTap: () {},
-          ),
+          );
+        },
+      ),
+    );
+  }
+}
 
-          const SizedBox(height: 24),
+class _HomeGrid extends StatelessWidget {
+  final ColorScheme colors;
+  const _HomeGrid({required this.colors});
 
-          // ── Tareas pendientes
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Expanded(
+          child: Row(
             children: [
-              Text(
-                'TAREAS DE HOY',
-                style: text.labelSmall?.copyWith(
-                  color: colors.primary,
-                  letterSpacing: 1.2,
-                  fontWeight: FontWeight.w600,
+              Expanded(
+                child: HomeMenuCard(
+                  icon: Icons.calendar_month_rounded,
+                  title: 'Calendario',
+                  accentColor: colors.primary,
+                  onTap: () {},
+                  indicator: HomeMenuProgressBar(
+                    value: 5 / 8,
+                    label: '5/8 tareas hoy',
+                    color: colors.primary,
+                  ),
                 ),
               ),
-              TextButton(onPressed: () {}, child: const Text('Ver todas')),
+              const SizedBox(width: 10),
+              Expanded(
+                child: HomeMenuCard(
+                  icon: Icons.trending_up_rounded,
+                  title: 'Progreso',
+                  accentColor: colors.secondary,
+                  onTap: () {},
+                  indicator: HomeMenuMiniBarChart(
+                    values: const [120, 180, 95, 210, 160, 240, 237],
+                    color: colors.secondary,
+                  ),
+                ),
+              ),
             ],
           ),
-          const SizedBox(height: 8),
-          TaskCard(
-            title: 'Diseñar pantalla de inicio',
-            description: 'Crear wireframe y componentes base',
-            dueDate: 'hoy',
-            priority: TaskPriority.high,
-            category: 'Diseño',
-            completed: _task1Done,
-            onToggle: () => setState(() => _task1Done = !_task1Done),
+        ),
+        const SizedBox(height: 10),
+        Expanded(
+          child: Row(
+            children: [
+              Expanded(
+                child: HomeMenuCard(
+                  icon: Icons.self_improvement_rounded,
+                  title: 'Hábitos',
+                  accentColor: colors.tertiary,
+                  onTap: () {},
+                  indicator: HomeMenuProgressBar(
+                    value: 7432 / 10000,
+                    label: '7.4k / 10k pasos',
+                    color: colors.tertiary,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: HomeMenuCard(
+                  icon: Icons.emoji_events_rounded,
+                  title: 'Rivalidad',
+                  accentColor: const Color(0xFFB85C00),
+                  onTap: () {},
+                  indicator: const HomeMenuRivalryIndicator(
+                    position: 4,
+                    total: 28,
+                    color: Color(0xFFB85C00),
+                  ),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 6),
-          TaskCard(
-            title: 'Revisar documentación de Flutter',
-            priority: TaskPriority.medium,
-            completed: _task2Done,
-            onToggle: () => setState(() => _task2Done = !_task2Done),
-          ),
-          const SizedBox(height: 6),
-          TaskCard(
-            title: 'Reunión de equipo',
-            dueDate: '18:00',
-            priority: TaskPriority.medium,
-            category: 'Trabajo',
-            completed: _task3Done,
-            onToggle: () => setState(() => _task3Done = !_task3Done),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

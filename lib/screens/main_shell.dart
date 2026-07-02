@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'home/home_screen.dart';
-import 'tasks/tasks_screen.dart';
-import 'ranking/ranking_screen.dart';
+import 'friends/friends_screen.dart';
+import 'notifications/notifications_screen.dart';
 import 'profile/profile_screen.dart';
 
 class MainShell extends StatefulWidget {
@@ -16,8 +16,8 @@ class _MainShellState extends State<MainShell> {
 
   static const _tabs = [
     HomeScreen(),
-    TasksScreen(),
-    RankingScreen(),
+    FriendsScreen(),
+    NotificationsScreen(),
     ProfileScreen(),
   ];
 
@@ -38,14 +38,14 @@ class _MainShellState extends State<MainShell> {
             label: 'Inicio',
           ),
           NavigationDestination(
-            icon: Icon(Icons.check_circle_outline_rounded),
-            selectedIcon: Icon(Icons.check_circle_rounded),
-            label: 'Tareas',
+            icon: Icon(Icons.group_outlined),
+            selectedIcon: Icon(Icons.group_rounded),
+            label: 'Amigos',
           ),
           NavigationDestination(
-            icon: Icon(Icons.emoji_events_outlined),
-            selectedIcon: Icon(Icons.emoji_events_rounded),
-            label: 'Ranking',
+            icon: Icon(Icons.notifications_outlined),
+            selectedIcon: Icon(Icons.notifications_rounded),
+            label: 'Avisos',
           ),
           NavigationDestination(
             icon: Icon(Icons.person_outline_rounded),

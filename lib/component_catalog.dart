@@ -564,11 +564,14 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
           // ── Resumen del día ──────────────────────────────────────
           _SectionHeader('Resumen del día'),
           const DailySummaryCard(
-            pointsFromTasks: 120,
-            pointsFromSteps: 37,
-            pointsFromTimer: 80,
-            pointsFromHealth: 50,
-            pointsFromWellness: 30,
+            userName: 'Demo',
+            streak: 7,
+            stepsToday: 7432,
+            stepsGoal: 10000,
+            tasksCompleted: 5,
+            tasksTotal: 8,
+            pointsToday: 237,
+            rankingPosition: 4,
           ),
 
           // ════════════════════════════════════════════════════════

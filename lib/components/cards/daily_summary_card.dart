@@ -1,146 +1,222 @@
 import 'package:flutter/material.dart';
 
 class DailySummaryCard extends StatelessWidget {
-  final int pointsFromTasks;
-  final int pointsFromSteps;
-  final int pointsFromTimer;
-  final int pointsFromHealth;
-  final int pointsFromWellness;
+  final String userName;
+  final int streak;
+  final int stepsToday;
+  final int stepsGoal;
+  final int tasksCompleted;
+  final int tasksTotal;
+  final int pointsToday;
+  final int rankingPosition;
 
   const DailySummaryCard({
     super.key,
-    this.pointsFromTasks = 0,
-    this.pointsFromSteps = 0,
-    this.pointsFromTimer = 0,
-    this.pointsFromHealth = 0,
-    this.pointsFromWellness = 0,
+    required this.userName,
+    this.streak = 0,
+    this.stepsToday = 0,
+    this.stepsGoal = 10000,
+    this.tasksCompleted = 0,
+    this.tasksTotal = 0,
+    this.pointsToday = 0,
+    this.rankingPosition = 0,
   });
-
-  int get _total =>
-      pointsFromTasks +
-      pointsFromSteps +
-      pointsFromTimer +
-      pointsFromHealth +
-      pointsFromWellness;
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final text = Theme.of(context).textTheme;
-    final maxVal = [
-      pointsFromTasks,
-      pointsFromSteps,
-      pointsFromTimer,
-      pointsFromHealth,
-      pointsFromWellness,
-    ].reduce((a, b) => a > b ? a : b).clamp(1, 1 << 30);
-
-    final sources = [
-      _Source('Tareas', Icons.task_alt_rounded, pointsFromTasks, colors.primary),
-      _Source('Pasos', Icons.directions_walk_rounded, pointsFromSteps, colors.tertiary),
-      _Source('Temporizador', Icons.timer_rounded, pointsFromTimer, colors.secondary),
-      _Source('Salud tech', Icons.health_and_safety_rounded, pointsFromHealth, colors.error),
-      _Source('Bienestar', Icons.self_improvement_rounded, pointsFromWellness, const Color(0xFF9C6FDE)),
-    ];
 
     return Card(
+      elevation: 4,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(24)),
+      ),
       clipBehavior: Clip.hardEdge,
       margin: EdgeInsets.zero,
-      child: Padding(
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              colors.primary.withAlpha(31),
+              colors.tertiary.withAlpha(15),
+            ],
+          ),
+        ),
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // ── Header: greeting + streak badge
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Resumen del día',
-                  style: text.titleMedium?.copyWith(fontWeight: FontWeight.w600),
-                ),
-                Row(
-                  children: [
-                    Icon(Icons.star_rounded,
-                        size: 18, color: const Color(0xFFFFD700)),
-                    const SizedBox(width: 4),
-                    Text(
-                      '$_total pts',
-                      style: text.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: colors.onSurface,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Hola, $userName 👋',
+                        style: text.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: colors.onSurface,
+                        ),
                       ),
-                    ),
-                  ],
+                      Text(
+                        'Tu resumen de hoy',
+                        style: text.bodySmall?.copyWith(
+                          color: colors.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: colors.primaryContainer,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text('🔥', style: TextStyle(fontSize: 13)),
+                      const SizedBox(width: 4),
+                      Text(
+                        '$streak días',
+                        style: text.labelMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: colors.onPrimaryContainer,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
-            ...sources.map((s) => _SourceRow(
-                  source: s,
-                  maxVal: maxVal,
-                )),
+
+            const Spacer(),
+
+            // ── 2×2 stat grid
+            Row(
+              children: [
+                Expanded(
+                  child: _StatCell(
+                    icon: Icons.directions_walk_rounded,
+                    label: 'Pasos',
+                    value: _fmt(stepsToday),
+                    sublabel: 'meta ${_fmt(stepsGoal)}',
+                    color: colors.primary,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _StatCell(
+                    icon: Icons.task_alt_rounded,
+                    label: 'Tareas',
+                    value: '$tasksCompleted/$tasksTotal',
+                    sublabel: 'completadas',
+                    color: colors.secondary,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Expanded(
+                  child: _StatCell(
+                    icon: Icons.star_rounded,
+                    label: 'Puntos hoy',
+                    value: '+$pointsToday',
+                    sublabel: 'pts ganados',
+                    color: const Color(0xFFFFAA00),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _StatCell(
+                    icon: Icons.emoji_events_rounded,
+                    label: 'Ranking',
+                    value: '#$rankingPosition',
+                    sublabel: 'posición global',
+                    color: colors.tertiary,
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),
     );
   }
+
+  static String _fmt(int n) =>
+      n >= 1000 ? '${(n / 1000).toStringAsFixed(1)}k' : '$n';
 }
 
-class _Source {
-  final String label;
+class _StatCell extends StatelessWidget {
   final IconData icon;
-  final int points;
+  final String label;
+  final String value;
+  final String sublabel;
   final Color color;
-  const _Source(this.label, this.icon, this.points, this.color);
-}
 
-class _SourceRow extends StatelessWidget {
-  final _Source source;
-  final int maxVal;
-
-  const _SourceRow({required this.source, required this.maxVal});
+  const _StatCell({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.sublabel,
+    required this.color,
+  });
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final text = Theme.of(context).textTheme;
-    final ratio = (source.points / maxVal).clamp(0.0, 1.0);
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Row(
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: colors.surface.withAlpha(190),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(source.icon, size: 18, color: source.color),
-          const SizedBox(width: 10),
-          SizedBox(
-            width: 90,
-            child: Text(
-              source.label,
-              style: text.bodySmall?.copyWith(color: colors.onSurface),
+          Row(
+            children: [
+              Icon(icon, size: 13, color: color),
+              const SizedBox(width: 4),
+              Expanded(
+                child: Text(
+                  label,
+                  style: text.labelSmall?.copyWith(
+                    color: colors.onSurfaceVariant,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 3),
+          Text(
+            value,
+            style: text.titleMedium?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: colors.onSurface,
             ),
           ),
-          Expanded(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              child: LinearProgressIndicator(
-                value: ratio,
-                minHeight: 8,
-                backgroundColor: source.color.withAlpha(25),
-                color: source.color,
-              ),
-            ),
-          ),
-          const SizedBox(width: 10),
-          SizedBox(
-            width: 44,
-            child: Text(
-              '+${source.points}',
-              style: text.labelMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: colors.onSurface,
-              ),
-              textAlign: TextAlign.right,
-            ),
+          Text(
+            sublabel,
+            style: text.labelSmall?.copyWith(color: colors.onSurfaceVariant),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
