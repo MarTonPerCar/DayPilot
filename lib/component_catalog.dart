@@ -9,6 +9,18 @@ import 'components/basic/section_indicator.dart';
 import 'components/basic/task_dot.dart';
 import 'components/basic/text_field.dart';
 import 'components/basic/top_bar.dart';
+import 'components/cards/task_card.dart';
+import 'components/cards/ranking_card.dart';
+import 'components/cards/friend_card.dart';
+import 'components/cards/habit_card.dart';
+import 'components/cards/app_limit_card.dart';
+import 'components/cards/notification_card.dart';
+import 'components/cards/timer_card.dart';
+import 'components/cards/profile_stats_card.dart';
+import 'components/cards/weekly_reaction_card.dart';
+import 'components/cards/steps_card.dart';
+import 'components/cards/calendar_day_card.dart';
+import 'components/cards/daily_summary_card.dart';
 
 class ComponentCatalog extends StatefulWidget {
   const ComponentCatalog({super.key});
@@ -18,9 +30,19 @@ class ComponentCatalog extends StatefulWidget {
 }
 
 class _ComponentCatalogState extends State<ComponentCatalog> {
+  // Basic
   String _filter = 'Todos';
   String? _reaction;
   int _activeSection = 0;
+
+  // Cards — tasks
+  bool _task1Done = false;
+  bool _task2Done = false;
+  int _swipeEpoch = 0;
+
+  // Cards — limits
+  bool _appEnabled = true;
+  bool _groupEnabled = true;
 
   static const _filterOptions = ['Todos', 'Tareas', 'Hábitos', 'Social'];
   static const _sections = [
@@ -222,6 +244,308 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
                 );
               }).toList(),
             ),
+          ),
+
+          // ════════════════════════════════════════════════════════
+          // TARJETAS
+          // ════════════════════════════════════════════════════════
+
+          // ── Tarjeta de tarea ─────────────────────────────────────
+          _SectionHeader('Tarjeta de tarea'),
+          TaskCard(
+            title: 'Diseñar pantalla de inicio',
+            description: 'Crear wireframe y componentes base',
+            dueDate: 'hoy',
+            priority: TaskPriority.high,
+            category: 'Diseño',
+            completed: _task1Done,
+            onToggle: () => setState(() => _task1Done = !_task1Done),
+          ),
+          const SizedBox(height: 8),
+          TaskCard(
+            title: 'Revisar documentación de Flutter',
+            priority: TaskPriority.medium,
+            completed: _task2Done,
+            onToggle: () => setState(() => _task2Done = !_task2Done),
+          ),
+          const SizedBox(height: 8),
+          const TaskCard(
+            title: 'Tarea completada de ejemplo',
+            dueDate: 'ayer',
+            priority: TaskPriority.low,
+            completed: true,
+          ),
+
+          // ── Tarjeta de tarea (deslizar) ──────────────────────────
+          _SectionHeader('Tarjeta de tarea (deslizar)'),
+          Text(
+            'Desliza hacia la izquierda para eliminar',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+          ),
+          const SizedBox(height: 8),
+          TaskSwipeCard(
+            key: ValueKey(_swipeEpoch),
+            id: 'swipe_demo_$_swipeEpoch',
+            title: 'Completar el informe semanal',
+            description: 'Incluir métricas de pasos y tareas',
+            dueDate: 'mañana',
+            priority: TaskPriority.medium,
+            category: 'Trabajo',
+            onDelete: () => setState(() => _swipeEpoch++),
+          ),
+
+          // ── Ranking ──────────────────────────────────────────────
+          _SectionHeader('Ranking'),
+          RankingCard(
+            position: 1,
+            username: 'mario_garcia',
+            points: 2840,
+            streak: 12,
+            isCurrentUser: true,
+          ),
+          RankingCard(
+            position: 2,
+            username: 'ana_lopez',
+            points: 2610,
+            streak: 8,
+          ),
+          RankingCard(
+            position: 3,
+            username: 'carlos_ruiz',
+            points: 2290,
+            streak: 5,
+          ),
+          RankingCard(
+            position: 4,
+            username: 'lucia_fdez',
+            points: 1870,
+          ),
+
+          // ── Podio ────────────────────────────────────────────────
+          _SectionHeader('Podio'),
+          PodiumCard(
+            firstName: 'Mario García',
+            firstPoints: 2840,
+            secondName: 'Ana López',
+            secondPoints: 2610,
+            thirdName: 'Carlos Ruiz',
+            thirdPoints: 2290,
+          ),
+
+          // ── Tarjeta de amigo ─────────────────────────────────────
+          _SectionHeader('Tarjeta de amigo'),
+          const FriendCard(
+            username: 'ana_lopez',
+            status: FriendStatus.accepted,
+          ),
+          const SizedBox(height: 8),
+          const FriendCard(
+            username: 'lucia_fdez',
+            status: FriendStatus.pendingSent,
+          ),
+          const SizedBox(height: 8),
+          FriendCard(
+            username: 'pedro_gz',
+            status: FriendStatus.pendingReceived,
+            onAccept: () {},
+            onDecline: () {},
+          ),
+
+          // ── Búsqueda de usuario ──────────────────────────────────
+          _SectionHeader('Búsqueda de usuario'),
+          const UserSearchCard(
+            username: 'nueva_persona',
+          ),
+          const SizedBox(height: 8),
+          const UserSearchCard(
+            username: 'ana_lopez',
+            isFriend: true,
+          ),
+          const SizedBox(height: 8),
+          const UserSearchCard(
+            username: 'otro_usuario',
+            isPending: true,
+          ),
+
+          // ── Hub de hábitos ───────────────────────────────────────
+          _SectionHeader('Hub de hábitos'),
+          HabitCard(
+            icon: Icons.directions_walk_rounded,
+            title: 'Pasos',
+            subtitle: '7.432 / 10.000 pasos hoy',
+            progress: 0.74,
+            iconColor: Theme.of(context).colorScheme.tertiary,
+            onTap: () {},
+          ),
+          const SizedBox(height: 8),
+          HabitCard(
+            icon: Icons.timer_rounded,
+            title: 'Temporizadores',
+            subtitle: '2 sesiones · 48 min totales',
+            progress: 0.48,
+            onTap: () {},
+          ),
+          const SizedBox(height: 8),
+          HabitCard(
+            icon: Icons.health_and_safety_rounded,
+            title: 'Salud tecnológica',
+            subtitle: '3 apps con límite activo',
+            iconColor: Theme.of(context).colorScheme.error,
+            onTap: () {},
+          ),
+
+          // ── Límite de app ────────────────────────────────────────
+          _SectionHeader('Límite de app'),
+          AppLimitCard(
+            appName: 'Instagram',
+            appIcon: Icons.photo_camera_outlined,
+            usageMinutes: 52,
+            limitMinutes: 60,
+            enabled: _appEnabled,
+            onToggle: () => setState(() => _appEnabled = !_appEnabled),
+          ),
+          const SizedBox(height: 8),
+          const AppLimitCard(
+            appName: 'YouTube',
+            appIcon: Icons.play_circle_outline_rounded,
+            usageMinutes: 30,
+            limitMinutes: 120,
+            enabled: true,
+          ),
+
+          // ── Límite de grupo ──────────────────────────────────────
+          _SectionHeader('Límite de grupo'),
+          GroupLimitCard(
+            groupName: 'Redes sociales',
+            groupIcon: Icons.people_alt_outlined,
+            appCount: 4,
+            usageMinutes: 95,
+            limitMinutes: 120,
+            enabled: _groupEnabled,
+            onToggle: () => setState(() => _groupEnabled = !_groupEnabled),
+          ),
+
+          // ── Notificación ─────────────────────────────────────────
+          _SectionHeader('Notificación'),
+          const NotificationCard(
+            type: NotificationType.friendRequest,
+            content: 'pedro_gz quiere ser tu amigo',
+            timestamp: 'hace 5 min',
+            read: false,
+          ),
+          const SizedBox(height: 6),
+          const NotificationCard(
+            type: NotificationType.levelUp,
+            content: '¡Subiste al nivel 8! Sigue así.',
+            timestamp: 'hace 2h',
+            read: false,
+          ),
+          const SizedBox(height: 6),
+          const NotificationCard(
+            type: NotificationType.reaction,
+            content: 'ana_lopez reaccionó a tu semana con 🔥',
+            timestamp: 'ayer',
+            read: true,
+          ),
+          const SizedBox(height: 6),
+          const NotificationCard(
+            type: NotificationType.streakAlert,
+            content: '¡Tu racha de 12 días está en riesgo!',
+            timestamp: 'hace 1h',
+            read: false,
+          ),
+
+          // ── Temporizador activo ──────────────────────────────────
+          _SectionHeader('Temporizador activo'),
+          TimerCard(
+            modeName: 'Pomodoro',
+            progress: 0.65,
+            timeDisplay: '15:32',
+            isRunning: true,
+            onPlayPause: () {},
+          ),
+
+          // ── Hub de temporizadores ────────────────────────────────
+          _SectionHeader('Hub de temporizadores'),
+          TimerHubCard(
+            icon: Icons.timer_rounded,
+            title: 'Pomodoro',
+            description: '25 min trabajo · 5 min descanso',
+            onTap: () {},
+          ),
+          const SizedBox(height: 8),
+          TimerHubCard(
+            icon: Icons.fitness_center_rounded,
+            title: 'Entrenamiento',
+            description: 'Series y descansos personalizados',
+            accentColor: Colors.orange,
+            onTap: () {},
+          ),
+          const SizedBox(height: 8),
+          TimerHubCard(
+            icon: Icons.self_improvement_rounded,
+            title: 'Meditación',
+            description: 'Sesiones guiadas de relajación',
+            accentColor: Colors.purple,
+            onTap: () {},
+          ),
+          const SizedBox(height: 8),
+          TimerHubCard(
+            icon: Icons.restaurant_rounded,
+            title: 'Cocina',
+            description: 'Temporizadores para recetas',
+            accentColor: Colors.deepOrange,
+            onTap: () {},
+          ),
+
+          // ── Estadísticas de perfil ───────────────────────────────
+          _SectionHeader('Estadísticas de perfil'),
+          const ProfileStatsCard(
+            level: 8,
+            totalPoints: 12840,
+            streak: 12,
+            tasksCompleted: 347,
+          ),
+
+          // ── Resumen semanal ──────────────────────────────────────
+          _SectionHeader('Resumen semanal'),
+          const WeeklyReactionCard(
+            weekLabel: '23 jun – 29 jun',
+            points: 1340,
+            steps: 58200,
+            tasks: 24,
+            reactions: {'👍': 3, '🔥': 5, '❤️': 2, '⭐': 1},
+          ),
+
+          // ── Pasos de hoy ─────────────────────────────────────────
+          _SectionHeader('Pasos de hoy'),
+          const StepsCard(
+            steps: 7432,
+            goal: 10000,
+            pointsEarned: 37,
+          ),
+
+          // ── Resumen semanal de pasos ─────────────────────────────
+          _SectionHeader('Resumen semanal de pasos'),
+          const StepsSummaryCard(
+            weeklySteps: [8210, 11430, 6800, 9340, 7432, 4200, 0],
+            goal: 10000,
+          ),
+
+          // ── Calendario ───────────────────────────────────────────
+          _SectionHeader('Calendario'),
+          const CalendarWeekRow(),
+
+          // ── Resumen del día ──────────────────────────────────────
+          _SectionHeader('Resumen del día'),
+          const DailySummaryCard(
+            pointsFromTasks: 120,
+            pointsFromSteps: 37,
+            pointsFromTimer: 80,
+            pointsFromHealth: 50,
+            pointsFromWellness: 30,
           ),
         ],
       ),
