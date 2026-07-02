@@ -11,6 +11,7 @@ class DayPilotTextField extends StatelessWidget {
   final String? Function(String?)? validator;
   final void Function(String)? onChanged;
   final int maxLines;
+  final String? errorText;
 
   const DayPilotTextField({
     super.key,
@@ -24,10 +25,12 @@ class DayPilotTextField extends StatelessWidget {
     this.validator,
     this.onChanged,
     this.maxLines = 1,
+    this.errorText,
   });
 
   @override
   Widget build(BuildContext context) {
+    final border = OutlineInputBorder(borderRadius: BorderRadius.circular(12));
     return TextFormField(
       controller: controller,
       keyboardType: keyboardType,
@@ -37,11 +40,16 @@ class DayPilotTextField extends StatelessWidget {
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
+        errorText: errorText,
         prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
         suffixIcon: suffixIcon != null
             ? IconButton(icon: Icon(suffixIcon), onPressed: onSuffixTap)
             : null,
-        border: const OutlineInputBorder(),
+        border: border,
+        enabledBorder: border,
+        focusedBorder: border,
+        errorBorder: border,
+        focusedErrorBorder: border,
       ),
     );
   }

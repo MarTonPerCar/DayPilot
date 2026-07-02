@@ -9,6 +9,16 @@ import 'components/basic/section_indicator.dart';
 import 'components/basic/task_dot.dart';
 import 'components/basic/text_field.dart';
 import 'components/basic/top_bar.dart';
+import 'components/forms/chip_group.dart';
+import 'components/forms/color_picker.dart';
+import 'components/forms/date_field.dart';
+import 'components/forms/form_section.dart';
+import 'components/forms/radio_group.dart';
+import 'components/forms/select_field.dart';
+import 'components/forms/slider_field.dart';
+import 'components/forms/stepper_field.dart';
+import 'components/forms/switch_tile.dart';
+import 'components/forms/time_field.dart';
 import 'components/cards/task_card.dart';
 import 'components/cards/ranking_card.dart';
 import 'components/cards/friend_card.dart';
@@ -43,6 +53,19 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
   // Cards — limits
   bool _appEnabled = true;
   bool _groupEnabled = true;
+
+  // Forms
+  bool _switchVal = true;
+  bool _switchVal2 = false;
+  String? _selectVal;
+  double _sliderVal = 30;
+  int _stepperVal = 25;
+  Color _pickedColor = DayPilotColorPicker.defaultColors.first;
+  DateTime? _pickedDate;
+  TimeOfDay? _pickedTime;
+  TaskPriority _radioVal = TaskPriority.medium;
+  List<String> _chipSelected = ['Trabajo'];
+  List<TaskPriority> _chipSingle = [TaskPriority.medium];
 
   static const _filterOptions = ['Todos', 'Tareas', 'Hábitos', 'Social'];
   static const _sections = [
@@ -546,6 +569,180 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             pointsFromTimer: 80,
             pointsFromHealth: 50,
             pointsFromWellness: 30,
+          ),
+
+          // ════════════════════════════════════════════════════════
+          // FORMULARIOS
+          // ════════════════════════════════════════════════════════
+
+          // ── Switch tile ──────────────────────────────────────────
+          _SectionHeader('Switch tile'),
+          DayPilotFormSection(
+            title: 'Opciones',
+            children: [
+              DayPilotSwitchTile(
+                label: 'Notificaciones',
+                subtitle: 'Recibir alertas y recordatorios',
+                icon: Icons.notifications_outlined,
+                value: _switchVal,
+                onChanged: (v) => setState(() => _switchVal = v),
+              ),
+              DayPilotSwitchTile(
+                label: 'Modo oscuro',
+                icon: Icons.dark_mode_outlined,
+                value: _switchVal2,
+                onChanged: (v) => setState(() => _switchVal2 = v),
+              ),
+            ],
+          ),
+
+          // ── Select field ─────────────────────────────────────────
+          _SectionHeader('Select field'),
+          DayPilotSelectField<String>(
+            label: 'Frecuencia',
+            value: _selectVal,
+            hint: 'Elige una opción',
+            options: const ['Diario', 'Semanal', 'Mensual', 'Días laborables'],
+            display: (s) => s,
+            prefixIcon: Icons.repeat_rounded,
+            onChanged: (v) => setState(() => _selectVal = v),
+          ),
+
+          // ── Slider ───────────────────────────────────────────────
+          _SectionHeader('Slider'),
+          DayPilotFormSection(
+            title: 'Límite de tiempo',
+            children: [
+              DayPilotSliderField(
+                label: 'Límite diario',
+                value: _sliderVal,
+                min: 5,
+                max: 120,
+                divisions: 23,
+                displayValue: (v) => '${v.toInt()} min',
+                onChanged: (v) => setState(() => _sliderVal = v),
+              ),
+            ],
+          ),
+
+          // ── Stepper ──────────────────────────────────────────────
+          _SectionHeader('Stepper'),
+          DayPilotFormSection(
+            title: 'Duración',
+            children: [
+              DayPilotStepper(
+                label: 'Tiempo de trabajo',
+                value: _stepperVal,
+                min: 5,
+                max: 90,
+                step: 5,
+                suffix: 'min',
+                onChanged: (v) => setState(() => _stepperVal = v),
+              ),
+            ],
+          ),
+
+          // ── Selector de fecha ────────────────────────────────────
+          _SectionHeader('Selector de fecha'),
+          DayPilotDateField(
+            label: 'Fecha límite',
+            value: _pickedDate,
+            onChanged: (d) => setState(() => _pickedDate = d),
+          ),
+
+          // ── Selector de hora ─────────────────────────────────────
+          _SectionHeader('Selector de hora'),
+          DayPilotTimeField(
+            label: 'Hora de aviso',
+            value: _pickedTime,
+            onChanged: (t) => setState(() => _pickedTime = t),
+          ),
+
+          // ── Grupo de radio ───────────────────────────────────────
+          _SectionHeader('Grupo de radio'),
+          DayPilotFormSection(
+            title: 'Prioridad',
+            children: [
+              DayPilotRadioGroup<TaskPriority>(
+                value: _radioVal,
+                options: TaskPriority.values,
+                display: (p) => switch (p) {
+                  TaskPriority.low    => 'Baja — sin urgencia',
+                  TaskPriority.medium => 'Media — importante',
+                  TaskPriority.high   => 'Alta — urgente',
+                },
+                onChanged: (v) => setState(() => _radioVal = v),
+              ),
+            ],
+          ),
+
+          // ── Grupo de chips ───────────────────────────────────────
+          _SectionHeader('Grupo de chips (multi)'),
+          DayPilotFormSection(
+            title: 'Categorías',
+            children: [
+              DayPilotChipGroup<String>(
+                options: const ['Personal', 'Trabajo', 'Salud', 'Estudio', 'Otro'],
+                selected: _chipSelected,
+                display: (s) => s,
+                onChanged: (v) => setState(() => _chipSelected = v),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          _SectionHeader('Grupo de chips (selección única)'),
+          DayPilotFormSection(
+            title: 'Prioridad',
+            children: [
+              DayPilotChipGroup<TaskPriority>(
+                options: TaskPriority.values,
+                selected: _chipSingle,
+                display: (p) => switch (p) {
+                  TaskPriority.low    => 'Baja',
+                  TaskPriority.medium => 'Media',
+                  TaskPriority.high   => 'Alta',
+                },
+                singleSelect: true,
+                onChanged: (v) => setState(() => _chipSingle = v),
+              ),
+            ],
+          ),
+
+          // ── Selector de color ────────────────────────────────────
+          _SectionHeader('Selector de color'),
+          DayPilotFormSection(
+            title: 'Color de categoría',
+            children: [
+              DayPilotColorPicker(
+                label: 'Elige un color',
+                value: _pickedColor,
+                colors: DayPilotColorPicker.defaultColors,
+                onChanged: (c) => setState(() => _pickedColor = c),
+              ),
+            ],
+          ),
+
+          // ── Sección de formulario ─────────────────────────────────
+          _SectionHeader('Sección de formulario'),
+          DayPilotFormSection(
+            title: 'Configuración del temporizador',
+            children: [
+              DayPilotStepper(
+                label: 'Tiempo de trabajo',
+                value: _stepperVal,
+                min: 5,
+                max: 90,
+                step: 5,
+                suffix: 'min',
+                onChanged: (v) => setState(() => _stepperVal = v),
+              ),
+              DayPilotSwitchTile(
+                label: 'Sonido al terminar',
+                icon: Icons.volume_up_outlined,
+                value: _switchVal,
+                onChanged: (v) => setState(() => _switchVal = v),
+              ),
+            ],
           ),
         ],
       ),

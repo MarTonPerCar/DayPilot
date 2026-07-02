@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'component_catalog.dart';
+import 'screens/auth/login_screen.dart';
 import 'theme/app_theme.dart';
 
 void main() {
@@ -17,7 +17,7 @@ class DayPilotApp extends StatelessWidget {
       theme:     buildTheme(DayPilotTheme.sageGreen),
       darkTheme: buildTheme(DayPilotTheme.sageGreen, darkMode: true),
       themeMode: ThemeMode.system,
-      home: const ComponentCatalog(),
+      home: const LoginScreen(),
     );
   }
 }
