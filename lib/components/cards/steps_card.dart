@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../l10n/app_localizations.dart';
 
 class StepsCard extends StatelessWidget {
   final int steps;
@@ -16,7 +17,8 @@ class StepsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final text = Theme.of(context).textTheme;
-    final ratio = (steps / goal).clamp(0.0, 1.0);
+    final l10n = AppLocalizations.of(context);
+    final ratio = goal > 0 ? (steps / goal).clamp(0.0, 1.0) : 0.0;
 
     return Card(
       clipBehavior: Clip.hardEdge,
@@ -43,7 +45,7 @@ class StepsCard extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 4),
                   child: Text(
-                    'pasos',
+                    l10n.stepsUnitLower,
                     style: text.titleMedium
                         ?.copyWith(color: colors.onSurfaceVariant),
                   ),
@@ -52,7 +54,7 @@ class StepsCard extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              'Meta: ${_formatNum(goal)} pasos',
+              l10n.stepsGoalCaption(_formatNum(goal)),
               style: text.bodySmall?.copyWith(color: colors.onSurfaceVariant),
             ),
             const SizedBox(height: 14),
@@ -70,7 +72,7 @@ class StepsCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '${(ratio * 100).toStringAsFixed(0)}% completado',
+                  l10n.stepsCompletedPercent((ratio * 100).toStringAsFixed(0)),
                   style: text.labelSmall?.copyWith(color: colors.onSurfaceVariant),
                 ),
                 if (pointsEarned > 0)
@@ -80,7 +82,7 @@ class StepsCard extends StatelessWidget {
                           size: 14, color: const Color(0xFFFFD700)),
                       const SizedBox(width: 3),
                       Text(
-                        '+$pointsEarned pts',
+                        l10n.stepsPointsEarned(pointsEarned),
                         style: text.labelSmall?.copyWith(
                           color: colors.onSurface,
                           fontWeight: FontWeight.w600,
@@ -121,6 +123,7 @@ class StepsSummaryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final text = Theme.of(context).textTheme;
+    final l10n = AppLocalizations.of(context);
     final labels = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
     final maxVal = weeklySteps.reduce((a, b) => a > b ? a : b).clamp(1, 1 << 30);
     final total = weeklySteps.reduce((a, b) => a + b);
@@ -138,11 +141,11 @@ class StepsSummaryCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Esta semana',
+                  l10n.stepsThisWeek,
                   style: text.titleSmall?.copyWith(fontWeight: FontWeight.w600),
                 ),
                 Text(
-                  'Media: ${_fmt(avg)}/día',
+                  l10n.stepsAveragePerDay(_fmt(avg)),
                   style:
                       text.labelMedium?.copyWith(color: colors.onSurfaceVariant),
                 ),
@@ -190,7 +193,7 @@ class StepsSummaryCard extends StatelessWidget {
                     size: 16, color: colors.tertiary),
                 const SizedBox(width: 6),
                 Text(
-                  'Total: ${_fmt(total)} pasos',
+                  l10n.stepsWeekTotal(_fmt(total)),
                   style: text.labelMedium?.copyWith(fontWeight: FontWeight.w600),
                 ),
               ],

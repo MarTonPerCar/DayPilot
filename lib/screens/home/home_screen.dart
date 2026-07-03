@@ -1,81 +1,73 @@
 import 'package:flutter/material.dart';
-import '../../components/basic/top_bar.dart';
-import '../../components/basic/avatar.dart';
 import '../../components/cards/daily_summary_card.dart';
 import '../../components/cards/home_menu_card.dart';
+import '../../data/app_data.dart';
+import '../../l10n/app_localizations.dart';
+import '../calendar/calendar_screen.dart';
+import '../habits/habits_screen.dart';
+import '../progress/progress_screen.dart';
+import '../rivalry/rivalry_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-
     return Scaffold(
-      appBar: DayPilotTopBarWithActions(
-        title: 'DayPilot',
-        actions: [
-          IconButton(
-            icon: Badge(
-              label: const Text('3'),
-              child: const Icon(Icons.notifications_outlined),
-            ),
-            onPressed: () {},
-          ),
-          Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: GestureDetector(
-              onTap: () {},
-              child: const DayPilotAvatar(name: 'Mario García', size: 36),
-            ),
-          ),
-        ],
-      ),
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          final available = constraints.maxHeight - 32; // 16 top + 16 bottom
-          final summaryH = available * 0.38;
-          final gridH = available - summaryH - 10;
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final available = constraints.maxHeight - 32; // 16 top + 16 bottom
+            final summaryH = available * 0.38;
+            final gridH = available - summaryH - 10;
 
-          return Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-            child: Column(
-              children: [
-                // ── Resumen del día (38%)
-                SizedBox(
-                  height: summaryH,
-                  child: const DailySummaryCard(
-                    userName: 'Mario',
-                    streak: 12,
-                    stepsToday: 7432,
-                    stepsGoal: 10000,
-                    tasksCompleted: 5,
-                    tasksTotal: 8,
-                    pointsToday: 237,
-                    rankingPosition: 4,
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+              child: Column(
+                children: [
+                  // ── Resumen del día (38%)
+                  SizedBox(
+                    height: summaryH,
+                    child: const DailySummaryCard(
+                      userName: 'Mario',
+                      streak: AppData.currentUserStreak,
+                      stepsToday: AppData.stepsToday,
+                      stepsGoal: AppData.stepsGoal,
+                      tasksCompleted: AppData.tasksCompletedToday,
+                      tasksTotal: AppData.tasksTotalToday,
+                      pointsToday: AppData.pointsToday,
+                      rankingPosition: AppData.rankingPositionToday,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 10),
-                // ── 2×2 menú principal (62%)
-                SizedBox(
-                  height: gridH,
-                  child: _HomeGrid(colors: colors),
-                ),
-              ],
-            ),
-          );
-        },
+                  const SizedBox(height: 10),
+                  // ── 2×2 menú principal (62%)
+                  SizedBox(
+                    height: gridH,
+                    child: const _HomeGrid(),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }
 }
 
 class _HomeGrid extends StatelessWidget {
-  final ColorScheme colors;
-  const _HomeGrid({required this.colors});
+  const _HomeGrid();
+
+  // Colores fijos por sección (no dependen del tema activo).
+  static const _calendarColor = Color(0xFF4A7C59); // verde
+  static const _progressColor = Color(0xFF1A6B8A); // azul
+  static const _habitsColor = Color(0xFF6B4FA8); // morado
+  static const _rivalryColor = Color(0xFFB85C00); // naranja
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Column(
       children: [
         Expanded(
@@ -84,13 +76,16 @@ class _HomeGrid extends StatelessWidget {
               Expanded(
                 child: HomeMenuCard(
                   icon: Icons.calendar_month_rounded,
-                  title: 'Calendario',
-                  accentColor: colors.primary,
-                  onTap: () {},
+                  title: l10n.calendarTitle,
+                  accentColor: _calendarColor,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const CalendarScreen()),
+                  ),
                   indicator: HomeMenuProgressBar(
-                    value: 5 / 8,
-                    label: '5/8 tareas hoy',
-                    color: colors.primary,
+                    value: AppData.tasksCompletedToday / AppData.tasksTotalToday,
+                    label: l10n.homeTasksTodayLabel(AppData.tasksCompletedToday, AppData.tasksTotalToday),
+                    color: _calendarColor,
                   ),
                 ),
               ),
@@ -98,12 +93,15 @@ class _HomeGrid extends StatelessWidget {
               Expanded(
                 child: HomeMenuCard(
                   icon: Icons.trending_up_rounded,
-                  title: 'Progreso',
-                  accentColor: colors.secondary,
-                  onTap: () {},
-                  indicator: HomeMenuMiniBarChart(
-                    values: const [120, 180, 95, 210, 160, 240, 237],
-                    color: colors.secondary,
+                  title: l10n.progressTitle,
+                  accentColor: _progressColor,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const ProgressScreen()),
+                  ),
+                  indicator: const HomeMenuMiniBarChart(
+                    values: AppData.homeWeeklyPointsTrend,
+                    color: _progressColor,
                   ),
                 ),
               ),
@@ -116,14 +114,18 @@ class _HomeGrid extends StatelessWidget {
             children: [
               Expanded(
                 child: HomeMenuCard(
-                  icon: Icons.self_improvement_rounded,
-                  title: 'Hábitos',
-                  accentColor: colors.tertiary,
-                  onTap: () {},
-                  indicator: HomeMenuProgressBar(
-                    value: 7432 / 10000,
-                    label: '7.4k / 10k pasos',
-                    color: colors.tertiary,
+                  icon: Icons.fitness_center_rounded,
+                  title: l10n.commonHabits,
+                  accentColor: _habitsColor,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const HabitsScreen()),
+                  ),
+                  indicator: HomeMenuHabitsIndicator(
+                    stepsProgress: AppData.stepsGoal > 0 ? AppData.stepsToday / AppData.stepsGoal : 0.0,
+                    stepsLabel: l10n.homeStepsProgressLabel(AppData.homeStepsProgressPercent),
+                    timerLabel: l10n.homeTimerPending,
+                    color: _habitsColor,
                   ),
                 ),
               ),
@@ -131,13 +133,16 @@ class _HomeGrid extends StatelessWidget {
               Expanded(
                 child: HomeMenuCard(
                   icon: Icons.emoji_events_rounded,
-                  title: 'Rivalidad',
-                  accentColor: const Color(0xFFB85C00),
-                  onTap: () {},
+                  title: l10n.rivalryTitle,
+                  accentColor: _rivalryColor,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const RivalryScreen()),
+                  ),
                   indicator: const HomeMenuRivalryIndicator(
-                    position: 4,
-                    total: 28,
-                    color: Color(0xFFB85C00),
+                    position: AppData.homeRivalryPosition,
+                    total: AppData.homeRivalryTotal,
+                    color: _rivalryColor,
                   ),
                 ),
               ),

@@ -35,7 +35,7 @@ class AppLimitCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final text = Theme.of(context).textTheme;
-    final ratio = (usageMinutes / limitMinutes).clamp(0.0, 1.0);
+    final ratio = limitMinutes > 0 ? (usageMinutes / limitMinutes).clamp(0.0, 1.0) : 0.0;
     final accent = _progressColor(ratio, colors);
 
     return Card.filled(
@@ -132,7 +132,7 @@ class GroupLimitCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final text = Theme.of(context).textTheme;
-    final ratio = (usageMinutes / limitMinutes).clamp(0.0, 1.0);
+    final ratio = limitMinutes > 0 ? (usageMinutes / limitMinutes).clamp(0.0, 1.0) : 0.0;
     final accent = _progressColor(ratio, colors);
 
     return Card(

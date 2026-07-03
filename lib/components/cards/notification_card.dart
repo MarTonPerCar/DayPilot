@@ -1,6 +1,48 @@
 import 'package:flutter/material.dart';
+import '../../l10n/app_localizations.dart';
 
-enum NotificationType { friendRequest, reaction, levelUp, dailySummary, streakAlert }
+enum NotificationType { task, social, steps, streak, reminder, achievement }
+
+extension NotificationTypeLabel on NotificationType {
+  String label(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return switch (this) {
+      NotificationType.task => l10n.commonTasks,
+      NotificationType.social => l10n.notifTypeSocial,
+      NotificationType.steps => l10n.commonSteps,
+      NotificationType.streak => l10n.notifTypeStreak,
+      NotificationType.reminder => l10n.notifTypeReminder,
+      NotificationType.achievement => l10n.notifTypeAchievement,
+    };
+  }
+
+  String get emoji => switch (this) {
+        NotificationType.task        => '✅',
+        NotificationType.social      => '👥',
+        NotificationType.steps       => '👣',
+        NotificationType.streak      => '🔥',
+        NotificationType.reminder    => '🔔',
+        NotificationType.achievement => '🏆',
+      };
+
+  IconData get icon => switch (this) {
+        NotificationType.task        => Icons.check_circle_rounded,
+        NotificationType.social      => Icons.people_rounded,
+        NotificationType.steps       => Icons.directions_walk_rounded,
+        NotificationType.streak      => Icons.local_fire_department_rounded,
+        NotificationType.reminder    => Icons.notifications_rounded,
+        NotificationType.achievement => Icons.emoji_events_rounded,
+      };
+
+  Color color(ColorScheme colors) => switch (this) {
+        NotificationType.task        => colors.primary,
+        NotificationType.social      => colors.secondary,
+        NotificationType.steps       => colors.tertiary,
+        NotificationType.streak      => colors.error,
+        NotificationType.reminder    => const Color(0xFF9C27B0),
+        NotificationType.achievement => const Color(0xFFFFD700),
+      };
+}
 
 class NotificationCard extends StatelessWidget {
   final NotificationType type;
@@ -18,19 +60,12 @@ class NotificationCard extends StatelessWidget {
     this.onTap,
   });
 
-  (IconData, Color) _typeStyle(ColorScheme colors) => switch (type) {
-        NotificationType.friendRequest => (Icons.person_add_rounded, colors.primary),
-        NotificationType.reaction      => (Icons.emoji_emotions_rounded, colors.tertiary),
-        NotificationType.levelUp       => (Icons.trending_up_rounded, const Color(0xFFFFD700)),
-        NotificationType.dailySummary  => (Icons.bar_chart_rounded, colors.secondary),
-        NotificationType.streakAlert   => (Icons.local_fire_department_rounded, colors.error),
-      };
-
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final text = Theme.of(context).textTheme;
-    final (icon, iconColor) = _typeStyle(colors);
+    final icon = type.icon;
+    final iconColor = type.color(colors);
 
     return Material(
       color: read ? colors.surfaceContainerLow : colors.primaryContainer.withAlpha(60),

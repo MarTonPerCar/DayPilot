@@ -13,29 +13,45 @@ class DayPilotAvatar extends StatelessWidget {
   });
 
   String get _initials {
-    if (name == null || name!.isEmpty) return '?';
+    if (name == null || name!.trim().isEmpty) return '?';
     final parts = name!.trim().split(' ');
-    if (parts.length >= 2) return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
-    return name![0].toUpperCase();
+    if (parts.length >= 2 && parts[1].isNotEmpty) {
+      return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
+    }
+    return parts[0][0].toUpperCase();
   }
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    return CircleAvatar(
-      radius: size / 2,
-      backgroundColor: colors.primaryContainer,
-      backgroundImage: imageUrl != null ? NetworkImage(imageUrl!) : null,
-      child: imageUrl == null
-          ? Text(
-              _initials,
-              style: TextStyle(
-                color: colors.onPrimaryContainer,
-                fontWeight: FontWeight.w600,
-                fontSize: size * 0.36,
+    final radius = BorderRadius.circular(size * 0.28);
+
+    return ClipRRect(
+      borderRadius: radius,
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          color: colors.primaryContainer,
+          borderRadius: radius,
+        ),
+        alignment: Alignment.center,
+        child: imageUrl != null
+            ? Image.network(
+                imageUrl!,
+                width: size,
+                height: size,
+                fit: BoxFit.cover,
+              )
+            : Text(
+                _initials,
+                style: TextStyle(
+                  color: colors.onPrimaryContainer,
+                  fontWeight: FontWeight.w600,
+                  fontSize: size * 0.4,
+                ),
               ),
-            )
-          : null,
+      ),
     );
   }
 }

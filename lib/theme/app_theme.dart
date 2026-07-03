@@ -2,6 +2,14 @@ import 'package:flutter/material.dart';
 
 enum DayPilotTheme { sageGreen, ocean, lavender, amber, amoled }
 
+/// Fuente única de verdad para el tema de color activo, para que
+/// cambiarlo desde Ajustes se refleje al instante en toda la app.
+final dayPilotThemeNotifier = ValueNotifier<DayPilotTheme>(DayPilotTheme.sageGreen);
+
+/// Fuente única de verdad para claro/oscuro/sistema, reflejada al instante
+/// por el switch "Modo oscuro" de Ajustes.
+final dayPilotThemeModeNotifier = ValueNotifier<ThemeMode>(ThemeMode.system);
+
 ThemeData buildTheme(DayPilotTheme theme, {bool darkMode = false}) {
   return switch (theme) {
     DayPilotTheme.sageGreen => _build(_sageLight, _sageDark, darkMode,

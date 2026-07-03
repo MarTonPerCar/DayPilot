@@ -170,6 +170,72 @@ class HomeMenuMiniBarChart extends StatelessWidget {
   }
 }
 
+class HomeMenuHabitsIndicator extends StatelessWidget {
+  final double stepsProgress;
+  final String stepsLabel;
+  final String timerLabel;
+  final Color color;
+
+  const HomeMenuHabitsIndicator({
+    super.key,
+    required this.stepsProgress,
+    required this.stepsLabel,
+    required this.timerLabel,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final text = Theme.of(context).textTheme;
+    final colors = Theme.of(context).colorScheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          children: [
+            Icon(Icons.directions_walk_rounded, size: 13, color: color),
+            const SizedBox(width: 4),
+            Expanded(
+              child: Text(
+                stepsLabel,
+                style: text.labelSmall?.copyWith(color: colors.onSurfaceVariant),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 3),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(2),
+          child: LinearProgressIndicator(
+            value: stepsProgress.clamp(0.0, 1.0),
+            minHeight: 4,
+            color: color,
+            backgroundColor: color.withAlpha(30),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Row(
+          children: [
+            Icon(Icons.timer_outlined, size: 13, color: color),
+            const SizedBox(width: 4),
+            Expanded(
+              child: Text(
+                timerLabel,
+                style: text.labelSmall?.copyWith(color: colors.onSurfaceVariant),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
 class HomeMenuRivalryIndicator extends StatelessWidget {
   final int position;
   final int total;
@@ -182,20 +248,50 @@ class HomeMenuRivalryIndicator extends StatelessWidget {
     required this.color,
   });
 
+  /// 1º/2º/3º si estás en el podio; si no, "···+posición".
+  String get _label => switch (position) {
+        1 => '1º',
+        2 => '2º',
+        3 => '3º',
+        _ => '···+$position',
+      };
+
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
     final colors = Theme.of(context).colorScheme;
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(Icons.emoji_events_rounded, size: 16, color: color),
-        const SizedBox(width: 4),
-        Text(
-          '#$position de $total',
-          style: text.labelSmall?.copyWith(
-            color: colors.onSurfaceVariant,
-            fontWeight: FontWeight.w600,
-          ),
+        Row(
+          children: [
+            Icon(Icons.emoji_events_rounded, size: 16, color: color),
+            const SizedBox(width: 4),
+            Text(
+              _label,
+              style: text.labelSmall?.copyWith(
+                color: colors.onSurfaceVariant,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 6),
+        Row(
+          children: List.generate(total, (i) {
+            final active = i == position - 1;
+            return Expanded(
+              child: Container(
+                margin: EdgeInsets.only(right: i < total - 1 ? 4 : 0),
+                height: 5,
+                decoration: BoxDecoration(
+                  color: active ? color : color.withAlpha(40),
+                  borderRadius: BorderRadius.circular(3),
+                ),
+              ),
+            );
+          }),
         ),
       ],
     );

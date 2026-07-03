@@ -5,7 +5,7 @@ class TaskCard extends StatelessWidget {
   final String title;
   final String? description;
   final String? dueDate;
-  final TaskPriority priority;
+  final TaskDifficulty priority;
   final String? category;
   final bool completed;
   final VoidCallback? onToggle;
@@ -16,7 +16,7 @@ class TaskCard extends StatelessWidget {
     required this.title,
     this.description,
     this.dueDate,
-    this.priority = TaskPriority.medium,
+    this.priority = TaskDifficulty.medium,
     this.category,
     this.completed = false,
     this.onToggle,
@@ -116,7 +116,7 @@ class TaskSwipeCard extends StatelessWidget {
   final String title;
   final String? description;
   final String? dueDate;
-  final TaskPriority priority;
+  final TaskDifficulty priority;
   final String? category;
   final bool completed;
   final VoidCallback? onToggle;
@@ -129,7 +129,7 @@ class TaskSwipeCard extends StatelessWidget {
     required this.title,
     this.description,
     this.dueDate,
-    this.priority = TaskPriority.medium,
+    this.priority = TaskDifficulty.medium,
     this.category,
     this.completed = false,
     this.onToggle,

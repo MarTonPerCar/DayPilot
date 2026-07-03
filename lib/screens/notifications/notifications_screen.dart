@@ -1,136 +1,140 @@
 import 'package:flutter/material.dart';
 import '../../components/basic/top_bar.dart';
+import '../../components/cards/notification_card.dart';
+import '../../data/app_data.dart';
+import '../../l10n/app_localizations.dart';
 
-class NotificationsScreen extends StatelessWidget {
+class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
 
-  static const _items = [
-    _Notif(
-      icon: Icons.emoji_events_rounded,
-      title: 'Nuevo logro desbloqueado',
-      body: 'Has completado 7 días seguidos de actividad.',
-      time: 'hace 5 min',
-      isNew: true,
-    ),
-    _Notif(
-      icon: Icons.group_rounded,
-      title: 'Solicitud de amistad',
-      body: 'sofia_mn quiere ser tu amiga.',
-      time: 'hace 1 h',
-      isNew: true,
-    ),
-    _Notif(
-      icon: Icons.task_alt_rounded,
-      title: 'Tarea vencida',
-      body: 'Revisar documentación de Flutter venció ayer.',
-      time: 'ayer',
-      isNew: false,
-    ),
-    _Notif(
-      icon: Icons.trending_up_rounded,
-      title: 'Subiste en el ranking',
-      body: 'Ahora estás en la posición #4 entre tus amigos.',
-      time: 'ayer',
-      isNew: false,
-    ),
-    _Notif(
-      icon: Icons.directions_walk_rounded,
-      title: 'Meta de pasos alcanzada',
-      body: 'Completaste tus 10 000 pasos diarios.',
-      time: 'hace 2 días',
-      isNew: false,
-    ),
-  ];
+  @override
+  State<NotificationsScreen> createState() => _NotificationsScreenState();
+}
+
+class _NotificationsScreenState extends State<NotificationsScreen> {
+  NotificationType? _filter;
+
+  static const _items = AppData.notifications;
+
+  List<AppNotification> get _filtered =>
+      _filter == null ? _items : _items.where((n) => n.type == _filter).toList();
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    final text = Theme.of(context).textTheme;
+    final items = _filtered;
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       appBar: DayPilotTopBarWithActions(
-        title: 'Avisos',
+        title: l10n.navAvisos,
         actions: [
           TextButton(
             onPressed: () {},
-            child: const Text('Leer todo'),
+            child: Text(l10n.notificationsMarkAllRead),
           ),
         ],
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
-        itemCount: _items.length,
-        itemBuilder: (ctx, i) {
-          final n = _items[i];
-          return Container(
-            margin: const EdgeInsets.only(bottom: 8),
-            decoration: BoxDecoration(
-              color: n.isNew
-                  ? colors.primaryContainer.withAlpha(80)
-                  : colors.surfaceContainerLow,
-              borderRadius: BorderRadius.circular(16),
-              border: n.isNew
-                  ? Border.all(color: colors.primary.withAlpha(60))
-                  : null,
-            ),
-            child: ListTile(
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-              leading: Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: colors.primaryContainer,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(n.icon, size: 22, color: colors.primary),
-              ),
-              title: Text(
-                n.title,
-                style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
-              ),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
                 children: [
-                  const SizedBox(height: 2),
-                  Text(n.body,
-                      style: text.bodySmall
-                          ?.copyWith(color: colors.onSurfaceVariant)),
-                  const SizedBox(height: 4),
-                  Text(n.time,
-                      style: text.labelSmall
-                          ?.copyWith(color: colors.onSurfaceVariant)),
+                  _FilterChip(
+                    label: l10n.calendarAll,
+                    selected: _filter == null,
+                    onTap: () => setState(() => _filter = null),
+                  ),
+                  ...NotificationType.values.map((t) => _FilterChip(
+                        emoji: t.emoji,
+                        label: t.label(context),
+                        color: t.color(Theme.of(context).colorScheme),
+                        selected: _filter == t,
+                        onTap: () => setState(() => _filter = t),
+                      )),
                 ],
               ),
-              trailing: n.isNew
-                  ? Container(
-                      width: 8,
-                      height: 8,
-                      decoration: BoxDecoration(
-                        color: colors.primary,
-                        shape: BoxShape.circle,
-                      ),
-                    )
-                  : null,
             ),
-          );
-        },
+          ),
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
+              itemCount: items.length,
+              itemBuilder: (ctx, i) {
+                final n = items[i];
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: NotificationCard(
+                    type: n.type,
+                    content: n.content,
+                    timestamp: n.time,
+                    read: n.read,
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-class _Notif {
-  final IconData icon;
-  final String title;
-  final String body;
-  final String time;
-  final bool isNew;
-  const _Notif({
-    required this.icon,
-    required this.title,
-    required this.body,
-    required this.time,
-    required this.isNew,
+class _FilterChip extends StatelessWidget {
+  final String? emoji;
+  final String label;
+  final Color? color;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _FilterChip({
+    this.emoji,
+    required this.label,
+    this.color,
+    required this.selected,
+    required this.onTap,
   });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final text = Theme.of(context).textTheme;
+    final tint = color ?? colors.onSurfaceVariant;
+
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: selected ? tint : tint.withAlpha(25),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: tint.withAlpha(selected ? 255 : 90)),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (emoji != null) ...[
+                Text(emoji!, style: const TextStyle(fontSize: 14)),
+                const SizedBox(width: 6),
+              ],
+              Text(
+                label,
+                style: text.labelMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: selected ? _onColor(tint) : tint,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Color _onColor(Color c) => c.computeLuminance() > 0.5 ? Colors.black : Colors.white;
 }

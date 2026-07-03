@@ -16,7 +16,7 @@ class DayPilotTopBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     return AppBar(
-      backgroundColor: colors.surface,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       surfaceTintColor: Colors.transparent,
       elevation: 0,
       leading: showBack
@@ -58,7 +58,7 @@ class DayPilotTopBarWithActions extends StatelessWidget
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     return AppBar(
-      backgroundColor: colors.surface,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       surfaceTintColor: Colors.transparent,
       elevation: 0,
       leading: showBack

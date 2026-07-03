@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import '../../l10n/app_localizations.dart';
 
 class TimerCard extends StatelessWidget {
   final String modeName;
@@ -64,7 +65,7 @@ class TimerCard extends StatelessWidget {
               icon: Icon(isRunning
                   ? Icons.pause_rounded
                   : Icons.play_arrow_rounded),
-              label: Text(isRunning ? 'Pausar' : 'Iniciar'),
+              label: Text(isRunning ? AppLocalizations.of(context).timerPause : AppLocalizations.of(context).commonStart),
               style: FilledButton.styleFrom(
                 minimumSize: const Size(160, 48),
               ),

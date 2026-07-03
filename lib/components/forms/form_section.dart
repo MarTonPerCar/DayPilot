@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 class DayPilotFormSection extends StatelessWidget {
-  final String title;
+  final String? title;
   final List<Widget> children;
 
   const DayPilotFormSection({
     super.key,
-    required this.title,
+    this.title,
     required this.children,
   });
 
@@ -18,17 +18,18 @@ class DayPilotFormSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(bottom: 8, left: 4),
-          child: Text(
-            title.toUpperCase(),
-            style: text.labelSmall?.copyWith(
-              color: colors.primary,
-              letterSpacing: 1.1,
-              fontWeight: FontWeight.w600,
+        if (title != null)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8, left: 4),
+            child: Text(
+              title!.toUpperCase(),
+              style: text.labelSmall?.copyWith(
+                color: colors.primary,
+                letterSpacing: 1.1,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
-        ),
         Card.filled(
           clipBehavior: Clip.hardEdge,
           margin: EdgeInsets.zero,

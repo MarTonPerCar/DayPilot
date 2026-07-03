@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../l10n/app_localizations.dart';
 
 class DailySummaryCard extends StatelessWidget {
   final String userName;
@@ -26,6 +27,7 @@ class DailySummaryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final text = Theme.of(context).textTheme;
+    final l10n = AppLocalizations.of(context);
 
     return Card(
       elevation: 4,
@@ -59,14 +61,14 @@ class DailySummaryCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Hola, $userName 👋',
-                        style: text.titleMedium?.copyWith(
+                        l10n.dailySummaryGreeting(userName),
+                        style: text.headlineSmall?.copyWith(
                           fontWeight: FontWeight.w700,
                           color: colors.onSurface,
                         ),
                       ),
                       Text(
-                        'Tu resumen de hoy',
+                        l10n.dailySummarySubtitle,
                         style: text.bodySmall?.copyWith(
                           color: colors.onSurfaceVariant,
                         ),
@@ -87,7 +89,7 @@ class DailySummaryCard extends StatelessWidget {
                       const Text('🔥', style: TextStyle(fontSize: 13)),
                       const SizedBox(width: 4),
                       Text(
-                        '$streak días',
+                        l10n.dailySummaryStreakDays(streak),
                         style: text.labelMedium?.copyWith(
                           fontWeight: FontWeight.w700,
                           color: colors.onPrimaryContainer,
@@ -107,9 +109,9 @@ class DailySummaryCard extends StatelessWidget {
                 Expanded(
                   child: _StatCell(
                     icon: Icons.directions_walk_rounded,
-                    label: 'Pasos',
+                    label: l10n.commonSteps,
                     value: _fmt(stepsToday),
-                    sublabel: 'meta ${_fmt(stepsGoal)}',
+                    sublabel: l10n.dailySummaryGoalCaption(_fmt(stepsGoal)),
                     color: colors.primary,
                   ),
                 ),
@@ -117,9 +119,9 @@ class DailySummaryCard extends StatelessWidget {
                 Expanded(
                   child: _StatCell(
                     icon: Icons.task_alt_rounded,
-                    label: 'Tareas',
+                    label: l10n.commonTasks,
                     value: '$tasksCompleted/$tasksTotal',
-                    sublabel: 'completadas',
+                    sublabel: l10n.dailySummaryCompleted,
                     color: colors.secondary,
                   ),
                 ),
@@ -131,9 +133,9 @@ class DailySummaryCard extends StatelessWidget {
                 Expanded(
                   child: _StatCell(
                     icon: Icons.star_rounded,
-                    label: 'Puntos hoy',
+                    label: l10n.commonPointsToday,
                     value: '+$pointsToday',
-                    sublabel: 'pts ganados',
+                    sublabel: l10n.dailySummaryPointsEarnedLabel,
                     color: const Color(0xFFFFAA00),
                   ),
                 ),
@@ -141,9 +143,9 @@ class DailySummaryCard extends StatelessWidget {
                 Expanded(
                   child: _StatCell(
                     icon: Icons.emoji_events_rounded,
-                    label: 'Ranking',
+                    label: l10n.commonRanking,
                     value: '#$rankingPosition',
-                    sublabel: 'posición global',
+                    sublabel: l10n.dailySummaryAmongFriends,
                     color: colors.tertiary,
                   ),
                 ),

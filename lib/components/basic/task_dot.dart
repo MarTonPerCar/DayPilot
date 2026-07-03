@@ -1,18 +1,58 @@
 import 'package:flutter/material.dart';
+import '../../l10n/app_localizations.dart';
 
-enum TaskPriority { low, medium, high }
+enum TaskDifficulty { easy, medium, hard }
+
+extension TaskDifficultyX on TaskDifficulty {
+  String label(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return switch (this) {
+      TaskDifficulty.easy => l10n.difficultyEasy,
+      TaskDifficulty.medium => l10n.difficultyMedium,
+      TaskDifficulty.hard => l10n.difficultyHard,
+    };
+  }
+
+  /// Colores semánticos fijos (verde/ámbar/rojo): la dificultad se lee igual
+  /// en cualquier paleta de tema, igual que ya ocurre con `colorScheme.error`.
+  Color color(ColorScheme colors) => switch (this) {
+        TaskDifficulty.easy => const Color(0xFF4CAF50),
+        TaskDifficulty.medium => const Color(0xFFFFA726),
+        TaskDifficulty.hard => colors.error,
+      };
+}
+
+/// Chip compacto con el color semántico de la dificultad (verde/ámbar/rojo).
+class DifficultyChip extends StatelessWidget {
+  final TaskDifficulty difficulty;
+  const DifficultyChip({super.key, required this.difficulty});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final text = Theme.of(context).textTheme;
+    final color = difficulty.color(colors);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withAlpha(30),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withAlpha(120)),
+      ),
+      child: Text(
+        difficulty.label(context),
+        style: text.labelSmall?.copyWith(color: color, fontWeight: FontWeight.w700),
+      ),
+    );
+  }
+}
 
 class TaskDot extends StatelessWidget {
-  final TaskPriority priority;
+  final TaskDifficulty priority;
   final double size;
 
   const TaskDot({super.key, required this.priority, this.size = 10});
-
-  Color _color(ColorScheme colors) => switch (priority) {
-        TaskPriority.low    => colors.tertiary,
-        TaskPriority.medium => colors.primary,
-        TaskPriority.high   => colors.error,
-      };
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +60,7 @@ class TaskDot extends StatelessWidget {
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: _color(Theme.of(context).colorScheme),
+        color: priority.color(Theme.of(context).colorScheme),
         shape: BoxShape.circle,
       ),
     );

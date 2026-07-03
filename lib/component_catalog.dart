@@ -5,13 +5,18 @@ import 'components/basic/divider.dart';
 import 'components/basic/empty_state.dart';
 import 'components/basic/filter_selector.dart';
 import 'components/basic/reactions.dart';
+import 'components/basic/dropdown_pill.dart';
 import 'components/basic/section_indicator.dart';
+import 'components/basic/task_category.dart';
 import 'components/basic/task_dot.dart';
 import 'components/basic/text_field.dart';
 import 'components/basic/top_bar.dart';
+import 'components/forms/category_chip_group.dart';
 import 'components/forms/chip_group.dart';
+import 'components/forms/collapsible_section.dart';
 import 'components/forms/color_picker.dart';
 import 'components/forms/date_field.dart';
+import 'components/forms/difficulty_field.dart';
 import 'components/forms/form_section.dart';
 import 'components/forms/radio_group.dart';
 import 'components/forms/select_field.dart';
@@ -19,18 +24,26 @@ import 'components/forms/slider_field.dart';
 import 'components/forms/stepper_field.dart';
 import 'components/forms/switch_tile.dart';
 import 'components/forms/time_field.dart';
+import 'components/cards/calendar_task_card.dart';
 import 'components/cards/task_card.dart';
 import 'components/cards/ranking_card.dart';
 import 'components/cards/friend_card.dart';
 import 'components/cards/habit_card.dart';
 import 'components/cards/app_limit_card.dart';
 import 'components/cards/notification_card.dart';
+import 'components/cards/reminder_card.dart';
+import 'components/cards/steps_progress_card.dart';
+import 'components/cards/tech_restriction_card.dart';
 import 'components/cards/timer_card.dart';
+import 'components/cards/timer_preset_card.dart';
 import 'components/cards/profile_stats_card.dart';
 import 'components/cards/weekly_reaction_card.dart';
 import 'components/cards/steps_card.dart';
 import 'components/cards/calendar_day_card.dart';
 import 'components/cards/daily_summary_card.dart';
+import 'components/cards/month_calendar_card.dart';
+import 'components/cards/progress_chart_card.dart';
+import 'data/app_data.dart';
 
 class ComponentCatalog extends StatefulWidget {
   const ComponentCatalog({super.key});
@@ -63,9 +76,23 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
   Color _pickedColor = DayPilotColorPicker.defaultColors.first;
   DateTime? _pickedDate;
   TimeOfDay? _pickedTime;
-  TaskPriority _radioVal = TaskPriority.medium;
+  TaskDifficulty _radioVal = TaskDifficulty.medium;
   List<String> _chipSelected = ['Trabajo'];
-  List<TaskPriority> _chipSingle = [TaskPriority.medium];
+  List<TaskDifficulty> _chipSingle = [TaskDifficulty.medium];
+
+  // Cards — calendario y tareas
+  TaskDifficulty? _dropdownDifficulty;
+  TaskCategory? _dropdownCategory;
+  TaskCategory _catalogCategory = TaskCategory.personal;
+  TaskDifficulty _catalogDifficulty = TaskDifficulty.easy;
+  bool _catalogTaskDone = false;
+  DateTime _catalogMonth = DateTime(2026, 7);
+  DateTime _catalogSelectedDay = DateTime(2026, 7, 3);
+
+  // Cards — hábitos
+  int _catalogStepsGoal = AppData.stepsGoal;
+  bool _catalogReminderEnabled = true;
+  late final _catalogRestriction = AppData.newRestrictionList().first;
 
   static const _filterOptions = ['Todos', 'Tareas', 'Hábitos', 'Social'];
   static const _sections = [
@@ -225,25 +252,25 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             ),
           ),
 
-          // ── Punto de prioridad ───────────────────────────────────
-          _SectionHeader('Punto de prioridad'),
+          // ── Punto de dificultad ──────────────────────────────────
+          _SectionHeader('Punto de dificultad'),
           Row(
             children: [
-              const TaskDot(priority: TaskPriority.low),
+              const TaskDot(priority: TaskDifficulty.easy),
               const SizedBox(width: 6),
-              Text('Baja', style: Theme.of(context).textTheme.labelMedium),
+              Text('Fácil', style: Theme.of(context).textTheme.labelMedium),
               const SizedBox(width: 20),
-              const TaskDot(priority: TaskPriority.medium),
+              const TaskDot(priority: TaskDifficulty.medium),
               const SizedBox(width: 6),
               Text('Media', style: Theme.of(context).textTheme.labelMedium),
               const SizedBox(width: 20),
-              const TaskDot(priority: TaskPriority.high),
+              const TaskDot(priority: TaskDifficulty.hard),
               const SizedBox(width: 6),
-              Text('Alta', style: Theme.of(context).textTheme.labelMedium),
+              Text('Difícil', style: Theme.of(context).textTheme.labelMedium),
               const SizedBox(width: 20),
-              const TaskDot(priority: TaskPriority.high, size: 14),
+              const TaskDot(priority: TaskDifficulty.hard, size: 14),
               const SizedBox(width: 6),
-              Text('Alta ×1.4', style: Theme.of(context).textTheme.labelMedium),
+              Text('Difícil ×1.4', style: Theme.of(context).textTheme.labelMedium),
             ],
           ),
 
@@ -279,7 +306,7 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             title: 'Diseñar pantalla de inicio',
             description: 'Crear wireframe y componentes base',
             dueDate: 'hoy',
-            priority: TaskPriority.high,
+            priority: TaskDifficulty.hard,
             category: 'Diseño',
             completed: _task1Done,
             onToggle: () => setState(() => _task1Done = !_task1Done),
@@ -287,7 +314,7 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
           const SizedBox(height: 8),
           TaskCard(
             title: 'Revisar documentación de Flutter',
-            priority: TaskPriority.medium,
+            priority: TaskDifficulty.medium,
             completed: _task2Done,
             onToggle: () => setState(() => _task2Done = !_task2Done),
           ),
@@ -295,7 +322,7 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
           const TaskCard(
             title: 'Tarea completada de ejemplo',
             dueDate: 'ayer',
-            priority: TaskPriority.low,
+            priority: TaskDifficulty.easy,
             completed: true,
           ),
 
@@ -314,7 +341,7 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             title: 'Completar el informe semanal',
             description: 'Incluir métricas de pasos y tareas',
             dueDate: 'mañana',
-            priority: TaskPriority.medium,
+            priority: TaskDifficulty.medium,
             category: 'Trabajo',
             onDelete: () => setState(() => _swipeEpoch++),
           ),
@@ -359,19 +386,28 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
 
           // ── Tarjeta de amigo ─────────────────────────────────────
           _SectionHeader('Tarjeta de amigo'),
-          const FriendCard(
-            username: 'ana_lopez',
-            status: FriendStatus.accepted,
-          ),
-          const SizedBox(height: 8),
-          const FriendCard(
-            username: 'lucia_fdez',
-            status: FriendStatus.pendingSent,
-          ),
-          const SizedBox(height: 8),
           FriendCard(
-            username: 'pedro_gz',
-            status: FriendStatus.pendingReceived,
+            name: 'Ana López',
+            email: 'ana.lopez@daypilot.test',
+            points: 2610,
+            streak: 8,
+            weeklyPoints: 480,
+            weeklyTasks: 12,
+            weeklySteps: 34200,
+            weeklyStreak: 5,
+            onReact: (_) {},
+          ),
+          const SizedBox(height: 8),
+          const FriendCard(
+            name: 'Lucía Fernández',
+            email: 'lucia.fernandez@daypilot.test',
+            points: 1870,
+            streak: 3,
+          ),
+          const SizedBox(height: 8),
+          FriendRequestCard(
+            name: 'Pedro Gómez',
+            email: 'pedro.gomez@daypilot.test',
             onAccept: () {},
             onDecline: () {},
           ),
@@ -379,16 +415,19 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
           // ── Búsqueda de usuario ──────────────────────────────────
           _SectionHeader('Búsqueda de usuario'),
           const UserSearchCard(
-            username: 'nueva_persona',
+            name: 'Nueva Persona',
+            email: 'nueva.persona@daypilot.test',
           ),
           const SizedBox(height: 8),
           const UserSearchCard(
-            username: 'ana_lopez',
+            name: 'Ana López',
+            email: 'ana.lopez@daypilot.test',
             isFriend: true,
           ),
           const SizedBox(height: 8),
           const UserSearchCard(
-            username: 'otro_usuario',
+            name: 'Otro Usuario',
+            email: 'otro.usuario@daypilot.test',
             isPending: true,
           ),
 
@@ -453,28 +492,28 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
           // ── Notificación ─────────────────────────────────────────
           _SectionHeader('Notificación'),
           const NotificationCard(
-            type: NotificationType.friendRequest,
+            type: NotificationType.social,
             content: 'pedro_gz quiere ser tu amigo',
             timestamp: 'hace 5 min',
             read: false,
           ),
           const SizedBox(height: 6),
           const NotificationCard(
-            type: NotificationType.levelUp,
+            type: NotificationType.achievement,
             content: '¡Subiste al nivel 8! Sigue así.',
             timestamp: 'hace 2h',
             read: false,
           ),
           const SizedBox(height: 6),
           const NotificationCard(
-            type: NotificationType.reaction,
-            content: 'ana_lopez reaccionó a tu semana con 🔥',
+            type: NotificationType.task,
+            content: 'Tienes 3 tareas pendientes para hoy',
             timestamp: 'ayer',
             read: true,
           ),
           const SizedBox(height: 6),
           const NotificationCard(
-            type: NotificationType.streakAlert,
+            type: NotificationType.streak,
             content: '¡Tu racha de 12 días está en riesgo!',
             timestamp: 'hace 1h',
             read: false,
@@ -526,10 +565,14 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
           // ── Estadísticas de perfil ───────────────────────────────
           _SectionHeader('Estadísticas de perfil'),
           const ProfileStatsCard(
+            name: 'Mario García',
+            username: 'mario_garcia',
             level: 8,
+            currentXp: 640,
+            xpToNextLevel: 1000,
             totalPoints: 12840,
             streak: 12,
-            tasksCompleted: 347,
+            bestStreak: 18,
           ),
 
           // ── Resumen semanal ──────────────────────────────────────
@@ -539,7 +582,12 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             points: 1340,
             steps: 58200,
             tasks: 24,
-            reactions: {'👍': 3, '🔥': 5, '❤️': 2, '⭐': 1},
+            streak: 6,
+            reactions: [
+              WeeklyReaction(name: 'Ana López', emoji: '👍'),
+              WeeklyReaction(name: 'Lucía Fdez', emoji: '🔥'),
+              WeeklyReaction(name: 'Carlos Ruiz', emoji: '❤️'),
+            ],
           ),
 
           // ── Pasos de hoy ─────────────────────────────────────────
@@ -561,6 +609,83 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
           _SectionHeader('Calendario'),
           const CalendarWeekRow(),
 
+          // ── Calendario mensual ────────────────────────────────────
+          _SectionHeader('Calendario mensual'),
+          MonthCalendarCard(
+            month: _catalogMonth,
+            selectedDay: _catalogSelectedDay,
+            today: DateTime(2026, 7, 3),
+            taskCountByDay: const {1: 1, 5: 2, 10: 3, 18: 1, 25: 1},
+            onPrevMonth: () => setState(
+              () => _catalogMonth = DateTime(_catalogMonth.year, _catalogMonth.month - 1),
+            ),
+            onNextMonth: () => setState(
+              () => _catalogMonth = DateTime(_catalogMonth.year, _catalogMonth.month + 1),
+            ),
+            onDaySelected: (d) => setState(() => _catalogSelectedDay = d),
+          ),
+
+          // ── Chips de categoría y dificultad ───────────────────────
+          _SectionHeader('Chips de categoría y dificultad'),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final c in TaskCategory.values) TaskCategoryChip(category: c),
+              for (final d in TaskDifficulty.values) DifficultyChip(difficulty: d),
+            ],
+          ),
+
+          // ── Filtro desplegable ────────────────────────────────────
+          _SectionHeader('Filtro desplegable'),
+          Row(
+            children: [
+              Expanded(
+                child: DropdownPill<TaskDifficulty>(
+                  label: 'Dificultad',
+                  selected: _dropdownDifficulty,
+                  onChanged: (v) => setState(() => _dropdownDifficulty = v),
+                  items: [
+                    const DropdownPillItem(value: null, label: 'Todas', icon: Icons.list_rounded),
+                    for (final d in TaskDifficulty.values)
+                      DropdownPillItem(
+                        value: d,
+                        label: d.label(context),
+                        icon: Icons.circle,
+                        color: d.color(Theme.of(context).colorScheme),
+                      ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: DropdownPill<TaskCategory>(
+                  label: 'Categoría',
+                  selected: _dropdownCategory,
+                  onChanged: (v) => setState(() => _dropdownCategory = v),
+                  items: [
+                    const DropdownPillItem(value: null, label: 'Todas', icon: Icons.list_rounded),
+                    for (final c in TaskCategory.values)
+                      DropdownPillItem(value: c, label: c.label(context), icon: c.icon, color: c.color),
+                  ],
+                ),
+              ),
+            ],
+          ),
+
+          // ── Tarjeta de tarea del calendario ────────────────────────
+          _SectionHeader('Tarjeta de tarea del calendario'),
+          CalendarTaskCard(
+            title: 'Preparar presentación TFG',
+            difficulty: TaskDifficulty.hard,
+            category: TaskCategory.estudio,
+            durationMinutes: 90,
+            completed: _catalogTaskDone,
+            onToggle: () => setState(() => _catalogTaskDone = !_catalogTaskDone),
+            onEdit: () {},
+            onDelete: () {},
+          ),
+
           // ── Resumen del día ──────────────────────────────────────
           _SectionHeader('Resumen del día'),
           const DailySummaryCard(
@@ -574,9 +699,69 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             rankingPosition: 4,
           ),
 
+          // ── Gráfica de progreso ───────────────────────────────────
+          _SectionHeader('Gráfica de progreso'),
+          const ProgressChartCard(
+            pointsHistory: AppData.last30DaysPoints,
+            stepsHistory: AppData.last30DaysSteps,
+            tasksHistory: AppData.last30DaysTasks,
+          ),
+
+          // ── Progreso de pasos ──────────────────────────────────────
+          _SectionHeader('Progreso de pasos'),
+          StepsProgressCard(
+            steps: AppData.stepsToday,
+            goal: _catalogStepsGoal,
+            pointsEarnedToday: AppData.pointsTodayFromSteps,
+            onConfigureGoal: () => setState(() => _catalogStepsGoal += 1000),
+          ),
+
+          // ── Preset de cronómetro ───────────────────────────────────
+          _SectionHeader('Preset de cronómetro'),
+          TimerPresetCard(preset: AppData.timerPresets.first, onPlay: () {}),
+
+          // ── Tarjeta de recordatorio ─────────────────────────────────
+          _SectionHeader('Tarjeta de recordatorio'),
+          ReminderCard(
+            title: 'Estirar la espalda',
+            dateTime: DateTime.now().add(const Duration(hours: 2)),
+            enabled: _catalogReminderEnabled,
+            onToggle: (v) => setState(() => _catalogReminderEnabled = v),
+            onDelete: () {},
+          ),
+
+          // ── Tarjeta de restricción tecnológica ──────────────────────
+          _SectionHeader('Tarjeta de restricción tecnológica'),
+          TechRestrictionCard(
+            restriction: _catalogRestriction,
+            onToggle: (v) => setState(() => _catalogRestriction.enabled = v),
+            onDelete: () {},
+          ),
+
           // ════════════════════════════════════════════════════════
           // FORMULARIOS
           // ════════════════════════════════════════════════════════
+
+          // ── Sección plegable ─────────────────────────────────────
+          _SectionHeader('Sección plegable'),
+          DayPilotCollapsibleSection(
+            icon: Icons.list_alt_rounded,
+            title: 'Detalles',
+            children: [
+              const SizedBox(height: 8),
+              CategoryChipGroup(
+                label: 'Categoría',
+                selected: _catalogCategory,
+                onChanged: (c) => setState(() => _catalogCategory = c),
+              ),
+              const SizedBox(height: 16),
+              DifficultyField(
+                label: 'Dificultad',
+                value: _catalogDifficulty,
+                onChanged: (d) => setState(() => _catalogDifficulty = d),
+              ),
+            ],
+          ),
 
           // ── Switch tile ──────────────────────────────────────────
           _SectionHeader('Switch tile'),
@@ -664,15 +849,15 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
           // ── Grupo de radio ───────────────────────────────────────
           _SectionHeader('Grupo de radio'),
           DayPilotFormSection(
-            title: 'Prioridad',
+            title: 'Dificultad',
             children: [
-              DayPilotRadioGroup<TaskPriority>(
+              DayPilotRadioGroup<TaskDifficulty>(
                 value: _radioVal,
-                options: TaskPriority.values,
+                options: TaskDifficulty.values,
                 display: (p) => switch (p) {
-                  TaskPriority.low    => 'Baja — sin urgencia',
-                  TaskPriority.medium => 'Media — importante',
-                  TaskPriority.high   => 'Alta — urgente',
+                  TaskDifficulty.easy   => 'Fácil — sin urgencia',
+                  TaskDifficulty.medium => 'Media — importante',
+                  TaskDifficulty.hard   => 'Difícil — urgente',
                 },
                 onChanged: (v) => setState(() => _radioVal = v),
               ),
@@ -695,15 +880,15 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
           const SizedBox(height: 12),
           _SectionHeader('Grupo de chips (selección única)'),
           DayPilotFormSection(
-            title: 'Prioridad',
+            title: 'Dificultad',
             children: [
-              DayPilotChipGroup<TaskPriority>(
-                options: TaskPriority.values,
+              DayPilotChipGroup<TaskDifficulty>(
+                options: TaskDifficulty.values,
                 selected: _chipSingle,
                 display: (p) => switch (p) {
-                  TaskPriority.low    => 'Baja',
-                  TaskPriority.medium => 'Media',
-                  TaskPriority.high   => 'Alta',
+                  TaskDifficulty.easy   => 'Fácil',
+                  TaskDifficulty.medium => 'Media',
+                  TaskDifficulty.hard   => 'Difícil',
                 },
                 singleSelect: true,
                 onChanged: (v) => setState(() => _chipSingle = v),

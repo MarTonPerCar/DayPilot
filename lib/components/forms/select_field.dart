@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../basic/sheet_handle.dart';
 
 class DayPilotSelectField<T> extends StatelessWidget {
   final String label;
@@ -34,14 +35,9 @@ class DayPilotSelectField<T> extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Container(
-                width: 36,
-                height: 4,
-                margin: const EdgeInsets.symmetric(vertical: 12),
-                decoration: BoxDecoration(
-                  color: colors.outlineVariant,
-                  borderRadius: BorderRadius.circular(2),
-                ),
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 12),
+                child: DayPilotSheetHandle(),
               ),
               Padding(
                 padding: const EdgeInsets.only(bottom: 8, left: 16),

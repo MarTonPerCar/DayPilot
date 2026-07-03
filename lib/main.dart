@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'l10n/app_localizations.dart';
+import 'l10n/locale_notifier.dart';
 import 'screens/auth/login_screen.dart';
 import 'theme/app_theme.dart';
 
@@ -11,13 +13,31 @@ class DayPilotApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'DayPilot',
-      debugShowCheckedModeBanner: false,
-      theme:     buildTheme(DayPilotTheme.sageGreen),
-      darkTheme: buildTheme(DayPilotTheme.sageGreen, darkMode: true),
-      themeMode: ThemeMode.system,
-      home: const LoginScreen(),
+    return ValueListenableBuilder<DayPilotTheme>(
+      valueListenable: dayPilotThemeNotifier,
+      builder: (context, activeTheme, _) {
+        return ValueListenableBuilder<ThemeMode>(
+          valueListenable: dayPilotThemeModeNotifier,
+          builder: (context, activeThemeMode, _) {
+            return ValueListenableBuilder<Locale>(
+              valueListenable: dayPilotLocaleNotifier,
+              builder: (context, activeLocale, _) {
+                return MaterialApp(
+                  title: 'DayPilot',
+                  debugShowCheckedModeBanner: false,
+                  theme: buildTheme(activeTheme),
+                  darkTheme: buildTheme(activeTheme, darkMode: true),
+                  themeMode: activeThemeMode,
+                  locale: activeLocale,
+                  localizationsDelegates: AppLocalizations.localizationsDelegates,
+                  supportedLocales: AppLocalizations.supportedLocales,
+                  home: const LoginScreen(),
+                );
+              },
+            );
+          },
+        );
+      },
     );
   }
 }
