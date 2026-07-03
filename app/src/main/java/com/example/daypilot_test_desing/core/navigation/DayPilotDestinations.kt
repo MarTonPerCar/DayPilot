@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.navigation
+package com.example.daypilot_test_desing.core.navigation
 
 object DayPilotDestinations {
     // Startup

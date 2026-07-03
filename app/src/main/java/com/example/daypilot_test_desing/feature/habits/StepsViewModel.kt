@@ -1,11 +1,15 @@
 package com.example.daypilot_test_desing.feature.habits
 
+import android.Manifest
 import android.app.Application
 import android.content.Context
+import android.content.pm.PackageManager
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.os.Build
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -60,9 +64,9 @@ class StepsViewModel(
             prevTotalSinceBoot = totalSinceBoot
             prevEventNs        = event.timestamp
 
-            if (baseline < 0) {
-                val today = todayStr()
-                val savedDate = prefs.getString("baseline_date", "")
+            val today = todayStr()
+            val savedDate = prefs.getString("baseline_date", "")
+            if (baseline < 0 || savedDate != today) {
                 baseline = if (savedDate == today) {
                     prefs.getInt("baseline_steps", totalSinceBoot)
                 } else {
@@ -86,9 +90,7 @@ class StepsViewModel(
     }
 
     init {
-        stepSensor?.let {
-            sensorManager?.registerListener(sensorListener, it, SensorManager.SENSOR_DELAY_NORMAL)
-        }
+        registerSensorIfPermitted()
         viewModelScope.launch { loadWeeklyStats() }
         updateLocalState()
         _uiState.update { it.copy(sensorAvailable = stepSensor != null) }
@@ -107,7 +109,25 @@ class StepsViewModel(
             override fun onStop(owner: LifecycleOwner) {
                 triggerSync(stepsRepo.getCurrentSteps())
             }
+            override fun onStart(owner: LifecycleOwner) {
+                registerSensorIfPermitted()
+            }
         })
+    }
+
+    private var sensorRegistered = false
+
+    private fun registerSensorIfPermitted() {
+        if (sensorRegistered) return
+        val ctx = getApplication<Application>()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
+            ContextCompat.checkSelfPermission(ctx, Manifest.permission.ACTIVITY_RECOGNITION)
+                != PackageManager.PERMISSION_GRANTED
+        ) return
+        stepSensor?.let {
+            sensorManager?.registerListener(sensorListener, it, SensorManager.SENSOR_DELAY_NORMAL)
+            sensorRegistered = true
+        }
     }
 
     override fun onCleared() {

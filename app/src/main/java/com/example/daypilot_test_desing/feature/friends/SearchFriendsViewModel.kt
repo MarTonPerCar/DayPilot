@@ -1,10 +1,10 @@
-package com.example.daypilot_test_desing.viewmodel.friends
+package com.example.daypilot_test_desing.feature.friends
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.daypilot_test_desing.R
-import com.example.daypilot_test_desing.backend.repository.FriendRepository
+import com.example.daypilot_test_desing.core.data.repository.FriendRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow

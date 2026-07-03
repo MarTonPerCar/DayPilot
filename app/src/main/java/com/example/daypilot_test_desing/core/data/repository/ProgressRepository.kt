@@ -1,7 +1,7 @@
-package com.example.daypilot_test_desing.backend.repository
+package com.example.daypilot_test_desing.core.data.repository
 
-import com.example.daypilot_test_desing.backend.supabase.dto.DailyLogDto
-import com.example.daypilot_test_desing.backend.supabase.dto.DailyProgressDto
+import com.example.daypilot_test_desing.data.supabase.dto.DailyLogDto
+import com.example.daypilot_test_desing.data.supabase.dto.DailyProgressDto
 
 interface ProgressRepository {
     suspend fun getTodayProgress(): DailyProgressDto

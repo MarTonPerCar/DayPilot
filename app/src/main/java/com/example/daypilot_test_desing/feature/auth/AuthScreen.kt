@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.presentation.auth
+package com.example.daypilot_test_desing.feature.auth
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -27,9 +27,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.R
-import com.example.daypilot_test_desing.ui.components.forms.AuthToggle
-import com.example.daypilot_test_desing.ui.components.forms.LoginCard
-import com.example.daypilot_test_desing.ui.components.forms.RegisterCard
+import com.example.daypilot_test_desing.core.ui.components.forms.AuthToggle
+import com.example.daypilot_test_desing.core.ui.components.forms.LoginCard
+import com.example.daypilot_test_desing.core.ui.components.forms.RegisterCard
 
 @Composable
 fun AuthScreen(
@@ -108,7 +108,6 @@ fun AuthScreen(
                             errorMessage = registerError,
                             onRegister = { name, username, email, password, region ->
                                 onRegisterClick(name, username, email, password, region)
-                                isLogin = true
                             },
                         )
                     }

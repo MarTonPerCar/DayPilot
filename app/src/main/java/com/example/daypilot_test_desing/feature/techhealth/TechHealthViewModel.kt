@@ -1,19 +1,18 @@
-package com.example.daypilot_test_desing.viewmodel.techhealth
+package com.example.daypilot_test_desing.feature.techhealth
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.daypilot_test_desing.backend.model.AppRestriction
-import com.example.daypilot_test_desing.backend.model.GroupRestriction
-import com.example.daypilot_test_desing.backend.preferences.AppPreferences
-import com.example.daypilot_test_desing.backend.sharedprefs.SharedPrefsTechHealthRepository
-import com.example.daypilot_test_desing.backend.supabase.dto.HabitsDailyReadTechDto
-import com.example.daypilot_test_desing.backend.supabase.dto.HabitsDailyTechDto
-import com.example.daypilot_test_desing.backend.supabase.dto.InsertPointsLogDto
-import com.example.daypilot_test_desing.backend.supabase.dto.TechHealthConfigDto
-import com.example.daypilot_test_desing.backend.supabase.supabase
-import com.example.daypilot_test_desing.reminders.AppUsageTracker
-import com.example.daypilot_test_desing.reminders.TechHealthNotificationManager
+import com.example.daypilot_test_desing.core.data.model.AppRestriction
+import com.example.daypilot_test_desing.core.data.model.GroupRestriction
+import com.example.daypilot_test_desing.core.data.local.SharedPrefsTechHealthRepository
+import com.example.daypilot_test_desing.data.supabase.dto.HabitsDailyReadTechDto
+import com.example.daypilot_test_desing.data.supabase.dto.TechHealthConfigDto
+import com.example.daypilot_test_desing.data.supabase.supabase
+import com.example.daypilot_test_desing.core.reminders.AppUsageTracker
+import com.example.daypilot_test_desing.core.reminders.DayPilotAccessibilityService
+import com.example.daypilot_test_desing.core.reminders.TechHealthNotificationManager
+import androidx.core.app.NotificationManagerCompat
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,16 +20,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
-import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
 class TechHealthViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = SharedPrefsTechHealthRepository(application)
-    private val appPrefs   = AppPreferences(application)
 
-    // Cached value from the last DB read so buildState() reflects DB truth synchronously.
+    // true while today has no violation; the bonus itself is awarded server-side
     private var cachedPointEarned = false
 
     private val _uiState = MutableStateFlow(buildState())
@@ -56,6 +53,8 @@ class TechHealthViewModel(application: Application) : AndroidViewModel(applicati
 
     private suspend fun refreshUsageInternal() {
         val ctx = getApplication<Application>()
+        // worker also does this, but it can be delayed hours by Doze
+        repository.applyPendingChangesIfNewDay()
         val hasPermission = AppUsageTracker.hasPermission(ctx)
         if (hasPermission) {
             val usageMap = AppUsageTracker.getTodayUsage(ctx)
@@ -64,14 +63,13 @@ class TechHealthViewModel(application: Application) : AndroidViewModel(applicati
                 if (used != r.usedMinutesToday) repository.updateUsage(r.id, used)
             }
         }
-        scheduleNotificationsForOverLimit()
-        val pointEarned = appPrefs.techHealthBonusDate == today() || readPointEarnedFromDb()
-        if (!pointEarned) checkAndAwardDailyBonus()
-        cachedPointEarned = pointEarned || (appPrefs.techHealthBonusDate == today())
+        cancelOverLimitNotifications()
+        cachedPointEarned = readPointEarnedFromDb()
         _uiState.value = TechHealthUiState(
             appRestrictions       = repository.getAppRestrictions(),
             groupRestrictions     = repository.getGroupRestrictions(),
             hasUsagePermission    = hasPermission,
+            hasAccessibilityPermission = DayPilotAccessibilityService.isEnabled(ctx),
             techHealthPointEarned = cachedPointEarned,
             activeRestrictionCount = repository.getAppRestrictions().count { it.isEnabled }
         )
@@ -80,7 +78,7 @@ class TechHealthViewModel(application: Application) : AndroidViewModel(applicati
     fun saveApp(restriction: AppRestriction) {
         repository.saveApp(restriction)
         viewModelScope.launch { upsertAppToSupabase(restriction) }
-        scheduleNotificationsForOverLimit()
+        cancelOverLimitNotifications()
         _uiState.value = buildState()
     }
 
@@ -93,7 +91,7 @@ class TechHealthViewModel(application: Application) : AndroidViewModel(applicati
         val pkg = repository.getAppRestrictions().find { it.id == id }?.packageName
         repository.toggleRestriction(id, enabled)
         if (!enabled) TechHealthNotificationManager.cancel(getApplication(), id)
-        else scheduleNotificationsForOverLimit()
+        else cancelOverLimitNotifications()
         if (pkg != null) viewModelScope.launch { updateIsActiveInSupabase(pkg, enabled) }
         _uiState.value = buildState()
     }
@@ -102,7 +100,7 @@ class TechHealthViewModel(application: Application) : AndroidViewModel(applicati
         TechHealthNotificationManager.cancel(getApplication(), id)
         val pkg = repository.getAppRestrictions().find { it.id == id }?.packageName
         repository.deleteRestriction(id)
-        if (pkg != null) viewModelScope.launch { deleteFromSupabase(pkg) }
+        if (pkg != null) viewModelScope.launch { markPendingDeleteInSupabase(pkg) }
         _uiState.value = buildState()
     }
 
@@ -139,7 +137,8 @@ class TechHealthViewModel(application: Application) : AndroidViewModel(applicati
                     dailyLimitMinutes           = limitMinutes,
                     notificationIntervalSeconds = 3600,
                     isEnabled                   = dto.isActive,
-                    usedMinutesToday            = 0
+                    usedMinutesToday            = 0,
+                    pendingDelete               = dto.pendingDelete
                 ))
             }
         } catch (_: Exception) { }
@@ -156,13 +155,25 @@ class TechHealthViewModel(application: Application) : AndroidViewModel(applicati
                 limitHours = restriction.dailyLimitMinutes / 60.0,
                 isActive   = restriction.isEnabled
             ))
+            // upsert skips false defaults (encodeDefaults=false), so clear it explicitly
+            supabase.from("tech_health_config").update({
+                set("pending_delete", false)
+            }) {
+                filter {
+                    eq("user_id", uid)
+                    eq("app_package", restriction.packageName)
+                }
+            }
         } catch (_: Exception) { }
     }
 
-    private suspend fun deleteFromSupabase(packageName: String) {
+    // soft delete, removed for real by fn_close_daily_progress() that night
+    private suspend fun markPendingDeleteInSupabase(packageName: String) {
         val uid = supabase.auth.currentUserOrNull()?.id ?: return
         try {
-            supabase.from("tech_health_config").delete {
+            supabase.from("tech_health_config").update({
+                set("pending_delete", true)
+            }) {
                 filter {
                     eq("user_id", uid)
                     eq("app_package", packageName)
@@ -186,65 +197,23 @@ class TechHealthViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     private suspend fun readPointEarnedFromDb(): Boolean {
-        val uid = supabase.auth.currentUserOrNull()?.id ?: return false
+        val uid = supabase.auth.currentUserOrNull()?.id ?: return true
         return try {
             supabase.from("habits_daily").select {
                 filter { eq("user_id", uid); eq("date", today()) }
                 limit(1)
             }.decodeList<HabitsDailyReadTechDto>()
-                .firstOrNull()?.techHealthPointEarned ?: false
-        } catch (_: Exception) { false }
-    }
-
-    // ── Point logic ──────────────────────────────────────────────────────────
-
-    private fun checkAndAwardDailyBonus() {
-        val todayStr = today()
-        if (appPrefs.techHealthBonusDate == todayStr) return
-        val active = repository.getAppRestrictions().filter { it.isEnabled }
-        if (active.size < 3) return   // need at least 3 active restrictions
-        if (active.all { it.usedMinutesToday < it.dailyLimitMinutes }) {
-            appPrefs.techHealthBonusDate = todayStr
-            viewModelScope.launch {
-                logPointsToDb(10, "TECH_HEALTH", today()) // TODO: was tomorrow() — was crediting to the wrong day
-                writeTechHealthEarned(true)
-            }
-        }
-    }
-
-    private suspend fun writeTechHealthEarned(earned: Boolean) {
-        val uid = supabase.auth.currentUserOrNull()?.id ?: return
-        try {
-            supabase.from("habits_daily").upsert(
-                HabitsDailyTechDto(userId = uid, date = today(), techHealthPointEarned = earned)
-            )
-        } catch (_: Exception) { }
-    }
-
-    private suspend fun logPointsToDb(points: Int, source: String, dayKey: String = today()) {
-        val uid = supabase.auth.currentUserOrNull()?.id ?: return
-        try {
-            supabase.from("points_log").insert(
-                InsertPointsLogDto(userId = uid, points = points, source = source, dayKey = dayKey)
-            )
-        } catch (_: Exception) { }
+                .firstOrNull()?.techHealthPointEarned ?: true
+        } catch (_: Exception) { true }
     }
 
     // ── Notifications ────────────────────────────────────────────────────────
 
-    private fun scheduleNotificationsForOverLimit() {
+    private fun cancelOverLimitNotifications() {
         val context = getApplication<Application>()
         repository.getAppRestrictions().forEach { r ->
-            if (r.isEnabled && r.usedMinutesToday >= r.dailyLimitMinutes
-                && r.notificationIntervalSeconds > 0
-            ) {
-                TechHealthNotificationManager.scheduleRepeating(
-                    context, r.id, r.appName, r.usedMinutesToday,
-                    r.dailyLimitMinutes, r.notificationIntervalSeconds
-                )
-            } else {
-                TechHealthNotificationManager.cancel(context, r.id)
-            }
+            TechHealthNotificationManager.cancel(context, r.id)
+            NotificationManagerCompat.from(context).cancel(r.appName.hashCode())
         }
     }
 
@@ -254,13 +223,11 @@ class TechHealthViewModel(application: Application) : AndroidViewModel(applicati
             appRestrictions        = apps,
             groupRestrictions      = repository.getGroupRestrictions(),
             hasUsagePermission     = AppUsageTracker.hasPermission(getApplication()),
+            hasAccessibilityPermission = DayPilotAccessibilityService.isEnabled(getApplication()),
             techHealthPointEarned  = cachedPointEarned,
             activeRestrictionCount = apps.count { it.isEnabled }
         )
     }
 
-    private fun today()    = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
-    private fun tomorrow() = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(
-        Calendar.getInstance().also { it.add(Calendar.DAY_OF_YEAR, 1) }.time
-    )
+    private fun today() = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
 }

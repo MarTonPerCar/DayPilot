@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.viewmodel.auth
+package com.example.daypilot_test_desing.feature.auth
 
 data class AuthUiState(
     val loginLoading: Boolean = false,

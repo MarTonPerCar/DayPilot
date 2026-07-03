@@ -107,23 +107,21 @@ class SupabaseUserRepository : UserRepository {
 
     override suspend fun updateProfile(name: String, username: String, region: TimeZoneRegion) {
         val uid = userId() ?: return
-        try {
-            supabase.from("users").update(
-                UpdateUserDto(
-                    name          = name,
-                    username      = username,
-                    usernameLower = username.lowercase(),
-                    region        = region.value
-                )
-            ) {
-                filter { eq("id", uid) }
-            }
-            SessionCache.userProfile.value = SessionCache.userProfile.value?.copy(
-                name     = name,
-                username = username,
-                region   = region
+        supabase.from("users").update(
+            UpdateUserDto(
+                name          = name,
+                username      = username,
+                usernameLower = username.lowercase(),
+                region        = region.value
             )
-        } catch (_: Exception) { }
+        ) {
+            filter { eq("id", uid) }
+        }
+        SessionCache.userProfile.value = SessionCache.userProfile.value?.copy(
+            name     = name,
+            username = username,
+            region   = region
+        )
     }
 
     override suspend fun uploadAvatar(bytes: ByteArray, mimeType: String): String? {

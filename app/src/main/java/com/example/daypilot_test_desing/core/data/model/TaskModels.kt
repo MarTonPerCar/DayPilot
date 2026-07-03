@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.backend.model
+package com.example.daypilot_test_desing.core.data.model
 
 import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
@@ -31,6 +31,8 @@ enum class TaskCategory(@StringRes val labelRes: Int, val icon: ImageVector, val
 
 data class CalendarTaskData(
     val id: String,
+    // task_days.id, used by toggleTask; id above is the shared series id
+    val occurrenceId: String = id,
     val day: Int,
     val month: Int,
     val year: Int,

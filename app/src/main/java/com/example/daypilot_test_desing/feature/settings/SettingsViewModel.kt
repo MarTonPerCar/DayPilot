@@ -1,13 +1,13 @@
-package com.example.daypilot_test_desing.viewmodel.settings
+package com.example.daypilot_test_desing.feature.settings
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.daypilot_test_desing.backend.preferences.AppPreferences
-import com.example.daypilot_test_desing.backend.repository.UserRepository
-import com.example.daypilot_test_desing.reminders.DailyNotificationScheduler
+import com.example.daypilot_test_desing.core.data.preferences.AppPreferences
+import com.example.daypilot_test_desing.core.data.repository.UserRepository
+import com.example.daypilot_test_desing.core.reminders.DailyNotificationScheduler
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

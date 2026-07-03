@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.presentation.habits
+package com.example.daypilot_test_desing.feature.habits
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -12,9 +12,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.R
-import com.example.daypilot_test_desing.ui.components.basic.DayPilotTopBar
-import com.example.daypilot_test_desing.ui.components.cards.StepsCard
-import com.example.daypilot_test_desing.ui.components.cards.StepsSummaryCard
+import com.example.daypilot_test_desing.core.ui.components.basic.DayPilotTopBar
+import com.example.daypilot_test_desing.core.ui.components.cards.StepsCard
+import com.example.daypilot_test_desing.core.ui.components.cards.StepsSummaryCard
 
 @Composable
 fun StepsScreen(

@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.presentation.profile
+package com.example.daypilot_test_desing.feature.profile
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -20,8 +20,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import com.example.daypilot_test_desing.R
-import com.example.daypilot_test_desing.ui.components.basic.*
-import com.example.daypilot_test_desing.backend.model.TimeZoneRegion
+import com.example.daypilot_test_desing.core.ui.components.basic.*
+import com.example.daypilot_test_desing.core.data.model.TimeZoneRegion
 import com.yalantis.ucrop.UCrop
 import java.io.File
 
@@ -34,10 +34,13 @@ fun EditProfileScreen(
     avatarUrl: String? = null,
     isUploadingAvatar: Boolean = false,
     avatarUploadError: Boolean = false,
+    isSavingProfile: Boolean = false,
+    profileSaveError: Boolean = false,
     onSave: (name: String, username: String, region: TimeZoneRegion) -> Unit,
     onNavigateToResetPassword: () -> Unit,
     onPhotoSelected: (Uri) -> Unit,
     onAvatarErrorDismissed: () -> Unit = {},
+    onProfileSaveErrorDismissed: () -> Unit = {},
     onBack: () -> Unit
 ) {
     val context         = LocalContext.current
@@ -52,6 +55,14 @@ fun EditProfileScreen(
         if (avatarUploadError) {
             snackbarHost.showSnackbar(photoErrorMsg)
             onAvatarErrorDismissed()
+        }
+    }
+
+    val saveErrorMsg = stringResource(R.string.edit_profile_save_error)
+    LaunchedEffect(profileSaveError) {
+        if (profileSaveError) {
+            snackbarHost.showSnackbar(saveErrorMsg)
+            onProfileSaveErrorDismissed()
         }
     }
 
@@ -212,8 +223,11 @@ fun EditProfileScreen(
             Spacer(Modifier.height(8.dp))
 
             DayPilotButtonPrimary(
-                text    = stringResource(R.string.edit_profile_save),
-                onClick = { onSave(name, username, region) }
+                text      = stringResource(R.string.edit_profile_save),
+                enabled   = !isSavingProfile,
+                isLoading = isSavingProfile,
+                hasError  = profileSaveError,
+                onClick   = { onSave(name, username, region) }
             )
 
             Spacer(Modifier.height(16.dp))

@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.presentation.loading
+package com.example.daypilot_test_desing.feature.loading
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

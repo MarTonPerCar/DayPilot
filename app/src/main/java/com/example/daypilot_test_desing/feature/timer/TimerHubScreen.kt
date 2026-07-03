@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.presentation.timer
+package com.example.daypilot_test_desing.feature.timer
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -47,9 +47,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.daypilot_test_desing.R
-import com.example.daypilot_test_desing.ui.components.basic.DayPilotTopBar
-import com.example.daypilot_test_desing.ui.components.cards.TimerHubCard
-import com.example.daypilot_test_desing.backend.model.TimerOption
+import com.example.daypilot_test_desing.core.ui.components.basic.DayPilotTopBar
+import com.example.daypilot_test_desing.core.ui.components.cards.TimerHubCard
+import com.example.daypilot_test_desing.core.data.model.TimerOption
 
 
 @OptIn(ExperimentalMaterial3Api::class)

@@ -68,17 +68,19 @@ class ProgressViewModel(
     fun recordTimerComplete() {
         val todayStr = today()
         if (appPrefs.timerPointsDate == todayStr) return
-        appPrefs.timerPointsDate = todayStr
         viewModelScope.launch {
-            repo.logPoints(10, "TIMER")  // clears SessionCache.todayProgress
-            load()  // re-fetches fresh todayProgress, updates UiState
-            // TODO: move notification sending to NotificationRepository so ProgressViewModel
-            //       doesn't depend on a concrete Supabase class
-            SupabaseNotificationRepository.insertForCurrentUser(
-                type  = "TIMER_DONE",
-                title = "¡Temporizador completado! ⏱",
-                body  = "Has completado una sesión de concentración y ganado 10 pts"
-            )
+            try {
+                repo.logPoints(10, "TIMER")  // clears SessionCache.todayProgress
+                appPrefs.timerPointsDate = todayStr
+                load()  // re-fetches fresh todayProgress, updates UiState
+                // TODO: move notification sending to NotificationRepository so ProgressViewModel
+                //       doesn't depend on a concrete Supabase class
+                SupabaseNotificationRepository.insertForCurrentUser(
+                    type  = "TIMER_DONE",
+                    title = "¡Temporizador completado! ⏱",
+                    body  = "Has completado una sesión de concentración y ganado 10 pts"
+                )
+            } catch (_: Exception) { }
         }
     }
 

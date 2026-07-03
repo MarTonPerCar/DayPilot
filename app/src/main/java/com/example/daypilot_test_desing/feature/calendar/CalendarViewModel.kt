@@ -108,14 +108,14 @@ class CalendarViewModel(
         }
     }
 
-    fun toggleTask(id: String, isDone: Boolean) {
-        val taskTitle = _uiState.value.tasks.firstOrNull { it.id == id }?.title
+    fun toggleTask(occurrenceId: String, isDone: Boolean) {
+        val taskTitle = _uiState.value.tasks.firstOrNull { it.occurrenceId == occurrenceId }?.title
         _uiState.update { state ->
-            state.copy(tasks = state.tasks.map { if (it.id == id) it.copy(isDone = isDone) else it })
+            state.copy(tasks = state.tasks.map { if (it.occurrenceId == occurrenceId) it.copy(isDone = isDone) else it })
         }
         viewModelScope.launch {
             try {
-                taskRepo.toggleTask(id, isDone)
+                taskRepo.toggleTask(occurrenceId, isDone)
                 val points = if (isDone) 20 else -20
                 progressRepo.logPoints(points, "TASKS")  // clears SessionCache.todayProgress
                 SessionCache.tasks.value = _uiState.value.tasks
@@ -129,7 +129,7 @@ class CalendarViewModel(
             } catch (e: Exception) {
                 _uiState.update { state ->
                     state.copy(
-                        tasks = state.tasks.map { if (it.id == id) it.copy(isDone = !isDone) else it },
+                        tasks = state.tasks.map { if (it.occurrenceId == occurrenceId) it.copy(isDone = !isDone) else it },
                         userMessage = R.string.error_task_toggle
                     )
                 }
@@ -139,13 +139,11 @@ class CalendarViewModel(
 
     fun deleteTask(id: String) {
         val snapshot = _uiState.value.tasks
+        val completedOccurrences = snapshot.count { it.id == id && it.isDone }
         _uiState.update { state -> state.copy(tasks = state.tasks.filter { it.id != id }) }
         viewModelScope.launch {
             try {
-                val task = snapshot.find { it.id == id }
-                if (task?.isDone == true) {
-                    progressRepo.logPoints(-20, "TASKS")  // clears SessionCache.todayProgress
-                }
+                repeat(completedOccurrences) { progressRepo.logPoints(-20, "TASKS") }
                 taskRepo.deleteTask(id)
                 SessionCache.tasks.value = _uiState.value.tasks
             } catch (e: Exception) {

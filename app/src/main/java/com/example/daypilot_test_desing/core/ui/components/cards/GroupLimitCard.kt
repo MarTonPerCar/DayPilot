@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.ui.components.cards
+package com.example.daypilot_test_desing.core.ui.components.cards
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -40,9 +40,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.daypilot_test_desing.R
-import com.example.daypilot_test_desing.backend.model.AppRestriction
-import com.example.daypilot_test_desing.backend.model.GroupRestriction
-import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
+import com.example.daypilot_test_desing.core.data.model.AppRestriction
+import com.example.daypilot_test_desing.core.data.model.GroupRestriction
+import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
 
 @Composable
 fun GroupLimitCard(

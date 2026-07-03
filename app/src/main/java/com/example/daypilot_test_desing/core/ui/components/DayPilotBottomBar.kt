@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.ui.components
+package com.example.daypilot_test_desing.core.ui.components
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -15,7 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.daypilot_test_desing.navigation.DayPilotDestinations
+import com.example.daypilot_test_desing.core.navigation.DayPilotDestinations
 
 // ── Tabs de la barra ─────────────────────────────────────────────
 data class BottomBarTab(

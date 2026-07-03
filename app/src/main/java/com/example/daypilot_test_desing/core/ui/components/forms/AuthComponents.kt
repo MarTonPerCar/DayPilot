@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.ui.components.forms
+package com.example.daypilot_test_desing.core.ui.components.forms
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -30,13 +30,13 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.R
-import com.example.daypilot_test_desing.ui.components.basic.DayPilotButtonPrimary
-import com.example.daypilot_test_desing.ui.components.basic.DayPilotButtonText
-import com.example.daypilot_test_desing.ui.components.basic.DayPilotDropdownField
-import com.example.daypilot_test_desing.ui.components.basic.DayPilotPasswordField
-import com.example.daypilot_test_desing.ui.components.basic.DayPilotTextField
-import com.example.daypilot_test_desing.backend.model.TimeZoneRegion
-import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
+import com.example.daypilot_test_desing.core.ui.components.basic.DayPilotButtonPrimary
+import com.example.daypilot_test_desing.core.ui.components.basic.DayPilotButtonText
+import com.example.daypilot_test_desing.core.ui.components.basic.DayPilotDropdownField
+import com.example.daypilot_test_desing.core.ui.components.basic.DayPilotPasswordField
+import com.example.daypilot_test_desing.core.ui.components.basic.DayPilotTextField
+import com.example.daypilot_test_desing.core.data.model.TimeZoneRegion
+import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
 
 // ── Toggle login / registro ───────────────────────────────────────
 @Composable

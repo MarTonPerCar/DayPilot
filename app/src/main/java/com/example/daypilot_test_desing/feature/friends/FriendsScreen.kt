@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.presentation.friends
+package com.example.daypilot_test_desing.feature.friends
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
@@ -34,12 +34,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.R
-import com.example.daypilot_test_desing.ui.components.basic.DayPilotEmptyState
-import com.example.daypilot_test_desing.ui.components.basic.DayPilotTopBarWithAction
-import com.example.daypilot_test_desing.ui.components.cards.FriendCard
-import com.example.daypilot_test_desing.ui.components.cards.FriendRequestCard
-import com.example.daypilot_test_desing.backend.model.FriendData
-import com.example.daypilot_test_desing.backend.model.ReactionType
+import com.example.daypilot_test_desing.core.ui.components.basic.DayPilotEmptyState
+import com.example.daypilot_test_desing.core.ui.components.basic.DayPilotTopBarWithAction
+import com.example.daypilot_test_desing.core.ui.components.cards.FriendCard
+import com.example.daypilot_test_desing.core.ui.components.cards.FriendRequestCard
+import com.example.daypilot_test_desing.core.data.model.FriendData
+import com.example.daypilot_test_desing.core.data.model.ReactionType
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

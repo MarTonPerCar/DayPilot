@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.presentation.calendar
+package com.example.daypilot_test_desing.feature.calendar
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
@@ -18,15 +18,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.R
-import com.example.daypilot_test_desing.ui.components.basic.*
-import com.example.daypilot_test_desing.ui.components.cards.*
-import com.example.daypilot_test_desing.ui.components.DayPilotCalendar
-import com.example.daypilot_test_desing.ui.components.forms.TaskFormCard
-import com.example.daypilot_test_desing.backend.model.CalendarTaskData
-import com.example.daypilot_test_desing.backend.model.CalendarTaskDot
-import com.example.daypilot_test_desing.backend.model.NewTaskData
-import com.example.daypilot_test_desing.backend.model.TaskCategory
-import com.example.daypilot_test_desing.backend.model.TaskDifficulty
+import com.example.daypilot_test_desing.core.ui.components.basic.*
+import com.example.daypilot_test_desing.core.ui.components.cards.*
+import com.example.daypilot_test_desing.core.ui.components.DayPilotCalendar
+import com.example.daypilot_test_desing.core.ui.components.forms.TaskFormCard
+import com.example.daypilot_test_desing.core.data.model.CalendarTaskData
+import com.example.daypilot_test_desing.core.data.model.CalendarTaskDot
+import com.example.daypilot_test_desing.core.data.model.NewTaskData
+import com.example.daypilot_test_desing.core.data.model.TaskCategory
+import com.example.daypilot_test_desing.core.data.model.TaskDifficulty
 import java.util.Calendar
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -101,7 +101,7 @@ fun CalendarScreen(
         derivedStateOf { editingTaskId?.let { id -> tasks.find { it.id == id } } }
     }
 
-    val detailTask = detailTaskId?.let { id -> tasks.find { it.id == id } }
+    val detailTask = detailTaskId?.let { id -> tasks.find { it.occurrenceId == id } }
 
     // ── Task detail bottom sheet ──────────────────────────────────
     detailTask?.let { task ->
@@ -188,7 +188,7 @@ fun CalendarScreen(
                 ) {
                     OutlinedButton(
                         onClick = {
-                            onToggleTask(task.id, !task.isDone)
+                            onToggleTask(task.occurrenceId, !task.isDone)
                         },
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(12.dp)
@@ -491,8 +491,8 @@ fun CalendarScreen(
                                 hasReminder    = task.hasReminder,
                                 isRecurring    = task.isRecurring,
                                 isPending      = task.isPending,
-                                onToggleComplete = { onToggleTask(task.id, it) },
-                                onTap          = { detailTaskId = task.id },
+                                onToggleComplete = { onToggleTask(task.occurrenceId, it) },
+                                onTap          = { detailTaskId = task.occurrenceId },
                                 onEdit         = { editingTaskId = task.id },
                                 onDelete       = { onDeleteTask(task.id) }
                             )

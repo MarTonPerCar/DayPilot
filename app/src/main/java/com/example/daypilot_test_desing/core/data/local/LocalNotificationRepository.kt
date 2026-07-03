@@ -1,6 +1,6 @@
-package com.example.daypilot_test_desing.backend.local
+package com.example.daypilot_test_desing.core.data.local
 
-import com.example.daypilot_test_desing.backend.model.NotificationData
+import com.example.daypilot_test_desing.core.data.model.NotificationData
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

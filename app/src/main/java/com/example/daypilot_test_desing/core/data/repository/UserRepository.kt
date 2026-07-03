@@ -1,8 +1,8 @@
-package com.example.daypilot_test_desing.backend.repository
+package com.example.daypilot_test_desing.core.data.repository
 
-import com.example.daypilot_test_desing.backend.model.TimeZoneRegion
-import com.example.daypilot_test_desing.backend.model.UserProfile
-import com.example.daypilot_test_desing.backend.model.WeeklySummaryData
+import com.example.daypilot_test_desing.core.data.model.TimeZoneRegion
+import com.example.daypilot_test_desing.core.data.model.UserProfile
+import com.example.daypilot_test_desing.core.data.model.WeeklySummaryData
 
 interface UserRepository {
     suspend fun getCurrentUser(): UserProfile

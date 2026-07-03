@@ -1,12 +1,15 @@
-package com.example.daypilot_test_desing.backend.sharedprefs
+package com.example.daypilot_test_desing.core.data.local
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.example.daypilot_test_desing.backend.model.AppRestriction
-import com.example.daypilot_test_desing.backend.model.GroupRestriction
-import com.example.daypilot_test_desing.backend.repository.TechHealthRepository
+import com.example.daypilot_test_desing.core.data.model.AppRestriction
+import com.example.daypilot_test_desing.core.data.model.GroupRestriction
+import com.example.daypilot_test_desing.core.data.repository.TechHealthRepository
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 /**
  * Persists app and group restrictions in SharedPreferences as JSON.
@@ -75,7 +78,11 @@ class SharedPrefsTechHealthRepository(context: Context) : TechHealthRepository {
         if (idx >= 0) { apps[idx] = apps[idx].copy(isEnabled = enabled); saveApps(apps) }
     }
 
-    override fun deleteRestriction(id: String) { saveApps(loadApps().filter { it.id != id }) }
+    override fun deleteRestriction(id: String) {
+        val apps = loadApps()
+        val idx  = apps.indexOfFirst { it.id == id }
+        if (idx >= 0) { apps[idx] = apps[idx].copy(pendingDelete = true); saveApps(apps) }
+    }
 
     override fun toggleGroup(id: String, enabled: Boolean) {
         val groups = loadGroups()
@@ -83,7 +90,11 @@ class SharedPrefsTechHealthRepository(context: Context) : TechHealthRepository {
         if (idx >= 0) { groups[idx] = groups[idx].copy(isEnabled = enabled); saveGroups(groups) }
     }
 
-    override fun deleteGroup(id: String) { saveGroups(loadGroups().filter { it.id != id }) }
+    override fun deleteGroup(id: String) {
+        val groups = loadGroups()
+        val idx    = groups.indexOfFirst { it.id == id }
+        if (idx >= 0) { groups[idx] = groups[idx].copy(pendingDelete = true); saveGroups(groups) }
+    }
 
     override fun updateUsage(id: String, usedMinutes: Int) {
         val apps = loadApps()
@@ -93,5 +104,26 @@ class SharedPrefsTechHealthRepository(context: Context) : TechHealthRepository {
 
     fun clearAll() {
         prefs.edit().remove("apps").remove("groups").apply()
+    }
+
+    // ── Daily reset / violation tracking ────────────────────────────
+
+    private fun today() = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
+
+    fun isViolatedToday(): Boolean = prefs.getString("violated_date", null) == today()
+
+    fun markViolatedToday() {
+        prefs.edit().putString("violated_date", today()).apply()
+    }
+
+    /** Deletes restrictions marked [AppRestriction.pendingDelete] and resets daily usage once a new day starts. */
+    fun applyPendingChangesIfNewDay() {
+        val lastReset = prefs.getString("last_reset_date", null)
+        val today = today()
+        if (lastReset == today) return
+
+        saveApps(loadApps().filterNot { it.pendingDelete }.map { it.copy(usedMinutesToday = 0) })
+        saveGroups(loadGroups().filterNot { it.pendingDelete }.map { it.copy(usedMinutesToday = 0) })
+        prefs.edit().putString("last_reset_date", today).apply()
     }
 }

@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.backend.supabase.dto
+package com.example.daypilot_test_desing.data.supabase.dto
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -53,19 +53,23 @@ data class DailyLogDto(
  */
 @Serializable
 data class TechHealthConfigDto(
-    @SerialName("user_id")     val userId: String,
-    @SerialName("app_package") val appPackage: String,
-    @SerialName("app_name")    val appName: String,
-    @SerialName("limit_hours") val limitHours: Double,
-    @SerialName("is_active")   val isActive: Boolean = true
+    @SerialName("user_id")        val userId: String,
+    @SerialName("app_package")    val appPackage: String,
+    @SerialName("app_name")       val appName: String,
+    @SerialName("limit_hours")    val limitHours: Double,
+    @SerialName("is_active")      val isActive: Boolean = true,
+    @SerialName("pending_delete") val pendingDelete: Boolean = false
 )
 
 /**
  * Minimal read DTO for checking tech_health_point_earned in `habits_daily`.
+ * Defaults to true ("no violation yet"), matching the habits_daily column default —
+ * a missing row (nothing has touched habits_daily today) means a clean day, not a
+ * violated one.
  */
 @Serializable
 data class HabitsDailyReadTechDto(
-    @SerialName("tech_health_point_earned") val techHealthPointEarned: Boolean = false
+    @SerialName("tech_health_point_earned") val techHealthPointEarned: Boolean = true
 )
 
 /**

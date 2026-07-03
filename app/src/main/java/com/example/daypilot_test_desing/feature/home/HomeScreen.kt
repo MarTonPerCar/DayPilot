@@ -1,14 +1,14 @@
-package com.example.daypilot_test_desing.presentation.home
+package com.example.daypilot_test_desing.feature.home
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.daypilot_test_desing.ui.components.cards.*
-import com.example.daypilot_test_desing.backend.model.DayProgress
-import com.example.daypilot_test_desing.backend.model.HomeSection
-import com.example.daypilot_test_desing.backend.model.HomeSectionData
+import com.example.daypilot_test_desing.core.ui.components.cards.*
+import com.example.daypilot_test_desing.core.data.model.DayProgress
+import com.example.daypilot_test_desing.core.data.model.HomeSection
+import com.example.daypilot_test_desing.core.data.model.HomeSectionData
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

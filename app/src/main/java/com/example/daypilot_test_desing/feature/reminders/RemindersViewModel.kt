@@ -67,7 +67,7 @@ class RemindersViewModel(application: Application) : AndroidViewModel(applicatio
             ReminderScheduler.cancel(getApplication(), id)
         } else {
             val reminder = repository.getReminders().find { it.id == id } ?: return
-            val nextFire = nextFireMillis(reminder.triggerAtMillis, reminder.frequencyType)
+            val nextFire = ReminderScheduler.nextFireMillis(reminder.triggerAtMillis, reminder.frequencyType)
             if (nextFire > 0L && appPrefs.notificationsEnabled) {
                 ReminderScheduler.schedule(
                     context         = getApplication(),
@@ -82,26 +82,5 @@ class RemindersViewModel(application: Application) : AndroidViewModel(applicatio
         }
         repository.toggleReminder(id, enabled)
         refresh()
-    }
-
-    // Returns the next future fire time for a reminder.
-    // ONCE reminders that have already passed return 0 (can't reschedule).
-    private fun nextFireMillis(triggerAtMillis: Long, frequencyType: FrequencyType): Long {
-        if (triggerAtMillis <= 0L) return 0L
-        val now = System.currentTimeMillis()
-        if (triggerAtMillis > now) return triggerAtMillis
-        return when (frequencyType) {
-            FrequencyType.ONCE   -> 0L
-            FrequencyType.DAILY  -> {
-                var t = triggerAtMillis
-                while (t <= now) t += 24 * 3600 * 1_000L
-                t
-            }
-            FrequencyType.WEEKLY -> {
-                var t = triggerAtMillis
-                while (t <= now) t += 7 * 24 * 3600 * 1_000L
-                t
-            }
-        }
     }
 }

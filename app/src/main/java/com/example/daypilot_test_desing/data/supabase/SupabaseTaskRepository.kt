@@ -120,15 +120,15 @@ class SupabaseTaskRepository : TaskRepository {
         SessionCache.tasks.value = null
     }
 
-    override suspend fun toggleTask(id: String, isDone: Boolean) {
+    override suspend fun toggleTask(occurrenceId: String, isDone: Boolean) {
         val uid = userId() ?: return
         val completedAt: String? = if (isDone) java.time.Instant.now().toString() else null
-        supabase.from("tasks").update({
+        supabase.from("task_days").update({
             set("is_completed", isDone)
             set("completed_at", completedAt)
         }) {
             filter {
-                eq("id", id)
+                eq("id", occurrenceId)
                 eq("user_id", uid)
             }
         }
@@ -159,18 +159,19 @@ private fun TaskCategory.toDbString(): String = when (this) {
 private fun CalendarTaskDto.toModel(): CalendarTaskData {
     val parts = date.split("-")
     return CalendarTaskData(
-        id          = id,
-        day         = parts[2].toInt(),
-        month       = parts[1].toInt(),
-        year        = parts[0].toInt(),
-        title       = title,
-        category    = category.toTaskCategory(),
-        difficulty  = difficulty.toTaskDifficulty(),
-        duration    = estimatedMinutes,
-        isDone      = isCompleted,
-        description = description,
-        isRecurring = isRecurring,
-        hasReminder = reminderEnabled
+        id           = taskId,
+        occurrenceId = occurrenceId,
+        day          = parts[2].toInt(),
+        month        = parts[1].toInt(),
+        year         = parts[0].toInt(),
+        title        = title,
+        category     = category.toTaskCategory(),
+        difficulty   = difficulty.toTaskDifficulty(),
+        duration     = estimatedMinutes,
+        isDone       = isCompleted,
+        description  = description,
+        isRecurring  = isRecurring,
+        hasReminder  = reminderEnabled
     )
 }
 

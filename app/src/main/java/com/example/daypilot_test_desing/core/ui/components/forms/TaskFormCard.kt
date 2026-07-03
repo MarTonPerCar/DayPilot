@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.ui.components.forms
+package com.example.daypilot_test_desing.core.ui.components.forms
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
@@ -62,11 +62,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.R
-import com.example.daypilot_test_desing.ui.components.basic.dayPilotTextFieldColors
-import com.example.daypilot_test_desing.backend.model.TaskCategory
-import com.example.daypilot_test_desing.backend.model.TaskDifficulty
-import com.example.daypilot_test_desing.backend.model.NewTaskData
-import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
+import com.example.daypilot_test_desing.core.ui.components.basic.dayPilotTextFieldColors
+import com.example.daypilot_test_desing.core.data.model.TaskCategory
+import com.example.daypilot_test_desing.core.data.model.TaskDifficulty
+import com.example.daypilot_test_desing.core.data.model.NewTaskData
+import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
 
 @Composable
 fun TaskFormCard(

@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.ui.components.basic
+package com.example.daypilot_test_desing.core.ui.components.basic
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
@@ -45,7 +45,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.R
-import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
+import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
 
 // ── Colores compartidos ──────────────────────────────────────────
 @Composable

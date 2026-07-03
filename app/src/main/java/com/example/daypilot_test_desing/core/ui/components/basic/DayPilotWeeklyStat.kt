@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.ui.components.basic
+package com.example.daypilot_test_desing.core.ui.components.basic
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -14,7 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
+import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
 
 @Composable
 fun DayPilotWeeklyStat(

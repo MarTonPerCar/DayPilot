@@ -1,6 +1,6 @@
-package com.example.daypilot_test_desing.backend.repository
+package com.example.daypilot_test_desing.core.data.repository
 
-import com.example.daypilot_test_desing.backend.model.RankingData
+import com.example.daypilot_test_desing.core.data.model.RankingData
 
 interface RankingRepository {
     suspend fun getRanking(): List<RankingData>

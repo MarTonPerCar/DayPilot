@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.ui.components.basic
+package com.example.daypilot_test_desing.core.ui.components.basic
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
@@ -19,7 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
+import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
 
 
 @Composable

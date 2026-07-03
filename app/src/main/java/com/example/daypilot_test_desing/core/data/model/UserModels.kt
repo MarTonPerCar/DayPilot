@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.backend.model
+package com.example.daypilot_test_desing.core.data.model
 
 data class UserProfile(
     val id: String,

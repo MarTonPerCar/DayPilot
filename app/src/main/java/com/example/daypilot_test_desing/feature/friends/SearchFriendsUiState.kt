@@ -1,7 +1,7 @@
-package com.example.daypilot_test_desing.viewmodel.friends
+package com.example.daypilot_test_desing.feature.friends
 
 import androidx.annotation.StringRes
-import com.example.daypilot_test_desing.backend.model.SearchUserData
+import com.example.daypilot_test_desing.core.data.model.SearchUserData
 
 data class SearchFriendsUiState(
     val searchResults: List<SearchUserData> = emptyList(),

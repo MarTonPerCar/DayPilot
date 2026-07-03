@@ -1,6 +1,6 @@
-package com.example.daypilot_test_desing.viewmodel.profile
+package com.example.daypilot_test_desing.feature.profile
 
-import com.example.daypilot_test_desing.backend.model.WeeklySummaryData
+import com.example.daypilot_test_desing.core.data.model.WeeklySummaryData
 
 data class ProfileUiState(
     val name: String = "",
@@ -22,5 +22,8 @@ data class ProfileUiState(
     val avatarUrl: String? = null,
     val weeklySummary: WeeklySummaryData = WeeklySummaryData(0, 0, 0, 0),
     val isUploadingAvatar: Boolean = false,
-    val avatarUploadError: Boolean = false
+    val avatarUploadError: Boolean = false,
+    val isSavingProfile: Boolean = false,
+    val profileSaveError: Boolean = false,
+    val profileSaveSuccess: Boolean = false
 )

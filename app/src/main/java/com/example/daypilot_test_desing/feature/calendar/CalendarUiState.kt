@@ -1,7 +1,7 @@
-package com.example.daypilot_test_desing.viewmodel.calendar
+package com.example.daypilot_test_desing.feature.calendar
 
 import androidx.annotation.StringRes
-import com.example.daypilot_test_desing.backend.model.CalendarTaskData
+import com.example.daypilot_test_desing.core.data.model.CalendarTaskData
 
 data class CalendarUiState(
     val tasks: List<CalendarTaskData> = emptyList(),

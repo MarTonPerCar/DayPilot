@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.ui.components.cards
+package com.example.daypilot_test_desing.core.ui.components.cards
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -21,14 +21,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.R
-import com.example.daypilot_test_desing.ui.components.basic.DayPilotDivider
-import com.example.daypilot_test_desing.ui.components.basic.DayPilotReactionBadgeRow
-import com.example.daypilot_test_desing.ui.components.basic.DayPilotStatVerticalDivider
-import com.example.daypilot_test_desing.ui.components.basic.DayPilotWeeklyStat
-import com.example.daypilot_test_desing.backend.model.ReactionType
-import com.example.daypilot_test_desing.backend.model.ReceivedReaction
-import com.example.daypilot_test_desing.backend.model.WeeklySummaryData
-import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
+import com.example.daypilot_test_desing.core.ui.components.basic.DayPilotDivider
+import com.example.daypilot_test_desing.core.ui.components.basic.DayPilotReactionBadgeRow
+import com.example.daypilot_test_desing.core.ui.components.basic.DayPilotStatVerticalDivider
+import com.example.daypilot_test_desing.core.ui.components.basic.DayPilotWeeklyStat
+import com.example.daypilot_test_desing.core.data.model.ReactionType
+import com.example.daypilot_test_desing.core.data.model.ReceivedReaction
+import com.example.daypilot_test_desing.core.data.model.WeeklySummaryData
+import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
 
 @Composable
 fun WeeklyReactionCard(
