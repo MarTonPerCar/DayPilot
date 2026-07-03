@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.ui.components.forms
+package com.example.daypilot_test_desing.core.ui.components.forms
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
@@ -43,10 +43,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.R
-import com.example.daypilot_test_desing.ui.components.basic.DayPilotTextField
-import com.example.daypilot_test_desing.backend.model.FrequencyType
-import com.example.daypilot_test_desing.backend.model.ReminderFormDataInfo
-import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
+import com.example.daypilot_test_desing.core.ui.components.basic.DayPilotTextField
+import com.example.daypilot_test_desing.core.data.model.FrequencyType
+import com.example.daypilot_test_desing.core.data.model.ReminderFormDataInfo
+import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
 import java.util.Calendar
 
 @Composable

@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.presentation.techhealth
+package com.example.daypilot_test_desing.feature.techhealth
 
 import android.content.Intent
 import android.provider.Settings
@@ -28,11 +28,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.daypilot_test_desing.R
-import com.example.daypilot_test_desing.ui.components.basic.*
-import com.example.daypilot_test_desing.ui.components.cards.*
-import com.example.daypilot_test_desing.ui.components.forms.AppLimitFormCard
-import com.example.daypilot_test_desing.backend.model.AppRestriction
-import com.example.daypilot_test_desing.backend.model.GroupRestriction
+import com.example.daypilot_test_desing.core.ui.components.basic.*
+import com.example.daypilot_test_desing.core.ui.components.cards.*
+import com.example.daypilot_test_desing.core.ui.components.forms.AppLimitFormCard
+import com.example.daypilot_test_desing.core.data.model.AppRestriction
+import com.example.daypilot_test_desing.core.data.model.GroupRestriction
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

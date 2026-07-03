@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.presentation.rivalry
+package com.example.daypilot_test_desing.feature.rivalry
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,13 +26,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.R
-import com.example.daypilot_test_desing.ui.components.basic.DayPilotSectionHeader
-import com.example.daypilot_test_desing.ui.components.basic.DayPilotTopBar
-import com.example.daypilot_test_desing.ui.components.cards.CurrentUserRankingCard
-import com.example.daypilot_test_desing.ui.components.cards.PodiumCard
-import com.example.daypilot_test_desing.ui.components.cards.RankingCard
-import com.example.daypilot_test_desing.backend.model.PodiumEntry
-import com.example.daypilot_test_desing.backend.model.RankingData
+import com.example.daypilot_test_desing.core.ui.components.basic.DayPilotSectionHeader
+import com.example.daypilot_test_desing.core.ui.components.basic.DayPilotTopBar
+import com.example.daypilot_test_desing.core.ui.components.cards.CurrentUserRankingCard
+import com.example.daypilot_test_desing.core.ui.components.cards.PodiumCard
+import com.example.daypilot_test_desing.core.ui.components.cards.RankingCard
+import com.example.daypilot_test_desing.core.data.model.PodiumEntry
+import com.example.daypilot_test_desing.core.data.model.RankingData
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

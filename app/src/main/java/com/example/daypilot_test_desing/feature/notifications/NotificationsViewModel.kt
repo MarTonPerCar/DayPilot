@@ -1,12 +1,12 @@
-package com.example.daypilot_test_desing.viewmodel.notifications
+package com.example.daypilot_test_desing.feature.notifications
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.daypilot_test_desing.backend.local.NotificationHub
-import com.example.daypilot_test_desing.backend.supabase.SupabaseNotificationRepository
-import com.example.daypilot_test_desing.backend.supabase.SupabaseNotificationRepository.toModel
-import com.example.daypilot_test_desing.backend.supabase.dto.NotificationDto
-import com.example.daypilot_test_desing.backend.supabase.supabase
+import com.example.daypilot_test_desing.core.data.local.NotificationHub
+import com.example.daypilot_test_desing.data.supabase.SupabaseNotificationRepository
+import com.example.daypilot_test_desing.data.supabase.SupabaseNotificationRepository.toModel
+import com.example.daypilot_test_desing.data.supabase.dto.NotificationDto
+import com.example.daypilot_test_desing.data.supabase.supabase
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.realtime.PostgresAction
 import io.github.jan.supabase.realtime.RealtimeChannel

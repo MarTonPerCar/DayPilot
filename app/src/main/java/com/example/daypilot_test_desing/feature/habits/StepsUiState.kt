@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.viewmodel.habits
+package com.example.daypilot_test_desing.feature.habits
 
 data class StepsUiState(
     val currentSteps: Int = 0,

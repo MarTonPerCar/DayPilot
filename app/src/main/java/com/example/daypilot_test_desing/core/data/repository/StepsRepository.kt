@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.backend.repository
+package com.example.daypilot_test_desing.core.data.repository
 
 data class StepsWeeklyStats(
     val totalSteps7Days: Int = 0,

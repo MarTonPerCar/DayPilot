@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.backend.supabase
+package com.example.daypilot_test_desing.data.supabase
 
 import com.example.daypilot_test_desing.BuildConfig
 import io.github.jan.supabase.auth.Auth

@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.backend.model
+package com.example.daypilot_test_desing.core.data.model
 
 import androidx.annotation.StringRes
 import com.example.daypilot_test_desing.R

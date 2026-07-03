@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.presentation.notifications
+package com.example.daypilot_test_desing.feature.notifications
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,10 +14,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.R
-import com.example.daypilot_test_desing.ui.components.basic.*
-import com.example.daypilot_test_desing.ui.components.cards.*
-import com.example.daypilot_test_desing.backend.model.NotificationData
-import com.example.daypilot_test_desing.backend.model.NotificationType
+import com.example.daypilot_test_desing.core.ui.components.basic.*
+import com.example.daypilot_test_desing.core.ui.components.cards.*
+import com.example.daypilot_test_desing.core.data.model.NotificationData
+import com.example.daypilot_test_desing.core.data.model.NotificationType
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

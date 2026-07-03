@@ -1,9 +1,9 @@
-package com.example.daypilot_test_desing.viewmodel.auth
+package com.example.daypilot_test_desing.feature.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.daypilot_test_desing.backend.supabase.dto.NewUserDto
-import com.example.daypilot_test_desing.backend.supabase.supabase
+import com.example.daypilot_test_desing.data.supabase.dto.NewUserDto
+import com.example.daypilot_test_desing.data.supabase.supabase
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.postgrest.from

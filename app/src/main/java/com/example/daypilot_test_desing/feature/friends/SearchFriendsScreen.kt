@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.presentation.friends
+package com.example.daypilot_test_desing.feature.friends
 
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
@@ -16,9 +16,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.R
-import com.example.daypilot_test_desing.ui.components.basic.*
-import com.example.daypilot_test_desing.ui.components.cards.UserSearchCard
-import com.example.daypilot_test_desing.backend.model.SearchUserData
+import com.example.daypilot_test_desing.core.ui.components.basic.*
+import com.example.daypilot_test_desing.core.ui.components.cards.UserSearchCard
+import com.example.daypilot_test_desing.core.data.model.SearchUserData
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

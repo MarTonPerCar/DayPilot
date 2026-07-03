@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.presentation.reminders
+package com.example.daypilot_test_desing.feature.reminders
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -27,12 +27,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.R
-import com.example.daypilot_test_desing.ui.components.basic.DayPilotEmptyState
-import com.example.daypilot_test_desing.ui.components.basic.DayPilotTopBar
-import com.example.daypilot_test_desing.ui.components.cards.ReminderCard
-import com.example.daypilot_test_desing.ui.components.forms.ReminderFormCard
-import com.example.daypilot_test_desing.backend.model.ReminderData
-import com.example.daypilot_test_desing.backend.model.ReminderFormDataInfo
+import com.example.daypilot_test_desing.core.ui.components.basic.DayPilotEmptyState
+import com.example.daypilot_test_desing.core.ui.components.basic.DayPilotTopBar
+import com.example.daypilot_test_desing.core.ui.components.cards.ReminderCard
+import com.example.daypilot_test_desing.core.ui.components.forms.ReminderFormCard
+import com.example.daypilot_test_desing.core.data.model.ReminderData
+import com.example.daypilot_test_desing.core.data.model.ReminderFormDataInfo
 
 
 @OptIn(ExperimentalMaterial3Api::class)

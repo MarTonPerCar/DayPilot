@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.presentation.auth
+package com.example.daypilot_test_desing.feature.auth
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -14,7 +14,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.R
-import com.example.daypilot_test_desing.ui.components.basic.*
+import com.example.daypilot_test_desing.core.ui.components.basic.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

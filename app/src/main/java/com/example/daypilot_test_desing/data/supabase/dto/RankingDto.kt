@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.backend.supabase.dto
+package com.example.daypilot_test_desing.data.supabase.dto
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

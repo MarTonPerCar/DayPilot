@@ -1,8 +1,8 @@
-package com.example.daypilot_test_desing.backend.repository
+package com.example.daypilot_test_desing.core.data.repository
 
-import com.example.daypilot_test_desing.backend.model.FriendData
-import com.example.daypilot_test_desing.backend.model.ReactionType
-import com.example.daypilot_test_desing.backend.model.SearchUserData
+import com.example.daypilot_test_desing.core.data.model.FriendData
+import com.example.daypilot_test_desing.core.data.model.ReactionType
+import com.example.daypilot_test_desing.core.data.model.SearchUserData
 
 interface FriendRepository {
     suspend fun getFriends(): List<FriendData>

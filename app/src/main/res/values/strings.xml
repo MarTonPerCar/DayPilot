@@ -158,12 +158,17 @@
     <string name="tech_health_point_pending">Punto obtenible — toca para saber más</string>
     <string name="tech_health_point_warning">Necesitas al menos 3 restricciones activas para ganar el punto</string>
     <string name="tech_health_point_info_title">Punto de salud tecnológica</string>
-    <string name="tech_health_point_info_body">Activa al menos 3 restricciones y no superes ningún límite durante el día. Si lo consigues, ganarás 1 punto extra que se sumará a tus puntos de mañana.</string>
+    <string name="tech_health_point_info_body">Activa al menos 3 restricciones y no superes ningún límite durante el día. Si lo consigues, ganarás 10 puntos extra que se sumarán a tus puntos de mañana.</string>
     <string name="tech_health_no_permission_title">Permiso de uso de apps necesario</string>
     <string name="tech_health_no_permission_body">Para rastrear el tiempo de pantalla, ve a Ajustes → Acceso al uso de apps y activa DayPilot.</string>
     <string name="tech_health_open_settings">Abrir Ajustes</string>
     <string name="tech_health_daily_limit">Límite diario</string>
     <string name="tech_health_app_limits">Límites por aplicación</string>
+    <string name="accessibility_service_description">DayPilot usa este servicio para detectar qué aplicación está en primer plano y así poder aplicar los límites de uso configurados en Salud Tecnológica.</string>
+    <string name="block_limit_reached">Límite alcanzado</string>
+    <string name="block_motivational">¡Es hora de hacer otra cosa!</string>
+    <string name="block_explanation">Has superado el tiempo de uso configurado para %1$s. Tómate un descanso y vuelve a intentarlo más tarde.</string>
+    <string name="block_go_home">Ir al inicio</string>
 
     <!-- Common -->
     <string name="common_back">Volver</string>

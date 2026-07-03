@@ -1,6 +1,6 @@
-package com.example.daypilot_test_desing.viewmodel.progress
+package com.example.daypilot_test_desing.feature.progress
 
-import com.example.daypilot_test_desing.backend.model.DayProgress
+import com.example.daypilot_test_desing.core.data.model.DayProgress
 
 data class ProgressUiState(
     val progressData: List<DayProgress> = emptyList(),

@@ -18,6 +18,7 @@ import com.example.daypilot_test_desing.feature.settings.SettingsViewModel
 import com.example.daypilot_test_desing.core.reminders.createDailyChannel
 import com.example.daypilot_test_desing.core.reminders.createNotificationChannel
 import com.example.daypilot_test_desing.core.reminders.createTechHealthChannel
+import com.example.daypilot_test_desing.core.reminders.scheduleTechHealthWorker
 import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
 
 class MainActivity : ComponentActivity() {
@@ -30,6 +31,7 @@ class MainActivity : ComponentActivity() {
         createNotificationChannel(this)
         createDailyChannel(this)
         createTechHealthChannel(this)
+        scheduleTechHealthWorker(this)
 
         val toRequest = mutableListOf<String>()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&

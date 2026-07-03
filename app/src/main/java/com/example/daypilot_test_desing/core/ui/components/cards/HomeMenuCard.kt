@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.ui.components.cards
+package com.example.daypilot_test_desing.core.ui.components.cards
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,11 +16,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.daypilot_test_desing.ui.components.basic.HomeSectionIndicator
-import com.example.daypilot_test_desing.backend.model.DayProgress
-import com.example.daypilot_test_desing.backend.model.HomeSection
-import com.example.daypilot_test_desing.backend.model.HomeSectionData
-import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
+import com.example.daypilot_test_desing.core.ui.components.basic.HomeSectionIndicator
+import com.example.daypilot_test_desing.core.data.model.DayProgress
+import com.example.daypilot_test_desing.core.data.model.HomeSection
+import com.example.daypilot_test_desing.core.data.model.HomeSectionData
+import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
 
 // ── HomeMenuCard ─────────────────────────────────────────────────
 @Composable

@@ -606,6 +606,7 @@ fun DayPilotNavGraph(
                     appRestrictions        = s.appRestrictions,
                     groupRestrictions      = s.groupRestrictions,
                     hasUsagePermission     = s.hasUsagePermission,
+                    hasAccessibilityPermission = s.hasAccessibilityPermission,
                     techHealthPointEarned  = s.techHealthPointEarned,
                     activeRestrictionCount = s.activeRestrictionCount,
                     onSaveApp              = { restriction, _ -> techHealthVM.saveApp(restriction) },

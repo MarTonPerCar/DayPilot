@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.ui.theme
+package com.example.daypilot_test_desing.core.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

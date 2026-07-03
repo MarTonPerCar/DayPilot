@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.presentation.timer
+package com.example.daypilot_test_desing.feature.timer
 
 import android.media.RingtoneManager
 import androidx.compose.animation.core.*
@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
 import com.example.daypilot_test_desing.R
-import com.example.daypilot_test_desing.ui.components.basic.DayPilotTopBar
+import com.example.daypilot_test_desing.core.ui.components.basic.DayPilotTopBar
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)

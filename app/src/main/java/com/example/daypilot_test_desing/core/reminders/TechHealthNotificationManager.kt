@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.reminders
+package com.example.daypilot_test_desing.core.reminders
 
 import android.app.AlarmManager
 import android.app.NotificationChannel

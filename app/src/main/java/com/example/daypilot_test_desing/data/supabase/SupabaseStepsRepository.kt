@@ -1,14 +1,14 @@
-package com.example.daypilot_test_desing.backend.supabase
+package com.example.daypilot_test_desing.data.supabase
 
 import android.content.SharedPreferences
-import com.example.daypilot_test_desing.backend.local.NotificationHub
-import com.example.daypilot_test_desing.backend.model.NotificationType
-import com.example.daypilot_test_desing.backend.supabase.SupabaseNotificationRepository
-import com.example.daypilot_test_desing.backend.repository.StepsRepository
-import com.example.daypilot_test_desing.backend.repository.StepsWeeklyStats
-import com.example.daypilot_test_desing.backend.supabase.dto.DailyLogDto
-import com.example.daypilot_test_desing.backend.supabase.dto.HabitsDailyUpsertDto
-import com.example.daypilot_test_desing.backend.supabase.dto.InsertPointsLogDto
+import com.example.daypilot_test_desing.core.data.local.NotificationHub
+import com.example.daypilot_test_desing.core.data.model.NotificationType
+import com.example.daypilot_test_desing.data.supabase.SupabaseNotificationRepository
+import com.example.daypilot_test_desing.core.data.repository.StepsRepository
+import com.example.daypilot_test_desing.core.data.repository.StepsWeeklyStats
+import com.example.daypilot_test_desing.data.supabase.dto.DailyLogDto
+import com.example.daypilot_test_desing.data.supabase.dto.HabitsDailyUpsertDto
+import com.example.daypilot_test_desing.data.supabase.dto.InsertPointsLogDto
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Order

@@ -1,7 +1,7 @@
-package com.example.daypilot_test_desing.backend.repository
+package com.example.daypilot_test_desing.core.data.repository
 
-import com.example.daypilot_test_desing.backend.model.ReminderData
-import com.example.daypilot_test_desing.backend.model.ReminderFormDataInfo
+import com.example.daypilot_test_desing.core.data.model.ReminderData
+import com.example.daypilot_test_desing.core.data.model.ReminderFormDataInfo
 
 interface ReminderRepository {
     fun getReminders(): List<ReminderData>

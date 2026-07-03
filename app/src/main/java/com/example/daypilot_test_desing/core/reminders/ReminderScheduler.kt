@@ -8,6 +8,8 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import com.example.daypilot_test_desing.R
+import com.example.daypilot_test_desing.core.data.local.SharedPrefsReminderRepository
+import com.example.daypilot_test_desing.core.data.model.FrequencyType
 
 const val CHANNEL_ID = "daypilot_reminders"
 
@@ -77,5 +79,44 @@ object ReminderScheduler {
     private fun notificationId(reminderId: String, isEarly: Boolean): Int {
         val base = reminderId.hashCode()
         return if (isEarly) base xor 0x8000_0000.toInt() else base
+    }
+
+    // Returns the next future fire time for a reminder.
+    // ONCE reminders that have already passed return 0 (can't reschedule).
+    fun nextFireMillis(triggerAtMillis: Long, frequencyType: FrequencyType): Long {
+        if (triggerAtMillis <= 0L) return 0L
+        val now = System.currentTimeMillis()
+        if (triggerAtMillis > now) return triggerAtMillis
+        return when (frequencyType) {
+            FrequencyType.ONCE   -> 0L
+            FrequencyType.DAILY  -> {
+                var t = triggerAtMillis
+                while (t <= now) t += 24 * 3600 * 1_000L
+                t
+            }
+            FrequencyType.WEEKLY -> {
+                var t = triggerAtMillis
+                while (t <= now) t += 7 * 24 * 3600 * 1_000L
+                t
+            }
+        }
+    }
+
+    /** Re-arms alarms for all enabled reminders; used after a device reboot clears AlarmManager state. */
+    fun rescheduleAll(context: Context, repository: SharedPrefsReminderRepository, notificationsEnabled: Boolean) {
+        if (!notificationsEnabled) return
+        repository.getReminders().filter { it.isEnabled }.forEach { reminder ->
+            val nextFire = nextFireMillis(reminder.triggerAtMillis, reminder.frequencyType)
+            if (nextFire <= 0L) return@forEach
+            schedule(
+                context         = context,
+                reminderId      = reminder.id,
+                title           = reminder.title,
+                triggerAtMillis = nextFire,
+                isOneTime       = reminder.frequencyType == FrequencyType.ONCE,
+                frequencyType   = reminder.frequencyType.name
+            )
+            if (nextFire != reminder.triggerAtMillis) repository.updateTriggerTime(reminder.id, nextFire)
+        }
     }
 }

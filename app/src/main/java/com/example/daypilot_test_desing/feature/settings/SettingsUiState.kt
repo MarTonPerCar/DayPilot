@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.viewmodel.settings
+package com.example.daypilot_test_desing.feature.settings
 
 data class SettingsUiState(
     val name: String = "",

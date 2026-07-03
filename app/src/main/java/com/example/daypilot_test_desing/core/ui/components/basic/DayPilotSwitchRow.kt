@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.ui.components.basic
+package com.example.daypilot_test_desing.core.ui.components.basic
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

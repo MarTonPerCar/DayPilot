@@ -1,9 +1,9 @@
-package com.example.daypilot_test_desing.backend.repository
+package com.example.daypilot_test_desing.core.data.repository
 
-import com.example.daypilot_test_desing.backend.model.CalendarTaskData
-import com.example.daypilot_test_desing.backend.model.NewTaskData
-import com.example.daypilot_test_desing.backend.model.TaskCategory
-import com.example.daypilot_test_desing.backend.model.TaskDifficulty
+import com.example.daypilot_test_desing.core.data.model.CalendarTaskData
+import com.example.daypilot_test_desing.core.data.model.NewTaskData
+import com.example.daypilot_test_desing.core.data.model.TaskCategory
+import com.example.daypilot_test_desing.core.data.model.TaskDifficulty
 
 interface TaskRepository {
     suspend fun getTasks(): List<CalendarTaskData>

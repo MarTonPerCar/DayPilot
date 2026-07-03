@@ -1,7 +1,7 @@
-package com.example.daypilot_test_desing.backend.local
+package com.example.daypilot_test_desing.core.data.local
 
-import com.example.daypilot_test_desing.backend.model.NotificationData
-import com.example.daypilot_test_desing.backend.model.NotificationType
+import com.example.daypilot_test_desing.core.data.model.NotificationData
+import com.example.daypilot_test_desing.core.data.model.NotificationType
 import java.util.UUID
 
 object NotificationHub {

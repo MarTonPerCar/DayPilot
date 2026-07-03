@@ -1,4 +1,4 @@
-package com.example.daypilot_test_desing.ui.components.cards
+package com.example.daypilot_test_desing.core.ui.components.cards
 
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
@@ -17,10 +17,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.R
-import com.example.daypilot_test_desing.ui.components.basic.*
-import com.example.daypilot_test_desing.backend.model.FriendWeeklySummary
-import com.example.daypilot_test_desing.backend.model.ReactionType
-import com.example.daypilot_test_desing.ui.theme.DayPilotTheme
+import com.example.daypilot_test_desing.core.ui.components.basic.*
+import com.example.daypilot_test_desing.core.data.model.FriendWeeklySummary
+import com.example.daypilot_test_desing.core.data.model.ReactionType
+import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
 
 @Composable
 fun FriendCard(
