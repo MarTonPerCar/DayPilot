@@ -70,6 +70,7 @@
     <string name="edit_profile_change_password">Cambiar contraseña</string>
     <string name="edit_profile_save">Guardar cambios</string>
     <string name="edit_profile_photo_error">No se pudo subir la foto. Inténtalo de nuevo.</string>
+    <string name="edit_profile_save_error">No se pudieron guardar los cambios. Inténtalo de nuevo.</string>
 
     <!-- Photo Picker -->
     <string name="photo_picker_title">Cambiar foto</string>

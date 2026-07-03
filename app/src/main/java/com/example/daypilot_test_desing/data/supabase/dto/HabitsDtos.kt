@@ -63,10 +63,13 @@ data class TechHealthConfigDto(
 
 /**
  * Minimal read DTO for checking tech_health_point_earned in `habits_daily`.
+ * Defaults to true ("no violation yet"), matching the habits_daily column default —
+ * a missing row (nothing has touched habits_daily today) means a clean day, not a
+ * violated one.
  */
 @Serializable
 data class HabitsDailyReadTechDto(
-    @SerialName("tech_health_point_earned") val techHealthPointEarned: Boolean = false
+    @SerialName("tech_health_point_earned") val techHealthPointEarned: Boolean = true
 )
 
 /**

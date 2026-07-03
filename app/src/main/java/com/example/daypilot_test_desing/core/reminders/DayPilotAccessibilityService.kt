@@ -26,8 +26,6 @@ import java.util.Locale
 class DayPilotAccessibilityService : AccessibilityService() {
 
     companion object {
-        // Checks the system setting directly instead of relying on onServiceConnected(),
-        // since that only fires while the service is alive and can't answer "is it granted?" on demand.
         fun isEnabled(context: Context): Boolean {
             val expected = ComponentName(context, DayPilotAccessibilityService::class.java)
             val enabledServices = Settings.Secure.getString(
@@ -74,7 +72,6 @@ class DayPilotAccessibilityService : AccessibilityService() {
 
     private fun checkAndBlock(pkg: String) {
         // TODO: de momento solo comprueba apps individuales, los grupos no se gestionan aquí
-        // pendingDelete apps stay enforced today — they're only removed tomorrow.
         val restriction = repo.getAppRestrictions().find {
             it.packageName == pkg && it.isEnabled
         } ?: return

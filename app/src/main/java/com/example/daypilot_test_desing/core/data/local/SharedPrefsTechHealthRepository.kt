@@ -78,8 +78,6 @@ class SharedPrefsTechHealthRepository(context: Context) : TechHealthRepository {
         if (idx >= 0) { apps[idx] = apps[idx].copy(isEnabled = enabled); saveApps(apps) }
     }
 
-    // Soft delete: mark for removal so it stays visible (and enforced) today;
-    // applyPendingChangesIfNewDay() removes it once a new day actually starts.
     override fun deleteRestriction(id: String) {
         val apps = loadApps()
         val idx  = apps.indexOfFirst { it.id == id }

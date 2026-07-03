@@ -6,11 +6,15 @@ import android.os.LocaleList
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -129,10 +133,16 @@ fun DayPilotNavGraph(
         if (currentRoute == DayPilotDestinations.HOME) homeVM.refresh()
     }
 
-    // Track that the app was opened today (for streak-danger alarm check).
-    LaunchedEffect(Unit) {
-        val today = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
-        appPrefs.lastOpenDate = today
+    // Track that the app was opened today (for streak-danger alarm check)
+    val navLifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(navLifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                appPrefs.lastOpenDate = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
+            }
+        }
+        navLifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { navLifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
     // Level-up in-app notification: fire when profileVM.level increases.
@@ -423,21 +433,29 @@ fun DayPilotNavGraph(
 
             composable(DayPilotDestinations.EDIT_PROFILE) {
                 val s by profileVM.uiState.collectAsState()
+                LaunchedEffect(s.profileSaveSuccess) {
+                    if (s.profileSaveSuccess) {
+                        profileVM.clearProfileSaveSuccess()
+                        navController.popBackStack()
+                    }
+                }
                 EditProfileScreen(
                     currentName          = s.name,
                     currentUsername      = s.username,
                     avatarUrl            = s.avatarUrl,
                     isUploadingAvatar    = s.isUploadingAvatar,
                     avatarUploadError    = s.avatarUploadError,
+                    isSavingProfile      = s.isSavingProfile,
+                    profileSaveError     = s.profileSaveError,
                     onSave               = { name, username, region ->
                         profileVM.updateProfile(name, username, region)
-                        navController.popBackStack()
                     },
                     onNavigateToResetPassword = {
                         navController.navigate(DayPilotDestinations.RESET_PASSWORD)
                     },
                     onPhotoSelected      = { uri -> profileVM.uploadAvatar(uri, context) },
                     onAvatarErrorDismissed = { profileVM.clearAvatarError() },
+                    onProfileSaveErrorDismissed = { profileVM.clearProfileSaveError() },
                     onBack               = { navController.popBackStack() }
                 )
             }
@@ -582,6 +600,7 @@ fun DayPilotNavGraph(
                 val sessions = backStackEntry.arguments?.getInt("sessions") ?: 4
                 PomodoroScreen(
                     totalSessions = sessions,
+                    onCompleted   = { progressVM.recordTimerComplete() },
                     onBack        = { navController.popBackStack() }
                 )
             }
@@ -600,7 +619,14 @@ fun DayPilotNavGraph(
 
             // ── TechHealth ───────────────────────────────────────
             composable(DayPilotDestinations.TECH_HEALTH) {
-                LaunchedEffect(Unit) { techHealthVM.refreshUsage() }
+                val lifecycleOwner = LocalLifecycleOwner.current
+                DisposableEffect(lifecycleOwner) {
+                    val observer = LifecycleEventObserver { _, event ->
+                        if (event == Lifecycle.Event.ON_RESUME) techHealthVM.refreshUsage()
+                    }
+                    lifecycleOwner.lifecycle.addObserver(observer)
+                    onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+                }
                 val s by techHealthVM.uiState.collectAsState()
                 TechHealthScreen(
                     appRestrictions        = s.appRestrictions,

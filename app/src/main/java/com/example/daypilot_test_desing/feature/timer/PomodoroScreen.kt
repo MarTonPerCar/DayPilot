@@ -32,6 +32,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun PomodoroScreen(
     totalSessions: Int = 4,
+    onCompleted: () -> Unit = {},
     onBack: () -> Unit
 ) {
     val context      = LocalContext.current
@@ -84,6 +85,11 @@ fun PomodoroScreen(
                 }
             }
         }
+    }
+
+    LaunchedEffect(isFinished) {
+        if (!isFinished) return@LaunchedEffect
+        onCompleted()
     }
 
     // Sonido al cambio de fase

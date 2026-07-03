@@ -3,6 +3,7 @@ package com.example.daypilot_test_desing.feature.auth
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.daypilot_test_desing.data.supabase.dto.NewUserDto
+import com.example.daypilot_test_desing.data.supabase.dto.UserDto
 import com.example.daypilot_test_desing.data.supabase.supabase
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.builtin.Email
@@ -46,15 +47,42 @@ class AuthViewModel : ViewModel() {
         region: String,
         onSuccess: () -> Unit
     ) {
+        if (name.isBlank() || username.isBlank() || email.isBlank() || password.isBlank()) {
+            _uiState.update { it.copy(registerError = "Please fill in all fields.") }
+            return
+        }
         viewModelScope.launch {
             _uiState.update { it.copy(registerLoading = true, registerError = "") }
             try {
-                supabase.auth.signUpWith(Email) {
-                    this.email = email
-                    this.password = password
+                try {
+                    supabase.auth.signUpWith(Email) {
+                        this.email = email
+                        this.password = password
+                    }
+                } catch (e: Exception) {
+                    // could be a real existing account, or an orphan from a failed signup — sign in to tell them apart
+                    if (e.message?.contains("User already registered", ignoreCase = true) == true) {
+                        supabase.auth.signInWith(Email) {
+                            this.email = email
+                            this.password = password
+                        }
+                    } else throw e
                 }
                 val uid = supabase.auth.currentUserOrNull()?.id
                 if (uid != null) {
+                    val hasProfile = supabase.from("users").select {
+                        filter { eq("id", uid) }
+                        limit(1)
+                    }.decodeList<UserDto>().isNotEmpty()
+                    if (hasProfile) {
+                        _uiState.update {
+                            it.copy(
+                                registerLoading = false,
+                                registerError = "An account with this email already exists."
+                            )
+                        }
+                        return@launch
+                    }
                     supabase.from("users").insert(
                         NewUserDto(
                             id = uid,

@@ -9,6 +9,6 @@ interface TaskRepository {
     suspend fun getTasks(): List<CalendarTaskData>
     suspend fun addTask(data: NewTaskData)
     suspend fun updateTask(id: String, title: String, category: TaskCategory, difficulty: TaskDifficulty, duration: Int, description: String = "")
-    suspend fun toggleTask(id: String, isDone: Boolean)
+    suspend fun toggleTask(occurrenceId: String, isDone: Boolean)
     suspend fun deleteTask(id: String)
 }

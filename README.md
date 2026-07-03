@@ -82,10 +82,6 @@ WorkManager impone un intervalo mínimo de 15 minutos para trabajo periódico en
 
 La tabla `user_weekly_summary` se puebla automáticamente mediante un job de `pg_cron` en Supabase que se ejecuta cada lunes a las 00:05 UTC, justo después de que el job diario cierre el día anterior. El lado Android solo lee de esta tabla; nunca escribe en ella.
 
-### Tema y modo oscuro en actividades independientes
-
-`TechHealthBlockActivity` es una `Activity` independiente (fuera del NavGraph), por lo que no hereda el tema del árbol de Compose principal. Hay que leer `AppPreferences` manualmente, resolver el `DayPilotTheme` enum por nombre y pasar tanto el tema como el `darkMode` al `setContent`. Sin esto, la pantalla de bloqueo siempre renderizaría el tema por defecto (SAGE_GREEN) independientemente de lo que el usuario haya configurado.
-
 ---
 
 ## Errores encontrados y corregidos

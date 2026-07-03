@@ -42,13 +42,13 @@ class TechHealthWorker(
 
     override suspend fun doWork(): Result {
         val uid = supabase.auth.currentUserOrNull()?.id ?: return Result.success()
-        if (!AppUsageTracker.hasPermission(applicationContext)) return Result.success()
 
         val repository = SharedPrefsTechHealthRepository(applicationContext)
         repository.applyPendingChangesIfNewDay()
 
+        if (!AppUsageTracker.hasPermission(applicationContext)) return Result.success()
+
         val usageMap     = AppUsageTracker.getTodayUsage(applicationContext)
-        // pendingDelete apps are still tracked/enforced today — they're only removed tomorrow.
         val restrictions = repository.getAppRestrictions().filter { it.isEnabled }
 
         var anyViolated = false

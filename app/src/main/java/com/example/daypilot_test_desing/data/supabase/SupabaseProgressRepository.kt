@@ -21,7 +21,9 @@ class SupabaseProgressRepository : ProgressRepository {
     private fun userId() = supabase.auth.currentUserOrNull()?.id
 
     override suspend fun getTodayProgress(): DailyProgressDto {
-        SessionCache.todayProgress.value?.let { return it }
+        SessionCache.todayProgress.value?.let { cached ->
+            if (cached.date == today()) return cached
+        }
         val uid = userId() ?: return DailyProgressDto(userId = "", date = today())
         return try {
             val result = supabase.from("daily_progress").select {
@@ -61,12 +63,10 @@ class SupabaseProgressRepository : ProgressRepository {
 
     override suspend fun logPoints(points: Int, source: String) {
         val uid = userId() ?: return
-        try {
-            supabase.from("points_log").insert(
-                InsertPointsLogDto(userId = uid, points = points, source = source, dayKey = today())
-            )
-            SessionCache.todayProgress.value = null
-        } catch (_: Exception) { }
+        supabase.from("points_log").insert(
+            InsertPointsLogDto(userId = uid, points = points, source = source, dayKey = today())
+        )
+        SessionCache.todayProgress.value = null
     }
 
     override suspend fun getRankingPosition(): Int {

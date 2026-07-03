@@ -27,30 +27,6 @@ fun createTechHealthChannel(context: Context) {
 
 object TechHealthNotificationManager {
 
-    fun scheduleRepeating(
-        context: Context,
-        restrictionId: String,
-        appName: String,
-        usedMinutes: Int,
-        limitMinutes: Int,
-        intervalSeconds: Int
-    ) {
-        val intent = buildIntent(context, appName, usedMinutes, limitMinutes)
-        val pi = PendingIntent.getBroadcast(
-            context,
-            restrictionId.hashCode(),
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-        val am = context.getSystemService(AlarmManager::class.java) ?: return
-        am.setRepeating(
-            AlarmManager.RTC_WAKEUP,
-            System.currentTimeMillis(),
-            intervalSeconds * 1_000L,
-            pi
-        )
-    }
-
     fun cancel(context: Context, restrictionId: String) {
         val am = context.getSystemService(AlarmManager::class.java) ?: return
         val pi = PendingIntent.getBroadcast(
@@ -60,16 +36,5 @@ object TechHealthNotificationManager {
             PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
         )
         pi?.let { am.cancel(it) }
-    }
-
-    private fun buildIntent(
-        context: Context,
-        appName: String,
-        usedMinutes: Int,
-        limitMinutes: Int
-    ) = Intent(context, TechHealthReceiver::class.java).apply {
-        putExtra("app_name",      appName)
-        putExtra("used_minutes",  usedMinutes)
-        putExtra("limit_minutes", limitMinutes)
     }
 }

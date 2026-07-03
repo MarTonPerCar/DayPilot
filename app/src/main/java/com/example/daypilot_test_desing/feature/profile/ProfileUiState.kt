@@ -22,5 +22,8 @@ data class ProfileUiState(
     val avatarUrl: String? = null,
     val weeklySummary: WeeklySummaryData = WeeklySummaryData(0, 0, 0, 0),
     val isUploadingAvatar: Boolean = false,
-    val avatarUploadError: Boolean = false
+    val avatarUploadError: Boolean = false,
+    val isSavingProfile: Boolean = false,
+    val profileSaveError: Boolean = false,
+    val profileSaveSuccess: Boolean = false
 )

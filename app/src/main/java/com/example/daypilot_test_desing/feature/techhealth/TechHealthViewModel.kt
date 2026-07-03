@@ -12,6 +12,7 @@ import com.example.daypilot_test_desing.data.supabase.supabase
 import com.example.daypilot_test_desing.core.reminders.AppUsageTracker
 import com.example.daypilot_test_desing.core.reminders.DayPilotAccessibilityService
 import com.example.daypilot_test_desing.core.reminders.TechHealthNotificationManager
+import androidx.core.app.NotificationManagerCompat
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,10 +27,7 @@ class TechHealthViewModel(application: Application) : AndroidViewModel(applicati
 
     private val repository = SharedPrefsTechHealthRepository(application)
 
-    // Cached value from the last DB read so buildState() reflects DB truth synchronously.
-    // Awarding the +10 bonus itself now happens server-side (fn_close_daily_progress,
-    // nightly pg_cron) — this only reflects whether today is still "clean" (no
-    // violation recorded yet), for the UI indicator.
+    // true while today has no violation; the bonus itself is awarded server-side
     private var cachedPointEarned = false
 
     private val _uiState = MutableStateFlow(buildState())
@@ -55,6 +53,8 @@ class TechHealthViewModel(application: Application) : AndroidViewModel(applicati
 
     private suspend fun refreshUsageInternal() {
         val ctx = getApplication<Application>()
+        // worker also does this, but it can be delayed hours by Doze
+        repository.applyPendingChangesIfNewDay()
         val hasPermission = AppUsageTracker.hasPermission(ctx)
         if (hasPermission) {
             val usageMap = AppUsageTracker.getTodayUsage(ctx)
@@ -63,7 +63,7 @@ class TechHealthViewModel(application: Application) : AndroidViewModel(applicati
                 if (used != r.usedMinutesToday) repository.updateUsage(r.id, used)
             }
         }
-        scheduleNotificationsForOverLimit()
+        cancelOverLimitNotifications()
         cachedPointEarned = readPointEarnedFromDb()
         _uiState.value = TechHealthUiState(
             appRestrictions       = repository.getAppRestrictions(),
@@ -78,7 +78,7 @@ class TechHealthViewModel(application: Application) : AndroidViewModel(applicati
     fun saveApp(restriction: AppRestriction) {
         repository.saveApp(restriction)
         viewModelScope.launch { upsertAppToSupabase(restriction) }
-        scheduleNotificationsForOverLimit()
+        cancelOverLimitNotifications()
         _uiState.value = buildState()
     }
 
@@ -91,7 +91,7 @@ class TechHealthViewModel(application: Application) : AndroidViewModel(applicati
         val pkg = repository.getAppRestrictions().find { it.id == id }?.packageName
         repository.toggleRestriction(id, enabled)
         if (!enabled) TechHealthNotificationManager.cancel(getApplication(), id)
-        else scheduleNotificationsForOverLimit()
+        else cancelOverLimitNotifications()
         if (pkg != null) viewModelScope.launch { updateIsActiveInSupabase(pkg, enabled) }
         _uiState.value = buildState()
     }
@@ -155,12 +155,19 @@ class TechHealthViewModel(application: Application) : AndroidViewModel(applicati
                 limitHours = restriction.dailyLimitMinutes / 60.0,
                 isActive   = restriction.isEnabled
             ))
+            // upsert skips false defaults (encodeDefaults=false), so clear it explicitly
+            supabase.from("tech_health_config").update({
+                set("pending_delete", false)
+            }) {
+                filter {
+                    eq("user_id", uid)
+                    eq("app_package", restriction.packageName)
+                }
+            }
         } catch (_: Exception) { }
     }
 
-    // Soft delete: the row is only actually removed by fn_close_daily_progress()
-    // that night, after the daily bonus has been decided — mirrors
-    // SharedPrefsTechHealthRepository.deleteRestriction() locally.
+    // soft delete, removed for real by fn_close_daily_progress() that night
     private suspend fun markPendingDeleteInSupabase(packageName: String) {
         val uid = supabase.auth.currentUserOrNull()?.id ?: return
         try {
@@ -190,31 +197,23 @@ class TechHealthViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     private suspend fun readPointEarnedFromDb(): Boolean {
-        val uid = supabase.auth.currentUserOrNull()?.id ?: return false
+        val uid = supabase.auth.currentUserOrNull()?.id ?: return true
         return try {
             supabase.from("habits_daily").select {
                 filter { eq("user_id", uid); eq("date", today()) }
                 limit(1)
             }.decodeList<HabitsDailyReadTechDto>()
-                .firstOrNull()?.techHealthPointEarned ?: false
-        } catch (_: Exception) { false }
+                .firstOrNull()?.techHealthPointEarned ?: true
+        } catch (_: Exception) { true }
     }
 
     // ── Notifications ────────────────────────────────────────────────────────
 
-    private fun scheduleNotificationsForOverLimit() {
+    private fun cancelOverLimitNotifications() {
         val context = getApplication<Application>()
         repository.getAppRestrictions().forEach { r ->
-            if (r.isEnabled && r.usedMinutesToday >= r.dailyLimitMinutes
-                && r.notificationIntervalSeconds > 0
-            ) {
-                TechHealthNotificationManager.scheduleRepeating(
-                    context, r.id, r.appName, r.usedMinutesToday,
-                    r.dailyLimitMinutes, r.notificationIntervalSeconds
-                )
-            } else {
-                TechHealthNotificationManager.cancel(context, r.id)
-            }
+            TechHealthNotificationManager.cancel(context, r.id)
+            NotificationManagerCompat.from(context).cancel(r.appName.hashCode())
         }
     }
 

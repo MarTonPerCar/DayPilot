@@ -108,7 +108,6 @@ fun AuthScreen(
                             errorMessage = registerError,
                             onRegister = { name, username, email, password, region ->
                                 onRegisterClick(name, username, email, password, region)
-                                isLogin = true
                             },
                         )
                     }

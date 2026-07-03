@@ -61,9 +61,23 @@ class ProfileViewModel(
 
     fun updateProfile(name: String, username: String, region: TimeZoneRegion) {
         viewModelScope.launch {
-            userRepo.updateProfile(name, username, region)  // updates SessionCache.userProfile
-            load()  // re-reads from cache (instant), refreshes UiState
+            _uiState.value = _uiState.value.copy(isSavingProfile = true, profileSaveError = false)
+            try {
+                userRepo.updateProfile(name, username, region)  // updates SessionCache.userProfile
+                load()  // re-reads from cache (instant), refreshes UiState
+                _uiState.value = _uiState.value.copy(isSavingProfile = false, profileSaveSuccess = true)
+            } catch (_: Exception) {
+                _uiState.value = _uiState.value.copy(isSavingProfile = false, profileSaveError = true)
+            }
         }
+    }
+
+    fun clearProfileSaveError() {
+        _uiState.value = _uiState.value.copy(profileSaveError = false)
+    }
+
+    fun clearProfileSaveSuccess() {
+        _uiState.value = _uiState.value.copy(profileSaveSuccess = false)
     }
 
     fun uploadAvatar(uri: Uri, context: Context): Job = viewModelScope.launch {

@@ -34,10 +34,13 @@ fun EditProfileScreen(
     avatarUrl: String? = null,
     isUploadingAvatar: Boolean = false,
     avatarUploadError: Boolean = false,
+    isSavingProfile: Boolean = false,
+    profileSaveError: Boolean = false,
     onSave: (name: String, username: String, region: TimeZoneRegion) -> Unit,
     onNavigateToResetPassword: () -> Unit,
     onPhotoSelected: (Uri) -> Unit,
     onAvatarErrorDismissed: () -> Unit = {},
+    onProfileSaveErrorDismissed: () -> Unit = {},
     onBack: () -> Unit
 ) {
     val context         = LocalContext.current
@@ -52,6 +55,14 @@ fun EditProfileScreen(
         if (avatarUploadError) {
             snackbarHost.showSnackbar(photoErrorMsg)
             onAvatarErrorDismissed()
+        }
+    }
+
+    val saveErrorMsg = stringResource(R.string.edit_profile_save_error)
+    LaunchedEffect(profileSaveError) {
+        if (profileSaveError) {
+            snackbarHost.showSnackbar(saveErrorMsg)
+            onProfileSaveErrorDismissed()
         }
     }
 
@@ -212,8 +223,11 @@ fun EditProfileScreen(
             Spacer(Modifier.height(8.dp))
 
             DayPilotButtonPrimary(
-                text    = stringResource(R.string.edit_profile_save),
-                onClick = { onSave(name, username, region) }
+                text      = stringResource(R.string.edit_profile_save),
+                enabled   = !isSavingProfile,
+                isLoading = isSavingProfile,
+                hasError  = profileSaveError,
+                onClick   = { onSave(name, username, region) }
             )
 
             Spacer(Modifier.height(16.dp))

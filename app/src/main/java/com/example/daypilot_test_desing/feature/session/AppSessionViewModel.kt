@@ -63,11 +63,11 @@ class AppSessionViewModel : ViewModel() {
 
     /** Signs the user out of Supabase and marks the session as gone. */
     fun signOut() {
-        SessionCache.clear()
-        NotificationHub.clear()
-        _state.value = State.Unauthenticated
         viewModelScope.launch {
             try { supabase.auth.signOut() } catch (_: Exception) {}
+            SessionCache.clear()
+            NotificationHub.clear()
+            _state.value = State.Unauthenticated
         }
     }
 }
