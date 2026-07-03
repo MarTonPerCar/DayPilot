@@ -22,3 +22,8 @@ Users track daily tasks, steps, and app usage limits, and compete with friends o
 - **Backend:** Supabase (PostgreSQL, Auth, Storage, Realtime)
 - **Architecture:** MVVM with repository pattern
 - **CI/CD:** GitHub Actions
+
+## Downloads
+
+- [⬇️ Descargar DayPilot (Version-Original)](https://github.com/MarTonPerCar/DayPilot/releases/download/v0.1.1/DayPilot.apk)
+- [⬇️ Descargar DayPilot (Incremento-Android)](https://github.com/MarTonPerCar/DayPilot/releases/download/incremento-android-v1.0.0/DayPilot-Incremento-Android.apk)
