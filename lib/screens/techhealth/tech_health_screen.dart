@@ -98,15 +98,16 @@ class _TechHealthScreenState extends State<TechHealthScreen> {
                 child: TechRestrictionCard(
                   restriction: r,
                   onToggle: (v) => setState(() => r.enabled = v),
-                  onDelete: () => setState(() => _restrictions.removeWhere((x) => x.id == r.id)),
+                  onDelete: () {},
                 ),
               ))),
         ],
       ),
+      // Nota: esta rama es solo diseño — crear/eliminar no persiste datos.
       floatingActionButton: FloatingActionButton(
         onPressed: () => showAddRestrictionSheet(
           context,
-          onCreate: (r) => setState(() => _restrictions.add(r)),
+          onCreate: (_) {},
         ),
         child: const Icon(Icons.add_rounded),
       ),

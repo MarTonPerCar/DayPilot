@@ -50,11 +50,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
     return map;
   }
 
+  // Nota: esta rama es solo diseño — crear/editar no persiste datos.
+  // La funcionalidad real vive en Test-Funcional-Flutter.
   void _openNewTaskForm() {
     showTaskFormSheet(
       context,
       forDate: _selectedDay,
-      onSave: (task) => setState(() => _tasks.add(task)),
+      onSave: (_) {},
     );
   }
 
@@ -63,12 +65,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
       context,
       forDate: task.date,
       existing: task,
-      onSave: (updated) {
-        setState(() {
-          final idx = _tasks.indexWhere((t) => t.id == updated.id);
-          if (idx != -1) _tasks[idx] = updated;
-        });
-      },
+      onSave: (_) {},
     );
   }
 
@@ -183,7 +180,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     onToggle: () => setState(() => t.done = !t.done),
                     onTap: () => _openDetail(t),
                     onEdit: () => _openEditTaskForm(t),
-                    onDelete: () => setState(() => _tasks.removeWhere((x) => x.id == t.id)),
+                    onDelete: () {},
                   ),
                 )),
         ],

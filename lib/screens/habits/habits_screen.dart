@@ -19,7 +19,7 @@ class HabitsScreen extends StatefulWidget {
 }
 
 class _HabitsScreenState extends State<HabitsScreen> {
-  int _stepsGoal = AppData.stepsGoal;
+  final int _stepsGoal = AppData.stepsGoal;
 
   void _openTechHealth() {
     Navigator.push(
@@ -52,10 +52,11 @@ class _HabitsScreenState extends State<HabitsScreen> {
             steps: AppData.stepsToday,
             goal: _stepsGoal,
             pointsEarnedToday: AppData.pointsTodayFromSteps,
+            // Nota: esta rama es solo diseño — la meta no se persiste.
             onConfigureGoal: () => showStepsGoalSheet(
               context,
               currentGoal: _stepsGoal,
-              onSave: (g) => setState(() => _stepsGoal = g),
+              onSave: (_) {},
             ),
           ),
           const SizedBox(height: 24),
