@@ -3,7 +3,7 @@ name: Release builds
 on:
   push:
     tags:
-      - "v*"
+      - "test-supabase-flutter-v*"
 
 permissions:
   contents: write

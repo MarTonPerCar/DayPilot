@@ -46,7 +46,7 @@ dart run tool/verify_connection.dart
 
 ## Descargas
 
-Cada tag `vX.Y.Z` dispara `.github/workflows/release.yml`, que compila la app para Linux, Windows, macOS, Android e iOS y las publica todas juntas en un mismo [GitHub Release](https://github.com/MarTonPerCar/DayPilot/releases). Flutter no genera un binario universal — cada plataforma necesita su propio build — pero al usar releases todas las versiones quedan en el mismo sitio, con la última siempre arriba.
+Cada tag `test-supabase-flutter-vX.Y.Z` dispara `.github/workflows/release.yml`, que compila la app para Linux, Windows, macOS, Android e iOS y las publica todas juntas en un mismo [GitHub Release](https://github.com/MarTonPerCar/DayPilot/releases). Flutter no genera un binario universal — cada plataforma necesita su propio build — pero al usar releases todas las versiones quedan en el mismo sitio, con la última siempre arriba.
 
 | Plataforma | Archivo | Instalación |
 |---|---|---|
