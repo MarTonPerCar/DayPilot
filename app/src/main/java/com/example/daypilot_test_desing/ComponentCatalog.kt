@@ -20,7 +20,6 @@ import com.example.daypilot_test_desing.core.ui.components.forms.*
 import com.example.daypilot_test_desing.core.data.model.*
 import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
 
-// ── Preview 1: Botones, Avatar, Chips, TextFields ─────────────────
 @Preview(showBackground = true)
 @Composable
 fun CatalogBasicInputs() {
@@ -76,7 +75,6 @@ fun CatalogBasicInputs() {
     }
 }
 
-// ── Preview 2: TopBars, SectionHeaders, Divider, EmptyState, Switch, Stats ────
 @Preview(showBackground = true)
 @Composable
 fun CatalogBasicLayout() {
@@ -120,7 +118,6 @@ fun CatalogBasicLayout() {
     }
 }
 
-// ── Preview 3: Reactions, Selectors, TaskDot, Steps, Profile blocks ───────────
 @Preview(showBackground = true)
 @Composable
 fun CatalogBasicMisc() {
@@ -181,7 +178,6 @@ fun CatalogBasicMisc() {
     }
 }
 
-// ── Preview 4: Task Cards, Notification, Habit, Friend, User cards ────────────
 @Preview(showBackground = true)
 @Composable
 fun CatalogCardsPeople() {
@@ -215,7 +211,6 @@ fun CatalogCardsPeople() {
     }
 }
 
-// ── Preview 5: Ranking, Podium, Reminder, Timer cards ─────────────────────────
 @Preview(showBackground = true)
 @Composable
 fun CatalogCardsRankingTimer() {
@@ -258,7 +253,6 @@ fun CatalogCardsRankingTimer() {
     }
 }
 
-// ── Preview 6: Stats, Profile, Weekly, Daily, Steps, AppLimit cards ───────────
 @Preview(showBackground = true)
 @Composable
 fun CatalogCardsStats() {
@@ -271,7 +265,7 @@ fun CatalogCardsStats() {
         ) {
             CatalogSection("Stats & Profile Cards") {
                 StatsCard(rankingPosition = 2, pointsToday = 8, pointsFromTasks = 4, pointsFromSteps = 2, pointsFromHabits = 1, pointsFromTimers = 1)
-                ProfileStatsCard(name = "Mario García", username = "mariogarcia", level = 7, totalPoints = 340, currentStreak = 7, longestStreak = 14)
+                ProfileStatsCard(name = "Mario García", username = "mariogarcia", level = 7, totalPoints = 340, pointsToNextLevel = 350, currentStreak = 7, longestStreak = 14)
                 ProfileInfoRow(label = "Email",    value = "mario@example.com")
                 ProfileInfoRow(label = "Username", value = "@mariogarcia")
             }
@@ -286,13 +280,13 @@ fun CatalogCardsStats() {
                 StepsCard(currentSteps = 1200, goalSteps = 2000, pointsEarned = 1, pointsRemaining = 5, onConfigureGoal = { _ -> })
                 StepsSummaryCard(totalSteps7Days = 42000, bestDaySteps = 8500, dailyAverage = 6000, goalStreak = 4)
                 AppLimitCard(
-                    restriction = AppRestriction(id = "1", appName = "YouTube", packageName = "com.google.youtube", dailyLimitMinutes = 120, notificationIntervalSeconds = 60, isEnabled = true, usedMinutesToday = 45),
+                    restriction = AppRestriction(id = "1", appName = "YouTube", packageName = "com.google.youtube", dailyLimitMinutes = 120, isEnabled = true, usedMinutesToday = 45),
                     onToggle = {}, onEdit = {}, onDelete = {}
                 )
                 GroupLimitCard(
                     restriction = GroupRestriction(id = "1", groupName = "Social Networks",
-                        apps = listOf(AppRestriction("1", "Instagram", "com.instagram.android", 60, 30, true, 20)),
-                        dailyLimitMinutes = 120, notificationIntervalSeconds = 60, isEnabled = true, usedMinutesToday = 45),
+                        apps = listOf(AppRestriction(id = "1", appName = "Instagram", packageName = "com.instagram.android", dailyLimitMinutes = 60, isEnabled = true, usedMinutesToday = 20)),
+                        dailyLimitMinutes = 120, isEnabled = true, usedMinutesToday = 45),
                     onToggle = {}, onEdit = {}, onDelete = {}
                 )
             }
@@ -300,7 +294,6 @@ fun CatalogCardsStats() {
     }
 }
 
-// ── Preview 7: Progress Chart, Home Menu, Calendar ─────────────────────────────
 @Preview(showBackground = true)
 @Composable
 fun CatalogCardsCalendar() {
@@ -342,7 +335,6 @@ fun CatalogCardsCalendar() {
     }
 }
 
-// ── Preview 8: Forms — Task, Reminder, AppLimit, Auth ─────────────────────────
 @Preview(showBackground = true)
 @Composable
 fun CatalogForms() {
@@ -370,7 +362,6 @@ fun CatalogForms() {
     }
 }
 
-// ── Catalog section wrapper ───────────────────────────────────────
 @Composable
 private fun CatalogSection(
     title  : String,

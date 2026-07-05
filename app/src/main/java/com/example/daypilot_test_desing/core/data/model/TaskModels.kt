@@ -41,6 +41,9 @@ data class CalendarTaskData(
     val difficulty: TaskDifficulty,
     val duration: Int,
     val isDone: Boolean,
+    // Whether points were ever paid out for this occurrence — sticky, unlike isDone.
+    // Prevents re-earning points by unchecking and rechecking the same task.
+    val isEarned: Boolean = false,
     val description: String? = null,
     val isRecurring: Boolean = false,
     val hasReminder: Boolean = false,

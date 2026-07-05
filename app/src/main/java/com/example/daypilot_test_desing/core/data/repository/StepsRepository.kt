@@ -8,7 +8,6 @@ data class StepsWeeklyStats(
 )
 
 interface StepsRepository {
-    // ── Local / sensor state (synchronous, no DB) ──────────────────
     fun getCurrentSteps(): Int
     fun getGoalSteps(): Int
     fun getPendingGoal(): Int?
@@ -18,7 +17,7 @@ interface StepsRepository {
     fun setSteps(steps: Int)
     fun resetMilestones()
 
-    // ── DB-backed (suspend) ────────────────────────────────────────
     suspend fun syncSteps(steps: Int, goal: Int)
     suspend fun getWeeklyStats(): StepsWeeklyStats
+    suspend fun hydrateGoalFromServer()
 }

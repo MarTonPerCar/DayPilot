@@ -1,20 +1,17 @@
 package com.example.daypilot_test_desing.feature.auth
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.daypilot_test_desing.data.supabase.dto.NewUserDto
-import com.example.daypilot_test_desing.data.supabase.dto.UserDto
-import com.example.daypilot_test_desing.data.supabase.supabase
-import io.github.jan.supabase.auth.auth
-import io.github.jan.supabase.auth.providers.builtin.Email
-import io.github.jan.supabase.postgrest.from
+import com.example.daypilot_test_desing.core.data.repository.AuthRepository
+import com.example.daypilot_test_desing.core.data.repository.RegisterOutcome
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class AuthViewModel : ViewModel() {
+class AuthViewModel(private val repo: AuthRepository) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AuthUiState())
     val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
@@ -27,10 +24,7 @@ class AuthViewModel : ViewModel() {
         viewModelScope.launch {
             _uiState.update { it.copy(loginLoading = true, loginError = "") }
             try {
-                supabase.auth.signInWith(Email) {
-                    this.email = email
-                    this.password = password
-                }
+                repo.login(email, password)
                 _uiState.update { it.copy(loginLoading = false) }
                 onSuccess()
             } catch (e: Exception) {
@@ -54,53 +48,26 @@ class AuthViewModel : ViewModel() {
         viewModelScope.launch {
             _uiState.update { it.copy(registerLoading = true, registerError = "") }
             try {
-                try {
-                    supabase.auth.signUpWith(Email) {
-                        this.email = email
-                        this.password = password
+                when (repo.register(name, username, email, password, region)) {
+                    RegisterOutcome.Success -> {
+                        _uiState.update { it.copy(registerLoading = false) }
+                        onSuccess()
                     }
-                } catch (e: Exception) {
-                    // could be a real existing account, or an orphan from a failed signup — sign in to tell them apart
-                    if (e.message?.contains("User already registered", ignoreCase = true) == true) {
-                        supabase.auth.signInWith(Email) {
-                            this.email = email
-                            this.password = password
-                        }
-                    } else throw e
-                }
-                val uid = supabase.auth.currentUserOrNull()?.id
-                if (uid != null) {
-                    val hasProfile = supabase.from("users").select {
-                        filter { eq("id", uid) }
-                        limit(1)
-                    }.decodeList<UserDto>().isNotEmpty()
-                    if (hasProfile) {
+                    RegisterOutcome.AlreadyExists -> {
                         _uiState.update {
                             it.copy(
                                 registerLoading = false,
                                 registerError = "An account with this email already exists."
                             )
                         }
-                        return@launch
                     }
-                    supabase.from("users").insert(
-                        NewUserDto(
-                            id = uid,
-                            email = email,
-                            name = name,
-                            username = username,
-                            usernameLower = username.lowercase(),
-                            region = region
-                        )
-                    )
-                    _uiState.update { it.copy(registerLoading = false) }
-                    onSuccess()
-                } else {
-                    _uiState.update {
-                        it.copy(
-                            registerLoading = false,
-                            registerError = "Account created — check your email to confirm before logging in."
-                        )
+                    RegisterOutcome.PendingEmailConfirmation -> {
+                        _uiState.update {
+                            it.copy(
+                                registerLoading = false,
+                                registerError = "Account created — check your email to confirm before logging in."
+                            )
+                        }
                     }
                 }
             } catch (e: Exception) {
@@ -113,7 +80,7 @@ class AuthViewModel : ViewModel() {
         viewModelScope.launch {
             _uiState.update { it.copy(resetLoading = true, resetError = "", resetSent = false) }
             try {
-                supabase.auth.resetPasswordForEmail(email)
+                repo.sendResetEmail(email)
                 _uiState.update { it.copy(resetLoading = false, resetSent = true) }
             } catch (e: Exception) {
                 _uiState.update { it.copy(resetLoading = false, resetError = friendlyError(e)) }
@@ -135,5 +102,14 @@ class AuthViewModel : ViewModel() {
             raw.contains("Unable to validate email", ignoreCase = true)   -> "Please enter a valid email address."
             else -> raw
         }
+    }
+
+    companion object {
+        fun factory(repo: AuthRepository): ViewModelProvider.Factory =
+            object : ViewModelProvider.Factory {
+                @Suppress("UNCHECKED_CAST")
+                override fun <T : ViewModel> create(modelClass: Class<T>): T =
+                    AuthViewModel(repo) as T
+            }
     }
 }

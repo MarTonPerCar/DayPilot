@@ -1,6 +1,7 @@
 package com.example.daypilot_test_desing.data.supabase
 
 import android.content.SharedPreferences
+import android.util.Log
 import com.example.daypilot_test_desing.core.data.local.NotificationHub
 import com.example.daypilot_test_desing.core.data.model.NotificationType
 import com.example.daypilot_test_desing.data.supabase.SupabaseNotificationRepository
@@ -20,19 +21,14 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-/**
- * Real implementation of StepsRepository.
- *
- * Synchronous methods operate on in-memory state (fast sensor path).
- * Milestone hits fire background DB writes to points_log and habits_daily.
- * getWeeklyStats() reads from user_daily_log (the closed-day archive).
- *
- * All goal configuration is persisted in the shared "daypilot_steps" SharedPreferences
- * file, which StepsViewModel also uses for baseline management. Key separation:
- *   Repository keys: steps_goal, pending_goal, goal_change_date
- *   ViewModel keys:  baseline_date, baseline_steps
- */
+// Shares the "daypilot_steps" SharedPreferences file with StepsViewModel — this
+// class owns steps_goal/pending_goal/goal_change_date, the ViewModel owns
+// baseline_date/baseline_steps. Don't reuse a key across the two.
 class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepository {
+
+    companion object {
+        private const val TAG = "SupabaseStepsRepository"
+    }
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
@@ -40,8 +36,6 @@ class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepos
     private var milestone1Awarded = false
     private var milestone2Awarded = false
     private var milestone3Awarded = false
-
-    // ── Helpers ──────────────────────────────────────────────────────
 
     private fun today() = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
 
@@ -56,8 +50,6 @@ class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepos
                 .apply()
         }
     }
-
-    // ── Synchronous interface ─────────────────────────────────────────
 
     override fun getCurrentSteps(): Int = currentSteps
 
@@ -76,9 +68,6 @@ class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepos
         (if (milestone2Awarded) 20 else 0) +
         (if (milestone3Awarded) 30 else 0)
 
-    // The active goal for today is always locked via the pending-goal mechanism.
-    // Users can update the pending goal as many times as they want; the change
-    // only takes effect the next day via applyPendingGoalIfNewDay().
     override fun canChangeGoal(): Boolean = true
 
     override fun configureGoal(newGoal: Int) {
@@ -129,32 +118,60 @@ class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepos
                     steps     = currentSteps,
                     stepsGoal = getGoalSteps()
                 )
-            )
-        } catch (_: Exception) { }
+            ) { onConflict = "user_id,date" }
+            Log.d(TAG, "Persisted milestone ($points pts) at $currentSteps steps")
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to persist milestone ($points pts)", e)
+        }
         val (title, msg) = when (points) {
             10   -> "A mitad de camino 🏃" to "Has completado el 50% de tu objetivo de pasos (+10 pts)"
             20   -> "¡Ya casi! 💪" to "Has completado el 75% de tu objetivo de pasos (+20 pts)"
             else -> "¡Objetivo completado! 🎉" to "Has alcanzado tu objetivo de pasos (+30 pts)"
         }
-        NotificationHub.add(title, msg, NotificationType.STEPS)
         if (points == 30) {
+            // Persisted to the DB — the always-on realtime subscription delivers it to
+            // NotificationHub, so adding it locally too would double it up.
             SupabaseNotificationRepository.insertForCurrentUser(
                 type  = "STEPS_GOAL",
                 title = title,
                 body  = msg
             )
+        } else {
+            NotificationHub.add(title, msg, NotificationType.STEPS)
         }
     }
-
-    // ── Suspend (DB-backed) ───────────────────────────────────────────
 
     override suspend fun syncSteps(steps: Int, goal: Int) {
         val uid = supabase.auth.currentUserOrNull()?.id ?: return
         try {
             supabase.from("habits_daily").upsert(
                 HabitsDailyUpsertDto(userId = uid, date = today(), steps = steps, stepsGoal = goal)
-            )
-        } catch (_: Exception) { }
+            ) { onConflict = "user_id,date" }
+            Log.d(TAG, "Synced steps ($steps/$goal)")
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to sync steps ($steps/$goal)", e)
+        }
+    }
+
+    // Guarded so it only runs once per device — otherwise a fresh install would
+    // default to 10_000 and syncSteps() would push that straight back to the DB,
+    // clobbering the real goal.
+    override suspend fun hydrateGoalFromServer() {
+        if (prefs.contains("steps_goal")) return
+        val uid = supabase.auth.currentUserOrNull()?.id ?: return
+        try {
+            val row = supabase.from("habits_daily").select {
+                filter { eq("user_id", uid) }
+                order("date", Order.DESCENDING)
+                limit(1)
+            }.decodeList<HabitsDailyUpsertDto>().firstOrNull()
+            if (row != null && row.stepsGoal > 0) {
+                prefs.edit().putInt("steps_goal", row.stepsGoal).apply()
+                Log.d(TAG, "Hydrated steps goal from DB: ${row.stepsGoal}")
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to hydrate steps goal from server", e)
+        }
     }
 
     override suspend fun getWeeklyStats(): StepsWeeklyStats {
@@ -181,6 +198,9 @@ class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepos
                 dailyAverage    = avgSteps,
                 goalStreak      = streak
             )
-        } catch (_: Exception) { StepsWeeklyStats() }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to load weekly steps stats", e)
+            StepsWeeklyStats()
+        }
     }
 }

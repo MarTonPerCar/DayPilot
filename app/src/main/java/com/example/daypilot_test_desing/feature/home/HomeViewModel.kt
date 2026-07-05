@@ -3,8 +3,7 @@ package com.example.daypilot_test_desing.feature.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.daypilot_test_desing.core.data.model.DayProgress
-import java.util.Calendar
+import com.example.daypilot_test_desing.core.data.model.buildProgressWindow
 import com.example.daypilot_test_desing.core.data.repository.FriendRepository
 import com.example.daypilot_test_desing.core.data.repository.ProgressRepository
 import com.example.daypilot_test_desing.core.data.repository.StepsRepository
@@ -37,7 +36,6 @@ class HomeViewModel(
     private suspend fun load() {
         try {
             coroutineScope {
-                // All repo calls are cache-first; only the first caller fetches from Supabase
                 val userD    = async { userRepo.getCurrentUser() }
                 val tasksD   = async { taskRepo.getTasks() }
                 val todayD   = async { progressRepo.getTodayProgress() }
@@ -53,18 +51,7 @@ class HomeViewModel(
                 val friends     = friendsD.await()
 
                 val uniqueTasks = allTasks.distinctBy { it.id }
-                val closedData  = history.reversed().map { log ->
-                    val day = log.date.substringAfterLast("-").toIntOrNull() ?: 0
-                    DayProgress(day = day, points = log.totalPoints, steps = log.steps, tasksCompleted = log.tasksCompleted)
-                }
-                val todayDayNum = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
-                val progressData = closedData + DayProgress(
-                    day            = todayDayNum,
-                    points         = today.totalPoints,
-                    steps          = today.steps,
-                    tasksCompleted = today.tasksCompleted,
-                    isToday        = true
-                )
+                val progressData = buildProgressWindow(history, today)
                 _uiState.value = HomeUiState(
                     userName            = user.name,
                     streak              = user.currentStreak,

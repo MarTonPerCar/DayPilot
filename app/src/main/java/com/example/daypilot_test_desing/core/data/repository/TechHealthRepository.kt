@@ -9,8 +9,13 @@ interface TechHealthRepository {
     fun saveApp(restriction: AppRestriction)
     fun saveGroup(restriction: GroupRestriction)
     fun toggleRestriction(id: String, enabled: Boolean)
-    fun deleteRestriction(id: String)
     fun toggleGroup(id: String, enabled: Boolean)
+    fun deleteRestriction(id: String)
     fun deleteGroup(id: String)
     fun updateUsage(id: String, usedMinutes: Int)
+    fun updateGroupUsage(id: String, usedMinutes: Int)
+    fun markViolated(id: String)
+    fun markGroupViolated(id: String)
+    // Swaps a client-generated placeholder group id for the real Supabase row id.
+    fun replaceGroupId(oldId: String, newId: String)
 }

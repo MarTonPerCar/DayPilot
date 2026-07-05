@@ -13,11 +13,11 @@ import androidx.compose.runtime.getValue
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.daypilot_test_desing.data.supabase.SupabaseUserRepository
+import com.example.daypilot_test_desing.core.data.local.NotificationHub
 import com.example.daypilot_test_desing.core.navigation.DayPilotNavGraph
 import com.example.daypilot_test_desing.feature.settings.SettingsViewModel
 import com.example.daypilot_test_desing.core.reminders.createDailyChannel
 import com.example.daypilot_test_desing.core.reminders.createNotificationChannel
-import com.example.daypilot_test_desing.core.reminders.createTechHealthChannel
 import com.example.daypilot_test_desing.core.reminders.scheduleTechHealthWorker
 import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
 
@@ -28,9 +28,9 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        NotificationHub.init(this)
         createNotificationChannel(this)
         createDailyChannel(this)
-        createTechHealthChannel(this)
         scheduleTechHealthWorker(this)
 
         val toRequest = mutableListOf<String>()

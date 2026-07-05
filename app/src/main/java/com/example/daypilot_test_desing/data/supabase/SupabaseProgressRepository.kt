@@ -2,6 +2,8 @@ package com.example.daypilot_test_desing.data.supabase
 
 import com.example.daypilot_test_desing.core.cache.SessionCache
 import com.example.daypilot_test_desing.core.data.model.RankingData
+import com.example.daypilot_test_desing.core.data.model.calculateLevel
+import com.example.daypilot_test_desing.core.data.model.pointsToNextLevel
 import com.example.daypilot_test_desing.core.data.repository.ProgressRepository
 import com.example.daypilot_test_desing.data.supabase.dto.DailyLogDto
 import com.example.daypilot_test_desing.data.supabase.dto.DailyProgressDto
@@ -66,11 +68,24 @@ class SupabaseProgressRepository : ProgressRepository {
         supabase.from("points_log").insert(
             InsertPointsLogDto(userId = uid, points = points, source = source, dayKey = today())
         )
-        SessionCache.todayProgress.value = null
+        SessionCache.todayProgress.value = SessionCache.todayProgress.value?.let { current ->
+            current.copy(
+                tasksPoints      = current.tasksPoints      + if (source == "TASKS")       points else 0,
+                stepsPoints      = current.stepsPoints      + if (source == "STEPS")       points else 0,
+                wellnessPoints   = current.wellnessPoints   + if (source == "WELLNESS")    points else 0,
+                timerPoints      = current.timerPoints      + if (source == "TIMER")       points else 0,
+                techHealthPoints = current.techHealthPoints + if (source == "TECH_HEALTH") points else 0,
+                totalPoints      = current.totalPoints      + points
+            )
+        }
+        SessionCache.userProfile.value = SessionCache.userProfile.value?.let { profile ->
+            val newTotal = profile.totalPoints + points
+            val newLevel = calculateLevel(newTotal)
+            profile.copy(totalPoints = newTotal, level = newLevel, pointsToNextLevel = pointsToNextLevel(newLevel))
+        }
     }
 
     override suspend fun getRankingPosition(): Int {
-        // Fast path: compute position from cached ranking list (populated by RivalryVM)
         SessionCache.ranking.value?.let { cached ->
             val uid = userId() ?: return 0
             val idx = cached.indexOfFirst { it.id == uid }
@@ -94,7 +109,6 @@ class SupabaseProgressRepository : ProgressRepository {
                 filter { isIn("id", allIds) }
             }.decodeList<FriendsRankingDto>()
                 .sortedByDescending { it.pointsLast30Days }
-            // Populate ranking cache as a side effect so subsequent calls are instant
             SessionCache.ranking.value       = ranking.map { dto ->
                 RankingData(
                     id        = dto.id,

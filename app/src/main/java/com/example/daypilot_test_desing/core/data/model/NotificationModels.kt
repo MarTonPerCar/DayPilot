@@ -5,7 +5,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.*
+import kotlinx.serialization.Serializable
 
+@Serializable
 enum class NotificationType(
     val icon: ImageVector,
     val color: Color
@@ -18,6 +20,7 @@ enum class NotificationType(
     ACHIEVEMENT( Icons.Default.EmojiEvents,                       Color(0xFFFFD700))
 }
 
+@Serializable
 data class NotificationData(
     val id: String,
     val title: String,

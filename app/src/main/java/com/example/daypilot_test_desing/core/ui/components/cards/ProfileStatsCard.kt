@@ -38,15 +38,13 @@ fun ProfileStatsCard(
     username: String,
     level: Int,
     totalPoints: Int,
+    pointsToNextLevel: Int,
     currentStreak: Int,
     longestStreak: Int,
     modifier: Modifier = Modifier,
     avatarUrl: String? = null
 ) {
-    // XP within the current level — independent of DB level to avoid mismatch
-    // if total_points_historical and level briefly diverge.
-    val xpInLevel = if (totalPoints > 0) totalPoints % 50 else 0
-    val levelProgress = (xpInLevel.toFloat() / 50f).coerceIn(0f, 1f)
+    val levelProgress = (totalPoints.toFloat() / pointsToNextLevel).coerceIn(0f, 1f)
 
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -69,7 +67,6 @@ fun ProfileStatsCard(
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
 
-                // ── Cabecera: avatar + info ───────────────────────
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     verticalAlignment = Alignment.CenterVertically
@@ -88,7 +85,6 @@ fun ProfileStatsCard(
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                        // Badge de nivel
                         Box(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(8.dp))
@@ -105,7 +101,6 @@ fun ProfileStatsCard(
                     }
                 }
 
-                // ── Barra de progreso de nivel ────────────────────
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -119,8 +114,8 @@ fun ProfileStatsCard(
                         Text(
                             text = stringResource(
                                 R.string.profile_level_points,
-                                xpInLevel,
-                                50
+                                totalPoints,
+                                pointsToNextLevel
                             ),
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.SemiBold,
@@ -138,7 +133,6 @@ fun ProfileStatsCard(
                     )
                 }
 
-                // ── Stats ─────────────────────────────────────────
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -167,7 +161,6 @@ fun ProfileStatsCard(
     }
 }
 
-// ── Preview ──────────────────────────────────────────────────────
 @Preview(showBackground = true)
 @Composable
 fun ProfileStatsCardPreview() {
@@ -182,6 +175,7 @@ fun ProfileStatsCardPreview() {
                 username = "mariogarcia",
                 level = 7,
                 totalPoints = 340,
+                pointsToNextLevel = 350,
                 currentStreak = 7,
                 longestStreak = 14
             )

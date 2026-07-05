@@ -3,11 +3,6 @@ package com.example.daypilot_test_desing.data.supabase.dto
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-/**
- * Payload for INSERT into `points_log`.
- * The DB trigger fn_sync_points_to_progress propagates the insert to
- * daily_progress (by category and total) and to users.total_points_historical.
- */
 @Serializable
 data class InsertPointsLogDto(
     @SerialName("user_id") val userId: String,
@@ -16,11 +11,9 @@ data class InsertPointsLogDto(
     @SerialName("day_key") val dayKey: String
 )
 
-/**
- * Payload for UPSERT into `habits_daily`.
- * UNIQUE(user_id, date) means repeated calls on the same day update the row.
- * The DB trigger fn_sync_habits_to_progress keeps daily_progress.steps in sync.
- */
+// Upserts must target the UNIQUE(user_id, date) constraint (onConflict at the
+// call site) or repeated calls the same day insert duplicate rows instead of
+// updating one.
 @Serializable
 data class HabitsDailyUpsertDto(
     @SerialName("user_id") val userId: String,
@@ -29,9 +22,6 @@ data class HabitsDailyUpsertDto(
     @SerialName("steps_goal") val stepsGoal: Int = 10_000
 )
 
-/**
- * Row from `user_daily_log` — the closed-day archive used for weekly history charts.
- */
 @Serializable
 data class DailyLogDto(
     @SerialName("user_id") val userId: String,
@@ -47,45 +37,54 @@ data class DailyLogDto(
     @SerialName("total_points") val totalPoints: Int
 )
 
-/**
- * Upsert payload for `tech_health_config`.
- * Uses UNIQUE(user_id, app_package) as the conflict target.
- */
 @Serializable
 data class TechHealthConfigDto(
-    @SerialName("user_id")        val userId: String,
-    @SerialName("app_package")    val appPackage: String,
-    @SerialName("app_name")       val appName: String,
-    @SerialName("limit_hours")    val limitHours: Double,
-    @SerialName("is_active")      val isActive: Boolean = true,
-    @SerialName("pending_delete") val pendingDelete: Boolean = false
+    @SerialName("user_id")            val userId: String,
+    @SerialName("app_package")        val appPackage: String,
+    @SerialName("app_name")           val appName: String,
+    @SerialName("limit_hours")        val limitHours: Double,
+    @SerialName("is_active")          val isActive: Boolean = true,
+    @SerialName("pending_active")     val pendingActive: Boolean? = null,
+    @SerialName("pending_limit_hours") val pendingLimitHours: Double? = null,
+    @SerialName("is_violated_today")  val isViolatedToday: Boolean = false,
+    @SerialName("pending_delete")     val pendingDelete: Boolean = false
 )
 
-/**
- * Minimal read DTO for checking tech_health_point_earned in `habits_daily`.
- * Defaults to true ("no violation yet"), matching the habits_daily column default —
- * a missing row (nothing has touched habits_daily today) means a clean day, not a
- * violated one.
- */
 @Serializable
-data class HabitsDailyReadTechDto(
-    @SerialName("tech_health_point_earned") val techHealthPointEarned: Boolean = true
+data class TechHealthGroupConfigDto(
+    val id: String,
+    @SerialName("user_id")            val userId: String,
+    @SerialName("group_name")         val groupName: String,
+    @SerialName("limit_hours")        val limitHours: Double,
+    @SerialName("is_active")          val isActive: Boolean = true,
+    @SerialName("pending_active")     val pendingActive: Boolean? = null,
+    @SerialName("pending_limit_hours") val pendingLimitHours: Double? = null,
+    @SerialName("is_violated_today")  val isViolatedToday: Boolean = false,
+    @SerialName("pending_delete")     val pendingDelete: Boolean = false,
+    @SerialName("tech_health_group_apps") val apps: List<TechHealthGroupAppDto> = emptyList()
 )
 
-/**
- * Upsert payload to write tech_health_point_earned into `habits_daily`.
- * Uses UNIQUE(user_id, date) — only overwrites the tech_health_point_earned column.
- */
 @Serializable
-data class HabitsDailyTechDto(
-    @SerialName("user_id")                  val userId: String,
-    val date: String,
-    @SerialName("tech_health_point_earned") val techHealthPointEarned: Boolean
+data class TechHealthGroupAppDto(
+    @SerialName("app_package") val appPackage: String,
+    @SerialName("app_name")    val appName: String
 )
 
-/**
- * Row from `daily_progress` — the live in-progress counter for today.
- */
+@Serializable
+data class UpsertTechHealthGroupDto(
+    @SerialName("user_id")     val userId: String,
+    @SerialName("group_name") val groupName: String,
+    @SerialName("limit_hours") val limitHours: Double,
+    @SerialName("is_active")   val isActive: Boolean = true
+)
+
+@Serializable
+data class InsertTechHealthGroupAppDto(
+    @SerialName("group_id")    val groupId: String,
+    @SerialName("app_package") val appPackage: String,
+    @SerialName("app_name")    val appName: String
+)
+
 @Serializable
 data class DailyProgressDto(
     @SerialName("user_id") val userId: String,
