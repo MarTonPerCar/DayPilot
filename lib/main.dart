@@ -35,6 +35,19 @@ class DayPilotApp extends StatelessWidget {
                   localizationsDelegates: AppLocalizations.localizationsDelegates,
                   supportedLocales: AppLocalizations.supportedLocales,
                   home: const LoginScreen(),
+                  builder: (context, child) {
+                    if (!isDesktopPlatform) return child!;
+                    const borderWidth = 5.0;
+                    return Container(
+                      padding: const EdgeInsets.all(borderWidth),
+                      decoration: const BoxDecoration(
+                        border: Border.fromBorderSide(
+                          BorderSide(color: Colors.black, width: borderWidth),
+                        ),
+                      ),
+                      child: child,
+                    );
+                  },
                 );
               },
             );
