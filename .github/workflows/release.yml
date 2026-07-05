@@ -85,27 +85,8 @@ jobs:
           name: macos-build
           path: test_supabase_flutter-macos.zip
 
-  build-ios:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-      - run: flutter pub get
-      - run: cp env.json.example env.json
-      - run: flutter build ios --release --no-codesign
-      - run: |
-          mkdir -p Payload
-          cp -r build/ios/iphoneos/Runner.app Payload/
-          zip -r test_supabase_flutter-ios-unsigned.zip Payload
-      - uses: actions/upload-artifact@v4
-        with:
-          name: ios-build
-          path: test_supabase_flutter-ios-unsigned.zip
-
   release:
-    needs: [build-linux, build-windows, build-android, build-macos, build-ios]
+    needs: [build-linux, build-windows, build-android, build-macos]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4

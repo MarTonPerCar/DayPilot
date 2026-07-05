@@ -52,5 +52,4 @@ dart run tool/verify_connection.dart
 - [Windows](https://github.com/MarTonPerCar/DayPilot/releases/download/test-supabase-flutter-v0.1.0/test_supabase_flutter-windows.zip)
 - [macOS](https://github.com/MarTonPerCar/DayPilot/releases/download/test-supabase-flutter-v0.1.0/test_supabase_flutter-macos.zip)
 - [Android](https://github.com/MarTonPerCar/DayPilot/releases/download/test-supabase-flutter-v0.1.0/test_supabase_flutter-android.apk)
-- [iOS (sin firmar)](https://github.com/MarTonPerCar/DayPilot/releases/download/test-supabase-flutter-v0.1.0/test_supabase_flutter-ios-unsigned.zip)
 
