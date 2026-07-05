@@ -7,7 +7,6 @@ import '../basic/sheet_handle.dart';
 import '../basic/text_field.dart';
 import 'switch_tile.dart';
 
-/// Hoja inferior para crear un nuevo recordatorio.
 Future<void> showReminderFormSheet(
   BuildContext context, {
   required void Function(AppReminder reminder) onSave,

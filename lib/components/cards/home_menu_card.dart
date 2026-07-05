@@ -34,7 +34,6 @@ class HomeMenuCard extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            // Gradient background overlay
             Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -48,7 +47,6 @@ class HomeMenuCard extends StatelessWidget {
               ),
             ),
 
-            // Large decorative icon — bottom-right, rotated -15°, faint
             Positioned(
               bottom: -10,
               right: -10,
@@ -58,13 +56,11 @@ class HomeMenuCard extends StatelessWidget {
               ),
             ),
 
-            // Foreground content
             Padding(
               padding: const EdgeInsets.all(14),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Small icon in tinted pill
                   Container(
                     width: 36,
                     height: 36,
@@ -86,7 +82,6 @@ class HomeMenuCard extends StatelessWidget {
 
                   const Spacer(),
 
-                  // Section-specific data indicator
                   indicator,
                 ],
               ),
@@ -97,8 +92,6 @@ class HomeMenuCard extends StatelessWidget {
     );
   }
 }
-
-// ── Pre-built indicator widgets ────────────────────────────────────────────────
 
 class HomeMenuProgressBar extends StatelessWidget {
   final double value;

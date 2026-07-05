@@ -11,9 +11,6 @@ import 'difficulty_field.dart';
 import 'stepper_field.dart';
 import 'switch_tile.dart';
 
-/// Abre el formulario de creación/edición de tarea en una hoja inferior
-/// arrastrable, con secciones plegables (Información / Detalles /
-/// Recordatorio y repetición).
 Future<void> showTaskFormSheet(
   BuildContext context, {
   required DateTime forDate,

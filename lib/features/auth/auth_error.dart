@@ -2,14 +2,11 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../l10n/app_localizations.dart';
 
-/// Thrown locally (never reaches the network) when the login form is
-/// submitted with an empty email or password.
+/// Never reaches the network — caught before calling Supabase.
 class EmptyCredentialsError implements Exception {
   const EmptyCredentialsError();
 }
 
-/// Maps a raw auth failure to a message fit for display, same mapping as
-/// the Android app's `AuthViewModel.friendlyError`.
 String friendlyAuthError(Object error, AppLocalizations l10n) {
   if (error is EmptyCredentialsError) {
     return l10n.authErrorInvalidCredentials;

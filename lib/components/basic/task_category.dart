@@ -27,8 +27,7 @@ extension TaskCategoryX on TaskCategory {
         TaskCategory.otro => Icons.star_rounded,
       };
 
-  /// Colores semánticos fijos por categoría, iguales en cualquier tema,
-  /// para que se puedan distinguir de un vistazo en calendario y filtros.
+  /// Fijos: iguales en cualquier tema, no vienen de [ColorScheme].
   Color get color => switch (this) {
         TaskCategory.trabajo => const Color(0xFF4A90D9),
         TaskCategory.estudio => const Color(0xFFAB6FDB),
@@ -40,7 +39,6 @@ extension TaskCategoryX on TaskCategory {
       };
 }
 
-/// Chip compacto de categoría: icono + etiqueta, coloreado según la categoría.
 class TaskCategoryChip extends StatelessWidget {
   final TaskCategory category;
   final bool filled;

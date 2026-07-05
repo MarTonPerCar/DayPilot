@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Casilla de estadística (icono + valor + etiqueta) usada en las tarjetas
-/// de resumen de perfil y de puntos del día. Se coloca directamente dentro
-/// de un [Row]: ya incluye su propio [Expanded].
+/// Ya incluye su propio [Expanded]; colocar directamente dentro de un [Row].
 class StatTile extends StatelessWidget {
   final IconData icon;
   final Color color;

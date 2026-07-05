@@ -52,7 +52,6 @@ class _HabitsScreenState extends State<HabitsScreen> {
             steps: AppData.stepsToday,
             goal: _stepsGoal,
             pointsEarnedToday: AppData.pointsTodayFromSteps,
-            // Nota: esta rama es solo diseño — la meta no se persiste.
             onConfigureGoal: () => showStepsGoalSheet(
               context,
               currentGoal: _stepsGoal,

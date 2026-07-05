@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import '../basic/task_category.dart';
 
-/// Selección única de categoría: chips con icono propio por categoría;
-/// la seleccionada se rellena con el color primario del tema.
 class CategoryChipGroup extends StatelessWidget {
   final TaskCategory? selected;
   final ValueChanged<TaskCategory> onChanged;

@@ -15,9 +15,6 @@ class DropdownPillItem<T> {
   });
 }
 
-/// Botón tipo pill que abre un menú de opciones (filtro). Flutter posiciona
-/// el menú automáticamente por encima o por debajo del botón según el
-/// espacio disponible en pantalla.
 class DropdownPill<T> extends StatelessWidget {
   final String label;
   final List<DropdownPillItem<T>> items;

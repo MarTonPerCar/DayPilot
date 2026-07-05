@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Sección de formulario plegable: icono + título + flecha que rota entre
-/// "abajo" (expandida) y "derecha" (colapsada). Usada en el formulario de
-/// nueva tarea para agrupar Información / Detalles / Recordatorio.
 class DayPilotCollapsibleSection extends StatefulWidget {
   final IconData icon;
   final String title;

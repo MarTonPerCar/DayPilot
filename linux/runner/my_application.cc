@@ -20,9 +20,7 @@ static void my_application_activate(GApplication* application) {
   GtkWindow* window =
       GTK_WINDOW(gtk_application_window_new(GTK_APPLICATION(application)));
 
-  // Utility windows are placed by the app instead of auto-centered by the
-  // window manager (Mutter centers plain top-level windows on first map,
-  // which fights the flyout's own corner positioning).
+  // Prevents Mutter from auto-centering the flyout on first map.
   gtk_window_set_type_hint(window, GDK_WINDOW_TYPE_HINT_UTILITY);
 
   // Use a header bar when running in GNOME as this is the common style used
@@ -52,9 +50,7 @@ static void my_application_activate(GApplication* application) {
     gtk_window_set_title(window, "test_diseno_flutter");
   }
 
-  // Must match mobileWindowSize in lib/core/window/desktop_window.dart —
-  // window_manager takes over sizing from there, but the window is created
-  // with this size so there's no visible resize once it's shown.
+  // Must match mobileWindowSize in desktop_window.dart.
   gtk_window_set_default_size(window, 390, 844);
   gtk_widget_realize(GTK_WIDGET(window));
 

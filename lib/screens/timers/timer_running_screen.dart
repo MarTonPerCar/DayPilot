@@ -3,9 +3,6 @@ import 'package:flutter/material.dart';
 import '../../components/basic/top_bar.dart';
 import '../../l10n/app_localizations.dart';
 
-/// Pantalla de cronómetro en marcha. Funciona tanto para presets simples
-/// (una sola cuenta atrás) como para Pomodoro (varias sesiones que alternan
-/// trabajo/descanso, con indicador de sesión y botón de saltar).
 class TimerRunningScreen extends StatefulWidget {
   final String title;
   final Color color;

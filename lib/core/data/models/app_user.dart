@@ -1,6 +1,5 @@
-/// Mirrors a row of the `users` table (see `Informacion-Supabase`'s
-/// `01_schema_v004.sql`). Stats like streaks or points-to-next-level live in
-/// separate tables and are fetched by other features, not here.
+/// Mirrors `users` (see `01_schema_v004.sql`) — stats like streaks live in
+/// separate tables, fetched elsewhere.
 class AppUser {
   const AppUser({
     required this.id,

@@ -39,8 +39,6 @@ class DayPilotReactions extends StatelessWidget {
   }
 }
 
-/// Botón circular que despliega una píldora con 4 emojis al pulsarlo y,
-/// tras elegir uno, se convierte en una marca de "ya reaccionado".
 /// Solo se permite una reacción por usuario.
 class DayPilotReactionPicker extends StatefulWidget {
   final String? selected;

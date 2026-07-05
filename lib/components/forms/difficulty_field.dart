@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import '../basic/task_dot.dart';
 
-/// Selector segmentado de dificultad (Fácil/Media/Difícil). Cada opción usa
-/// su color semántico fijo, relleno cuando está seleccionada.
 class DifficultyField extends StatelessWidget {
   final TaskDifficulty value;
   final ValueChanged<TaskDifficulty> onChanged;

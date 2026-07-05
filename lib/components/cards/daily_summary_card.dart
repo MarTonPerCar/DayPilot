@@ -51,7 +51,6 @@ class DailySummaryCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── Header: greeting + streak badge
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -103,7 +102,6 @@ class DailySummaryCard extends StatelessWidget {
 
             const Spacer(),
 
-            // ── 2×2 stat grid
             Row(
               children: [
                 Expanded(

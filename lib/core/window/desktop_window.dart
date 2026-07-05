@@ -6,15 +6,8 @@ import 'package:screen_retriever/screen_retriever.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
 
-/// Fixed size of the flyout window, matching a common phone screen so the
-/// mobile UI can be used as-is on desktop.
 const Size mobileWindowSize = Size(390, 844);
-
-/// Gap kept between the flyout and the screen edges when anchoring it to a
-/// corner.
 const double _screenEdgeMargin = 24;
-
-/// Duration/curve of the pop-in shown when the flyout opens or closes.
 const Duration _popDuration = Duration(milliseconds: 220);
 const Curve _popInCurve = Curves.easeOutBack;
 const Curve _popOutCurve = Curves.easeIn;
@@ -22,9 +15,6 @@ const Curve _popOutCurve = Curves.easeIn;
 bool get isDesktopPlatform =>
     !kIsWeb && (Platform.isLinux || Platform.isWindows || Platform.isMacOS);
 
-/// Sets up the window as a frameless, transparent, fixed-size flyout: hidden
-/// and outside the taskbar until opened from the tray icon. Must be called
-/// before `runApp`, after `WidgetsFlutterBinding.ensureInitialized()`.
 Future<void> initDesktopWindow() async {
   if (!isDesktopPlatform) return;
 
@@ -36,18 +26,14 @@ Future<void> initDesktopWindow() async {
       maximumSize: mobileWindowSize,
       skipTaskbar: true,
       titleBarStyle: TitleBarStyle.hidden,
-      // Transparent so the pop-in scale/fade doesn't show a plain window
-      // background around the shrunk content.
-      backgroundColor: Color(0x00000000),
+      backgroundColor: Color(0x00000000), // transparent, for the pop-in fade
       title: 'DayPilot',
     ),
     () async {
       await windowManager.setAsFrameless();
       await windowManager.setResizable(false);
-      // Floats above whatever else has focus whenever it's shown, since
-      // the tray click that opens it shouldn't have to fight for z-order.
       await windowManager.setAlwaysOnTop(true);
-      // Left hidden here on purpose — only the tray icon opens it.
+      // stays hidden — only the tray icon opens it
     },
   );
 
@@ -67,11 +53,8 @@ Future<void> initDesktopWindow() async {
   );
 }
 
-/// Bottom-right corner of the screen's work area (the region excluding the
-/// taskbar/panel/dock, whichever edge it's on). Linux's tray backend
-/// (AppIndicator) never reports the icon's actual position, so unlike
-/// Windows/macOS this can't be anchored to the exact icon/click point — it
-/// always opens in this corner.
+/// Linux's tray backend never reports the icon's position, so this always
+/// opens bottom-right instead of anchoring to the click point.
 Future<Offset> _cornerPosition() async {
   final display = await screenRetriever.getPrimaryDisplay();
   final areaOrigin = display.visiblePosition ?? Offset.zero;
@@ -82,12 +65,8 @@ Future<Offset> _cornerPosition() async {
   );
 }
 
-/// Wraps the app root to drive the flyout: the tray menu opens/hides it, it
-/// hides itself when it loses focus (click elsewhere) — same as a
-/// OneDrive-style tray popup — and it pops in/out with a scale+fade instead
-/// of the window itself moving (window managers don't reliably animate
-/// window position, especially on Linux, but animating the content inside
-/// an already-placed, transparent window works everywhere).
+/// Pops in/out via scale+fade rather than moving the window — window
+/// managers (especially Linux) don't animate position reliably.
 class DesktopFlyoutScope extends StatefulWidget {
   const DesktopFlyoutScope({super.key, required this.child});
 

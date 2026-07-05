@@ -4,9 +4,6 @@ import '../../l10n/app_localizations.dart';
 
 enum ProgressMetric { points, steps, tasks }
 
-/// Tarjeta de progreso: gráfica de línea de los últimos 30 días, con
-/// selector de métrica (puntos/pasos/tareas). Si hay menos de 30 días
-/// de historial, marca con una línea el último día disponible.
 class ProgressChartCard extends StatefulWidget {
   final List<double> pointsHistory;
   final List<double> stepsHistory;
@@ -223,7 +220,6 @@ class _LineChartPainter extends CustomPainter {
     final maxValue = data.isEmpty ? 0.0 : data.reduce(max);
     final niceMax = _niceCeil(maxValue);
 
-    // ── Cuadrícula y etiquetas del eje Y
     for (int i = 0; i <= 4; i++) {
       final v = niceMax * i / 4;
       final y = chartRect.bottom - chartRect.height * (i / 4);
@@ -238,7 +234,6 @@ class _LineChartPainter extends CustomPainter {
       tp.paint(canvas, Offset(0, y - tp.height / 2));
     }
 
-    // ── Etiquetas del eje X (incrementos de `daysStep` hasta `maxDays`)
     for (int d = daysStep; d <= maxDays; d += daysStep) {
       final x = chartRect.left + chartRect.width * (d / maxDays);
       final tp = _text('$d', labelColor);
@@ -247,7 +242,6 @@ class _LineChartPainter extends CustomPainter {
 
     if (data.isEmpty) return;
 
-    // ── Puntos de la serie (día 1 → hoy, dentro del dominio de `maxDays`)
     final points = <Offset>[
       for (int i = 0; i < data.length; i++)
         Offset(
@@ -256,7 +250,6 @@ class _LineChartPainter extends CustomPainter {
         ),
     ];
 
-    // ── Área rellena bajo la curva
     final areaPath = Path()..moveTo(points.first.dx, chartRect.bottom);
     for (final p in points) {
       areaPath.lineTo(p.dx, p.dy);
@@ -273,7 +266,6 @@ class _LineChartPainter extends CustomPainter {
         ).createShader(chartRect),
     );
 
-    // ── Línea
     final linePath = Path()..moveTo(points.first.dx, points.first.dy);
     for (final p in points.skip(1)) {
       linePath.lineTo(p.dx, p.dy);
@@ -288,13 +280,11 @@ class _LineChartPainter extends CustomPainter {
         ..strokeCap = StrokeCap.round,
     );
 
-    // ── Puntos
     final dotPaint = Paint()..color = lineColor;
     for (final p in points) {
       canvas.drawCircle(p, 3, dotPaint);
     }
 
-    // ── Marca del último día disponible (si aún no llega a `maxDays`)
     if (data.length < maxDays) {
       final x = chartRect.left + chartRect.width * (data.length / maxDays);
       _drawDashedLine(

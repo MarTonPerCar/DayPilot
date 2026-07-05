@@ -30,7 +30,6 @@ class ProfileScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 40),
         children: const [
-          // ── Perfil con progreso
           ProfileStatsCard(
             name: AppData.currentUserName,
             username: AppData.currentUserUsername,
@@ -43,7 +42,6 @@ class ProfileScreen extends StatelessWidget {
           ),
           SizedBox(height: 16),
 
-          // ── Datos
           ProfileInfoCard(
             username: AppData.currentUserUsername,
             email: AppData.currentUserEmail,
@@ -51,7 +49,6 @@ class ProfileScreen extends StatelessWidget {
           ),
           SizedBox(height: 16),
 
-          // ── Resumen del día
           DailyPointsCard(
             rankingPosition: AppData.rankingPositionToday,
             pointsToday: AppData.pointsToday,
@@ -62,7 +59,6 @@ class ProfileScreen extends StatelessWidget {
           ),
           SizedBox(height: 16),
 
-          // ── Resumen de la semana pasada
           WeeklyReactionCard(
             weekLabel: AppData.lastWeekLabel,
             points: AppData.lastWeekPoints,

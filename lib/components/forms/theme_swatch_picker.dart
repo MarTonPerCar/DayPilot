@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../l10n/app_localizations.dart';
 
-/// Selector de tema estilo "paleta": franjas de color unidas donde la
-/// seleccionada se expande y muestra su check, una tira de matices del
-/// color activo, y un pie con el nombre del tema — todo dentro de una
-/// única tarjeta con sombra.
 class DayPilotThemeSwatchPicker<T> extends StatelessWidget {
   final T value;
   final List<T> options;
@@ -52,7 +48,6 @@ class DayPilotThemeSwatchPicker<T> extends StatelessWidget {
             borderRadius: BorderRadius.circular(20),
             child: Column(
               children: [
-                // ── Franjas de color: la seleccionada se expande
                 LayoutBuilder(
                   builder: (context, constraints) {
                     final unit = constraints.maxWidth / (options.length + 1);
@@ -78,7 +73,6 @@ class DayPilotThemeSwatchPicker<T> extends StatelessWidget {
                     );
                   },
                 ),
-                // ── Tira de matices del color activo
                 Row(
                   children: List.generate(5, (i) {
                     return Expanded(
@@ -89,7 +83,6 @@ class DayPilotThemeSwatchPicker<T> extends StatelessWidget {
                     );
                   }),
                 ),
-                // ── Pie: nombre del tema + muestra de color
                 Container(
                   color: colors.surface,
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),

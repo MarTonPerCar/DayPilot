@@ -1,6 +1,4 @@
-// Datos de ejemplo (placeholder) para toda la app.
-// Todo lo que se ve en pantalla sale de aquí: cuando haya backend real,
-// basta con sustituir el contenido de esta clase por llamadas a la API.
+// Placeholder: sustituir por llamadas reales cuando haya backend.
 
 import 'package:flutter/material.dart';
 import '../components/basic/task_category.dart';
@@ -170,7 +168,6 @@ class TechRestriction {
 class AppData {
   AppData._();
 
-  // ── Usuario actual (perfil) ──────────────────────────────────────
   static const currentUserName = 'Mario García';
   static const currentUserUsername = 'mario_garcia';
   static const currentUserEmail = 'unNobleXD@hotmail.com';
@@ -182,7 +179,6 @@ class AppData {
   static const currentUserStreak = 12;
   static const currentUserBestStreak = 18;
 
-  // ── Resumen de hoy ────────────────────────────────────────────────
   static const stepsToday = 7432;
   static const stepsGoal = 10000;
   static const tasksCompletedToday = 5;
@@ -194,7 +190,6 @@ class AppData {
   static const pointsTodayFromHabits = 35;
   static const pointsTodayFromTimer = 20;
 
-  // ── Progreso (últimos 30 días, cronológico: día 1 → hoy) ─────────
   static const List<double> last30DaysPoints = [
     64, 58, 70, 66, 60, 55, 62, 59, 53, 60, 57, 54, 58, 62, 65, 60, 57, 50, 33, 20, 8, 0, 45, 132,
   ];
@@ -206,7 +201,6 @@ class AppData {
     4, 5, 6, 3, 5, 4, 6, 5, 3, 4, 5, 6, 4, 5, 6, 5, 4, 3, 2, 1, 0, 1, 4, 7,
   ];
 
-  // ── Resumen de la semana pasada ─────────────────────────────────
   static const lastWeekLabel = 'Semana pasada';
   static const lastWeekPoints = 1640;
   static const lastWeekSteps = 58200;
@@ -218,14 +212,12 @@ class AppData {
     WeeklyReaction(name: 'Lucía Fdez', emoji: '⭐'),
   ];
 
-  // ── Menú principal (home) ────────────────────────────────────────
   static const List<double> homeWeeklyPointsTrend = [120, 180, 95, 210, 160, 240, 237];
   static int get homeStepsProgressPercent =>
       stepsGoal > 0 ? ((stepsToday / stepsGoal) * 100).round() : 0;
   static const homeRivalryPosition = 2;
   static const homeRivalryTotal = 4;
 
-  // ── Amigos ────────────────────────────────────────────────────────
   static const friends = [
     AppFriend('Carlos Ruiz', 'carlos.ruiz@daypilot.test', 80, 1,
         weeklyPoints: 145,
@@ -253,7 +245,6 @@ class AppData {
     AppSearchResult('Javier Prieto', 'javier.prieto@daypilot.test', false, true),
   ];
 
-  // ── Avisos ────────────────────────────────────────────────────────
   static const notifications = [
     AppNotification(
       type: NotificationType.achievement,
@@ -293,7 +284,6 @@ class AppData {
     ),
   ];
 
-  // ── Rivalidad (ranking solo entre amigos) ────────────────────────
   static const rankingUsers = [
     AppRankingUser('Lucía Fernández', 430, 1, false),
     AppRankingUser('Mario García', 320, 12, true),
@@ -301,7 +291,6 @@ class AppData {
     AppRankingUser('Carlos Ruiz', 80, 1, false),
   ];
 
-  // ── Tareas del calendario (julio 2026) ───────────────────────────
   static final today = DateTime(2026, 7, 3);
 
   static List<AppTask> newTaskList() {
@@ -404,7 +393,6 @@ class AppData {
     ];
   }
 
-  // ── Cronómetros ────────────────────────────────────────────────
   static const timerPresets = [
     TimerPreset(
       id: 'pomodoro',
@@ -455,10 +443,8 @@ class AppData {
     ),
   ];
 
-  // ── Recordatorios ─────────────────────────────────────────────
   static List<AppReminder> newReminderList() => [];
 
-  // ── Salud tecnológica ────────────────────────────────────────────
   static List<TechRestriction> newRestrictionList() => [
         TechRestriction(
           id: '1',
@@ -501,7 +487,6 @@ class AppData {
     ('WhatsApp', Icons.chat_rounded, Color(0xFF43A047)),
   ];
 
-  // ── Registro ──────────────────────────────────────────────────────
   static const timezoneOptions = [
     'Europe/Madrid',
     'Europe/London',

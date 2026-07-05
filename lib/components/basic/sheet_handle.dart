@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Tirador de arrastre para hojas inferiores (bottom sheets). Centralizado
-/// para que el gesto visual sea idéntico en todas las hojas de la app.
 class DayPilotSheetHandle extends StatelessWidget {
   const DayPilotSheetHandle({super.key});
 

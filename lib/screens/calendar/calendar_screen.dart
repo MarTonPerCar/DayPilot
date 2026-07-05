@@ -50,8 +50,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
     return map;
   }
 
-  // Nota: esta rama es solo diseño — crear/editar no persiste datos.
-  // La funcionalidad real vive en Test-Funcional-Flutter.
   void _openNewTaskForm() {
     showTaskFormSheet(
       context,

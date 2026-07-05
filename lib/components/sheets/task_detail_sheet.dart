@@ -6,8 +6,6 @@ import '../basic/task_category.dart';
 import '../basic/task_dot.dart';
 import '../cards/calendar_task_card.dart';
 
-/// Abre el detalle de una tarea en una hoja inferior: título, chips de
-/// dificultad/categoría/duración y acciones de completar/editar.
 Future<void> showTaskDetailSheet(
   BuildContext context, {
   required AppTask task,

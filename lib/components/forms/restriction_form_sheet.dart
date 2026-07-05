@@ -6,7 +6,6 @@ import '../basic/sheet_handle.dart';
 import '../basic/text_field.dart';
 import 'dotted_slider.dart';
 
-/// Hoja inferior para crear una restricción de app o de grupo de apps.
 Future<void> showAddRestrictionSheet(
   BuildContext context, {
   required void Function(TechRestriction restriction) onCreate,

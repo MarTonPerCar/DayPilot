@@ -2,12 +2,8 @@ import 'package:flutter/material.dart';
 
 enum DayPilotTheme { sageGreen, ocean, lavender, amber, amoled }
 
-/// Fuente única de verdad para el tema de color activo, para que
-/// cambiarlo desde Ajustes se refleje al instante en toda la app.
 final dayPilotThemeNotifier = ValueNotifier<DayPilotTheme>(DayPilotTheme.sageGreen);
 
-/// Fuente única de verdad para claro/oscuro/sistema, reflejada al instante
-/// por el switch "Modo oscuro" de Ajustes.
 final dayPilotThemeModeNotifier = ValueNotifier<ThemeMode>(ThemeMode.system);
 
 ThemeData buildTheme(DayPilotTheme theme, {bool darkMode = false}) {
@@ -33,8 +29,6 @@ ThemeData _build(ColorScheme light, ColorScheme dark, bool darkMode,
     scaffoldBackgroundColor: darkMode ? bgDark : bgLight,
   );
 }
-
-// ─── VERDE SALVIA ─────────────────────────────────────────────────────────────
 
 const _sageLight = ColorScheme(
   brightness: Brightness.light,
@@ -108,8 +102,6 @@ const _sageDark = ColorScheme(
   surfaceTint: Color(0xFF7EBD8F),
 );
 
-// ─── AZUL OCÉANO ──────────────────────────────────────────────────────────────
-
 const _oceanLight = ColorScheme(
   brightness: Brightness.light,
   primary: Color(0xFF1A6B8A),
@@ -181,8 +173,6 @@ const _oceanDark = ColorScheme(
   inversePrimary: Color(0xFF1A6B8A),
   surfaceTint: Color(0xFF5BC8E8),
 );
-
-// ─── MORADO LAVANDA ───────────────────────────────────────────────────────────
 
 const _lavLight = ColorScheme(
   brightness: Brightness.light,
@@ -256,8 +246,6 @@ const _lavDark = ColorScheme(
   surfaceTint: Color(0xFFBCA0E8),
 );
 
-// ─── NARANJA ÁMBAR ────────────────────────────────────────────────────────────
-
 const _amberLight = ColorScheme(
   brightness: Brightness.light,
   primary: Color(0xFFB85C00),
@@ -329,8 +317,6 @@ const _amberDark = ColorScheme(
   inversePrimary: Color(0xFFB85C00),
   surfaceTint: Color(0xFFFFB366),
 );
-
-// ─── AMOLED ───────────────────────────────────────────────────────────────────
 
 ThemeData _amoledTheme() => ThemeData(
       useMaterial3: true,

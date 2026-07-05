@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Píldora de ancho completo con dos segmentos (puntos / racha)
-/// separados por un divisor vertical.
 class StatsPill extends StatelessWidget {
   final int points;
   final int streak;

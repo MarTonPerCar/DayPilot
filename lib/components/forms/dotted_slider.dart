@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Slider con textura de puntos y una franja rellena hasta el valor actual;
-/// usado en las hojas de configuración (meta de pasos, duración de
-/// cronómetro, número de sesiones de Pomodoro).
 class DottedSliderField extends StatelessWidget {
   final double value;
   final double min;

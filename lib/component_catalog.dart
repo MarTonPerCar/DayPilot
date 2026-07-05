@@ -53,21 +53,17 @@ class ComponentCatalog extends StatefulWidget {
 }
 
 class _ComponentCatalogState extends State<ComponentCatalog> {
-  // Basic
   String _filter = 'Todos';
   String? _reaction;
   int _activeSection = 0;
 
-  // Cards — tasks
   bool _task1Done = false;
   bool _task2Done = false;
   int _swipeEpoch = 0;
 
-  // Cards — limits
   bool _appEnabled = true;
   bool _groupEnabled = true;
 
-  // Forms
   bool _switchVal = true;
   bool _switchVal2 = false;
   String? _selectVal;
@@ -80,7 +76,6 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
   List<String> _chipSelected = ['Trabajo'];
   List<TaskDifficulty> _chipSingle = [TaskDifficulty.medium];
 
-  // Cards — calendario y tareas
   TaskDifficulty? _dropdownDifficulty;
   TaskCategory? _dropdownCategory;
   TaskCategory _catalogCategory = TaskCategory.personal;
@@ -89,7 +84,6 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
   DateTime _catalogMonth = DateTime(2026, 7);
   DateTime _catalogSelectedDay = DateTime(2026, 7, 3);
 
-  // Cards — hábitos
   int _catalogStepsGoal = AppData.stepsGoal;
   bool _catalogReminderEnabled = true;
   late final _catalogRestriction = AppData.newRestrictionList().first;
@@ -119,7 +113,6 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
         children: [
 
-          // ── TopBar ──────────────────────────────────────────────
           _SectionHeader('TopBar'),
           _Preview(child: DayPilotTopBar(title: 'Sin botón atrás')),
           const SizedBox(height: 8),
@@ -143,7 +136,6 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             ),
           ),
 
-          // ── Botones ─────────────────────────────────────────────
           _SectionHeader('Botones'),
           Wrap(
             spacing: 8,
@@ -171,7 +163,6 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             ],
           ),
 
-          // ── Campos de texto ─────────────────────────────────────
           _SectionHeader('Campos de texto'),
           const DayPilotTextField(
             label: 'Nombre de usuario',
@@ -194,7 +185,6 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
           const SizedBox(height: 10),
           const DayPilotPasswordField(),
 
-          // ── Avatar ──────────────────────────────────────────────
           _SectionHeader('Avatar'),
           Row(
             children: [
@@ -210,7 +200,6 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             ],
           ),
 
-          // ── Estado vacío ─────────────────────────────────────────
           _SectionHeader('Estado vacío'),
           const DayPilotEmptyState(
             icon: Icons.task_alt_outlined,
@@ -223,7 +212,6 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             title: 'Sin amigos aún',
           ),
 
-          // ── Separador ────────────────────────────────────────────
           _SectionHeader('Separador'),
           const DayPilotDivider(),
           const SizedBox(height: 8),
@@ -231,7 +219,6 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
           const SizedBox(height: 8),
           const DayPilotDivider(label: 'hoy'),
 
-          // ── Filtros ──────────────────────────────────────────────
           _SectionHeader('Filtros'),
           DayPilotFilterSelector<String>(
             options: _filterOptions,
@@ -240,7 +227,6 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             onSelected: (s) => setState(() => _filter = s),
           ),
 
-          // ── Reacciones ───────────────────────────────────────────
           _SectionHeader('Reacciones'),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
@@ -252,7 +238,6 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             ),
           ),
 
-          // ── Punto de dificultad ──────────────────────────────────
           _SectionHeader('Punto de dificultad'),
           Row(
             children: [
@@ -274,7 +259,6 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             ],
           ),
 
-          // ── Indicador de sección ─────────────────────────────────
           _SectionHeader('Indicador de sección'),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
@@ -296,11 +280,6 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             ),
           ),
 
-          // ════════════════════════════════════════════════════════
-          // TARJETAS
-          // ════════════════════════════════════════════════════════
-
-          // ── Tarjeta de tarea ─────────────────────────────────────
           _SectionHeader('Tarjeta de tarea'),
           TaskCard(
             title: 'Diseñar pantalla de inicio',
@@ -326,7 +305,6 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             completed: true,
           ),
 
-          // ── Tarjeta de tarea (deslizar) ──────────────────────────
           _SectionHeader('Tarjeta de tarea (deslizar)'),
           Text(
             'Desliza hacia la izquierda para eliminar',
@@ -346,7 +324,6 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             onDelete: () => setState(() => _swipeEpoch++),
           ),
 
-          // ── Ranking ──────────────────────────────────────────────
           _SectionHeader('Ranking'),
           RankingCard(
             position: 1,
@@ -373,7 +350,6 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             points: 1870,
           ),
 
-          // ── Podio ────────────────────────────────────────────────
           _SectionHeader('Podio'),
           PodiumCard(
             firstName: 'Mario García',
@@ -384,7 +360,6 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             thirdPoints: 2290,
           ),
 
-          // ── Tarjeta de amigo ─────────────────────────────────────
           _SectionHeader('Tarjeta de amigo'),
           FriendCard(
             name: 'Ana López',
@@ -412,7 +387,6 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             onDecline: () {},
           ),
 
-          // ── Búsqueda de usuario ──────────────────────────────────
           _SectionHeader('Búsqueda de usuario'),
           const UserSearchCard(
             name: 'Nueva Persona',
@@ -431,7 +405,6 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             isPending: true,
           ),
 
-          // ── Hub de hábitos ───────────────────────────────────────
           _SectionHeader('Hub de hábitos'),
           HabitCard(
             icon: Icons.directions_walk_rounded,
@@ -458,7 +431,6 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             onTap: () {},
           ),
 
-          // ── Límite de app ────────────────────────────────────────
           _SectionHeader('Límite de app'),
           AppLimitCard(
             appName: 'Instagram',
@@ -477,7 +449,6 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             enabled: true,
           ),
 
-          // ── Límite de grupo ──────────────────────────────────────
           _SectionHeader('Límite de grupo'),
           GroupLimitCard(
             groupName: 'Redes sociales',
@@ -489,7 +460,6 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             onToggle: () => setState(() => _groupEnabled = !_groupEnabled),
           ),
 
-          // ── Notificación ─────────────────────────────────────────
           _SectionHeader('Notificación'),
           const NotificationCard(
             type: NotificationType.social,
@@ -519,7 +489,6 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             read: false,
           ),
 
-          // ── Temporizador activo ──────────────────────────────────
           _SectionHeader('Temporizador activo'),
           TimerCard(
             modeName: 'Pomodoro',
@@ -529,7 +498,6 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             onPlayPause: () {},
           ),
 
-          // ── Hub de temporizadores ────────────────────────────────
           _SectionHeader('Hub de temporizadores'),
           TimerHubCard(
             icon: Icons.timer_rounded,
@@ -562,7 +530,6 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             onTap: () {},
           ),
 
-          // ── Estadísticas de perfil ───────────────────────────────
           _SectionHeader('Estadísticas de perfil'),
           const ProfileStatsCard(
             name: 'Mario García',
@@ -575,7 +542,6 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             bestStreak: 18,
           ),
 
-          // ── Resumen semanal ──────────────────────────────────────
           _SectionHeader('Resumen semanal'),
           const WeeklyReactionCard(
             weekLabel: '23 jun – 29 jun',
@@ -590,7 +556,6 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             ],
           ),
 
-          // ── Pasos de hoy ─────────────────────────────────────────
           _SectionHeader('Pasos de hoy'),
           const StepsCard(
             steps: 7432,
@@ -598,18 +563,15 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             pointsEarned: 37,
           ),
 
-          // ── Resumen semanal de pasos ─────────────────────────────
           _SectionHeader('Resumen semanal de pasos'),
           const StepsSummaryCard(
             weeklySteps: [8210, 11430, 6800, 9340, 7432, 4200, 0],
             goal: 10000,
           ),
 
-          // ── Calendario ───────────────────────────────────────────
           _SectionHeader('Calendario'),
           const CalendarWeekRow(),
 
-          // ── Calendario mensual ────────────────────────────────────
           _SectionHeader('Calendario mensual'),
           MonthCalendarCard(
             month: _catalogMonth,
@@ -625,7 +587,6 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             onDaySelected: (d) => setState(() => _catalogSelectedDay = d),
           ),
 
-          // ── Chips de categoría y dificultad ───────────────────────
           _SectionHeader('Chips de categoría y dificultad'),
           Wrap(
             spacing: 8,
@@ -636,7 +597,6 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             ],
           ),
 
-          // ── Filtro desplegable ────────────────────────────────────
           _SectionHeader('Filtro desplegable'),
           Row(
             children: [
@@ -673,7 +633,6 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             ],
           ),
 
-          // ── Tarjeta de tarea del calendario ────────────────────────
           _SectionHeader('Tarjeta de tarea del calendario'),
           CalendarTaskCard(
             title: 'Preparar presentación TFG',
@@ -686,7 +645,6 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             onDelete: () {},
           ),
 
-          // ── Resumen del día ──────────────────────────────────────
           _SectionHeader('Resumen del día'),
           const DailySummaryCard(
             userName: 'Demo',
@@ -699,7 +657,6 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             rankingPosition: 4,
           ),
 
-          // ── Gráfica de progreso ───────────────────────────────────
           _SectionHeader('Gráfica de progreso'),
           const ProgressChartCard(
             pointsHistory: AppData.last30DaysPoints,
@@ -707,7 +664,6 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             tasksHistory: AppData.last30DaysTasks,
           ),
 
-          // ── Progreso de pasos ──────────────────────────────────────
           _SectionHeader('Progreso de pasos'),
           StepsProgressCard(
             steps: AppData.stepsToday,
@@ -716,11 +672,9 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             onConfigureGoal: () => setState(() => _catalogStepsGoal += 1000),
           ),
 
-          // ── Preset de cronómetro ───────────────────────────────────
           _SectionHeader('Preset de cronómetro'),
           TimerPresetCard(preset: AppData.timerPresets.first, onPlay: () {}),
 
-          // ── Tarjeta de recordatorio ─────────────────────────────────
           _SectionHeader('Tarjeta de recordatorio'),
           ReminderCard(
             title: 'Estirar la espalda',
@@ -730,7 +684,6 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             onDelete: () {},
           ),
 
-          // ── Tarjeta de restricción tecnológica ──────────────────────
           _SectionHeader('Tarjeta de restricción tecnológica'),
           TechRestrictionCard(
             restriction: _catalogRestriction,
@@ -738,11 +691,6 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             onDelete: () {},
           ),
 
-          // ════════════════════════════════════════════════════════
-          // FORMULARIOS
-          // ════════════════════════════════════════════════════════
-
-          // ── Sección plegable ─────────────────────────────────────
           _SectionHeader('Sección plegable'),
           DayPilotCollapsibleSection(
             icon: Icons.list_alt_rounded,
@@ -763,7 +711,6 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             ],
           ),
 
-          // ── Switch tile ──────────────────────────────────────────
           _SectionHeader('Switch tile'),
           DayPilotFormSection(
             title: 'Opciones',
@@ -784,7 +731,6 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             ],
           ),
 
-          // ── Select field ─────────────────────────────────────────
           _SectionHeader('Select field'),
           DayPilotSelectField<String>(
             label: 'Frecuencia',
@@ -796,7 +742,6 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             onChanged: (v) => setState(() => _selectVal = v),
           ),
 
-          // ── Slider ───────────────────────────────────────────────
           _SectionHeader('Slider'),
           DayPilotFormSection(
             title: 'Límite de tiempo',
@@ -813,7 +758,6 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             ],
           ),
 
-          // ── Stepper ──────────────────────────────────────────────
           _SectionHeader('Stepper'),
           DayPilotFormSection(
             title: 'Duración',
@@ -830,7 +774,6 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             ],
           ),
 
-          // ── Selector de fecha ────────────────────────────────────
           _SectionHeader('Selector de fecha'),
           DayPilotDateField(
             label: 'Fecha límite',
@@ -838,7 +781,6 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             onChanged: (d) => setState(() => _pickedDate = d),
           ),
 
-          // ── Selector de hora ─────────────────────────────────────
           _SectionHeader('Selector de hora'),
           DayPilotTimeField(
             label: 'Hora de aviso',
@@ -846,7 +788,6 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             onChanged: (t) => setState(() => _pickedTime = t),
           ),
 
-          // ── Grupo de radio ───────────────────────────────────────
           _SectionHeader('Grupo de radio'),
           DayPilotFormSection(
             title: 'Dificultad',
@@ -864,7 +805,6 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             ],
           ),
 
-          // ── Grupo de chips ───────────────────────────────────────
           _SectionHeader('Grupo de chips (multi)'),
           DayPilotFormSection(
             title: 'Categorías',
@@ -896,7 +836,6 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             ],
           ),
 
-          // ── Selector de color ────────────────────────────────────
           _SectionHeader('Selector de color'),
           DayPilotFormSection(
             title: 'Color de categoría',
@@ -910,7 +849,6 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             ],
           ),
 
-          // ── Sección de formulario ─────────────────────────────────
           _SectionHeader('Sección de formulario'),
           DayPilotFormSection(
             title: 'Configuración del temporizador',
@@ -937,8 +875,6 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
     );
   }
 }
-
-// ── Helpers ─────────────────────────────────────────────────────────────────
 
 class _SectionHeader extends StatelessWidget {
   final String title;

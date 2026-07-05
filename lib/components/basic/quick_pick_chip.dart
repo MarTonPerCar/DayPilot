@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Chip pill para accesos rápidos en sliders (metas, duraciones, sesiones):
-/// relleno cuando está seleccionado, contorneado cuando no.
 class QuickPickChip extends StatelessWidget {
   final String label;
   final bool selected;

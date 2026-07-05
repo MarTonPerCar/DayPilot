@@ -2,14 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'calendar_day_card.dart';
 
-/// Calendario mensual completo: navegación de mes, cabecera de días de la
-/// semana (lunes a domingo) y cuadrícula de 6×7 con indicador de densidad
-/// de tareas por día. El estado (mes mostrado, día seleccionado) lo controla
-/// quien lo use, para que la pantalla pueda reaccionar a la selección.
-///
-/// Las celdas usan una altura fija (no un aspect ratio) para que el alto
-/// del calendario no crezca al ensanchar la pantalla: el ancho siempre
-/// coincide con el resto del contenido (filtros, tarjetas de tarea).
+/// Las celdas usan altura fija (no aspect ratio) para que el calendario no
+/// crezca en alto al ensanchar la pantalla.
 class MonthCalendarCard extends StatelessWidget {
   final DateTime month;
   final DateTime selectedDay;
@@ -52,7 +46,6 @@ class MonthCalendarCard extends StatelessWidget {
         padding: const EdgeInsets.all(14),
         child: Column(
           children: [
-            // ── Navegación de mes
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -72,7 +65,6 @@ class MonthCalendarCard extends StatelessWidget {
             ),
             const SizedBox(height: 4),
 
-            // ── Cabecera de días de la semana
             Row(
               children: _weekdayLabels.map((l) {
                 return Expanded(
@@ -90,7 +82,6 @@ class MonthCalendarCard extends StatelessWidget {
             ),
             const SizedBox(height: 4),
 
-            // ── Cuadrícula de días
             for (int row = 0; row < totalCells ~/ 7; row++)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 1),

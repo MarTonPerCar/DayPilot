@@ -6,9 +6,6 @@ import '../../l10n/app_localizations.dart';
 
 class RivalryScreen extends StatelessWidget {
   const RivalryScreen({super.key});
-
-  // Solo amigos: la rivalidad no tiene clasificación global.
-  // Se puntúa únicamente por puntos acumulados en el mes en curso.
   static const _users = AppData.rankingUsers;
 
   @override
@@ -22,7 +19,6 @@ class RivalryScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
-          // Ámbito: puntos acumulados este mes, solo entre amigos.
           Row(
             children: [
               Icon(Icons.calendar_month_rounded, size: 16, color: colors.onSurfaceVariant),
@@ -38,7 +34,6 @@ class RivalryScreen extends StatelessWidget {
           ),
           const SizedBox(height: 16),
 
-          // Podium
           PodiumCard(
             firstName: _users[0].name,
             firstPoints: _users[0].points,
@@ -49,7 +44,6 @@ class RivalryScreen extends StatelessWidget {
           ),
           const SizedBox(height: 20),
 
-          // Full list
           Text(
             l10n.rivalryFullRanking,
             style: text.labelSmall?.copyWith(

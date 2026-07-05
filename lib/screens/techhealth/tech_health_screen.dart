@@ -103,7 +103,6 @@ class _TechHealthScreenState extends State<TechHealthScreen> {
               ))),
         ],
       ),
-      // Nota: esta rama es solo diseño — crear/eliminar no persiste datos.
       floatingActionButton: FloatingActionButton(
         onPressed: () => showAddRestrictionSheet(
           context,

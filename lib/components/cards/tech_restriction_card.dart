@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import '../../data/app_data.dart';
 import '../../l10n/app_localizations.dart';
 
-/// Tarjeta de restricción de salud tecnológica: app/grupo, uso de hoy vs
-/// límite, intervalo de notificación y aviso de que se elimina al día
-/// siguiente (las restricciones son de un solo día).
+/// Las restricciones son de un solo día: se eliminan al día siguiente.
 class TechRestrictionCard extends StatelessWidget {
   final TechRestriction restriction;
   final ValueChanged<bool> onToggle;

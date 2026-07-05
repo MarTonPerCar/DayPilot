@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../data/app_data.dart';
 
-/// Fila de preset de cronómetro: icono, nombre, descripción y botón de
-/// inicio rápido coloreado según el preset.
 class TimerPresetCard extends StatelessWidget {
   final TimerPreset preset;
   final VoidCallback onPlay;

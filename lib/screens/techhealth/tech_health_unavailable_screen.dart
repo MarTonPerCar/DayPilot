@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import '../../components/basic/top_bar.dart';
 import '../../l10n/app_localizations.dart';
 
-/// Versión mostrada en plataformas donde la salud tecnológica no puede
-/// funcionar (de momento, cualquier cosa que no sea Android/iOS): la
-/// función depende de permisos y APIs del sistema (estadísticas de uso,
-/// accesibilidad) que no existen en escritorio/web.
+/// Salud tecnológica depende de permisos/APIs (accesibilidad, uso de apps)
+/// que no existen fuera de Android/iOS.
 class TechHealthUnavailableScreen extends StatelessWidget {
   const TechHealthUnavailableScreen({super.key});
 

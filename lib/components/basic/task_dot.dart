@@ -13,8 +13,7 @@ extension TaskDifficultyX on TaskDifficulty {
     };
   }
 
-  /// Colores semánticos fijos (verde/ámbar/rojo): la dificultad se lee igual
-  /// en cualquier paleta de tema, igual que ya ocurre con `colorScheme.error`.
+  /// Fijos: iguales en cualquier tema, no vienen de [ColorScheme].
   Color color(ColorScheme colors) => switch (this) {
         TaskDifficulty.easy => const Color(0xFF4CAF50),
         TaskDifficulty.medium => const Color(0xFFFFA726),
@@ -22,7 +21,6 @@ extension TaskDifficultyX on TaskDifficulty {
       };
 }
 
-/// Chip compacto con el color semántico de la dificultad (verde/ámbar/rojo).
 class DifficultyChip extends StatelessWidget {
   final TaskDifficulty difficulty;
   const DifficultyChip({super.key, required this.difficulty});

@@ -16,7 +16,6 @@ class RemindersScreen extends StatefulWidget {
 class _RemindersScreenState extends State<RemindersScreen> {
   final List<AppReminder> _reminders = AppData.newReminderList();
 
-  // Nota: esta rama es solo diseño — crear/eliminar no persiste datos.
   void _openForm() {
     showReminderFormSheet(
       context,

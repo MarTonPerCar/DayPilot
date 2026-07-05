@@ -4,7 +4,6 @@ import '../basic/quick_pick_chip.dart';
 import '../basic/sheet_handle.dart';
 import 'dotted_slider.dart';
 
-/// Hoja inferior para configurar la meta diaria de pasos.
 Future<void> showStepsGoalSheet(
   BuildContext context, {
   required int currentGoal,

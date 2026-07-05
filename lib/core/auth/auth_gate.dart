@@ -5,19 +5,12 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../screens/auth/login_screen.dart';
 import '../../screens/main_shell.dart';
 
-/// Supabase restores a persisted session from local storage asynchronously
-/// on startup; this decides the initial screen (login vs. already signed
-/// in), mirroring the Android app's `AppSessionViewModel`. The interactive
-/// login flow itself navigates directly (see `LoginScreen._submitLogin`)
-/// rather than relying on this rebuilding — it only needs to fire once per
-/// cold start.
+/// Only handles cold-start session restore — the login form navigates
+/// directly on success instead of relying on this to rebuild.
 final authStateChangesProvider = StreamProvider<AuthState>((ref) {
   return Supabase.instance.client.auth.onAuthStateChange;
 });
 
-/// App root once past `main()`: shows the login screen or the app shell
-/// depending on session state, with a brief loading screen while Supabase
-/// checks local storage for a persisted session.
 class AuthGate extends ConsumerWidget {
   const AuthGate({super.key});
 

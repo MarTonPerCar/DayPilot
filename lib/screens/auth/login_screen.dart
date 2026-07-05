@@ -12,8 +12,6 @@ import '../../l10n/app_localizations.dart';
 import '../main_shell.dart';
 import 'forgot_password_screen.dart';
 
-/// Pantalla de acceso: login y registro son dos caras de una misma tarjeta
-/// que gira en 3D al cambiar el interruptor de arriba.
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
@@ -148,8 +146,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 }
 
-/// Interruptor tipo pill "Iniciar sesión" / "Crear cuenta" con franja que
-/// se desliza al lado activo.
 class _AuthToggle extends StatelessWidget {
   final bool showRegister;
   final ValueChanged<bool> onChanged;
@@ -205,9 +201,6 @@ class _AuthToggle extends StatelessWidget {
   }
 }
 
-/// Tarjeta que gira en 3D (eje Y) entre [front] y [back] cuando cambia
-/// [showBack]; se redimensiona con suavidad si las caras tienen alturas
-/// distintas.
 class _FlipCard extends StatefulWidget {
   final bool showBack;
   final Widget front;

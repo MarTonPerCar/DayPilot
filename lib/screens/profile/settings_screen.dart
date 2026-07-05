@@ -96,7 +96,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 40),
         children: [
-          // ── Tema de color (sin tarjeta, sobre el fondo)
           ValueListenableBuilder<DayPilotTheme>(
             valueListenable: dayPilotThemeNotifier,
             builder: (context, activeTheme, _) {
@@ -111,7 +110,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           const SizedBox(height: 20),
 
-          // ── Modo oscuro
           ValueListenableBuilder<ThemeMode>(
             valueListenable: dayPilotThemeModeNotifier,
             builder: (context, activeThemeMode, _) {
@@ -131,7 +129,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           const SizedBox(height: 16),
 
-          // ── Notificaciones
           DayPilotFormSection(
             children: [
               DayPilotSwitchTile(
@@ -163,7 +160,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           const SizedBox(height: 16),
 
-          // ── Editar perfil
           DayPilotFormSection(
             children: [
               ListTile(
@@ -177,7 +173,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           const SizedBox(height: 16),
 
-          // ── Idioma
           ValueListenableBuilder<Locale>(
             valueListenable: dayPilotLocaleNotifier,
             builder: (context, activeLocale, _) {
@@ -199,7 +194,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           const SizedBox(height: 16),
 
-          // ── Desarrollador
           DayPilotFormSection(
             title: l10n.settingsDeveloper,
             children: [
@@ -220,7 +214,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const DayPilotDivider(),
           const SizedBox(height: 16),
 
-          // ── Sign out
           FilledButton.icon(
             onPressed: () => Navigator.pushAndRemoveUntil(
               context,

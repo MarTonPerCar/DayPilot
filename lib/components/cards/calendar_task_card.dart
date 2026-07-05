@@ -2,10 +2,7 @@ import 'package:flutter/material.dart';
 import '../basic/task_category.dart';
 import '../basic/task_dot.dart';
 
-/// Fila de tarea del calendario: checkbox, título, chips de categoría y
-/// duración, y accesos directos de editar/eliminar. La franja superior se
-/// divide en dos: la mitad izquierda es el color de dificultad, la derecha
-/// el color de categoría.
+/// La franja superior se divide en dos: mitad dificultad, mitad categoría.
 class CalendarTaskCard extends StatelessWidget {
   final String title;
   final TaskDifficulty difficulty;

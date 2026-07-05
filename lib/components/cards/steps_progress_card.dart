@@ -2,8 +2,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import '../../l10n/app_localizations.dart';
 
-/// Tarjeta principal de "Pasos" del hub de hábitos: medidor circular de
-/// progreso, hitos (50/75/100%), y resumen de puntos ganados hoy.
 class StepsProgressCard extends StatelessWidget {
   final int steps;
   final int goal;

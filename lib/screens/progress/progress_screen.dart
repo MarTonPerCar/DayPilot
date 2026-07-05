@@ -16,7 +16,6 @@ class ProgressScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 40),
         children: const [
-          // ── Resumen del día
           DailyPointsCard(
             rankingPosition: AppData.rankingPositionToday,
             pointsToday: AppData.pointsToday,
@@ -27,7 +26,6 @@ class ProgressScreen extends StatelessWidget {
           ),
           SizedBox(height: 16),
 
-          // ── Gráfica de progreso de los últimos 30 días
           ProgressChartCard(
             pointsHistory: AppData.last30DaysPoints,
             stepsHistory: AppData.last30DaysSteps,

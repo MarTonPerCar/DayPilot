@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Fila de recordatorio: título, fecha/hora relativa, eliminar y activar.
 class ReminderCard extends StatelessWidget {
   final String title;
   final DateTime dateTime;

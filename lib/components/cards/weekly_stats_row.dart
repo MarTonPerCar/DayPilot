@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Fila de 4 estadísticas semanales (puntos/tareas/pasos/racha), compartida
-/// entre FriendCard y WeeklyReactionCard para que se vean igual.
+/// Compartida entre FriendCard y WeeklyReactionCard para que se vean igual.
 class WeeklyStatsRow extends StatelessWidget {
   final int points;
   final int tasks;

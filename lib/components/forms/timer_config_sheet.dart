@@ -4,7 +4,6 @@ import '../basic/quick_pick_chip.dart';
 import '../basic/sheet_handle.dart';
 import 'dotted_slider.dart';
 
-/// Hoja para configurar un cronómetro de duración libre ("Custom").
 Future<void> showCustomTimerSheet(
   BuildContext context, {
   required Color color,
@@ -99,7 +98,6 @@ class _CustomTimerSheetState extends State<_CustomTimerSheet> {
   }
 }
 
-/// Hoja para configurar una sesión de Pomodoro (número de sesiones).
 Future<void> showPomodoroConfigSheet(
   BuildContext context, {
   required Color color,

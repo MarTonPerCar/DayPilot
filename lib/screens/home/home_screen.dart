@@ -25,7 +25,6 @@ class HomeScreen extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
               child: Column(
                 children: [
-                  // ── Resumen del día (38%)
                   SizedBox(
                     height: summaryH,
                     child: const DailySummaryCard(
@@ -40,7 +39,6 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  // ── 2×2 menú principal (62%)
                   SizedBox(
                     height: gridH,
                     child: const _HomeGrid(),
