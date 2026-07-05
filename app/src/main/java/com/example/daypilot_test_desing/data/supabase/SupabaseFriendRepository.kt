@@ -81,7 +81,6 @@ class SupabaseFriendRepository : FriendRepository {
             val users   = getUsersForIds(friendIds)
             val streaks = getStreaksForIds(friendIds)
 
-            // Most-recent weekly summary per friend
             val allSummaries = try {
                 supabase.from("user_weekly_summary").select {
                     filter { isIn("user_id", friendIds) }
@@ -90,7 +89,6 @@ class SupabaseFriendRepository : FriendRepository {
             } catch (_: Exception) { emptyList() }
             val summaryByUser = allSummaries.groupBy { it.userId }.mapValues { it.value.first() }
 
-            // My reactions to those summaries
             val summaryIds = summaryByUser.values.map { it.id }
             val myReactions = if (summaryIds.isNotEmpty()) {
                 try {
@@ -171,7 +169,6 @@ class SupabaseFriendRepository : FriendRepository {
             InsertFriendDto(requesterId = userId, receiverId = uid)
         )
         try {
-            // Notify the requester that their request was accepted
             val myName = supabase.from("users").select {
                 filter { eq("id", uid) }
                 limit(1)
@@ -211,10 +208,9 @@ class SupabaseFriendRepository : FriendRepository {
                 weeklySummaryId = summaryId,
                 type            = reaction.toDbString()
             )
-        )
+        ) { onConflict = "from_user_id,weekly_summary_id" }
 
         try {
-            // Fetch both names in one query
             val users = getUsersForIds(listOf(uid, userId))
             val myName     = users.firstOrNull { it.id == uid }?.name     ?: ""
             val targetName = users.firstOrNull { it.id == userId }?.name  ?: ""
@@ -226,7 +222,6 @@ class SupabaseFriendRepository : FriendRepository {
                 ReactionType.STAR   -> "⭐"
             }
 
-            // Notification for the recipient (requires INSERT policy for any authenticated user)
             if (targetName.isNotEmpty()) {
                 SupabaseNotificationRepository.insert(
                     userId = userId,
@@ -236,7 +231,6 @@ class SupabaseFriendRepository : FriendRepository {
                 )
             }
 
-            // Notification for the sender (always succeeds — inserting for self)
             if (targetName.isNotEmpty()) {
                 SupabaseNotificationRepository.insertForCurrentUser(
                     type  = "REACTION",
@@ -252,7 +246,6 @@ class SupabaseFriendRepository : FriendRepository {
         val uid = userId()
         val q = query.lowercase()
         return try {
-            // Search by username_lower OR email
             supabase.from("users").select {
                 filter {
                     or {
@@ -282,7 +275,6 @@ class SupabaseFriendRepository : FriendRepository {
             InsertFriendRequestDto(fromUserId = uid, toUserId = userId)
         )
         try {
-            // Notify the recipient about the request
             val myName = supabase.from("users").select {
                 filter { eq("id", uid) }
                 limit(1)
@@ -299,7 +291,6 @@ class SupabaseFriendRepository : FriendRepository {
 
     override suspend fun removeFriend(userId: String) {
         val uid = this.userId() ?: return
-        // Try both directions — exactly one will match the stored friendship row.
         supabase.from("friends").delete {
             filter { eq("requester_id", uid); eq("receiver_id", userId) }
         }

@@ -1,11 +1,19 @@
 package com.example.daypilot_test_desing.core.data.local
 
+import android.content.Context
 import com.example.daypilot_test_desing.core.data.model.NotificationData
 import com.example.daypilot_test_desing.core.data.model.NotificationType
 import java.util.UUID
 
 object NotificationHub {
-    val repo = LocalNotificationRepository()
+    private var _repo: LocalNotificationRepository? = null
+
+    fun init(context: Context) {
+        if (_repo == null) _repo = LocalNotificationRepository(context.applicationContext)
+    }
+
+    val repo: LocalNotificationRepository
+        get() = _repo ?: error("NotificationHub.init(context) must be called before use")
 
     fun add(title: String, message: String, type: NotificationType) {
         repo.add(

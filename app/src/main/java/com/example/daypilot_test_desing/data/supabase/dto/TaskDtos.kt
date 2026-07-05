@@ -17,13 +17,13 @@ data class CalendarTaskDto(
     val category: String,
     val difficulty: String,
     @SerialName("is_completed") val isCompleted: Boolean,
+    @SerialName("is_earned") val isEarned: Boolean = false,
     @SerialName("estimated_minutes") val estimatedMinutes: Int,
     @SerialName("reminder_enabled") val reminderEnabled: Boolean = false,
     @SerialName("is_recurring") val isRecurring: Boolean = false,
     val date: String
 )
 
-/** Payload for INSERT into `tasks`. */
 @Serializable
 data class NewTaskDto(
     val id: String,
@@ -38,10 +38,12 @@ data class NewTaskDto(
     @SerialName("is_recurring") val isRecurring: Boolean
 )
 
-/** Payload for INSERT into `task_days`. */
 @Serializable
 data class NewTaskDayDto(
     @SerialName("task_id") val taskId: String,
     @SerialName("user_id") val userId: String,
     val date: String
 )
+
+@Serializable
+data class TaskIdDto(val id: String)

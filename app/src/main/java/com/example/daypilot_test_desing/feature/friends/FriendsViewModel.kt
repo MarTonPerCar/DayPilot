@@ -50,10 +50,8 @@ class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
         viewModelScope.launch {
             try {
                 repo.acceptRequest(userId)
-                // Propagate updated friends list to SessionCache so HomeVM sees fresh count
                 SessionCache.friends.value    = _uiState.value.friends
                 SessionCache.friendsFetchedAt = System.currentTimeMillis()
-                // Ranking changes when a new friend is added
                 SessionCache.ranking.value    = null
                 SessionCache.rankingFetchedAt = 0L
                 NotificationHub.add(
@@ -106,23 +104,12 @@ class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
         }
         viewModelScope.launch {
             try {
+                // repo.reactToFriend() already persists a "Reacción enviada" notification
+                // for the current user and the always-on realtime subscription delivers it
+                // to NotificationHub — adding it here too would double it up.
                 repo.reactToFriend(userId, reaction)
                 SessionCache.friends.value    = _uiState.value.friends
                 SessionCache.friendsFetchedAt = System.currentTimeMillis()
-                val name  = _uiState.value.friends.firstOrNull { it.id == userId }?.name
-                val emoji = when (reaction) {
-                    ReactionType.FIRE   -> "🔥"
-                    ReactionType.CLAP   -> "👏"
-                    ReactionType.STRONG -> "💪"
-                    ReactionType.STAR   -> "⭐"
-                }
-                if (name != null) {
-                    NotificationHub.add(
-                        title   = "Reacción enviada $emoji",
-                        message = "Reaccionaste a la semana de $name",
-                        type    = NotificationType.SOCIAL
-                    )
-                }
             } catch (e: Exception) {
                 _uiState.update { state ->
                     state.copy(friends = originalFriends, userMessage = R.string.error_react_friend)
@@ -139,7 +126,6 @@ class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
                 repo.removeFriend(userId)
                 SessionCache.friends.value    = _uiState.value.friends
                 SessionCache.friendsFetchedAt = System.currentTimeMillis()
-                // Ranking changes when a friend is removed
                 SessionCache.ranking.value    = null
                 SessionCache.rankingFetchedAt = 0L
             } catch (e: Exception) {

@@ -25,6 +25,7 @@ fun ProfileScreen(
     memberSince: String,
     level: Int,
     totalPoints: Int,
+    pointsToNextLevel: Int,
     currentStreak: Int,
     longestStreak: Int,
     rankingPosition: Int,
@@ -59,14 +60,14 @@ fun ProfileScreen(
             ProfileStatsCard(
                 name          = name,
                 username      = username,
-                level         = level,
-                totalPoints   = totalPoints,
+                level             = level,
+                totalPoints       = totalPoints,
+                pointsToNextLevel = pointsToNextLevel,
                 currentStreak = currentStreak,
                 longestStreak = longestStreak,
                 avatarUrl     = avatarUrl
             )
 
-            // ── Info básica ──────────────────────────────────────
             Card(
                 modifier  = Modifier.fillMaxWidth(),
                 shape     = RoundedCornerShape(20.dp),
@@ -98,7 +99,6 @@ fun ProfileScreen(
                 }
             }
 
-            // ── Resumen del día ──────────────────────────────────
             StatsCard(
                 rankingPosition  = rankingPosition,
                 pointsToday      = pointsToday,
