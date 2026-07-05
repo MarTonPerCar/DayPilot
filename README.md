@@ -46,15 +46,11 @@ dart run tool/verify_connection.dart
 
 ## Descargas
 
-Cada tag `test-supabase-flutter-vX.Y.Z` dispara `.github/workflows/release.yml`, que compila la app para Linux, Windows, macOS, Android e iOS y las publica todas juntas en un mismo [GitHub Release](https://github.com/MarTonPerCar/DayPilot/releases). Flutter no genera un binario universal — cada plataforma necesita su propio build — pero al usar releases todas las versiones quedan en el mismo sitio, con la última siempre arriba.
+### test-supabase-flutter-v0.1.0
 
-| Plataforma | Archivo | Instalación |
-|---|---|---|
-| Linux | `test_supabase_flutter-linux.tar.gz` | Descomprimir y ejecutar `test_supabase_flutter` |
-| Windows | `test_supabase_flutter-windows.zip` | Descomprimir y ejecutar `test_supabase_flutter.exe` |
-| macOS | `test_supabase_flutter-macos.zip` | Descomprimir y abrir `test_supabase_flutter.app` (clic derecho → Abrir, al no estar notarizado) |
-| Android | `test_supabase_flutter-android.apk` | Instalar el APK (permitir orígenes desconocidos) |
-| iOS | `test_supabase_flutter-ios-unsigned.zip` | **Sin firmar**: no se puede instalar directamente en un iPhone. Sirve para Simulator o para volver a firmar con tu propia cuenta de Apple Developer en Xcode |
-
-Estos builds usan las credenciales de ejemplo de `env.json.example` (clave publishable/anon de Supabase, pensada para exponerse en cliente y protegida por RLS), no tus credenciales locales de `env.json`.
+- [Linux](https://github.com/MarTonPerCar/DayPilot/releases/download/test-supabase-flutter-v0.1.0/test_supabase_flutter-linux.tar.gz)
+- [Windows](https://github.com/MarTonPerCar/DayPilot/releases/download/test-supabase-flutter-v0.1.0/test_supabase_flutter-windows.zip)
+- [macOS](https://github.com/MarTonPerCar/DayPilot/releases/download/test-supabase-flutter-v0.1.0/test_supabase_flutter-macos.zip)
+- [Android](https://github.com/MarTonPerCar/DayPilot/releases/download/test-supabase-flutter-v0.1.0/test_supabase_flutter-android.apk)
+- [iOS (sin firmar)](https://github.com/MarTonPerCar/DayPilot/releases/download/test-supabase-flutter-v0.1.0/test_supabase_flutter-ios-unsigned.zip)
 
