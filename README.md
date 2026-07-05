@@ -29,22 +29,18 @@ Con los usuarios de la seed (`ana.garcia@daypilot.test` / `password123`):
 
 ## Cómo ejecutarlo
 
+Copia `env.json.example` a `env.json` (ignorado por git) y rellena tus credenciales reales de Supabase. Sin este paso la app arranca con `SUPABASE_URL`/`SUPABASE_KEY` vacíos y no conecta.
+
 ```bash
-flutter run -d linux \
-  --dart-define=SUPABASE_URL=https://xxxx.supabase.co \
-  --dart-define=SUPABASE_KEY=sb_publishable_xxxx
+cp env.json.example env.json   # solo la primera vez, luego edita env.json
+flutter run -d linux
 ```
 
-O el script de verificación sin UI:
+(cambia `-d linux` por `-d chrome`, `-d <dispositivo-android>`, etc. según dónde quieras probarlo)
+
+O el script de verificación sin UI (tiene las credenciales de prueba embebidas, no depende de env.json):
 
 ```bash
 dart run tool/verify_connection.dart
 ```
 
-## Base de datos
-
-El esquema real vive en la rama `Informacion-Supabase` (no en este repo). Ver esa rama para las migraciones (`01_schema_v004.sql`, `02_drop_all.sql`, `03_seed.sql`).
-
-## Siguiente paso
-
-Los resultados de esta rama alimentan `Incremento-Flutter-TestFinal`: repositorios reales de Supabase, uno por dominio, sustituyendo a los fakes de `Test-Funcional-Flutter`.

@@ -1,13 +1,20 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'db_test_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  final envString = await rootBundle.loadString('env.json');
+  final env = jsonDecode(envString) as Map<String, dynamic>;
+
   await Supabase.initialize(
-    url: const String.fromEnvironment('SUPABASE_URL'),
-    publishableKey: const String.fromEnvironment('SUPABASE_KEY'),
+    url: env['SUPABASE_URL'] as String,
+    publishableKey: env['SUPABASE_KEY'] as String,
   );
   runApp(const TestSupabaseApp());
 }
