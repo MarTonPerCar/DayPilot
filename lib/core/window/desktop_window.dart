@@ -67,11 +67,11 @@ Future<void> initDesktopWindow() async {
   );
 }
 
-/// Corner of the screen's work area (the region excluding the taskbar/
-/// panel/dock, whichever edge it's on) the flyout is anchored to. Linux's
-/// tray backend (AppIndicator) never reports the icon's actual position, so
-/// unlike Windows/macOS this can't be anchored to the exact icon/click
-/// point — it always opens in this corner.
+/// Bottom-right corner of the screen's work area (the region excluding the
+/// taskbar/panel/dock, whichever edge it's on). Linux's tray backend
+/// (AppIndicator) never reports the icon's actual position, so unlike
+/// Windows/macOS this can't be anchored to the exact icon/click point — it
+/// always opens in this corner.
 Future<Offset> _cornerPosition() async {
   final display = await screenRetriever.getPrimaryDisplay();
   final areaOrigin = display.visiblePosition ?? Offset.zero;
