@@ -14,16 +14,16 @@ struct _MyApplication {
 
 G_DEFINE_TYPE(MyApplication, my_application, GTK_TYPE_APPLICATION)
 
-// Called when first Flutter frame received.
-static void first_frame_cb(MyApplication* self, FlView* view) {
-  gtk_widget_show(gtk_widget_get_toplevel(GTK_WIDGET(view)));
-}
-
 // Implements GApplication::activate.
 static void my_application_activate(GApplication* application) {
   MyApplication* self = MY_APPLICATION(application);
   GtkWindow* window =
       GTK_WINDOW(gtk_application_window_new(GTK_APPLICATION(application)));
+
+  // Utility windows are placed by the app instead of auto-centered by the
+  // window manager (Mutter centers plain top-level windows on first map,
+  // which fights the flyout's own corner positioning).
+  gtk_window_set_type_hint(window, GDK_WINDOW_TYPE_HINT_UTILITY);
 
   // Use a header bar when running in GNOME as this is the common style used
   // by applications and is the setup most users will be using (e.g. Ubuntu
@@ -52,7 +52,11 @@ static void my_application_activate(GApplication* application) {
     gtk_window_set_title(window, "test_diseno_flutter");
   }
 
-  gtk_window_set_default_size(window, 1280, 720);
+  // Must match mobileWindowSize in lib/core/window/desktop_window.dart —
+  // window_manager takes over sizing from there, but the window is created
+  // with this size so there's no visible resize once it's shown.
+  gtk_window_set_default_size(window, 390, 844);
+  gtk_widget_realize(GTK_WIDGET(window));
 
   g_autoptr(FlDartProject) project = fl_dart_project_new();
   fl_dart_project_set_dart_entrypoint_arguments(
@@ -66,12 +70,6 @@ static void my_application_activate(GApplication* application) {
   fl_view_set_background_color(view, &background_color);
   gtk_widget_show(GTK_WIDGET(view));
   gtk_container_add(GTK_CONTAINER(window), GTK_WIDGET(view));
-
-  // Show the window when Flutter renders.
-  // Requires the view to be realized so we can start rendering.
-  g_signal_connect_swapped(view, "first-frame", G_CALLBACK(first_frame_cb),
-                           self);
-  gtk_widget_realize(GTK_WIDGET(view));
 
   fl_register_plugins(FL_PLUGIN_REGISTRY(view));
 

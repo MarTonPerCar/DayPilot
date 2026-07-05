@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'core/window/desktop_window.dart';
 import 'l10n/app_localizations.dart';
 import 'l10n/locale_notifier.dart';
 import 'screens/auth/login_screen.dart';
 import 'theme/app_theme.dart';
 
-void main() {
-  runApp(const DayPilotApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initDesktopWindow();
+  runApp(const DesktopFlyoutScope(child: DayPilotApp()));
 }
 
 class DayPilotApp extends StatelessWidget {
