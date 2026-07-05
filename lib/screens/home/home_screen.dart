@@ -17,9 +17,9 @@ class HomeScreen extends StatelessWidget {
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
-            final available = constraints.maxHeight - 32; // 16 top + 16 bottom
+            final available = (constraints.maxHeight - 32).clamp(0.0, double.infinity); // 16 top + 16 bottom
             final summaryH = available * 0.38;
-            final gridH = available - summaryH - 10;
+            final gridH = (available - summaryH - 10).clamp(0.0, double.infinity);
 
             return Padding(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),

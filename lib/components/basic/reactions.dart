@@ -60,11 +60,17 @@ class DayPilotReactionPicker extends StatefulWidget {
 
 class _DayPilotReactionPickerState extends State<DayPilotReactionPicker>
     with SingleTickerProviderStateMixin {
-  late final AnimationController _controller = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 200),
-  );
+  late final AnimationController _controller;
   bool _open = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+    );
+  }
 
   @override
   void dispose() {

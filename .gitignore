@@ -45,3 +45,6 @@ app.*.map.json
 
 # Leftover Flutter project subdirectory (files moved to root)
 test_diseno_flutter/
+
+# Local Supabase credentials (see env.json.example)
+env.json

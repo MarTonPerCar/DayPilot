@@ -658,9 +658,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loginTagline => 'Fly toward your goals';
 
   @override
-  String get loginDemoMode => 'Enter demo mode';
-
-  @override
   String get loginSignInTab => 'Sign in';
 
   @override
@@ -683,6 +680,26 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get loginRegisterSubmit => 'Register';
+
+  @override
+  String get authErrorInvalidCredentials => 'Incorrect email or password.';
+
+  @override
+  String get authErrorEmailNotConfirmed =>
+      'Please confirm your email before signing in.';
+
+  @override
+  String get authErrorAlreadyRegistered =>
+      'An account with this email already exists.';
+
+  @override
+  String get authErrorWeakPassword => 'Password must be at least 6 characters.';
+
+  @override
+  String get authErrorInvalidEmail => 'Please enter a valid email address.';
+
+  @override
+  String get authErrorUnknown => 'Something went wrong. Please try again.';
 
   @override
   String get forgotPasswordTitle => 'Recover password';

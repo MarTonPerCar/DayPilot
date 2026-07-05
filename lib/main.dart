@@ -1,14 +1,30 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'core/auth/auth_gate.dart';
 import 'core/window/desktop_window.dart';
 import 'l10n/app_localizations.dart';
 import 'l10n/locale_notifier.dart';
-import 'screens/auth/login_screen.dart';
 import 'theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initDesktopWindow();
-  runApp(const DesktopFlyoutScope(child: DayPilotApp()));
+
+  final env = jsonDecode(await rootBundle.loadString('env.json')) as Map<String, dynamic>;
+  await Supabase.initialize(
+    url: env['SUPABASE_URL'] as String,
+    publishableKey: env['SUPABASE_KEY'] as String,
+  );
+
+  runApp(
+    const ProviderScope(
+      child: DesktopFlyoutScope(child: DayPilotApp()),
+    ),
+  );
 }
 
 class DayPilotApp extends StatelessWidget {
@@ -34,7 +50,7 @@ class DayPilotApp extends StatelessWidget {
                   locale: activeLocale,
                   localizationsDelegates: AppLocalizations.localizationsDelegates,
                   supportedLocales: AppLocalizations.supportedLocales,
-                  home: const LoginScreen(),
+                  home: const AuthGate(),
                   builder: (context, child) {
                     if (!isDesktopPlatform) return child!;
                     const borderWidth = 5.0;

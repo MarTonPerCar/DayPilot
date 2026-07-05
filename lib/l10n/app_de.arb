@@ -254,7 +254,6 @@
   "permissionsOpenAccessibility": "Bedienungshilfen öffnen",
 
   "loginTagline": "Fliege deinen Zielen entgegen",
-  "loginDemoMode": "Demo-Modus starten",
   "loginSignInTab": "Anmelden",
   "loginSignUpTab": "Konto erstellen",
   "loginForgotPassword": "Passwort vergessen?",
@@ -263,6 +262,13 @@
   "loginUsernameLabel": "Benutzername",
   "loginTimezoneLabel": "Region / Zeitzone",
   "loginRegisterSubmit": "Registrieren",
+
+  "authErrorInvalidCredentials": "E-Mail oder Passwort ist falsch.",
+  "authErrorEmailNotConfirmed": "Bitte bestätige deine E-Mail, bevor du dich anmeldest.",
+  "authErrorAlreadyRegistered": "Für diese E-Mail existiert bereits ein Konto.",
+  "authErrorWeakPassword": "Das Passwort muss mindestens 6 Zeichen lang sein.",
+  "authErrorInvalidEmail": "Bitte gib eine gültige E-Mail-Adresse ein.",
+  "authErrorUnknown": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
 
   "forgotPasswordTitle": "Passwort wiederherstellen",
   "forgotPasswordSentBody": "Sieh in deinem Postfach nach, wir haben dir einen Link zum Zurücksetzen deines Passworts geschickt.",

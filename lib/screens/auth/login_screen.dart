@@ -1,36 +1,58 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../components/basic/button.dart';
 import '../../components/basic/text_field.dart';
 import '../../components/forms/select_field.dart';
 import '../../data/app_data.dart';
+import '../../features/auth/auth_error.dart';
+import '../../features/auth/auth_notifier.dart';
+import '../../features/auth/auth_session.dart';
 import '../../l10n/app_localizations.dart';
 import '../main_shell.dart';
 import 'forgot_password_screen.dart';
 
 /// Pantalla de acceso: login y registro son dos caras de una misma tarjeta
 /// que gira en 3D al cambiar el interruptor de arriba.
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   bool _showRegister = false;
-  bool _loading = false;
+  bool _registerLoading = false;
   String? _timezone = AppData.timezoneOptions.first;
+  final _loginEmailController = TextEditingController();
+  final _loginPasswordController = TextEditingController();
 
-  void _submit() async {
-    setState(() => _loading = true);
-    await Future.delayed(const Duration(milliseconds: 800));
-    if (!mounted) return;
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const MainShell()));
+  @override
+  void dispose() {
+    _loginEmailController.dispose();
+    _loginPasswordController.dispose();
+    super.dispose();
   }
 
-  void _demo() {
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const MainShell()));
+  Future<void> _submitLogin() async {
+    await ref.read(authNotifierProvider.notifier).login(
+          email: _loginEmailController.text.trim(),
+          password: _loginPasswordController.text,
+        );
+    if (!mounted) return;
+    if (ref.read(authNotifierProvider).status == AuthStatus.authenticated) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const MainShell()),
+      );
+    }
+  }
+
+  void _submitRegister() async {
+    setState(() => _registerLoading = true);
+    await Future.delayed(const Duration(milliseconds: 800));
+    if (!mounted) return;
+    setState(() => _registerLoading = false);
   }
 
   @override
@@ -38,6 +60,15 @@ class _LoginScreenState extends State<LoginScreen> {
     final colors = Theme.of(context).colorScheme;
     final text = Theme.of(context).textTheme;
     final l10n = AppLocalizations.of(context);
+    final session = ref.watch(authNotifierProvider);
+
+    ref.listen(authNotifierProvider, (previous, next) {
+      if (next.status == AuthStatus.unauthenticated && next.error != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(friendlyAuthError(next.error!, l10n))),
+        );
+      }
+    });
 
     return Scaffold(
       body: SafeArea(
@@ -92,22 +123,20 @@ class _LoginScreenState extends State<LoginScreen> {
                       padding: const EdgeInsets.all(24),
                       child: _FlipCard(
                         showBack: _showRegister,
-                        front: _LoginForm(loading: _loading, onSubmit: _submit),
+                        front: _LoginForm(
+                          loading: session.status == AuthStatus.authenticating,
+                          emailController: _loginEmailController,
+                          passwordController: _loginPasswordController,
+                          onSubmit: _submitLogin,
+                        ),
                         back: _RegisterForm(
-                          loading: _loading,
+                          loading: _registerLoading,
                           timezone: _timezone,
                           onTimezoneChanged: (v) => setState(() => _timezone = v),
-                          onSubmit: _submit,
+                          onSubmit: _submitRegister,
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 28),
-
-                  TextButton.icon(
-                    onPressed: _demo,
-                    icon: const Icon(Icons.play_arrow_rounded, size: 18),
-                    label: Text(l10n.loginDemoMode),
                   ),
                 ],
               ),
@@ -236,9 +265,16 @@ class _FlipCardState extends State<_FlipCard> with SingleTickerProviderStateMixi
 
 class _LoginForm extends StatelessWidget {
   final bool loading;
+  final TextEditingController emailController;
+  final TextEditingController passwordController;
   final VoidCallback onSubmit;
 
-  const _LoginForm({required this.loading, required this.onSubmit});
+  const _LoginForm({
+    required this.loading,
+    required this.emailController,
+    required this.passwordController,
+    required this.onSubmit,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -252,10 +288,11 @@ class _LoginForm extends StatelessWidget {
         const SizedBox(height: 20),
         DayPilotTextField(
           label: l10n.profileInfoEmail,
+          controller: emailController,
           keyboardType: TextInputType.emailAddress,
         ),
         const SizedBox(height: 14),
-        DayPilotPasswordField(label: l10n.commonPassword),
+        DayPilotPasswordField(label: l10n.commonPassword, controller: passwordController),
         const SizedBox(height: 8),
         Align(
           alignment: Alignment.centerRight,

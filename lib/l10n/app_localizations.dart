@@ -1270,12 +1270,6 @@ abstract class AppLocalizations {
   /// **'Vuela hacia tus metas'**
   String get loginTagline;
 
-  /// No description provided for @loginDemoMode.
-  ///
-  /// In es, this message translates to:
-  /// **'Entrar en modo demo'**
-  String get loginDemoMode;
-
   /// No description provided for @loginSignInTab.
   ///
   /// In es, this message translates to:
@@ -1323,6 +1317,42 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Registrar'**
   String get loginRegisterSubmit;
+
+  /// No description provided for @authErrorInvalidCredentials.
+  ///
+  /// In es, this message translates to:
+  /// **'Email o contraseña incorrectos.'**
+  String get authErrorInvalidCredentials;
+
+  /// No description provided for @authErrorEmailNotConfirmed.
+  ///
+  /// In es, this message translates to:
+  /// **'Confirma tu email antes de iniciar sesión.'**
+  String get authErrorEmailNotConfirmed;
+
+  /// No description provided for @authErrorAlreadyRegistered.
+  ///
+  /// In es, this message translates to:
+  /// **'Ya existe una cuenta con este email.'**
+  String get authErrorAlreadyRegistered;
+
+  /// No description provided for @authErrorWeakPassword.
+  ///
+  /// In es, this message translates to:
+  /// **'La contraseña debe tener al menos 6 caracteres.'**
+  String get authErrorWeakPassword;
+
+  /// No description provided for @authErrorInvalidEmail.
+  ///
+  /// In es, this message translates to:
+  /// **'Introduce un email válido.'**
+  String get authErrorInvalidEmail;
+
+  /// No description provided for @authErrorUnknown.
+  ///
+  /// In es, this message translates to:
+  /// **'Ha ocurrido un error. Inténtalo de nuevo.'**
+  String get authErrorUnknown;
 
   /// No description provided for @forgotPasswordTitle.
   ///

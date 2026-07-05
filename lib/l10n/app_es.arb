@@ -254,7 +254,6 @@
   "permissionsOpenAccessibility": "Abrir accesibilidad",
 
   "loginTagline": "Vuela hacia tus metas",
-  "loginDemoMode": "Entrar en modo demo",
   "loginSignInTab": "Iniciar sesión",
   "loginSignUpTab": "Crear cuenta",
   "loginForgotPassword": "¿Has olvidado tu contraseña?",
@@ -263,6 +262,13 @@
   "loginUsernameLabel": "Nombre de usuario",
   "loginTimezoneLabel": "Región / zona horaria",
   "loginRegisterSubmit": "Registrar",
+
+  "authErrorInvalidCredentials": "Email o contraseña incorrectos.",
+  "authErrorEmailNotConfirmed": "Confirma tu email antes de iniciar sesión.",
+  "authErrorAlreadyRegistered": "Ya existe una cuenta con este email.",
+  "authErrorWeakPassword": "La contraseña debe tener al menos 6 caracteres.",
+  "authErrorInvalidEmail": "Introduce un email válido.",
+  "authErrorUnknown": "Ha ocurrido un error. Inténtalo de nuevo.",
 
   "forgotPasswordTitle": "Recuperar contraseña",
   "forgotPasswordSentBody": "Revisa tu correo, te hemos enviado un enlace para restablecer tu contraseña.",
