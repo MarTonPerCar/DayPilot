@@ -36,6 +36,7 @@ import com.example.daypilot_test_desing.core.reminders.DailyNotificationSchedule
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import com.example.daypilot_test_desing.data.supabase.SupabaseAuthRepository
 import com.example.daypilot_test_desing.data.supabase.SupabaseFriendRepository
 import com.example.daypilot_test_desing.data.supabase.SupabaseNotificationRepository
 import com.example.daypilot_test_desing.data.supabase.SupabaseProgressRepository
@@ -88,10 +89,10 @@ fun DayPilotNavGraph(
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
 
-    // ViewModels scoped to the NavGraph lifetime
     val sessionVM: AppSessionViewModel          = viewModel()
-    val authVM: AuthViewModel                   = viewModel()
-    val notificationsVM: NotificationsViewModel = viewModel()
+    val authRepo = remember { SupabaseAuthRepository() }
+    val authVM: AuthViewModel                   = viewModel(factory = AuthViewModel.factory(authRepo))
+    val notificationsVM: NotificationsViewModel = viewModel(factory = NotificationsViewModel.factory(SupabaseNotificationRepository))
     val remindersVM: RemindersViewModel         = viewModel()
     val techHealthVM: TechHealthViewModel       = viewModel()
 
@@ -99,7 +100,6 @@ fun DayPilotNavGraph(
     val application = context.applicationContext as Application
     val appPrefs = remember { AppPreferences(context) }
 
-    // Shared repository instances — created once, passed to all ViewModels that need them.
     val stepsRepo    = remember { SupabaseStepsRepository(application.getSharedPreferences("daypilot_steps", Context.MODE_PRIVATE)) }
     val progressRepo = remember { SupabaseProgressRepository() }
     val userRepo     = remember { SupabaseUserRepository() }
@@ -118,22 +118,16 @@ fun DayPilotNavGraph(
     val settingsVM: SettingsViewModel = viewModel(factory = SettingsViewModel.factory(application, userRepo))
     val calendarVM: CalendarViewModel = viewModel(factory = CalendarViewModel.factory(taskRepo, progressRepo))
 
-    // Propagate sensor step updates to HabitsScreen (local read, fast)
-    // homeVM is NOT refreshed here — the sensor fires many times per second
-    // and homeVM.refresh() makes 5+ DB calls. Home data refreshes on navigation.
+    // homeVM.refresh() makes 5+ DB calls, too costly to run on every sensor tick.
     val stepsState by stepsVM.uiState.collectAsState()
     LaunchedEffect(stepsState.currentSteps) {
         habitsVM.refresh()
     }
 
-    // Refresh home data every time the user lands on HOME so friend/ranking
-    // counts are always up-to-date (avoids race conditions with accept/remove
-    // friend callbacks that fire before the Supabase write completes).
     LaunchedEffect(currentRoute) {
         if (currentRoute == DayPilotDestinations.HOME) homeVM.refresh()
     }
 
-    // Track that the app was opened today (for streak-danger alarm check)
     val navLifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(navLifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
@@ -145,19 +139,17 @@ fun DayPilotNavGraph(
         onDispose { navLifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
-    // Level-up in-app notification: fire when profileVM.level increases.
     val profileStateForLevel by profileVM.uiState.collectAsState()
     LaunchedEffect(profileStateForLevel.level) {
         val newLevel = profileStateForLevel.level
         if (newLevel < 1) return@LaunchedEffect
-        // Skip until the profile has actually loaded — default state has name = ""
-        // and level = 1, which would falsely trigger a notification on every launch.
         if (profileStateForLevel.name.isEmpty()) return@LaunchedEffect
         val lastLevel = appPrefs.lastKnownLevel
         if (lastLevel > 0 && newLevel > lastLevel) {
             val title = "¡Subiste de nivel! 🏆"
             val msg   = "Ahora eres nivel $newLevel. ¡Sigue así!"
-            NotificationHub.add(title = title, message = msg, type = NotificationType.ACHIEVEMENT)
+            // Persisted to the DB — the always-on realtime subscription delivers it to
+            // NotificationHub, so adding it locally too would double it up.
             SupabaseNotificationRepository.insertForCurrentUser(
                 type  = "LEVEL_UP",
                 title = title,
@@ -167,7 +159,6 @@ fun DayPilotNavGraph(
         appPrefs.lastKnownLevel = newLevel
     }
 
-    // Cache today's pending task count so DailyNotificationsReceiver can read it.
     val calendarStateForCache by calendarVM.uiState.collectAsState()
     LaunchedEffect(calendarStateForCache.tasks) {
         val cal        = java.util.Calendar.getInstance()
@@ -185,17 +176,11 @@ fun DayPilotNavGraph(
         appPrefs.pendingTaskCountDate = today
     }
 
-    // Session restoration: on startup, skip AUTH if a saved session exists;
-    // on logout, return to AUTH from wherever the user is.
     val sessionState by sessionVM.state.collectAsState()
     LaunchedEffect(sessionState) {
         val current = navController.currentBackStackEntry?.destination?.route
         when (sessionState) {
             AppSessionViewModel.State.DataLoading -> {
-                // Refresh all data in parallel while the LoadingScreen is still visible.
-                // joinAll() waits for every Job to complete before marking data as ready.
-                // There is no offline queue to flush first — all Supabase writes in this
-                // app are fire-and-immediate, so the fresh load below is always authoritative.
                 listOf(
                     homeVM.refresh(),
                     calendarVM.refresh(),
@@ -206,7 +191,6 @@ fun DayPilotNavGraph(
                     settingsVM.refresh(),
                     notificationsVM.load(),
                 ).joinAll()
-                // Schedule or cancel daily alarms based on current settings.
                 val s = settingsVM.uiState.value
                 DailyNotificationScheduler.scheduleAll(
                     context              = context,
@@ -217,7 +201,6 @@ fun DayPilotNavGraph(
                 sessionVM.markDataLoaded()
             }
             AppSessionViewModel.State.Authenticated -> {
-                // Data is already loaded; just navigate to HOME.
                 if (current == DayPilotDestinations.LOADING ||
                     current == DayPilotDestinations.AUTH   ||
                     current == null) {
@@ -227,7 +210,6 @@ fun DayPilotNavGraph(
                 }
             }
             AppSessionViewModel.State.Unauthenticated -> {
-                // From LOADING go to AUTH; also handles logout from any screen.
                 if (current != null && current != DayPilotDestinations.AUTH) {
                     navController.navigate(DayPilotDestinations.AUTH) {
                         popUpTo(0) { inclusive = true }
@@ -257,12 +239,10 @@ fun DayPilotNavGraph(
             modifier         = Modifier.padding(innerPadding)
         ) {
 
-            // ── Loading ───────────────────────────────────────────
             composable(DayPilotDestinations.LOADING) {
                 LoadingScreen()
             }
 
-            // ── Auth ─────────────────────────────────────────────
             composable(DayPilotDestinations.AUTH) {
                 val authState by authVM.uiState.collectAsState()
                 AuthScreen(
@@ -273,8 +253,6 @@ fun DayPilotNavGraph(
                     registerError       = authState.registerError,
                     onLoginClick        = { email, password ->
                         authVM.login(email, password) {
-                            // notifyAuthenticated triggers the LaunchedEffect above,
-                            // which navigates to HOME and loads all data.
                             sessionVM.notifyAuthenticated()
                         }
                     },
@@ -289,7 +267,6 @@ fun DayPilotNavGraph(
                 )
             }
 
-            // ── Home ─────────────────────────────────────────────
             composable(DayPilotDestinations.HOME) {
                 val s by homeVM.uiState.collectAsState()
                 HomeScreen(
@@ -311,7 +288,6 @@ fun DayPilotNavGraph(
                 )
             }
 
-            // ── Friends ──────────────────────────────────────────
             composable(DayPilotDestinations.FRIENDS) {
                 val s by friendsVM.uiState.collectAsState()
                 FriendsScreen(
@@ -349,10 +325,9 @@ fun DayPilotNavGraph(
                     onAddFriend          = searchVM::addFriend,
                     onConfirmationDismissed = {
                         searchVM.dismissConfirmation()
-                        friendsVM.refresh()  // friends list may have new requests
+                        friendsVM.refresh()
                         rivalryVM.invalidate()
                         homeVM.invalidate()
-                        // Navigate to a fresh Friends screen (tab 0) and clear search from the stack.
                         navController.navigate(DayPilotDestinations.FRIENDS) {
                             popUpTo(DayPilotDestinations.FRIENDS) { inclusive = true }
                         }
@@ -363,7 +338,6 @@ fun DayPilotNavGraph(
                 )
             }
 
-            // ── Notifications ─────────────────────────────────────
             composable(DayPilotDestinations.NOTIFICATIONS) {
                 val s by notificationsVM.uiState.collectAsState()
                 NotificationsScreen(
@@ -374,7 +348,6 @@ fun DayPilotNavGraph(
                 )
             }
 
-            // ── Profile ───────────────────────────────────────────
             composable(DayPilotDestinations.PROFILE) {
                 LaunchedEffect(Unit) { profileVM.refresh() }
                 val s by profileVM.uiState.collectAsState()
@@ -385,6 +358,7 @@ fun DayPilotNavGraph(
                     memberSince         = s.memberSince,
                     level               = s.level,
                     totalPoints         = s.totalPoints,
+                    pointsToNextLevel   = s.pointsToNextLevel,
                     currentStreak       = s.currentStreak,
                     longestStreak       = s.longestStreak,
                     rankingPosition     = s.rankingPosition,
@@ -399,7 +373,6 @@ fun DayPilotNavGraph(
                 )
             }
 
-            // ── Settings ──────────────────────────────────────────
             composable(DayPilotDestinations.SETTINGS) {
                 val s by settingsVM.uiState.collectAsState()
                 SettingsScreen(
@@ -472,7 +445,6 @@ fun DayPilotNavGraph(
                 )
             }
 
-            // ── Calendar ──────────────────────────────────────────
             composable(DayPilotDestinations.CALENDAR) {
                 val s by calendarVM.uiState.collectAsState()
                 CalendarScreen(
@@ -488,7 +460,6 @@ fun DayPilotNavGraph(
                 )
             }
 
-            // ── Habits ───────────────────────────────────────────
             composable(DayPilotDestinations.HABITS) {
                 val s by habitsVM.uiState.collectAsState()
                 HabitsScreen(
@@ -521,7 +492,6 @@ fun DayPilotNavGraph(
                 )
             }
 
-            // ── Progress ─────────────────────────────────────────
             composable(DayPilotDestinations.PROGRESS) {
                 LaunchedEffect(Unit) { progressVM.refresh() }
                 val s by progressVM.uiState.collectAsState()
@@ -537,7 +507,6 @@ fun DayPilotNavGraph(
                 )
             }
 
-            // ── Rivalry ──────────────────────────────────────────
             composable(DayPilotDestinations.RIVALRY) {
                 LaunchedEffect(Unit) { rivalryVM.refresh() }
                 val s by rivalryVM.uiState.collectAsState()
@@ -553,7 +522,6 @@ fun DayPilotNavGraph(
                 )
             }
 
-            // ── Steps ────────────────────────────────────────────
             composable(DayPilotDestinations.STEPS) {
                 val s by stepsVM.uiState.collectAsState()
                 StepsScreen(
@@ -573,7 +541,6 @@ fun DayPilotNavGraph(
                 )
             }
 
-            // ── Timer ────────────────────────────────────────────
             composable(
                 route     = DayPilotDestinations.TIMER,
                 arguments = listOf(
@@ -605,7 +572,6 @@ fun DayPilotNavGraph(
                 )
             }
 
-            // ── Reminders ────────────────────────────────────────
             composable(DayPilotDestinations.REMINDERS) {
                 val s by remindersVM.uiState.collectAsState()
                 RemindersScreen(
@@ -617,7 +583,6 @@ fun DayPilotNavGraph(
                 )
             }
 
-            // ── TechHealth ───────────────────────────────────────
             composable(DayPilotDestinations.TECH_HEALTH) {
                 val lifecycleOwner = LocalLifecycleOwner.current
                 DisposableEffect(lifecycleOwner) {

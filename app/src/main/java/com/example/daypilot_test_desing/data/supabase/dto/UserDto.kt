@@ -13,7 +13,8 @@ data class UserDto(
     @SerialName("region") val region: String? = null,
     @SerialName("created_at") val createdAt: String = "2025",
     @SerialName("level") val level: Int = 1,
-    @SerialName("total_points_historical") val totalPointsHistorical: Int = 0
+    @SerialName("total_points_historical") val totalPointsHistorical: Int = 0,
+    @SerialName("points_to_next_level") val pointsToNextLevel: Int = 20
 )
 
 @Serializable

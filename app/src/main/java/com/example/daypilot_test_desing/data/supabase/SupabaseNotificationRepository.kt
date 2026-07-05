@@ -18,6 +18,8 @@ object SupabaseNotificationRepository : NotificationRepository {
     private const val DISPLAY_LIMIT = 30
     private const val RETAIN_LIMIT  = 50
 
+    override suspend fun getCurrentUserId(): String? = supabase.auth.currentUserOrNull()?.id
+
     override suspend fun getUnreadCount(userId: String): Int {
         return try {
             supabase.from("notifications").select {
@@ -74,9 +76,8 @@ object SupabaseNotificationRepository : NotificationRepository {
     }
 
     suspend fun insertForCurrentUser(type: String, title: String, body: String) {
-        // awaitInitialization() is a no-op when the session is already loaded (normal
-        // in-app path), but is essential when called from a BroadcastReceiver where
-        // the Auth plugin may still be restoring the session from SharedPreferences.
+        // Needed when called from a BroadcastReceiver, where Auth may still be
+        // restoring the session from SharedPreferences; a no-op otherwise.
         supabase.auth.awaitInitialization()
         val uid = supabase.auth.currentUserOrNull()?.id ?: return
         insert(uid, type, title, body)

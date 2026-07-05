@@ -67,7 +67,6 @@ fun AppLimitCard(
             restriction.dailyLimitMinutes).coerceIn(0f, 1f)
     val isOverLimit = restriction.usedMinutesToday >= restriction.dailyLimitMinutes
 
-    // ── Diálogo de confirmación de borrado ────────────────────────
     if (showDeleteConfirm) {
         AlertDialog(
             onDismissRequest = { showDeleteConfirm = false },
@@ -112,13 +111,11 @@ fun AppLimitCard(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            // ── Cabecera ──────────────────────────────────────────
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // App icon — real launcher icon when available, letter avatar as fallback
                 if (appIcon != null) {
                     Image(
                         bitmap             = appIcon.asImageBitmap(),
@@ -154,7 +151,6 @@ fun AppLimitCard(
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface
                         )
-                        // Badge "App"
                         Box(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(4.dp))
@@ -186,7 +182,28 @@ fun AppLimitCard(
                 )
             }
 
-            // ── Barra de progreso ─────────────────────────────────
+            // Pending on/off and/or limit change — still fully editable/toggleable/
+            // deletable, unlike pendingDelete below which locks the card.
+            if (!restriction.pendingDelete) {
+                if (restriction.pendingActive != null) {
+                    Text(
+                        text = stringResource(
+                            if (restriction.pendingActive) R.string.tech_health_pending_activate
+                            else R.string.tech_health_pending_deactivate
+                        ),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.tertiary
+                    )
+                }
+                if (restriction.pendingLimitMinutes != null) {
+                    Text(
+                        text = stringResource(R.string.tech_health_pending_limit, restriction.pendingLimitMinutes),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.tertiary
+                    )
+                }
+            }
+
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 LinearProgressIndicator(
                     progress = { progress },
@@ -198,32 +215,18 @@ fun AppLimitCard(
                     else MaterialTheme.colorScheme.primary,
                     trackColor = MaterialTheme.colorScheme.surfaceVariant
                 )
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = stringResource(
-                            R.string.tech_health_usage_today,
-                            restriction.usedMinutesToday,
-                            restriction.dailyLimitMinutes
-                        ),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = if (isOverLimit) MaterialTheme.colorScheme.error
-                        else MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Text(
-                        text = stringResource(
-                            R.string.tech_health_notif_interval,
-                            restriction.notificationIntervalSeconds
-                        ),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
+                Text(
+                    text = stringResource(
+                        R.string.tech_health_usage_today,
+                        restriction.usedMinutesToday,
+                        restriction.dailyLimitMinutes
+                    ),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = if (isOverLimit) MaterialTheme.colorScheme.error
+                    else MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
 
-            // ── Botones ───────────────────────────────────────────
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -276,7 +279,6 @@ fun AppLimitCard(
     }
 }
 
-// ── Preview ──────────────────────────────────────────────────────
 @Preview(showBackground = true)
 @Composable
 fun AppLimitCardPreview() {
@@ -293,7 +295,6 @@ fun AppLimitCardPreview() {
                     appName = "YouTube",
                     packageName = "com.google.youtube",
                     dailyLimitMinutes = 120,
-                    notificationIntervalSeconds = 60,
                     isEnabled = true,
                     usedMinutesToday = 45
                 ),
@@ -307,7 +308,6 @@ fun AppLimitCardPreview() {
                     appName = "Instagram",
                     packageName = "com.instagram.android",
                     dailyLimitMinutes = 30,
-                    notificationIntervalSeconds = 30,
                     isEnabled = true,
                     usedMinutesToday = 30,
                     pendingDelete = true

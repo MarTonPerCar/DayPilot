@@ -11,19 +11,12 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-/**
- * Persists app and group restrictions in SharedPreferences as JSON.
- * There is no server-side table for tech-health rules; they are device-local.
- * usedMinutesToday is saved per session and refreshed from AppUsageTracker on load.
- */
 class SharedPrefsTechHealthRepository(context: Context) : TechHealthRepository {
 
     private val prefs: SharedPreferences =
         context.getSharedPreferences("daypilot_tech_health", Context.MODE_PRIVATE)
 
     private val json = Json { ignoreUnknownKeys = true }
-
-    // ── Apps ─────────────────────────────────────────────────────────
 
     private fun loadApps(): MutableList<AppRestriction> {
         val raw = prefs.getString("apps", null) ?: return mutableListOf()
@@ -38,8 +31,6 @@ class SharedPrefsTechHealthRepository(context: Context) : TechHealthRepository {
             .apply()
     }
 
-    // ── Groups ───────────────────────────────────────────────────────
-
     private fun loadGroups(): MutableList<GroupRestriction> {
         val raw = prefs.getString("groups", null) ?: return mutableListOf()
         return try {
@@ -52,8 +43,6 @@ class SharedPrefsTechHealthRepository(context: Context) : TechHealthRepository {
             .putString("groups", json.encodeToString(ListSerializer(GroupRestriction.serializer()), list))
             .apply()
     }
-
-    // ── TechHealthRepository ─────────────────────────────────────────
 
     override fun getAppRestrictions(): List<AppRestriction>    = loadApps()
     override fun getGroupRestrictions(): List<GroupRestriction> = loadGroups()
@@ -75,19 +64,27 @@ class SharedPrefsTechHealthRepository(context: Context) : TechHealthRepository {
     override fun toggleRestriction(id: String, enabled: Boolean) {
         val apps = loadApps()
         val idx  = apps.indexOfFirst { it.id == id }
-        if (idx >= 0) { apps[idx] = apps[idx].copy(isEnabled = enabled); saveApps(apps) }
+        if (idx >= 0) {
+            val current = apps[idx]
+            apps[idx] = current.copy(pendingActive = if (enabled == current.isEnabled) null else enabled)
+            saveApps(apps)
+        }
+    }
+
+    override fun toggleGroup(id: String, enabled: Boolean) {
+        val groups = loadGroups()
+        val idx    = groups.indexOfFirst { it.id == id }
+        if (idx >= 0) {
+            val current = groups[idx]
+            groups[idx] = current.copy(pendingActive = if (enabled == current.isEnabled) null else enabled)
+            saveGroups(groups)
+        }
     }
 
     override fun deleteRestriction(id: String) {
         val apps = loadApps()
         val idx  = apps.indexOfFirst { it.id == id }
         if (idx >= 0) { apps[idx] = apps[idx].copy(pendingDelete = true); saveApps(apps) }
-    }
-
-    override fun toggleGroup(id: String, enabled: Boolean) {
-        val groups = loadGroups()
-        val idx    = groups.indexOfFirst { it.id == id }
-        if (idx >= 0) { groups[idx] = groups[idx].copy(isEnabled = enabled); saveGroups(groups) }
     }
 
     override fun deleteGroup(id: String) {
@@ -102,28 +99,62 @@ class SharedPrefsTechHealthRepository(context: Context) : TechHealthRepository {
         if (idx >= 0) { apps[idx] = apps[idx].copy(usedMinutesToday = usedMinutes); saveApps(apps) }
     }
 
+    override fun updateGroupUsage(id: String, usedMinutes: Int) {
+        val groups = loadGroups()
+        val idx    = groups.indexOfFirst { it.id == id }
+        if (idx >= 0) { groups[idx] = groups[idx].copy(usedMinutesToday = usedMinutes); saveGroups(groups) }
+    }
+
+    override fun markViolated(id: String) {
+        val apps = loadApps()
+        val idx  = apps.indexOfFirst { it.id == id }
+        if (idx >= 0 && !apps[idx].isViolatedToday) { apps[idx] = apps[idx].copy(isViolatedToday = true); saveApps(apps) }
+    }
+
+    override fun markGroupViolated(id: String) {
+        val groups = loadGroups()
+        val idx    = groups.indexOfFirst { it.id == id }
+        if (idx >= 0 && !groups[idx].isViolatedToday) { groups[idx] = groups[idx].copy(isViolatedToday = true); saveGroups(groups) }
+    }
+
+    override fun replaceGroupId(oldId: String, newId: String) {
+        if (oldId == newId) return
+        val groups = loadGroups()
+        val idx    = groups.indexOfFirst { it.id == oldId }
+        if (idx >= 0) { groups[idx] = groups[idx].copy(id = newId); saveGroups(groups) }
+    }
+
     fun clearAll() {
         prefs.edit().remove("apps").remove("groups").apply()
     }
 
-    // ── Daily reset / violation tracking ────────────────────────────
-
     private fun today() = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
 
-    fun isViolatedToday(): Boolean = prefs.getString("violated_date", null) == today()
-
-    fun markViolatedToday() {
-        prefs.edit().putString("violated_date", today()).apply()
-    }
-
-    /** Deletes restrictions marked [AppRestriction.pendingDelete] and resets daily usage once a new day starts. */
     fun applyPendingChangesIfNewDay() {
         val lastReset = prefs.getString("last_reset_date", null)
         val today = today()
         if (lastReset == today) return
 
-        saveApps(loadApps().filterNot { it.pendingDelete }.map { it.copy(usedMinutesToday = 0) })
-        saveGroups(loadGroups().filterNot { it.pendingDelete }.map { it.copy(usedMinutesToday = 0) })
+        saveApps(loadApps().filterNot { it.pendingDelete }.map {
+            it.copy(
+                isEnabled           = it.pendingActive ?: it.isEnabled,
+                pendingActive       = null,
+                dailyLimitMinutes   = it.pendingLimitMinutes ?: it.dailyLimitMinutes,
+                pendingLimitMinutes = null,
+                isViolatedToday     = false,
+                usedMinutesToday    = 0
+            )
+        })
+        saveGroups(loadGroups().filterNot { it.pendingDelete }.map {
+            it.copy(
+                isEnabled           = it.pendingActive ?: it.isEnabled,
+                pendingActive       = null,
+                dailyLimitMinutes   = it.pendingLimitMinutes ?: it.dailyLimitMinutes,
+                pendingLimitMinutes = null,
+                isViolatedToday     = false,
+                usedMinutesToday    = 0
+            )
+        })
         prefs.edit().putString("last_reset_date", today).apply()
     }
 }

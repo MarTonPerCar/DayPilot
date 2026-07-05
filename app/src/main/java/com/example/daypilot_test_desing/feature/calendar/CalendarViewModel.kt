@@ -1,5 +1,6 @@
 package com.example.daypilot_test_desing.feature.calendar
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -67,6 +68,7 @@ class CalendarViewModel(
                 load()                           // re-fetches from Supabase, repopulates cache
                 SessionCache.tasks.value = _uiState.value.tasks
             } catch (e: Exception) {
+                Log.e(TAG, "Failed to create task '${data.title}' (recurring=${data.isRecurring})", e)
                 _uiState.update { state ->
                     state.copy(
                         tasks = state.tasks.filter { it.id != fakeId },
@@ -95,6 +97,7 @@ class CalendarViewModel(
                 taskRepo.updateTask(id, title, category, difficulty, duration, description)
                 SessionCache.tasks.value = _uiState.value.tasks
             } catch (e: Exception) {
+                Log.e(TAG, "Failed to update task $id", e)
                 _uiState.update { state ->
                     state.copy(
                         tasks = if (original != null)
@@ -109,27 +112,34 @@ class CalendarViewModel(
     }
 
     fun toggleTask(occurrenceId: String, isDone: Boolean) {
-        val taskTitle = _uiState.value.tasks.firstOrNull { it.occurrenceId == occurrenceId }?.title
+        val original = _uiState.value.tasks.firstOrNull { it.occurrenceId == occurrenceId } ?: return
+        // Points are only ever paid once per occurrence, tracked by isEarned (sticky,
+        // unlike isDone) — unchecking never takes points back, rechecking never re-pays.
+        val shouldAwardPoints = isDone && !original.isEarned
         _uiState.update { state ->
-            state.copy(tasks = state.tasks.map { if (it.occurrenceId == occurrenceId) it.copy(isDone = isDone) else it })
+            state.copy(tasks = state.tasks.map {
+                if (it.occurrenceId == occurrenceId)
+                    it.copy(isDone = isDone, isEarned = it.isEarned || shouldAwardPoints)
+                else it
+            })
         }
         viewModelScope.launch {
             try {
                 taskRepo.toggleTask(occurrenceId, isDone)
-                val points = if (isDone) 20 else -20
-                progressRepo.logPoints(points, "TASKS")  // clears SessionCache.todayProgress
-                SessionCache.tasks.value = _uiState.value.tasks
-                if (isDone && taskTitle != null) {
+                if (shouldAwardPoints) {
+                    progressRepo.logPoints(20, "TASKS")
                     NotificationHub.add(
-                        title   = "✓ $taskTitle",
+                        title   = "✓ ${original.title}",
                         message = "+20 puntos ganados",
                         type    = NotificationType.TASK
                     )
                 }
+                SessionCache.tasks.value = _uiState.value.tasks
             } catch (e: Exception) {
+                Log.e(TAG, "Failed to toggle task occurrence $occurrenceId to isDone=$isDone", e)
                 _uiState.update { state ->
                     state.copy(
-                        tasks = state.tasks.map { if (it.occurrenceId == occurrenceId) it.copy(isDone = !isDone) else it },
+                        tasks = state.tasks.map { if (it.occurrenceId == occurrenceId) original else it },
                         userMessage = R.string.error_task_toggle
                     )
                 }
@@ -139,14 +149,15 @@ class CalendarViewModel(
 
     fun deleteTask(id: String) {
         val snapshot = _uiState.value.tasks
-        val completedOccurrences = snapshot.count { it.id == id && it.isDone }
+        // Points already earned for completed occurrences stay earned — deleting a
+        // task never takes points back.
         _uiState.update { state -> state.copy(tasks = state.tasks.filter { it.id != id }) }
         viewModelScope.launch {
             try {
-                repeat(completedOccurrences) { progressRepo.logPoints(-20, "TASKS") }
                 taskRepo.deleteTask(id)
                 SessionCache.tasks.value = _uiState.value.tasks
             } catch (e: Exception) {
+                Log.e(TAG, "Failed to delete task $id", e)
                 _uiState.update { it.copy(tasks = snapshot, userMessage = R.string.error_task_delete) }
             }
         }
@@ -157,6 +168,8 @@ class CalendarViewModel(
     }
 
     companion object {
+        private const val TAG = "CalendarViewModel"
+
         fun factory(taskRepo: TaskRepository, progressRepo: ProgressRepository): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")

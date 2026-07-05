@@ -43,6 +43,7 @@ class ProfileViewModel(
                 memberSince          = user.memberSince,
                 level                = user.level,
                 totalPoints          = user.totalPoints,
+                pointsToNextLevel    = user.pointsToNextLevel,
                 currentStreak        = user.currentStreak,
                 longestStreak        = user.longestStreak,
                 rankingPosition      = ranking,

@@ -55,7 +55,6 @@ import com.example.daypilot_test_desing.core.data.model.AppRestriction
 import com.example.daypilot_test_desing.core.data.model.GroupRestriction
 import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
 
-// ── Tipo de restricción ───────────────────────────────────────────
 private enum class RestrictionType { APP, GROUP }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -105,7 +104,6 @@ fun AppLimitFormCard(
         else -> "${limitMinutes.toInt()}min"
     }
 
-    // ── App picker sheet ──────────────────────────────────────────
     if (showAppPicker) {
         ModalBottomSheet(
             onDismissRequest = { showAppPicker = false },
@@ -120,7 +118,6 @@ fun AppLimitFormCard(
         }
     }
 
-    // ── Group app picker sheet ────────────────────────────────────
     if (showGroupAppPicker) {
         ModalBottomSheet(
             onDismissRequest = { showGroupAppPicker = false },
@@ -148,7 +145,6 @@ fun AppLimitFormCard(
                 .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // ── Título ────────────────────────────────────────────
             Text(
                 text = stringResource(
                     if (isEditing) R.string.app_limit_form_title_edit
@@ -159,7 +155,6 @@ fun AppLimitFormCard(
                 color = MaterialTheme.colorScheme.onSurface
             )
 
-            // ── Selector de tipo (solo al crear) ──────────────────
             if (!isEditing) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -194,7 +189,6 @@ fun AppLimitFormCard(
                 }
             }
 
-            // ── App ───────────────────────────────────────────────
             if (!isGroup) {
                 Text(
                     text = stringResource(R.string.app_limit_form_app_label),
@@ -203,6 +197,10 @@ fun AppLimitFormCard(
                 )
                 OutlinedButton(
                     onClick = { showAppPicker = true },
+                    // Which app a restriction targets can't be changed after creation —
+                    // re-picking here would desync the stable id from a new package
+                    // and orphan the original restriction's row in the database.
+                    enabled = !isEditing,
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.outlinedButtonColors(
@@ -240,12 +238,14 @@ fun AppLimitFormCard(
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
-                        Icon(
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = null,
-                            modifier = Modifier.size(14.dp),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                        if (!isEditing) {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = null,
+                                modifier = Modifier.size(14.dp),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     } else {
                         Icon(
                             imageVector = Icons.Default.PhoneAndroid,
@@ -262,7 +262,6 @@ fun AppLimitFormCard(
                 }
             }
 
-            // ── Grupo ─────────────────────────────────────────────
             if (isGroup) {
                 DayPilotTextField(
                     value = groupName,
@@ -346,7 +345,6 @@ fun AppLimitFormCard(
                 }
             }
 
-            // ── Límite diario ─────────────────────────────────────
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
                     text = stringResource(
@@ -369,7 +367,6 @@ fun AppLimitFormCard(
                     steps = if (isGroup) 16 else 10,
                     modifier = Modifier.fillMaxWidth()
                 )
-                // Presets
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -410,7 +407,6 @@ fun AppLimitFormCard(
                 }
             }
 
-            // ── Botones ───────────────────────────────────────────
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -436,12 +432,10 @@ fun AppLimitFormCard(
                                                 appName = it.name,
                                                 packageName = it.packageName,
                                                 dailyLimitMinutes = limitMinutes.toInt(),
-                                                notificationIntervalSeconds = 0,
                                                 isEnabled = true
                                             )
                                         },
                                         dailyLimitMinutes = limitMinutes.toInt(),
-                                        notificationIntervalSeconds = 0,
                                         isEnabled = true
                                     )
                                 )
@@ -453,7 +447,6 @@ fun AppLimitFormCard(
                                         appName = selectedApp!!.name,
                                         packageName = selectedApp!!.packageName,
                                         dailyLimitMinutes = limitMinutes.toInt(),
-                                        notificationIntervalSeconds = 0,
                                         isEnabled = true
                                     )
                                 )
@@ -476,7 +469,6 @@ fun AppLimitFormCard(
     }
 }
 
-// ── Preview ──────────────────────────────────────────────────────
 @Preview(showBackground = true)
 @Composable
 fun AppLimitFormPreview() {

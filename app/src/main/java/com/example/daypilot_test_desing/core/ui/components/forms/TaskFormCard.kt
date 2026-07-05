@@ -103,7 +103,6 @@ fun TaskFormCard(
             color = MaterialTheme.colorScheme.onBackground
         )
 
-        // Section: Information
         FormSection(title = stringResource(R.string.task_section_info), icon = Icons.Default.Edit) {
             OutlinedTextField(
                 value = title, onValueChange = { title = it },
@@ -119,7 +118,6 @@ fun TaskFormCard(
             )
         }
 
-        // Section: Details
         FormSection(
             title = stringResource(R.string.task_section_details),
             icon = Icons.Default.List
@@ -146,94 +144,97 @@ fun TaskFormCard(
             DurationSelector(value = duration, onValueChange = { duration = it })
         }
 
-        // Section: Reminder & Recurrence — collapsed by default
         FormSection(
             title           = stringResource(R.string.task_section_extras),
             icon            = Icons.Default.Notifications,
             initiallyExpanded = false
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column {
-                    Text(
-                        text = stringResource(R.string.task_reminder_label),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    Text(
-                        text = stringResource(R.string.task_reminder_description),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-                Switch(
-                    checked = reminder,
-                    onCheckedChange = { reminder = it },
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
-                        checkedTrackColor = MaterialTheme.colorScheme.primary
-                    )
-                )
-            }
-
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = 4.dp),
-                color = MaterialTheme.colorScheme.surfaceVariant
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column {
-                    Text(
-                        text = stringResource(R.string.task_recurring_label),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    Text(
-                        text = stringResource(R.string.task_recurring_description),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+            // Reminder, like recurrence below, can only be set at creation —
+            // updateTask() has no way to change it afterwards, so hide it during
+            // edit rather than show a toggle that silently does nothing on save.
+            if (!isEditing) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text(
+                            text = stringResource(R.string.task_reminder_label),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Text(
+                            text = stringResource(R.string.task_reminder_description),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Switch(
+                        checked = reminder,
+                        onCheckedChange = { reminder = it },
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
+                            checkedTrackColor = MaterialTheme.colorScheme.primary
+                        )
                     )
                 }
-                Switch(
-                    checked = recurring,
-                    onCheckedChange = { recurring = it },
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
-                        checkedTrackColor = MaterialTheme.colorScheme.primary
-                    )
+
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 4.dp),
+                    color = MaterialTheme.colorScheme.surfaceVariant
                 )
-            }
-            AnimatedVisibility(
-                visible = recurring,
-                enter = fadeIn() + expandVertically(),
-                exit = fadeOut() + shrinkVertically()
-            ) {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Spacer(Modifier.height(4.dp))
-                    Text(
-                        text = stringResource(R.string.task_recurring_repeat),
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text(
+                            text = stringResource(R.string.task_recurring_label),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Text(
+                            text = stringResource(R.string.task_recurring_description),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Switch(
+                        checked = recurring,
+                        onCheckedChange = { recurring = it },
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
+                            checkedTrackColor = MaterialTheme.colorScheme.primary
+                        )
                     )
-                    DurationSelector(
-                        value = recurrenceDays,
-                        onValueChange = { recurrenceDays = it },
-                        unitLabel = stringResource(R.string.common_days),
-                        min = 1,
-                        step = 1
-                    )
+                }
+                AnimatedVisibility(
+                    visible = recurring,
+                    enter = fadeIn() + expandVertically(),
+                    exit = fadeOut() + shrinkVertically()
+                ) {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            text = stringResource(R.string.task_recurring_repeat),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        DurationSelector(
+                            value = recurrenceDays,
+                            onValueChange = { recurrenceDays = it },
+                            unitLabel = stringResource(R.string.common_days),
+                            min = 1,
+                            step = 1
+                        )
+                    }
                 }
             }
         }
 
-        // Buttons
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -266,7 +267,6 @@ fun TaskFormCard(
     }
 }
 
-// ── Collapsible section wrapper ───────────────────────────────────
 @Composable
 fun FormSection(
     title: String,
@@ -332,7 +332,6 @@ fun FormSection(
     }
 }
 
-// ── Category selector ─────────────────────────────────────────────
 @Composable
 fun CategorySelector(selected: TaskCategory, onSelect: (TaskCategory) -> Unit) {
     FlowRow(
@@ -366,7 +365,6 @@ fun CategorySelector(selected: TaskCategory, onSelect: (TaskCategory) -> Unit) {
     }
 }
 
-// ── Difficulty selector ───────────────────────────────────────────
 @Composable
 fun DifficultySelector(selected: TaskDifficulty, onSelect: (TaskDifficulty) -> Unit) {
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -397,7 +395,6 @@ fun DifficultySelector(selected: TaskDifficulty, onSelect: (TaskDifficulty) -> U
     }
 }
 
-// ── Duration selector ─────────────────────────────────────────────
 @Composable
 fun DurationSelector(
     value: Int,

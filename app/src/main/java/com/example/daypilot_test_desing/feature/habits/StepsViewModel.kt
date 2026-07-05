@@ -9,6 +9,7 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Build
+import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.DefaultLifecycleObserver
@@ -57,6 +58,7 @@ class StepsViewModel(
                 val stepDelta  = totalSinceBoot - prevTotalSinceBoot
                 val timeDeltaS = (event.timestamp - prevEventNs) / 1_000_000_000.0
                 if (stepDelta > 0 && timeDeltaS in 0.001..30.0 && stepDelta / timeDeltaS > 10.0) {
+                    Log.d(TAG, "Rejected step spike: $stepDelta steps in ${timeDeltaS}s")
                     prevEventNs = event.timestamp
                     return
                 }
@@ -70,6 +72,7 @@ class StepsViewModel(
                 baseline = if (savedDate == today) {
                     prefs.getInt("baseline_steps", totalSinceBoot)
                 } else {
+                    Log.d(TAG, "New day detected, resetting steps baseline to $totalSinceBoot")
                     prefs.edit()
                         .putString("baseline_date", today)
                         .putInt("baseline_steps", totalSinceBoot)
@@ -91,11 +94,14 @@ class StepsViewModel(
 
     init {
         registerSensorIfPermitted()
+        viewModelScope.launch {
+            stepsRepo.hydrateGoalFromServer()
+            updateLocalState()
+        }
         viewModelScope.launch { loadWeeklyStats() }
         updateLocalState()
         _uiState.update { it.copy(sensorAvailable = stepSensor != null) }
 
-        // Periodic sync every 5 minutes
         viewModelScope.launch {
             while (true) {
                 delay(PERIODIC_SYNC_MS)
@@ -104,7 +110,6 @@ class StepsViewModel(
             }
         }
 
-        // Sync when the app goes to background so the latest step count is persisted
         ProcessLifecycleOwner.get().lifecycle.addObserver(object : DefaultLifecycleObserver {
             override fun onStop(owner: LifecycleOwner) {
                 triggerSync(stepsRepo.getCurrentSteps())
@@ -127,6 +132,7 @@ class StepsViewModel(
         stepSensor?.let {
             sensorManager?.registerListener(sensorListener, it, SensorManager.SENSOR_DELAY_NORMAL)
             sensorRegistered = true
+            Log.d(TAG, "Step sensor registered")
         }
     }
 
@@ -143,6 +149,7 @@ class StepsViewModel(
     private fun triggerSync(steps: Int = stepsRepo.getCurrentSteps()) {
         lastSyncedSteps = steps
         val goal = stepsRepo.getGoalSteps()
+        Log.d(TAG, "Triggering steps sync: $steps/$goal")
         viewModelScope.launch { stepsRepo.syncSteps(steps, goal) }
     }
 
@@ -180,6 +187,7 @@ class StepsViewModel(
     private fun todayStr() = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
 
     companion object {
+        private const val TAG = "StepsViewModel"
         private const val STEP_SYNC_THRESHOLD = 50
         private const val PERIODIC_SYNC_MS    = 5 * 60_000L
 

@@ -49,8 +49,9 @@ class SupabaseUserRepository : UserRepository {
                 avatarUrl     = dto.photoUrl,
                 region        = region,
                 memberSince   = memberSince,
-                level         = dto.level,
-                totalPoints   = dto.totalPointsHistorical,
+                level             = dto.level,
+                totalPoints       = dto.totalPointsHistorical,
+                pointsToNextLevel = dto.pointsToNextLevel,
                 currentStreak = streak?.currentStreak ?: 0,
                 longestStreak = streak?.longestStreak ?: 0
             )

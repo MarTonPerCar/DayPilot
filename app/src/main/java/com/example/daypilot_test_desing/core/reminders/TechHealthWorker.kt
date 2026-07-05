@@ -7,18 +7,13 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.example.daypilot_test_desing.core.data.local.SharedPrefsTechHealthRepository
-import com.example.daypilot_test_desing.data.supabase.dto.HabitsDailyTechDto
 import com.example.daypilot_test_desing.data.supabase.supabase
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 private const val TECH_HEALTH_WORK_NAME = "tech_health_usage_check"
 
-/** Enqueues the periodic usage check; safe to call on every app start (KEEP avoids duplicate schedules). */
 fun scheduleTechHealthWorker(context: Context) {
     val request = PeriodicWorkRequestBuilder<TechHealthWorker>(15, TimeUnit.MINUTES).build()
     WorkManager.getInstance(context).enqueueUniquePeriodicWork(
@@ -28,51 +23,58 @@ fun scheduleTechHealthWorker(context: Context) {
     )
 }
 
-/**
- * Tarea de WorkManager que corre en background cada ~15 min (puede variar según la batería).
- * Actualiza el uso por app, detecta violaciones y escribe en habits_daily.
- * El bloqueo real lo hace DayPilotAccessibilityService; esto solo persiste el estado.
- *
- * FIXME: si el usuario tiene el modo de ahorro de batería agresivo puede que no corra
- */
+// FIXME: aggressive battery-saver modes on some devices may prevent this from running.
 class TechHealthWorker(
     context: Context,
     params: WorkerParameters
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
-        val uid = supabase.auth.currentUserOrNull()?.id ?: return Result.success()
+        if (supabase.auth.currentUserOrNull()?.id == null) return Result.success()
 
         val repository = SharedPrefsTechHealthRepository(applicationContext)
         repository.applyPendingChangesIfNewDay()
 
         if (!AppUsageTracker.hasPermission(applicationContext)) return Result.success()
 
-        val usageMap     = AppUsageTracker.getTodayUsage(applicationContext)
-        val restrictions = repository.getAppRestrictions().filter { it.isEnabled }
+        val usageMap = AppUsageTracker.getTodayUsage(applicationContext)
 
-        var anyViolated = false
-        restrictions.forEach { r ->
+        repository.getAppRestrictions().filter { it.isEnabled }.forEach { r ->
             val used = usageMap[r.packageName] ?: 0
             if (used != r.usedMinutesToday) repository.updateUsage(r.id, used)
-            if (used >= r.dailyLimitMinutes && r.dailyLimitMinutes > 0) anyViolated = true
+            if (used >= r.dailyLimitMinutes && r.dailyLimitMinutes > 0 && !r.isViolatedToday) {
+                repository.markViolated(r.id)
+                markAppViolatedInSupabase(r.packageName)
+            }
         }
 
-        if (anyViolated && !repository.isViolatedToday()) {
-            repository.markViolatedToday()
-            try {
-                supabase.from("habits_daily").upsert(
-                    HabitsDailyTechDto(
-                        userId              = uid,
-                        date                = today(),
-                        techHealthPointEarned = false
-                    )
-                )
-            } catch (_: Exception) { }
+        repository.getGroupRestrictions().filter { it.isEnabled }.forEach { g ->
+            val used = g.apps.sumOf { usageMap[it.packageName] ?: 0 }
+            if (used != g.usedMinutesToday) repository.updateGroupUsage(g.id, used)
+            if (used >= g.dailyLimitMinutes && g.dailyLimitMinutes > 0 && !g.isViolatedToday) {
+                repository.markGroupViolated(g.id)
+                markGroupViolatedInSupabase(g.groupName)
+            }
         }
 
         return Result.success()
     }
 
-    private fun today() = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
+    private suspend fun markAppViolatedInSupabase(packageName: String) {
+        try {
+            val uid = supabase.auth.currentUserOrNull()?.id ?: return
+            supabase.from("tech_health_config").update({ set("is_violated_today", true) }) {
+                filter { eq("user_id", uid); eq("app_package", packageName) }
+            }
+        } catch (_: Exception) { }
+    }
+
+    private suspend fun markGroupViolatedInSupabase(groupName: String) {
+        try {
+            val uid = supabase.auth.currentUserOrNull()?.id ?: return
+            supabase.from("tech_health_group_config").update({ set("is_violated_today", true) }) {
+                filter { eq("user_id", uid); eq("group_name", groupName) }
+            }
+        } catch (_: Exception) { }
+    }
 }

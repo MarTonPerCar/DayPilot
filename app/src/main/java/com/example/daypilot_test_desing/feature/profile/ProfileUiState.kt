@@ -9,6 +9,7 @@ data class ProfileUiState(
     val memberSince: String = "",
     val level: Int = 1,
     val totalPoints: Int = 0,
+    val pointsToNextLevel: Int = 20,
     val currentStreak: Int = 0,
     val longestStreak: Int = 0,
     val rankingPosition: Int = 0,

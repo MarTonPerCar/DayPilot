@@ -5,10 +5,9 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.daypilot_test_desing.core.data.model.DayProgress
+import com.example.daypilot_test_desing.core.data.model.buildProgressWindow
 import com.example.daypilot_test_desing.core.data.preferences.AppPreferences
 import com.example.daypilot_test_desing.data.supabase.SupabaseNotificationRepository
-import java.util.Calendar
 import com.example.daypilot_test_desing.core.data.repository.ProgressRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,18 +39,7 @@ class ProgressViewModel(
             val todayProgress = repo.getTodayProgress()   // cache-first
             val history       = repo.getHistory(30)        // cache-first with 1h TTL
             val ranking       = repo.getRankingPosition()  // uses cached ranking if available
-            val closedData    = history.reversed().map { log ->
-                val day = log.date.substringAfterLast("-").toIntOrNull() ?: 0
-                DayProgress(day = day, points = log.totalPoints, steps = log.steps, tasksCompleted = log.tasksCompleted)
-            }
-            val todayDayNum  = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
-            val progressData = closedData + DayProgress(
-                day            = todayDayNum,
-                points         = todayProgress.totalPoints,
-                steps          = todayProgress.steps,
-                tasksCompleted = todayProgress.tasksCompleted,
-                isToday        = true
-            )
+            val progressData  = buildProgressWindow(history, todayProgress)
             _uiState.value = ProgressUiState(
                 progressData        = progressData,
                 rankingPosition     = ranking,
@@ -70,7 +58,7 @@ class ProgressViewModel(
         if (appPrefs.timerPointsDate == todayStr) return
         viewModelScope.launch {
             try {
-                repo.logPoints(10, "TIMER")  // clears SessionCache.todayProgress
+                repo.logPoints(10, "TIMER")  // bumps SessionCache.todayProgress/userProfile in place
                 appPrefs.timerPointsDate = todayStr
                 load()  // re-fetches fresh todayProgress, updates UiState
                 // TODO: move notification sending to NotificationRepository so ProgressViewModel

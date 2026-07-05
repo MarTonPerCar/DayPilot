@@ -1,5 +1,7 @@
 package com.example.daypilot_test_desing.core.ui.components.cards
 
+import android.graphics.Bitmap
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -34,11 +36,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.graphics.drawable.toBitmap
 import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.core.data.model.AppRestriction
 import com.example.daypilot_test_desing.core.data.model.GroupRestriction
@@ -54,12 +60,12 @@ fun GroupLimitCard(
 ) {
     var showDeleteConfirm by remember { mutableStateOf(false) }
     var expanded by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     val progress = (restriction.usedMinutesToday.toFloat() /
             restriction.dailyLimitMinutes).coerceIn(0f, 1f)
     val isOverLimit = restriction.usedMinutesToday >= restriction.dailyLimitMinutes
 
-    // ── Diálogo de confirmación de borrado ────────────────────────
     if (showDeleteConfirm) {
         AlertDialog(
             onDismissRequest = { showDeleteConfirm = false },
@@ -109,13 +115,11 @@ fun GroupLimitCard(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            // ── Cabecera ──────────────────────────────────────────
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Icono grupo
                 Box(
                     modifier = Modifier
                         .size(44.dp)
@@ -142,7 +146,6 @@ fun GroupLimitCard(
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface
                         )
-                        // Badge "Grupo"
                         Box(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(4.dp))
@@ -177,7 +180,28 @@ fun GroupLimitCard(
                 )
             }
 
-            // ── Barra de progreso ─────────────────────────────────
+            // Pending on/off and/or limit change — still fully editable/toggleable/
+            // deletable, unlike pendingDelete below which locks the card.
+            if (!restriction.pendingDelete) {
+                if (restriction.pendingActive != null) {
+                    Text(
+                        text = stringResource(
+                            if (restriction.pendingActive) R.string.tech_health_pending_activate
+                            else R.string.tech_health_pending_deactivate
+                        ),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.tertiary
+                    )
+                }
+                if (restriction.pendingLimitMinutes != null) {
+                    Text(
+                        text = stringResource(R.string.tech_health_pending_limit, restriction.pendingLimitMinutes),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.tertiary
+                    )
+                }
+            }
+
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 LinearProgressIndicator(
                     progress = { progress },
@@ -189,32 +213,18 @@ fun GroupLimitCard(
                     else MaterialTheme.colorScheme.tertiary,
                     trackColor = MaterialTheme.colorScheme.surfaceVariant
                 )
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = stringResource(
-                            R.string.tech_health_usage_today,
-                            restriction.usedMinutesToday,
-                            restriction.dailyLimitMinutes
-                        ),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = if (isOverLimit) MaterialTheme.colorScheme.error
-                        else MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Text(
-                        text = stringResource(
-                            R.string.tech_health_notif_interval,
-                            restriction.notificationIntervalSeconds
-                        ),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
+                Text(
+                    text = stringResource(
+                        R.string.tech_health_usage_today,
+                        restriction.usedMinutesToday,
+                        restriction.dailyLimitMinutes
+                    ),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = if (isOverLimit) MaterialTheme.colorScheme.error
+                    else MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
 
-            // ── Apps del grupo (desplegable) ──────────────────────
             TextButton(
                 onClick = { expanded = !expanded },
                 modifier = Modifier.fillMaxWidth()
@@ -232,24 +242,37 @@ fun GroupLimitCard(
             if (expanded) {
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     restriction.apps.forEach { app ->
+                        val appIcon: Bitmap? = remember(app.packageName) {
+                            try { context.packageManager.getApplicationIcon(app.packageName).toBitmap() }
+                            catch (_: Exception) { null }
+                        }
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(28.dp)
-                                    .clip(RoundedCornerShape(6.dp))
-                                    .background(MaterialTheme.colorScheme.surfaceVariant),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = app.appName.first().uppercase(),
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.primary
+                            if (appIcon != null) {
+                                Image(
+                                    bitmap             = appIcon.asImageBitmap(),
+                                    contentDescription = null,
+                                    contentScale       = ContentScale.Fit,
+                                    modifier           = Modifier.size(28.dp).clip(RoundedCornerShape(6.dp))
                                 )
+                            } else {
+                                Box(
+                                    modifier = Modifier
+                                        .size(28.dp)
+                                        .clip(RoundedCornerShape(6.dp))
+                                        .background(MaterialTheme.colorScheme.surfaceVariant),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = app.appName.first().uppercase(),
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                }
                             }
                             Text(
                                 text = app.appName,
@@ -267,7 +290,6 @@ fun GroupLimitCard(
                 }
             }
 
-            // ── Botones ───────────────────────────────────────────
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -320,7 +342,6 @@ fun GroupLimitCard(
     }
 }
 
-// ── Preview ──────────────────────────────────────────────────────
 @Preview(showBackground = true)
 @Composable
 fun GroupLimitCardPreview() {
@@ -340,13 +361,11 @@ fun GroupLimitCardPreview() {
                             appName = "Instagram",
                             packageName = "com.instagram.android",
                             dailyLimitMinutes = 60,
-                            notificationIntervalSeconds = 30,
                             isEnabled = true,
                             usedMinutesToday = 20
                         )
                     ),
                     dailyLimitMinutes = 120,
-                    notificationIntervalSeconds = 60,
                     isEnabled = true,
                     usedMinutesToday = 45
                 ),
