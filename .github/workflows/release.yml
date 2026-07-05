@@ -1,0 +1,118 @@
+name: Release builds
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: sudo apt-get update -y && sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev
+      - run: flutter pub get
+      - run: cp env.json.example env.json
+      - run: flutter config --enable-linux-desktop
+      - run: flutter build linux --release
+      - run: |
+          cd build/linux/x64/release/bundle
+          tar -czf ../../../../../test_supabase_flutter-linux.tar.gz .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-build
+          path: test_supabase_flutter-linux.tar.gz
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter pub get
+      - run: Copy-Item env.json.example env.json
+      - run: flutter config --enable-windows-desktop
+      - run: flutter build windows --release
+      - run: Compress-Archive -Path build/windows/x64/runner/Release/* -DestinationPath test_supabase_flutter-windows.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-build
+          path: test_supabase_flutter-windows.zip
+
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter pub get
+      - run: cp env.json.example env.json
+      - run: flutter build apk --release
+      - run: cp build/app/outputs/flutter-apk/app-release.apk test_supabase_flutter-android.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-build
+          path: test_supabase_flutter-android.apk
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter pub get
+      - run: cp env.json.example env.json
+      - run: flutter config --enable-macos-desktop
+      - run: flutter build macos --release
+      - run: |
+          cd build/macos/Build/Products/Release
+          zip -r ../../../../../test_supabase_flutter-macos.zip test_supabase_flutter.app
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos-build
+          path: test_supabase_flutter-macos.zip
+
+  build-ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter pub get
+      - run: cp env.json.example env.json
+      - run: flutter build ios --release --no-codesign
+      - run: |
+          mkdir -p Payload
+          cp -r build/ios/iphoneos/Runner.app Payload/
+          zip -r test_supabase_flutter-ios-unsigned.zip Payload
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ios-build
+          path: test_supabase_flutter-ios-unsigned.zip
+
+  release:
+    needs: [build-linux, build-windows, build-android, build-macos, build-ios]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+          generate_release_notes: true
