@@ -662,6 +662,7 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             pointsHistory: AppData.last30DaysPoints,
             stepsHistory: AppData.last30DaysSteps,
             tasksHistory: AppData.last30DaysTasks,
+            dayLabels: AppData.last30DaysLabels,
           ),
 
           _SectionHeader('Progreso de pasos'),

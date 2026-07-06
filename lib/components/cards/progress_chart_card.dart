@@ -8,12 +8,14 @@ class ProgressChartCard extends StatefulWidget {
   final List<double> pointsHistory;
   final List<double> stepsHistory;
   final List<double> tasksHistory;
+  final List<int> dayLabels;
 
   const ProgressChartCard({
     super.key,
     required this.pointsHistory,
     required this.stepsHistory,
     required this.tasksHistory,
+    required this.dayLabels,
   });
 
   @override
@@ -23,7 +25,6 @@ class ProgressChartCard extends StatefulWidget {
 class _ProgressChartCardState extends State<ProgressChartCard> {
   ProgressMetric _metric = ProgressMetric.points;
 
-  static const _maxDays = 30;
   static const _daysStep = 5;
 
   List<double> get _data => switch (_metric) {
@@ -77,7 +78,7 @@ class _ProgressChartCardState extends State<ProgressChartCard> {
                 size: Size.infinite,
                 painter: _LineChartPainter(
                   data: data,
-                  maxDays: _maxDays,
+                  dayLabels: widget.dayLabels,
                   daysStep: _daysStep,
                   lineColor: lineColor,
                   gridColor: colors.outlineVariant,
@@ -187,7 +188,7 @@ class _StatLabel extends StatelessWidget {
 
 class _LineChartPainter extends CustomPainter {
   final List<double> data;
-  final int maxDays;
+  final List<int> dayLabels;
   final int daysStep;
   final Color lineColor;
   final Color gridColor;
@@ -196,7 +197,7 @@ class _LineChartPainter extends CustomPainter {
 
   _LineChartPainter({
     required this.data,
-    required this.maxDays,
+    required this.dayLabels,
     required this.daysStep,
     required this.lineColor,
     required this.gridColor,
@@ -206,7 +207,7 @@ class _LineChartPainter extends CustomPainter {
 
   static const _leftAxisWidth = 34.0;
   static const _bottomAxisHeight = 20.0;
-  static const _topPadding = 18.0;
+  static const _topPadding = 26.0;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -234,18 +235,14 @@ class _LineChartPainter extends CustomPainter {
       tp.paint(canvas, Offset(0, y - tp.height / 2));
     }
 
-    for (int d = daysStep; d <= maxDays; d += daysStep) {
-      final x = chartRect.left + chartRect.width * (d / maxDays);
-      final tp = _text('$d', labelColor);
-      tp.paint(canvas, Offset(x - tp.width / 2, chartRect.bottom + 4));
-    }
-
     if (data.isEmpty) return;
+
+    final todayIndex = data.length - 1;
 
     final points = <Offset>[
       for (int i = 0; i < data.length; i++)
         Offset(
-          chartRect.left + chartRect.width * ((i + 1) / maxDays),
+          chartRect.left + chartRect.width * ((i + 0.5) / data.length),
           chartRect.bottom - chartRect.height * (niceMax == 0 ? 0 : (data[i] / niceMax).clamp(0.0, 1.0)),
         ),
     ];
@@ -285,18 +282,31 @@ class _LineChartPainter extends CustomPainter {
       canvas.drawCircle(p, 3, dotPaint);
     }
 
-    if (data.length < maxDays) {
-      final x = chartRect.left + chartRect.width * (data.length / maxDays);
-      _drawDashedLine(
-        canvas,
-        Offset(x, chartRect.top),
-        Offset(x, chartRect.bottom),
-        Paint()
-          ..color = lineColor.withAlpha(180)
-          ..strokeWidth = 1.5,
-      );
-      final tp = _text('${data.length}', lineColor, bold: true);
-      tp.paint(canvas, Offset(x - tp.width / 2, chartRect.top - tp.height - 2));
+    final todayX = points[todayIndex].dx;
+    _drawDashedLine(
+      canvas,
+      Offset(todayX, chartRect.top),
+      Offset(todayX, chartRect.bottom),
+      Paint()
+        ..color = lineColor.withAlpha(180)
+        ..strokeWidth = 1.5,
+    );
+
+    // Value label above the point: every Nth day, plus always today.
+    for (int i = 0; i < points.length; i++) {
+      final isToday = i == todayIndex;
+      if (i % daysStep != 0 && !isToday) continue;
+      final tp = _text(_fmtAxis(data[i]), lineColor, bold: isToday);
+      tp.paint(canvas, Offset(points[i].dx - tp.width / 2, points[i].dy - tp.height - 4));
+    }
+
+    // X-axis label: real calendar day-of-month, every 5th day, plus always today.
+    for (int i = 0; i < dayLabels.length && i < points.length; i++) {
+      final isToday = i == todayIndex;
+      final day = dayLabels[i];
+      if (day % daysStep != 0 && !isToday) continue;
+      final tp = _text('$day', isToday ? lineColor : labelColor, bold: isToday);
+      tp.paint(canvas, Offset(points[i].dx - tp.width / 2, chartRect.bottom + 4));
     }
   }
 

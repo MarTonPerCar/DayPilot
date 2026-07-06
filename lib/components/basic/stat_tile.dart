@@ -24,7 +24,7 @@ class StatTile extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          color: colors.surfaceContainerHighest,
+          color: colors.surfaceContainerHigh,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(

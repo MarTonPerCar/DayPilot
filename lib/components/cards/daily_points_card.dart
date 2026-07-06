@@ -3,7 +3,7 @@ import '../../l10n/app_localizations.dart';
 import '../basic/stat_tile.dart';
 
 class DailyPointsCard extends StatelessWidget {
-  final int rankingPosition;
+  final int? rankingPosition;
   final int pointsToday;
   final int pointsFromTasks;
   final int pointsFromSteps;
@@ -12,7 +12,7 @@ class DailyPointsCard extends StatelessWidget {
 
   const DailyPointsCard({
     super.key,
-    required this.rankingPosition,
+    this.rankingPosition,
     required this.pointsToday,
     this.pointsFromTasks = 0,
     this.pointsFromSteps = 0,
@@ -41,13 +41,15 @@ class DailyPointsCard extends StatelessWidget {
             const SizedBox(height: 12),
             Row(
               children: [
-                StatTile(
-                  icon: Icons.emoji_events_rounded,
-                  color: colors.tertiary,
-                  value: '#$rankingPosition',
-                  label: l10n.commonRanking,
-                ),
-                const SizedBox(width: 12),
+                if (rankingPosition != null) ...[
+                  StatTile(
+                    icon: Icons.emoji_events_rounded,
+                    color: colors.tertiary,
+                    value: '#$rankingPosition',
+                    label: l10n.commonRanking,
+                  ),
+                  const SizedBox(width: 12),
+                ],
                 StatTile(
                   icon: Icons.star_rounded,
                   color: const Color(0xFFFFD700),

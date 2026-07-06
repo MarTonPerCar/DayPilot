@@ -2,8 +2,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'auth_repository.dart';
+import 'progress_repository.dart';
 import 'steps_repository.dart';
 import 'supabase_auth_repository.dart';
+import 'supabase_progress_repository.dart';
 import 'supabase_steps_repository.dart';
 import 'supabase_task_repository.dart';
 import 'task_repository.dart';
@@ -22,4 +24,8 @@ final taskRepositoryProvider = Provider<TaskRepository>((ref) {
 
 final stepsRepositoryProvider = Provider<StepsRepository>((ref) {
   return SupabaseStepsRepository(ref.read(supabaseClientProvider));
+});
+
+final progressRepositoryProvider = Provider<ProgressRepository>((ref) {
+  return SupabaseProgressRepository(ref.read(supabaseClientProvider));
 });
