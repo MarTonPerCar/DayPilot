@@ -4,7 +4,9 @@ import androidx.annotation.StringRes
 import com.example.daypilot_test_desing.R
 
 data class DayProgress(
-    val day: Int,
+    // Calendar day-of-month (1-31) this point actually falls on — used as the
+    // chart's x-axis label, not the point's position within the window.
+    val dayOfMonth: Int,
     val points: Int,
     val steps: Int,
     val tasksCompleted: Int,

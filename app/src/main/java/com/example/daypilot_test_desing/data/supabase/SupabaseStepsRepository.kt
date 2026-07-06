@@ -10,6 +10,7 @@ import com.example.daypilot_test_desing.core.data.repository.StepsWeeklyStats
 import com.example.daypilot_test_desing.data.supabase.dto.DailyLogDto
 import com.example.daypilot_test_desing.data.supabase.dto.HabitsDailyUpsertDto
 import com.example.daypilot_test_desing.data.supabase.dto.InsertPointsLogDto
+import com.example.daypilot_test_desing.data.supabase.dto.UserPendingGoalDto
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Order
@@ -18,6 +19,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -39,10 +41,19 @@ class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepos
 
     private fun today() = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
 
+    private fun tomorrow(): String {
+        val cal = Calendar.getInstance()
+        cal.add(Calendar.DAY_OF_MONTH, 1)
+        return SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(cal.time)
+    }
+
+    // "goal_change_date" stores the date the pending goal *takes effect* (not the
+    // date it was set) — same semantics as users.pending_steps_goal_date, so a
+    // value pulled from the server can be copied in as-is, no translation needed.
     private fun applyPendingGoalIfNewDay() {
         val pendingGoal = prefs.getInt("pending_goal", -1)
         val pendingDate = prefs.getString("goal_change_date", "") ?: ""
-        if (pendingGoal > 0 && pendingDate.isNotEmpty() && pendingDate < today()) {
+        if (pendingGoal > 0 && pendingDate.isNotEmpty() && pendingDate <= today()) {
             prefs.edit()
                 .putInt("steps_goal", pendingGoal)
                 .putInt("pending_goal", -1)
@@ -71,10 +82,57 @@ class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepos
     override fun canChangeGoal(): Boolean = true
 
     override fun configureGoal(newGoal: Int) {
+        val applyDate = tomorrow()
         prefs.edit()
             .putInt("pending_goal", newGoal)
-            .putString("goal_change_date", today())
+            .putString("goal_change_date", applyDate)
             .apply()
+        // Mirrors it to users.pending_steps_goal/_date so any other device this
+        // account is signed into sees the same pending change, instead of the
+        // change silently only taking effect on the device it was set from.
+        scope.launch { pushPendingGoalToServer(newGoal, applyDate) }
+    }
+
+    private suspend fun pushPendingGoalToServer(newGoal: Int, applyDate: String) {
+        val uid = supabase.auth.currentUserOrNull()?.id ?: return
+        try {
+            supabase.from("users").update({
+                set("pending_steps_goal", newGoal)
+                set("pending_steps_goal_date", applyDate)
+            }) {
+                filter { eq("id", uid) }
+            }
+            Log.d(TAG, "Pushed pending goal to server: $newGoal effective $applyDate")
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to push pending goal to server", e)
+        }
+    }
+
+    // Adopts a pending goal queued from another device into the local prefs
+    // mirror, so this device's own applyPendingGoalIfNewDay() picks it up too.
+    private suspend fun pullPendingGoalFromServer() {
+        val uid = supabase.auth.currentUserOrNull()?.id ?: return
+        try {
+            val dto = supabase.from("users").select {
+                filter { eq("id", uid) }
+                limit(1)
+            }.decodeList<UserPendingGoalDto>().firstOrNull() ?: return
+            val serverGoal = dto.pendingStepsGoal
+            val serverDate = dto.pendingStepsGoalDate
+            if (serverGoal != null && serverGoal > 0 && !serverDate.isNullOrEmpty()) {
+                val localGoal = prefs.getInt("pending_goal", -1)
+                val localDate = prefs.getString("goal_change_date", "")
+                if (serverGoal != localGoal || serverDate != localDate) {
+                    prefs.edit()
+                        .putInt("pending_goal", serverGoal)
+                        .putString("goal_change_date", serverDate)
+                        .apply()
+                    Log.d(TAG, "Adopted pending goal from server: $serverGoal effective $serverDate")
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to pull pending goal from server", e)
+        }
     }
 
     override fun setSteps(steps: Int) {
@@ -153,10 +211,15 @@ class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepos
         }
     }
 
+    override suspend fun hydrateGoalFromServer() {
+        hydrateActiveGoalIfFirstRun()
+        pullPendingGoalFromServer()
+    }
+
     // Guarded so it only runs once per device — otherwise a fresh install would
     // default to 10_000 and syncSteps() would push that straight back to the DB,
     // clobbering the real goal.
-    override suspend fun hydrateGoalFromServer() {
+    private suspend fun hydrateActiveGoalIfFirstRun() {
         if (prefs.contains("steps_goal")) return
         val uid = supabase.auth.currentUserOrNull()?.id ?: return
         try {
