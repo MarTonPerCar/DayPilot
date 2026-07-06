@@ -86,7 +86,7 @@ class WeeklyReactionCard extends StatelessWidget {
                               height: 22,
                               alignment: Alignment.center,
                               decoration: BoxDecoration(
-                                color: colors.surfaceContainerHighest,
+                                color: colors.surfaceContainerHigh,
                                 shape: BoxShape.circle,
                                 border: Border.all(color: colors.surface, width: 2),
                               ),

@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../cache/session_cache.dart';
+import '../../utils/iso_date.dart';
 import '../models/app_task.dart';
 import '../models/task_category.dart';
 import '../models/task_difficulty.dart';
@@ -50,7 +51,7 @@ class SupabaseTaskRepository implements TaskRepository {
     await _client.from('task_days').insert({
       'task_id': taskId,
       'user_id': uid,
-      'date': _isoDate(data.date),
+      'date': isoDate(data.date),
     });
 
     // One row per occurrence, capped 90 days out — same approach as Android;
@@ -62,7 +63,7 @@ class SupabaseTaskRepository implements TaskRepository {
         await _client.from('task_days').insert({
           'task_id': taskId,
           'user_id': uid,
-          'date': _isoDate(next),
+          'date': isoDate(next),
         });
         next = next.add(Duration(days: data.recurrenceDays));
       }
@@ -106,6 +107,3 @@ class SupabaseTaskRepository implements TaskRepository {
     await _client.from('tasks').delete().eq('id', id).eq('user_id', uid);
   }
 }
-
-String _isoDate(DateTime date) =>
-    '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';

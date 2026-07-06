@@ -137,7 +137,7 @@ class _MetricSelector extends StatelessWidget {
                 duration: const Duration(milliseconds: 150),
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 decoration: BoxDecoration(
-                  color: isSelected ? colors.primaryContainer : colors.surfaceContainerHighest,
+                  color: isSelected ? colors.primaryContainer : colors.surfaceContainerHigh,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Row(

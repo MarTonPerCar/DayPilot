@@ -1078,6 +1078,12 @@ abstract class AppLocalizations {
   /// **'Siguiente meta'**
   String get stepsNextGoal;
 
+  /// No description provided for @stepsPendingGoal.
+  ///
+  /// In es, this message translates to:
+  /// **'Meta pendiente: {goal} pasos (activa mañana)'**
+  String stepsPendingGoal(int goal);
+
   /// No description provided for @notificationsMarkAllRead.
   ///
   /// In es, this message translates to:

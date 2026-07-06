@@ -210,6 +210,8 @@
   "@stepsOfGoal": {"placeholders": {"goal": {"type": "int"}}},
   "stepsPointsEarnedToday": "Points earned today",
   "stepsNextGoal": "Next milestone",
+  "stepsPendingGoal": "Pending goal: {goal} steps (active tomorrow)",
+  "@stepsPendingGoal": {"placeholders": {"goal": {"type": "int"}}},
 
   "notificationsMarkAllRead": "Mark all read",
 

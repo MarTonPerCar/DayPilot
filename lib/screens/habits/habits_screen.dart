@@ -1,26 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../components/basic/top_bar.dart';
 import '../../components/cards/habit_card.dart';
 import '../../components/cards/steps_progress_card.dart';
 import '../../components/forms/steps_goal_sheet.dart';
-import '../../data/app_data.dart';
 import '../../data/platform_capabilities.dart';
+import '../../features/steps/steps_notifier.dart';
 import '../../l10n/app_localizations.dart';
 import '../reminders/reminders_screen.dart';
 import '../techhealth/tech_health_screen.dart';
 import '../techhealth/tech_health_unavailable_screen.dart';
 import '../timers/timers_screen.dart';
 
-class HabitsScreen extends StatefulWidget {
+class HabitsScreen extends ConsumerStatefulWidget {
   const HabitsScreen({super.key});
 
   @override
-  State<HabitsScreen> createState() => _HabitsScreenState();
+  ConsumerState<HabitsScreen> createState() => _HabitsScreenState();
 }
 
-class _HabitsScreenState extends State<HabitsScreen> {
-  final int _stepsGoal = AppData.stepsGoal;
-
+class _HabitsScreenState extends ConsumerState<HabitsScreen> {
   void _openTechHealth() {
     Navigator.push(
       context,
@@ -37,6 +36,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
     final colors = Theme.of(context).colorScheme;
     final text = Theme.of(context).textTheme;
     final l10n = AppLocalizations.of(context);
+    final steps = ref.watch(stepsNotifierProvider);
 
     return Scaffold(
       appBar: DayPilotTopBar(title: l10n.commonHabits, showBack: true),
@@ -48,16 +48,24 @@ class _HabitsScreenState extends State<HabitsScreen> {
             style: text.labelLarge?.copyWith(color: colors.onSurfaceVariant, fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 8),
-          StepsProgressCard(
-            steps: AppData.stepsToday,
-            goal: _stepsGoal,
-            pointsEarnedToday: AppData.pointsTodayFromSteps,
-            onConfigureGoal: () => showStepsGoalSheet(
-              context,
-              currentGoal: _stepsGoal,
-              onSave: (_) {},
+          if (steps == null)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 24),
+              child: Center(child: CircularProgressIndicator()),
+            )
+          else
+            StepsProgressCard(
+              steps: steps.steps,
+              goal: steps.goal,
+              pointsEarnedToday: steps.pointsEarnedToday,
+              pendingGoal: steps.pendingGoal,
+              onConfigureGoal: () => showStepsGoalSheet(
+                context,
+                currentGoal: steps.goal,
+                onSave: (newGoal) =>
+                    ref.read(stepsNotifierProvider.notifier).setGoal(newGoal),
+              ),
             ),
-          ),
           const SizedBox(height: 24),
           Text(
             l10n.habitsOtherHabits,

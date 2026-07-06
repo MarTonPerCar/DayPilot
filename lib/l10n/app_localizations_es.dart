@@ -546,6 +546,11 @@ class AppLocalizationsEs extends AppLocalizations {
   String get stepsNextGoal => 'Siguiente meta';
 
   @override
+  String stepsPendingGoal(int goal) {
+    return 'Meta pendiente: $goal pasos (activa mañana)';
+  }
+
+  @override
   String get notificationsMarkAllRead => 'Leer todo';
 
   @override

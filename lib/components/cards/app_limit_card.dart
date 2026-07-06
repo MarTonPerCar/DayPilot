@@ -51,7 +51,7 @@ class AppLimitCard extends StatelessWidget {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: colors.surfaceContainerHighest,
+                    color: colors.surfaceContainerHigh,
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(appIcon, color: colors.onSurfaceVariant, size: 22),
@@ -83,7 +83,7 @@ class AppLimitCard extends StatelessWidget {
                 value: ratio,
                 minHeight: 6,
                 backgroundColor: accent.withAlpha(30),
-                color: enabled ? accent : colors.surfaceContainerHighest,
+                color: enabled ? accent : colors.surfaceContainerHigh,
               ),
             ),
           ],

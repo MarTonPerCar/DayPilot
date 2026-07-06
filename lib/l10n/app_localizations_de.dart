@@ -546,6 +546,11 @@ class AppLocalizationsDe extends AppLocalizations {
   String get stepsNextGoal => 'Nächster Meilenstein';
 
   @override
+  String stepsPendingGoal(int goal) {
+    return 'Ausstehendes Ziel: $goal Schritte (aktiv ab morgen)';
+  }
+
+  @override
   String get notificationsMarkAllRead => 'Alle als gelesen markieren';
 
   @override

@@ -6,6 +6,7 @@ class StepsProgressCard extends StatelessWidget {
   final int steps;
   final int goal;
   final int pointsEarnedToday;
+  final int? pendingGoal;
   final VoidCallback onConfigureGoal;
 
   const StepsProgressCard({
@@ -13,6 +14,7 @@ class StepsProgressCard extends StatelessWidget {
     required this.steps,
     required this.goal,
     required this.pointsEarnedToday,
+    this.pendingGoal,
     required this.onConfigureGoal,
   });
 
@@ -63,7 +65,7 @@ class StepsProgressCard extends StatelessWidget {
                   child: CustomPaint(
                     painter: _GaugePainter(
                       progress: ratio,
-                      trackColor: colors.surfaceContainerHighest,
+                      trackColor: colors.surfaceContainerHigh,
                       progressColor: colors.primary,
                     ),
                     child: Center(
@@ -105,7 +107,7 @@ class StepsProgressCard extends StatelessWidget {
                           return Container(
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                             decoration: BoxDecoration(
-                              color: reached ? colors.primaryContainer : colors.surfaceContainerHighest,
+                              color: reached ? colors.primaryContainer : colors.surfaceContainerHigh,
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Text(
@@ -141,6 +143,24 @@ class StepsProgressCard extends StatelessWidget {
                 Text('$nextMilestone%', style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w700)),
               ],
             ),
+            if (pendingGoal != null) ...[
+              const SizedBox(height: 12),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                decoration: BoxDecoration(
+                  color: colors.primaryContainer,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  l10n.stepsPendingGoal(pendingGoal!),
+                  style: text.bodySmall?.copyWith(
+                    color: colors.onPrimaryContainer,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
           ],
         ),
       ),

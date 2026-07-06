@@ -62,7 +62,7 @@ class TechRestrictionCard extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                             decoration: BoxDecoration(
-                              color: colors.surfaceContainerHighest,
+                              color: colors.surfaceContainerHigh,
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
@@ -91,7 +91,7 @@ class TechRestrictionCard extends StatelessWidget {
               child: LinearProgressIndicator(
                 value: ratio,
                 minHeight: 4,
-                backgroundColor: colors.surfaceContainerHighest,
+                backgroundColor: colors.surfaceContainerHigh,
                 color: barColor,
               ),
             ),
@@ -116,7 +116,7 @@ class TechRestrictionCard extends StatelessWidget {
                 child: TextButton(
                   onPressed: onDelete,
                   style: TextButton.styleFrom(
-                    backgroundColor: colors.surfaceContainerHighest,
+                    backgroundColor: colors.surfaceContainerHigh,
                     foregroundColor: colors.onSurfaceVariant,
                   ),
                   child: Text(l10n.techRestrictionDeletesTomorrow),

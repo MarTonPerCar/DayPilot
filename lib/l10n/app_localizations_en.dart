@@ -545,6 +545,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get stepsNextGoal => 'Next milestone';
 
   @override
+  String stepsPendingGoal(int goal) {
+    return 'Pending goal: $goal steps (active tomorrow)';
+  }
+
+  @override
   String get notificationsMarkAllRead => 'Mark all read';
 
   @override
