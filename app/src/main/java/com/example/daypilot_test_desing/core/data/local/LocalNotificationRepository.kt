@@ -49,10 +49,13 @@ class LocalNotificationRepository(context: Context) {
         save(_notifications.value)
     }
 
+    // The server is fully authoritative — every notification is created by inserting
+    // into Supabase first (never locally), so anything here that isn't in fromServer
+    // is stale, not "pending sync": a leftover from before every notification path
+    // went through the DB, or a deleted/expired row. Replacing outright (instead of
+    // keeping unmatched local entries around) is what actually clears those out.
     fun mergeServerNotifications(fromServer: List<NotificationData>) {
-        val serverIds = fromServer.map { it.id }.toSet()
-        val localOnly = _notifications.value.filter { it.id !in serverIds }
-        _notifications.value = (fromServer + localOnly).take(50)
+        _notifications.value = fromServer.take(50)
         save(_notifications.value)
     }
 

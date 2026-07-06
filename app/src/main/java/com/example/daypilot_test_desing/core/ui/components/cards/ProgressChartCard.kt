@@ -77,7 +77,7 @@ fun ProgressChartCard(
 
     val textMeasurer = rememberTextMeasurer()
     val todayIndex   = data.indexOfFirst { it.isToday }
-    val dayLabels    = data.map { it.day }
+    val dayLabels    = data.map { it.dayOfMonth }
 
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -257,10 +257,11 @@ fun ProgressChartCard(
                         }
                     }
 
-                    // ── Eje X — etiquetas en múltiplos de 5 + hoy ─
+                    // ── Eje X — etiquetas cada 5 posiciones + hoy ─
+                    // Position-based, not day-value-based: dayOfMonth rolls over
+                    // a month boundary so it's not evenly divisible by 5 anymore.
                     animValues.forEachIndexed { index, _ ->
-                        val showLabel = (index < dayLabels.size && dayLabels[index] % 5 == 0)
-                                || index == todayIndex
+                        val showLabel = index % 5 == 4 || index == todayIndex
                         if (showLabel) {
                             val x = yAxisWidth + index * barWidth + barWidth / 2
                             val label = if (index < dayLabels.size) dayLabels[index].toString()
@@ -321,7 +322,7 @@ fun ProgressChartCardPreview() {
             ProgressChartCard(
                 data = List(30) { index ->
                     DayProgress(
-                        day = index + 1,
+                        dayOfMonth = (index % 31) + 1,
                         points = (5..25).random(),
                         steps = (500..3000).random(),
                         tasksCompleted = (0..8).random()

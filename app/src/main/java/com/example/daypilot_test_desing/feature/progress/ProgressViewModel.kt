@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.daypilot_test_desing.core.data.model.buildProgressWindow
-import com.example.daypilot_test_desing.core.data.preferences.AppPreferences
 import com.example.daypilot_test_desing.data.supabase.SupabaseNotificationRepository
 import com.example.daypilot_test_desing.core.data.repository.ProgressRepository
 import kotlinx.coroutines.Job
@@ -22,8 +21,6 @@ class ProgressViewModel(
     application: Application,
     private val repo: ProgressRepository
 ) : AndroidViewModel(application) {
-
-    private val appPrefs = AppPreferences(application)
 
     private val _uiState = MutableStateFlow(ProgressUiState())
     val uiState: StateFlow<ProgressUiState> = _uiState.asStateFlow()
@@ -48,18 +45,16 @@ class ProgressViewModel(
                 pointsFromSteps     = todayProgress.stepsPoints,
                 pointsFromHabits    = todayProgress.techHealthPoints + todayProgress.wellnessPoints,
                 pointsFromTimers    = todayProgress.timerPoints,
-                timerCompletedToday = appPrefs.timerPointsDate == today()
+                timerCompletedToday = todayProgress.timerPoints > 0
             )
         } catch (_: Exception) { }
     }
 
     fun recordTimerComplete() {
-        val todayStr = today()
-        if (appPrefs.timerPointsDate == todayStr) return
         viewModelScope.launch {
             try {
-                repo.logPoints(10, "TIMER")  // bumps SessionCache.todayProgress/userProfile in place
-                appPrefs.timerPointsDate = todayStr
+                val awarded = repo.completeTimerSession()  // server-side gated via habits_daily
+                if (!awarded) return@launch
                 load()  // re-fetches fresh todayProgress, updates UiState
                 // TODO: move notification sending to NotificationRepository so ProgressViewModel
                 //       doesn't depend on a concrete Supabase class

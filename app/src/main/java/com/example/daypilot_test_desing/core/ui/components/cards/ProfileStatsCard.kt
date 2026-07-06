@@ -28,6 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.R
+import com.example.daypilot_test_desing.core.data.model.pointsToNextLevel as cumulativeThresholdFor
 import com.example.daypilot_test_desing.core.ui.components.basic.DayPilotAvatar
 import com.example.daypilot_test_desing.core.ui.components.basic.ProfileStatBlock
 import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
@@ -44,7 +45,16 @@ fun ProfileStatsCard(
     modifier: Modifier = Modifier,
     avatarUrl: String? = null
 ) {
-    val levelProgress = (totalPoints.toFloat() / pointsToNextLevel).coerceIn(0f, 1f)
+    // totalPoints/pointsToNextLevel are both cumulative-since-account-creation
+    // thresholds (see UserModels.kt's pointsToNextLevel(level)), so dividing them
+    // directly makes the bar look almost full right after a level-up — it still
+    // carries every point banked from previous levels. Normalize to progress
+    // within the *current* level's bracket instead: subtract the cumulative
+    // threshold that was needed to reach this level from both sides.
+    val previousLevelThreshold = cumulativeThresholdFor(level - 1)
+    val pointsIntoLevel = (totalPoints - previousLevelThreshold).coerceAtLeast(0)
+    val pointsNeededForLevel = (pointsToNextLevel - previousLevelThreshold).coerceAtLeast(1)
+    val levelProgress = (pointsIntoLevel.toFloat() / pointsNeededForLevel).coerceIn(0f, 1f)
 
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -114,8 +124,8 @@ fun ProfileStatsCard(
                         Text(
                             text = stringResource(
                                 R.string.profile_level_points,
-                                totalPoints,
-                                pointsToNextLevel
+                                pointsIntoLevel,
+                                pointsNeededForLevel
                             ),
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.SemiBold,

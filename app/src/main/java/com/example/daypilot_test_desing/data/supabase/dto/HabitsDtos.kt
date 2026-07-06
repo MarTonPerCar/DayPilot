@@ -23,6 +23,28 @@ data class HabitsDailyUpsertDto(
 )
 
 @Serializable
+data class HabitsDailyReadTimerDto(
+    @SerialName("timer_point_earned") val timerPointEarned: Boolean = false
+)
+
+@Serializable
+data class HabitsDailyTimerDto(
+    @SerialName("user_id") val userId: String,
+    val date: String,
+    @SerialName("timer_point_earned") val timerPointEarned: Boolean
+)
+
+// Mirrors users.pending_steps_goal / users.pending_steps_goal_date — the same
+// columns the pg_cron rollover job reads to promote a queued goal change. Lets
+// any device see a goal change queued from another device instead of only the
+// device that set it (SharedPreferences alone can't do that).
+@Serializable
+data class UserPendingGoalDto(
+    @SerialName("pending_steps_goal") val pendingStepsGoal: Int? = null,
+    @SerialName("pending_steps_goal_date") val pendingStepsGoalDate: String? = null
+)
+
+@Serializable
 data class DailyLogDto(
     @SerialName("user_id") val userId: String,
     val date: String,

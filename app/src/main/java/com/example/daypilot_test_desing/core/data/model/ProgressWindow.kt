@@ -8,8 +8,11 @@ import java.util.Locale
 
 private const val WINDOW_SIZE = 30
 
-// Labels slots 1..30 by position, not calendar date, and zero-fills days with
-// no user_daily_log row — always exactly 30 slots regardless of month boundaries.
+// Always exactly 30 slots (position in the list = how far back the day is),
+// zero-filled for days with no user_daily_log row, but each slot now carries
+// its real calendar day-of-month for the chart's x-axis labels — labels can
+// therefore roll over a month boundary (e.g. ...25, 30, 5, 6) instead of
+// counting 1..30 regardless of what month it actually is.
 fun buildProgressWindow(history: List<DailyLogDto>, today: DailyProgressDto): List<DayProgress> {
     val fmt = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT)
     val byDate = history.associateBy { it.date }
@@ -19,14 +22,14 @@ fun buildProgressWindow(history: List<DailyLogDto>, today: DailyProgressDto): Li
         val cal = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -offset) }
         val log = byDate[fmt.format(cal.time)]
         result += DayProgress(
-            day            = WINDOW_SIZE - offset,
+            dayOfMonth     = cal.get(Calendar.DAY_OF_MONTH),
             points         = log?.totalPoints ?: 0,
             steps          = log?.steps ?: 0,
             tasksCompleted = log?.tasksCompleted ?: 0
         )
     }
     result += DayProgress(
-        day            = WINDOW_SIZE,
+        dayOfMonth     = Calendar.getInstance().get(Calendar.DAY_OF_MONTH),
         points         = today.totalPoints,
         steps          = today.steps,
         tasksCompleted = today.tasksCompleted,

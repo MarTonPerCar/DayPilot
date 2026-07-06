@@ -130,7 +130,7 @@ fun HomeMenuCardPreview() {
                     data = HomeSectionData.Progress(
                         data = List(7) { index ->
                             DayProgress(
-                                day = index + 1,
+                                dayOfMonth = index + 1,
                                 points = listOf(8, 12, 5, 15, 20, 10, 7)[index],
                                 steps = listOf(1200, 2500, 800, 3000, 2200, 1500, 900)[index],
                                 tasksCompleted = listOf(3, 5, 2, 6, 8, 4, 2)[index]
