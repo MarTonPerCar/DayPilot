@@ -9,6 +9,8 @@ import com.example.daypilot_test_desing.data.supabase.dto.DailyLogDto
 import com.example.daypilot_test_desing.data.supabase.dto.DailyProgressDto
 import com.example.daypilot_test_desing.data.supabase.dto.FriendRowDto
 import com.example.daypilot_test_desing.data.supabase.dto.FriendsRankingDto
+import com.example.daypilot_test_desing.data.supabase.dto.HabitsDailyReadTimerDto
+import com.example.daypilot_test_desing.data.supabase.dto.HabitsDailyTimerDto
 import com.example.daypilot_test_desing.data.supabase.dto.InsertPointsLogDto
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
@@ -78,10 +80,29 @@ class SupabaseProgressRepository : ProgressRepository {
                 totalPoints      = current.totalPoints      + points
             )
         }
-        SessionCache.userProfile.value = SessionCache.userProfile.value?.let { profile ->
+        val profile = SessionCache.userProfile.value
+        if (profile != null) {
             val newTotal = profile.totalPoints + points
             val newLevel = calculateLevel(newTotal)
-            profile.copy(totalPoints = newTotal, level = newLevel, pointsToNextLevel = pointsToNextLevel(newLevel))
+            SessionCache.userProfile.value = profile.copy(
+                totalPoints       = newTotal,
+                level             = newLevel,
+                pointsToNextLevel = pointsToNextLevel(newLevel)
+            )
+            // Checked here (the single place total_points_historical changes) rather than
+            // wherever the UI happens to next observe the level, so it fires right when the
+            // threshold from pointsToNextLevel's formula is actually crossed, from any source.
+            if (newLevel > profile.level) {
+                try {
+                    // Persisted to the DB — the always-on realtime subscription delivers it to
+                    // NotificationHub, so adding it locally too would double it up.
+                    SupabaseNotificationRepository.insertForCurrentUser(
+                        type  = "LEVEL_UP",
+                        title = "¡Subiste de nivel! 🏆",
+                        body  = "Ahora eres nivel $newLevel. ¡Sigue así!"
+                    )
+                } catch (_: Exception) { }
+            }
         }
     }
 
@@ -123,5 +144,23 @@ class SupabaseProgressRepository : ProgressRepository {
             val idx = ranking.indexOfFirst { it.id == uid }
             if (idx >= 0) idx + 1 else ranking.size + 1
         } catch (_: Exception) { 0 }
+    }
+
+    override suspend fun completeTimerSession(): Boolean {
+        val uid = userId() ?: return false
+        val alreadyEarned = try {
+            supabase.from("habits_daily").select {
+                filter { eq("user_id", uid); eq("date", today()) }
+                limit(1)
+            }.decodeList<HabitsDailyReadTimerDto>()
+                .firstOrNull()?.timerPointEarned ?: false
+        } catch (_: Exception) { false }
+        if (alreadyEarned) return false
+
+        logPoints(10, "TIMER")
+        supabase.from("habits_daily").upsert(
+            HabitsDailyTimerDto(userId = uid, date = today(), timerPointEarned = true)
+        ) { onConflict = "user_id,date" }
+        return true
     }
 }

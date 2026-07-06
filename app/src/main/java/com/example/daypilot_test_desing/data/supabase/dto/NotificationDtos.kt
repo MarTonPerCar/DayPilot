@@ -2,7 +2,6 @@ package com.example.daypilot_test_desing.data.supabase.dto
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonObject
 
 @Serializable
 data class NotificationDto(
@@ -12,7 +11,6 @@ data class NotificationDto(
     val title: String = "",
     val body: String = "",
     @SerialName("is_read")    val isRead: Boolean = false,
-    val metadata: JsonObject? = null,
     @SerialName("created_at") val createdAt: String = ""
 )
 

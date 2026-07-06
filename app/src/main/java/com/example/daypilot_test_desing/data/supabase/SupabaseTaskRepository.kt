@@ -60,16 +60,6 @@ class SupabaseTaskRepository : TaskRepository {
         val taskId = UUID.randomUUID().toString()
         val date = "%04d-%02d-%02d".format(data.year, data.month, data.day)
 
-        val endCal = Calendar.getInstance().also {
-            it.set(data.year, data.month - 1, data.day)
-            it.add(Calendar.DAY_OF_YEAR, 90)
-        }
-        val recurrenceEndDate = "%04d-%02d-%02d".format(
-            endCal.get(Calendar.YEAR),
-            endCal.get(Calendar.MONTH) + 1,
-            endCal.get(Calendar.DAY_OF_MONTH)
-        )
-
         try {
             // Read back the id Postgrest actually stored rather than trusting the
             // client-generated one — they can diverge (server-side default/trigger),
@@ -84,10 +74,6 @@ class SupabaseTaskRepository : TaskRepository {
                 put("estimated_minutes", data.duration)
                 put("reminder_enabled",  data.hasReminder)
                 put("is_recurring",      data.isRecurring)
-                if (data.isRecurring) {
-                    put("recurrence_days",     data.recurrenceDays)
-                    put("recurrence_end_date", recurrenceEndDate)
-                }
             }) {
                 select(Columns.raw("id"))
             }.decodeSingle<TaskIdDto>().id

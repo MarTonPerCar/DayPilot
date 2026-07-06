@@ -139,25 +139,9 @@ fun DayPilotNavGraph(
         onDispose { navLifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
-    val profileStateForLevel by profileVM.uiState.collectAsState()
-    LaunchedEffect(profileStateForLevel.level) {
-        val newLevel = profileStateForLevel.level
-        if (newLevel < 1) return@LaunchedEffect
-        if (profileStateForLevel.name.isEmpty()) return@LaunchedEffect
-        val lastLevel = appPrefs.lastKnownLevel
-        if (lastLevel > 0 && newLevel > lastLevel) {
-            val title = "¡Subiste de nivel! 🏆"
-            val msg   = "Ahora eres nivel $newLevel. ¡Sigue así!"
-            // Persisted to the DB — the always-on realtime subscription delivers it to
-            // NotificationHub, so adding it locally too would double it up.
-            SupabaseNotificationRepository.insertForCurrentUser(
-                type  = "LEVEL_UP",
-                title = title,
-                body  = msg
-            )
-        }
-        appPrefs.lastKnownLevel = newLevel
-    }
+    // LEVEL_UP detection lives in SupabaseProgressRepository.logPoints() — the single place
+    // total_points_historical actually changes — instead of here, so it fires the moment the
+    // pointsToNextLevel threshold is crossed rather than whenever ProfileViewModel next reloads.
 
     val calendarStateForCache by calendarVM.uiState.collectAsState()
     LaunchedEffect(calendarStateForCache.tasks) {

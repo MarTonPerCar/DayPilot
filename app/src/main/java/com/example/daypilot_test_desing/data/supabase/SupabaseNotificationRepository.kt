@@ -116,6 +116,7 @@ object SupabaseNotificationRepository : NotificationRepository {
         "STREAK_RISK"                                   -> NotificationType.STREAK
         "STEPS_GOAL"                                    -> NotificationType.STEPS
         "TIMER_DONE"                                    -> NotificationType.ACHIEVEMENT
+        "TASK_COMPLETED"                                -> NotificationType.TASK
         "TASK_REMINDER"                                 -> NotificationType.REMINDER
         "DAILY_SUMMARY"                                 -> NotificationType.REMINDER
         else                                            -> NotificationType.REMINDER

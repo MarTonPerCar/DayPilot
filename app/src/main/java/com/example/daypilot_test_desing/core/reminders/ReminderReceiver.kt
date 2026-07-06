@@ -70,7 +70,7 @@ class ReminderReceiver : BroadcastReceiver() {
             // to avoid duplicate entries).
             scope.launch {
                 SupabaseNotificationRepository.insertForCurrentUser(
-                    type  = "REMINDER",
+                    type  = "TASK_REMINDER",
                     title = contentTitle,
                     body  = contentText
                 )

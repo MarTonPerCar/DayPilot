@@ -5,10 +5,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.core.cache.SessionCache
-import com.example.daypilot_test_desing.core.data.local.NotificationHub
-import com.example.daypilot_test_desing.core.data.model.NotificationType
 import com.example.daypilot_test_desing.core.data.model.ReactionType
 import com.example.daypilot_test_desing.core.data.repository.FriendRepository
+import com.example.daypilot_test_desing.data.supabase.SupabaseNotificationRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -54,10 +53,12 @@ class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
                 SessionCache.friendsFetchedAt = System.currentTimeMillis()
                 SessionCache.ranking.value    = null
                 SessionCache.rankingFetchedAt = 0L
-                NotificationHub.add(
-                    title   = "Nueva amistad 🤝",
-                    message = "${request.name} es ahora tu amigo",
-                    type    = NotificationType.SOCIAL
+                // Persisted to the DB — the always-on realtime subscription delivers it to
+                // NotificationHub, so adding it locally too would double it up.
+                SupabaseNotificationRepository.insertForCurrentUser(
+                    type  = "FRIEND_ACCEPTED",
+                    title = "Nueva amistad 🤝",
+                    body  = "${request.name} es ahora tu amigo"
                 )
             } catch (e: Exception) {
                 _uiState.update { state ->

@@ -6,14 +6,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.core.cache.SessionCache
-import com.example.daypilot_test_desing.core.data.local.NotificationHub
 import com.example.daypilot_test_desing.core.data.model.CalendarTaskData
 import com.example.daypilot_test_desing.core.data.model.NewTaskData
-import com.example.daypilot_test_desing.core.data.model.NotificationType
 import com.example.daypilot_test_desing.core.data.model.TaskCategory
 import com.example.daypilot_test_desing.core.data.model.TaskDifficulty
 import com.example.daypilot_test_desing.core.data.repository.ProgressRepository
 import com.example.daypilot_test_desing.core.data.repository.TaskRepository
+import com.example.daypilot_test_desing.data.supabase.SupabaseNotificationRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -128,10 +127,12 @@ class CalendarViewModel(
                 taskRepo.toggleTask(occurrenceId, isDone)
                 if (shouldAwardPoints) {
                     progressRepo.logPoints(20, "TASKS")
-                    NotificationHub.add(
-                        title   = "✓ ${original.title}",
-                        message = "+20 puntos ganados",
-                        type    = NotificationType.TASK
+                    // Persisted to the DB — the always-on realtime subscription delivers it to
+                    // NotificationHub, so adding it locally too would double it up.
+                    SupabaseNotificationRepository.insertForCurrentUser(
+                        type  = "TASK_COMPLETED",
+                        title = "✓ ${original.title}",
+                        body  = "+20 puntos ganados"
                     )
                 }
                 SessionCache.tasks.value = _uiState.value.tasks

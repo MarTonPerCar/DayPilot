@@ -2,14 +2,11 @@ package com.example.daypilot_test_desing.data.supabase
 
 import android.content.SharedPreferences
 import android.util.Log
-import com.example.daypilot_test_desing.core.data.local.NotificationHub
-import com.example.daypilot_test_desing.core.data.model.NotificationType
 import com.example.daypilot_test_desing.data.supabase.SupabaseNotificationRepository
 import com.example.daypilot_test_desing.core.data.repository.StepsRepository
 import com.example.daypilot_test_desing.core.data.repository.StepsWeeklyStats
 import com.example.daypilot_test_desing.data.supabase.dto.DailyLogDto
 import com.example.daypilot_test_desing.data.supabase.dto.HabitsDailyUpsertDto
-import com.example.daypilot_test_desing.data.supabase.dto.InsertPointsLogDto
 import com.example.daypilot_test_desing.data.supabase.dto.UserPendingGoalDto
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
@@ -166,9 +163,10 @@ class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepos
         val uid = supabase.auth.currentUserOrNull()?.id ?: return
         val todayStr = today()
         try {
-            supabase.from("points_log").insert(
-                InsertPointsLogDto(userId = uid, points = points, source = "STEPS", dayKey = todayStr)
-            )
+            // Routes through the shared repo (not a raw points_log insert here) so
+            // SessionCache.userProfile/todayProgress stay in sync and the LEVEL_UP check
+            // in SupabaseProgressRepository.logPoints() also runs for steps-sourced points.
+            SupabaseProgressRepository().logPoints(points, "STEPS")
             supabase.from("habits_daily").upsert(
                 HabitsDailyUpsertDto(
                     userId    = uid,
@@ -186,17 +184,11 @@ class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepos
             20   -> "¡Ya casi! 💪" to "Has completado el 75% de tu objetivo de pasos (+20 pts)"
             else -> "¡Objetivo completado! 🎉" to "Has alcanzado tu objetivo de pasos (+30 pts)"
         }
-        if (points == 30) {
-            // Persisted to the DB — the always-on realtime subscription delivers it to
-            // NotificationHub, so adding it locally too would double it up.
-            SupabaseNotificationRepository.insertForCurrentUser(
-                type  = "STEPS_GOAL",
-                title = title,
-                body  = msg
-            )
-        } else {
-            NotificationHub.add(title, msg, NotificationType.STEPS)
-        }
+        SupabaseNotificationRepository.insertForCurrentUser(
+            type  = "STEPS_GOAL",
+            title = title,
+            body  = msg
+        )
     }
 
     override suspend fun syncSteps(steps: Int, goal: Int) {
