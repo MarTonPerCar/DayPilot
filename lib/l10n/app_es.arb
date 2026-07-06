@@ -124,6 +124,10 @@
   "taskRecurringSubtitle": "Se repite cada X días",
   "taskRepeatEvery": "Repetir cada",
   "taskCreateButton": "Crear tarea",
+  "taskErrorCreate": "No se pudo crear la tarea.",
+  "taskErrorUpdate": "No se pudo actualizar la tarea.",
+  "taskErrorToggle": "No se pudo actualizar la tarea.",
+  "taskErrorDelete": "No se pudo eliminar la tarea.",
 
   "techRestrictionTypeApp": "App",
   "techRestrictionTypeGroup": "Grupo",
@@ -161,9 +165,6 @@
   "reminderCreateButton": "Crear recordatorio",
 
   "taskDetailReminderActive": "Recordatorio activado",
-  "taskDetailRepeatsDaily": "Se repite cada día",
-  "taskDetailRepeatsEveryDays": "Se repite cada {days} días",
-  "@taskDetailRepeatsEveryDays": {"placeholders": {"days": {"type": "int"}}},
   "taskDetailMarkPending": "Marcar como pendiente",
   "taskDetailMarkDone": "Marcar como completada",
 

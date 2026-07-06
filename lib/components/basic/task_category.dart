@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import '../../core/data/models/task_category.dart';
 import '../../l10n/app_localizations.dart';
 
-enum TaskCategory { trabajo, estudio, deporte, salud, personal, hogar, otro }
+export '../../core/data/models/task_category.dart';
 
 extension TaskCategoryX on TaskCategory {
   String label(BuildContext context) {

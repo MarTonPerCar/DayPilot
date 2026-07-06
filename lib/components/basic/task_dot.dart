@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import '../../core/data/models/task_difficulty.dart';
 import '../../l10n/app_localizations.dart';
 
-enum TaskDifficulty { easy, medium, hard }
+export '../../core/data/models/task_difficulty.dart';
 
 extension TaskDifficultyX on TaskDifficulty {
   String label(BuildContext context) {

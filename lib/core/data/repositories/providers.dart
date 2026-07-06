@@ -3,6 +3,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'auth_repository.dart';
 import 'supabase_auth_repository.dart';
+import 'supabase_task_repository.dart';
+import 'task_repository.dart';
 
 final supabaseClientProvider = Provider<SupabaseClient>((ref) {
   return Supabase.instance.client;
@@ -10,4 +12,8 @@ final supabaseClientProvider = Provider<SupabaseClient>((ref) {
 
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
   return SupabaseAuthRepository(ref.read(supabaseClientProvider));
+});
+
+final taskRepositoryProvider = Provider<TaskRepository>((ref) {
+  return SupabaseTaskRepository(ref.read(supabaseClientProvider), ref);
 });

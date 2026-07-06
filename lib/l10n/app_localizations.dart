@@ -712,6 +712,30 @@ abstract class AppLocalizations {
   /// **'Crear tarea'**
   String get taskCreateButton;
 
+  /// No description provided for @taskErrorCreate.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo crear la tarea.'**
+  String get taskErrorCreate;
+
+  /// No description provided for @taskErrorUpdate.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo actualizar la tarea.'**
+  String get taskErrorUpdate;
+
+  /// No description provided for @taskErrorToggle.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo actualizar la tarea.'**
+  String get taskErrorToggle;
+
+  /// No description provided for @taskErrorDelete.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo eliminar la tarea.'**
+  String get taskErrorDelete;
+
   /// No description provided for @techRestrictionTypeApp.
   ///
   /// In es, this message translates to:
@@ -879,18 +903,6 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Recordatorio activado'**
   String get taskDetailReminderActive;
-
-  /// No description provided for @taskDetailRepeatsDaily.
-  ///
-  /// In es, this message translates to:
-  /// **'Se repite cada día'**
-  String get taskDetailRepeatsDaily;
-
-  /// No description provided for @taskDetailRepeatsEveryDays.
-  ///
-  /// In es, this message translates to:
-  /// **'Se repite cada {days} días'**
-  String taskDetailRepeatsEveryDays(int days);
 
   /// No description provided for @taskDetailMarkPending.
   ///

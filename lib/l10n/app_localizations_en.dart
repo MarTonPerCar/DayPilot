@@ -334,6 +334,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get taskCreateButton => 'Create task';
 
   @override
+  String get taskErrorCreate => 'Couldn\'t create the task.';
+
+  @override
+  String get taskErrorUpdate => 'Couldn\'t update the task.';
+
+  @override
+  String get taskErrorToggle => 'Couldn\'t update the task.';
+
+  @override
+  String get taskErrorDelete => 'Couldn\'t delete the task.';
+
+  @override
   String get techRestrictionTypeApp => 'App';
 
   @override
@@ -426,14 +438,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get taskDetailReminderActive => 'Reminder on';
-
-  @override
-  String get taskDetailRepeatsDaily => 'Repeats every day';
-
-  @override
-  String taskDetailRepeatsEveryDays(int days) {
-    return 'Repeats every $days days';
-  }
 
   @override
   String get taskDetailMarkPending => 'Mark as pending';

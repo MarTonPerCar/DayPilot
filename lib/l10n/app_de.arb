@@ -124,6 +124,10 @@
   "taskRecurringSubtitle": "Wiederholt sich alle X Tage",
   "taskRepeatEvery": "Wiederholen alle",
   "taskCreateButton": "Aufgabe erstellen",
+  "taskErrorCreate": "Aufgabe konnte nicht erstellt werden.",
+  "taskErrorUpdate": "Aufgabe konnte nicht aktualisiert werden.",
+  "taskErrorToggle": "Aufgabe konnte nicht aktualisiert werden.",
+  "taskErrorDelete": "Aufgabe konnte nicht gelöscht werden.",
 
   "techRestrictionTypeApp": "App",
   "techRestrictionTypeGroup": "Gruppe",
@@ -161,9 +165,6 @@
   "reminderCreateButton": "Erinnerung erstellen",
 
   "taskDetailReminderActive": "Erinnerung aktiv",
-  "taskDetailRepeatsDaily": "Wiederholt sich täglich",
-  "taskDetailRepeatsEveryDays": "Wiederholt sich alle {days} Tage",
-  "@taskDetailRepeatsEveryDays": {"placeholders": {"days": {"type": "int"}}},
   "taskDetailMarkPending": "Als ausstehend markieren",
   "taskDetailMarkDone": "Als erledigt markieren",
 

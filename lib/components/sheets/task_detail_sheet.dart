@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../data/app_data.dart';
+import '../../core/data/models/app_task.dart';
 import '../../l10n/app_localizations.dart';
 import '../basic/sheet_handle.dart';
 import '../basic/task_category.dart';
@@ -103,12 +103,7 @@ class TaskDetailSheet extends StatelessWidget {
                   if (task.reminder)
                     _InfoRow(icon: Icons.notifications_active_rounded, label: l10n.taskDetailReminderActive),
                   if (task.recurring)
-                    _InfoRow(
-                      icon: Icons.repeat_rounded,
-                      label: task.repeatEveryDays == 1
-                          ? l10n.taskDetailRepeatsDaily
-                          : l10n.taskDetailRepeatsEveryDays(task.repeatEveryDays),
-                    ),
+                    _InfoRow(icon: Icons.repeat_rounded, label: l10n.taskRecurring),
                 ],
               ),
             ],

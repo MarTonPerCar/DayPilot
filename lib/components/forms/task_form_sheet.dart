@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../data/app_data.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/data/models/app_task.dart';
+import '../../features/tasks/tasks_notifier.dart';
 import '../../l10n/app_localizations.dart';
 import '../basic/sheet_handle.dart';
 import '../basic/task_category.dart';
@@ -15,7 +17,6 @@ Future<void> showTaskFormSheet(
   BuildContext context, {
   required DateTime forDate,
   AppTask? existing,
-  required void Function(AppTask task) onSave,
 }) {
   return showModalBottomSheet(
     context: context,
@@ -24,27 +25,21 @@ Future<void> showTaskFormSheet(
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
     ),
-    builder: (_) => TaskFormSheet(forDate: forDate, existing: existing, onSave: onSave),
+    builder: (_) => TaskFormSheet(forDate: forDate, existing: existing),
   );
 }
 
-class TaskFormSheet extends StatefulWidget {
+class TaskFormSheet extends ConsumerStatefulWidget {
   final DateTime forDate;
   final AppTask? existing;
-  final void Function(AppTask task) onSave;
 
-  const TaskFormSheet({
-    super.key,
-    required this.forDate,
-    this.existing,
-    required this.onSave,
-  });
+  const TaskFormSheet({super.key, required this.forDate, this.existing});
 
   @override
-  State<TaskFormSheet> createState() => _TaskFormSheetState();
+  ConsumerState<TaskFormSheet> createState() => _TaskFormSheetState();
 }
 
-class _TaskFormSheetState extends State<TaskFormSheet> {
+class _TaskFormSheetState extends ConsumerState<TaskFormSheet> {
   late final _titleCtrl = TextEditingController(text: widget.existing?.title ?? '');
   late final _descCtrl = TextEditingController(text: widget.existing?.description ?? '');
   late TaskCategory _category = widget.existing?.category ?? TaskCategory.personal;
@@ -52,30 +47,42 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
   late int _duration = widget.existing?.durationMinutes ?? 30;
   late bool _reminder = widget.existing?.reminder ?? false;
   late bool _recurring = widget.existing?.recurring ?? false;
-  late int _repeatEveryDays = widget.existing?.repeatEveryDays ?? 1;
+  late int _repeatEveryDays = 1;
   bool _hasTitleError = false;
 
   bool get _isEditing => widget.existing != null;
 
   void _submit() {
-    if (_titleCtrl.text.trim().isEmpty) {
+    final title = _titleCtrl.text.trim();
+    if (title.isEmpty) {
       setState(() => _hasTitleError = true);
       return;
     }
-    widget.onSave(AppTask(
-      id: widget.existing?.id ?? DateTime.now().microsecondsSinceEpoch.toString(),
-      title: _titleCtrl.text.trim(),
-      description: _descCtrl.text.trim().isEmpty ? null : _descCtrl.text.trim(),
-      difficulty: _difficulty,
-      category: _category,
-      date: widget.existing?.date ?? widget.forDate,
-      durationMinutes: _duration,
-      reminder: _reminder,
-      recurring: _recurring,
-      repeatEveryDays: _recurring ? _repeatEveryDays : 1,
-      done: widget.existing?.done ?? false,
-    ));
+    final description = _descCtrl.text.trim();
+    final notifier = ref.read(tasksNotifierProvider.notifier);
     Navigator.pop(context);
+    if (_isEditing) {
+      notifier.updateTask(
+        id: widget.existing!.id,
+        title: title,
+        description: description,
+        category: _category,
+        difficulty: _difficulty,
+        durationMinutes: _duration,
+      );
+    } else {
+      notifier.addTask(NewTaskData(
+        date: widget.forDate,
+        title: title,
+        description: description,
+        category: _category,
+        difficulty: _difficulty,
+        durationMinutes: _duration,
+        reminder: _reminder,
+        recurring: _recurring,
+        recurrenceDays: _repeatEveryDays,
+      ));
+    }
   }
 
   @override

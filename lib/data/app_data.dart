@@ -1,8 +1,6 @@
 // Placeholder: sustituir por llamadas reales cuando haya backend.
 
 import 'package:flutter/material.dart';
-import '../components/basic/task_category.dart';
-import '../components/basic/task_dot.dart';
 import '../components/cards/notification_card.dart';
 import '../components/cards/weekly_reaction_card.dart';
 
@@ -63,34 +61,6 @@ class AppRankingUser {
   final int streak;
   final bool isCurrentUser;
   const AppRankingUser(this.name, this.points, this.streak, this.isCurrentUser);
-}
-
-class AppTask {
-  final String id;
-  final String title;
-  final String? description;
-  final TaskDifficulty difficulty;
-  final TaskCategory category;
-  final DateTime date;
-  final int durationMinutes;
-  final bool reminder;
-  final bool recurring;
-  final int repeatEveryDays;
-  bool done;
-
-  AppTask({
-    required this.id,
-    required this.title,
-    this.description,
-    required this.difficulty,
-    required this.category,
-    required this.date,
-    required this.durationMinutes,
-    this.reminder = false,
-    this.recurring = false,
-    this.repeatEveryDays = 1,
-    this.done = false,
-  });
 }
 
 enum TimerMode { pomodoro, fixed, custom }
@@ -290,108 +260,6 @@ class AppData {
     AppRankingUser('María López', 200, 4, false),
     AppRankingUser('Carlos Ruiz', 80, 1, false),
   ];
-
-  static final today = DateTime(2026, 7, 3);
-
-  static List<AppTask> newTaskList() {
-    DateTime d(int day) => DateTime(2026, 7, day);
-    return [
-      AppTask(
-        id: '1',
-        title: 'Prueba',
-        difficulty: TaskDifficulty.hard,
-        category: TaskCategory.otro,
-        date: d(1),
-        durationMinutes: 35,
-        done: true,
-      ),
-      AppTask(
-        id: '2',
-        title: 'Reunión de equipo',
-        difficulty: TaskDifficulty.medium,
-        category: TaskCategory.trabajo,
-        date: d(5),
-        durationMinutes: 45,
-      ),
-      AppTask(
-        id: '3',
-        title: 'Revisar documentación de Flutter',
-        difficulty: TaskDifficulty.easy,
-        category: TaskCategory.estudio,
-        date: d(5),
-        durationMinutes: 60,
-      ),
-      AppTask(
-        id: '4',
-        title: 'Entrenamiento de piernas',
-        difficulty: TaskDifficulty.hard,
-        category: TaskCategory.deporte,
-        date: d(8),
-        durationMinutes: 50,
-      ),
-      AppTask(
-        id: '5',
-        title: 'Llamar al médico',
-        difficulty: TaskDifficulty.easy,
-        category: TaskCategory.salud,
-        date: d(10),
-        durationMinutes: 15,
-        done: true,
-      ),
-      AppTask(
-        id: '6',
-        title: 'Comprar comida',
-        difficulty: TaskDifficulty.easy,
-        category: TaskCategory.hogar,
-        date: d(10),
-        durationMinutes: 30,
-      ),
-      AppTask(
-        id: '7',
-        title: 'Preparar presentación TFG',
-        description: 'Slides y guion de la defensa',
-        difficulty: TaskDifficulty.hard,
-        category: TaskCategory.estudio,
-        date: d(14),
-        durationMinutes: 90,
-        reminder: true,
-      ),
-      AppTask(
-        id: '8',
-        title: 'Yoga matutino',
-        difficulty: TaskDifficulty.medium,
-        category: TaskCategory.deporte,
-        date: d(18),
-        durationMinutes: 25,
-        recurring: true,
-      ),
-      AppTask(
-        id: '9',
-        title: 'Organizar armario',
-        difficulty: TaskDifficulty.easy,
-        category: TaskCategory.hogar,
-        date: d(22),
-        durationMinutes: 40,
-      ),
-      AppTask(
-        id: '10',
-        title: 'Cita con el dentista',
-        difficulty: TaskDifficulty.medium,
-        category: TaskCategory.salud,
-        date: d(25),
-        durationMinutes: 30,
-        reminder: true,
-      ),
-      AppTask(
-        id: '11',
-        title: 'Cerrar sprint',
-        difficulty: TaskDifficulty.hard,
-        category: TaskCategory.trabajo,
-        date: d(30),
-        durationMinutes: 60,
-      ),
-    ];
-  }
 
   static const timerPresets = [
     TimerPreset(

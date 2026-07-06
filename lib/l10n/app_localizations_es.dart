@@ -335,6 +335,18 @@ class AppLocalizationsEs extends AppLocalizations {
   String get taskCreateButton => 'Crear tarea';
 
   @override
+  String get taskErrorCreate => 'No se pudo crear la tarea.';
+
+  @override
+  String get taskErrorUpdate => 'No se pudo actualizar la tarea.';
+
+  @override
+  String get taskErrorToggle => 'No se pudo actualizar la tarea.';
+
+  @override
+  String get taskErrorDelete => 'No se pudo eliminar la tarea.';
+
+  @override
   String get techRestrictionTypeApp => 'App';
 
   @override
@@ -427,14 +439,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get taskDetailReminderActive => 'Recordatorio activado';
-
-  @override
-  String get taskDetailRepeatsDaily => 'Se repite cada día';
-
-  @override
-  String taskDetailRepeatsEveryDays(int days) {
-    return 'Se repite cada $days días';
-  }
 
   @override
   String get taskDetailMarkPending => 'Marcar como pendiente';

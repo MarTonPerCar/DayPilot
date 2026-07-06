@@ -124,6 +124,10 @@
   "taskRecurringSubtitle": "Repeats every X days",
   "taskRepeatEvery": "Repeat every",
   "taskCreateButton": "Create task",
+  "taskErrorCreate": "Couldn't create the task.",
+  "taskErrorUpdate": "Couldn't update the task.",
+  "taskErrorToggle": "Couldn't update the task.",
+  "taskErrorDelete": "Couldn't delete the task.",
 
   "techRestrictionTypeApp": "App",
   "techRestrictionTypeGroup": "Group",
@@ -161,9 +165,6 @@
   "reminderCreateButton": "Create reminder",
 
   "taskDetailReminderActive": "Reminder on",
-  "taskDetailRepeatsDaily": "Repeats every day",
-  "taskDetailRepeatsEveryDays": "Repeats every {days} days",
-  "@taskDetailRepeatsEveryDays": {"placeholders": {"days": {"type": "int"}}},
   "taskDetailMarkPending": "Mark as pending",
   "taskDetailMarkDone": "Mark as done",
 
