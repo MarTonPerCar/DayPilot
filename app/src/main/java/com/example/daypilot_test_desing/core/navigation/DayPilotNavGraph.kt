@@ -28,8 +28,6 @@ import android.content.Context
 import androidx.compose.runtime.remember
 import kotlinx.coroutines.joinAll
 
-import com.example.daypilot_test_desing.core.data.local.NotificationHub
-import com.example.daypilot_test_desing.core.data.model.NotificationType
 import com.example.daypilot_test_desing.core.data.preferences.AppPreferences
 
 import com.example.daypilot_test_desing.core.reminders.DailyNotificationScheduler
