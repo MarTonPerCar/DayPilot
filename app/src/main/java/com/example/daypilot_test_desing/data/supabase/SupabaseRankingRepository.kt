@@ -3,6 +3,7 @@ package com.example.daypilot_test_desing.data.supabase
 import com.example.daypilot_test_desing.core.cache.SessionCache
 import com.example.daypilot_test_desing.core.data.model.RankingData
 import com.example.daypilot_test_desing.core.data.repository.RankingRepository
+import com.example.daypilot_test_desing.data.supabase.dto.DailyLogDto
 import com.example.daypilot_test_desing.data.supabase.dto.DailyProgressDto
 import com.example.daypilot_test_desing.data.supabase.dto.FriendRowDto
 import com.example.daypilot_test_desing.data.supabase.dto.FriendsRankingDto
@@ -10,6 +11,10 @@ import com.example.daypilot_test_desing.data.supabase.dto.UserDto
 import com.example.daypilot_test_desing.data.supabase.dto.UserStreakDto
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 class SupabaseRankingRepository : RankingRepository {
 
@@ -82,12 +87,26 @@ class SupabaseRankingRepository : RankingRepository {
                 }.decodeList<UserStreakDto>().firstOrNull()?.currentStreak ?: 0
             } catch (_: Exception) { 0 }
 
-            val points = try {
+            // Mirrors the friends_ranking view's points_last_30_days: sum of closed days
+            // from user_daily_log over the trailing 30 days, plus today's still-open
+            // total from daily_progress. Using only daily_progress here (today alone)
+            // was the bug — it showed a much smaller number than everyone else's
+            // 30-day rolling total.
+            val thirtyDaysAgo = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(
+                Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -30) }.time
+            )
+            val last30DaysPoints = try {
+                supabase.from("user_daily_log").select {
+                    filter { eq("user_id", uid); gte("date", thirtyDaysAgo) }
+                }.decodeList<DailyLogDto>().sumOf { it.totalPoints }
+            } catch (_: Exception) { 0 }
+            val todayPoints = try {
                 supabase.from("daily_progress").select {
                     filter { eq("user_id", uid) }
                     limit(1)
                 }.decodeList<DailyProgressDto>().firstOrNull()?.totalPoints ?: 0
             } catch (_: Exception) { 0 }
+            val points = last30DaysPoints + todayPoints
 
             RankingData(
                 id        = uid,
