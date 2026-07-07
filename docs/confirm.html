@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DayPilot</title>
+<style>
+  :root { color-scheme: light dark; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #eef3ee;
+    color: #1a2b1f;
+  }
+  @media (prefers-color-scheme: dark) {
+    body { background: #12201a; color: #e6f0e8; }
+  }
+  .card {
+    max-width: 420px;
+    margin: 24px;
+    padding: 32px 28px;
+    border-radius: 20px;
+    background: #ffffff;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    text-align: center;
+  }
+  @media (prefers-color-scheme: dark) {
+    .card { background: #1c2e22; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4); }
+  }
+  .icon { font-size: 56px; line-height: 1; margin-bottom: 16px; }
+  h1 { font-size: 22px; margin: 0 0 12px; }
+  p { font-size: 15px; line-height: 1.5; color: #4a5a4d; margin: 0; }
+  @media (prefers-color-scheme: dark) { p { color: #a9bcae; } }
+  .success .icon { color: #4a7c59; }
+  .error .icon { color: #b3261e; }
+</style>
+</head>
+<body>
+  <div class="card" id="card">
+    <div class="icon" id="icon">⏳</div>
+    <h1 id="title">…</h1>
+    <p id="message"></p>
+  </div>
+
+<script>
+(function () {
+  var params = new URLSearchParams(
+    (location.hash || '').replace(/^#/, '') || location.search.replace(/^\?/, '')
+  );
+
+  var lang = (navigator.language || 'es').slice(0, 2);
+  if (['es', 'en', 'de'].indexOf(lang) === -1) lang = 'es';
+
+  var text = {
+    es: {
+      success: { title: '¡Cuenta verificada!', message: 'Ya puedes volver a la app de DayPilot e iniciar sesión con tu email y contraseña.' },
+      error: { title: 'Este enlace ya no es válido', message: 'Puede que ya lo hayas usado antes, o que haya caducado. Vuelve a intentar crear la cuenta desde la app para recibir un nuevo email de confirmación.' },
+      neutral: { title: 'Todo listo', message: 'Puedes cerrar esta pestaña y volver a la app de DayPilot.' }
+    },
+    en: {
+      success: { title: 'Account verified!', message: 'You can now go back to the DayPilot app and log in with your email and password.' },
+      error: { title: 'This link is no longer valid', message: "It may have already been used, or it's expired. Try signing up again from the app to get a new confirmation email." },
+      neutral: { title: 'All set', message: 'You can close this tab and go back to the DayPilot app.' }
+    },
+    de: {
+      success: { title: 'Konto bestätigt!', message: 'Du kannst jetzt zur DayPilot-App zurückkehren und dich mit deiner E-Mail und deinem Passwort anmelden.' },
+      error: { title: 'Dieser Link ist nicht mehr gültig', message: 'Er wurde möglicherweise bereits verwendet oder ist abgelaufen. Versuche, dich erneut über die App zu registrieren, um eine neue Bestätigungs-E-Mail zu erhalten.' },
+      neutral: { title: 'Alles bereit', message: 'Du kannst diesen Tab schließen und zur DayPilot-App zurückkehren.' }
+    }
+  }[lang];
+
+  var card = document.getElementById('card');
+  var icon = document.getElementById('icon');
+  var title = document.getElementById('title');
+  var message = document.getElementById('message');
+
+  var hasError = params.get('error') || params.get('error_description');
+  var hasToken = params.get('access_token') || params.get('token_hash') || params.get('code');
+
+  var state;
+  if (hasError) {
+    state = 'error';
+    card.className = 'card error';
+    icon.textContent = '✕';
+  } else if (hasToken) {
+    state = 'success';
+    card.className = 'card success';
+    icon.textContent = '✓';
+  } else {
+    state = 'neutral';
+    card.className = 'card success';
+    icon.textContent = '✓';
+  }
+
+  title.textContent = text[state].title;
+  message.textContent = text[state].message;
+})();
+</script>
+</body>
+</html>
