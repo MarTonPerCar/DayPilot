@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../data/app_data.dart';
 import '../../l10n/app_localizations.dart';
 
-/// Las restricciones son de un solo día: se eliminan al día siguiente.
 class TechRestrictionCard extends StatelessWidget {
   final TechRestriction restriction;
   final ValueChanged<bool> onToggle;

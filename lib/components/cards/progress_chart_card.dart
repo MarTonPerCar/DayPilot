@@ -292,7 +292,6 @@ class _LineChartPainter extends CustomPainter {
         ..strokeWidth = 1.5,
     );
 
-    // Value label above the point: every Nth day, plus always today.
     for (int i = 0; i < points.length; i++) {
       final isToday = i == todayIndex;
       if (i % daysStep != 0 && !isToday) continue;
@@ -300,7 +299,6 @@ class _LineChartPainter extends CustomPainter {
       tp.paint(canvas, Offset(points[i].dx - tp.width / 2, points[i].dy - tp.height - 4));
     }
 
-    // X-axis label: real calendar day-of-month, every 5th day, plus always today.
     for (int i = 0; i < dayLabels.length && i < points.length; i++) {
       final isToday = i == todayIndex;
       final day = dayLabels[i];
@@ -344,8 +342,7 @@ class _LineChartPainter extends CustomPainter {
     return v.round().toString();
   }
 
-  /// Redondea hacia arriba a un "número bonito" (1/2/5 × potencia de 10)
-  /// para que las 4 divisiones del eje Y caigan en valores legibles.
+  /// Rounds up to a "nice" number (1/2/5 × power of 10) for readable Y-axis steps.
   double _niceCeil(double maxValue) {
     if (maxValue <= 0) return 4;
     final raw = maxValue / 4;

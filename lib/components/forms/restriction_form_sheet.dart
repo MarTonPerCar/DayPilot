@@ -5,9 +5,7 @@ import '../basic/quick_pick_chip.dart';
 import '../basic/sheet_handle.dart';
 import 'dotted_slider.dart';
 
-/// Groups aren't synced to Supabase in the Android reference app either
-/// (tech_health_group_config exists in the schema but nothing writes to it
-/// yet), so this only supports creating single-app restrictions for now.
+/// No group support yet — nothing writes to tech_health_group_config.
 Future<void> showAddRestrictionSheet(
   BuildContext context, {
   required Future<void> Function({

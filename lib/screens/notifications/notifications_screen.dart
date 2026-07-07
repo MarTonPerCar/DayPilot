@@ -6,8 +6,6 @@ import '../../core/data/models/app_notification_item.dart';
 import '../../features/notifications/notifications_notifier.dart';
 import '../../l10n/app_localizations.dart';
 
-/// Maps the DB's fine-grained event type onto the shared UI category
-/// (icon/color/filter chip) used by NotificationCard.
 NotificationType _uiType(AppNotificationType type) => switch (type) {
       AppNotificationType.friendRequest => NotificationType.social,
       AppNotificationType.friendAccepted => NotificationType.social,

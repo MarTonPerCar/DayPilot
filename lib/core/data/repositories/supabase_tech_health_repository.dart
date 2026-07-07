@@ -88,12 +88,7 @@ class SupabaseTechHealthRepository implements TechHealthRepository {
     final uid = _userId;
     if (uid == null) return false;
 
-    // Mirrors fn_close_daily_progress's actual payout gate: at least 3 active
-    // restrictions and none of them violated today (groups excluded — nothing
-    // writes to tech_health_group_config yet, same as the Android reference
-    // app). Previously this only checked for violations, so a user with zero
-    // restrictions configured still saw "point earned" — the count
-    // requirement was never enforced client-side.
+    // Mirrors fn_close_daily_progress's payout gate: >=3 active restrictions, none violated.
     final rows = await _client
         .from('tech_health_config')
         .select('is_violated_today')

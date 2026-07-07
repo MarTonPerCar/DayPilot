@@ -108,11 +108,10 @@ class _HomeGrid extends StatelessWidget {
   final int rankingPosition;
   final int rankingTotal;
 
-  // Colores fijos por sección (no dependen del tema activo).
-  static const _calendarColor = Color(0xFF4A7C59); // verde
-  static const _progressColor = Color(0xFF1A6B8A); // azul
-  static const _habitsColor = Color(0xFF6B4FA8); // morado
-  static const _rivalryColor = Color(0xFFB85C00); // naranja
+  static const _calendarColor = Color(0xFF4A7C59);
+  static const _progressColor = Color(0xFF1A6B8A);
+  static const _habitsColor = Color(0xFF6B4FA8);
+  static const _rivalryColor = Color(0xFFB85C00);
 
   @override
   Widget build(BuildContext context) {

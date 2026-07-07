@@ -10,11 +10,8 @@ import 'steps_repository.dart';
 
 typedef _Milestone = ({double threshold, int points, int cumulative});
 
-// 50/75/100% of goal, matching Android's thresholds — gated by the actual
-// accumulated steps_points (server-authoritative) instead of in-memory
-// flags, so it's correct regardless of which client/device notices the
-// crossing first, and survives restarts (Android's own in-memory
-// milestone1Awarded-style flags don't).
+// Gated by the accumulated steps_points column (server-authoritative), not
+// an in-memory flag, so it survives restarts and multiple devices.
 const _stepMilestones = <_Milestone>[
   (threshold: 0.5, points: 10, cumulative: 10),
   (threshold: 0.75, points: 20, cumulative: 30),
@@ -33,13 +30,8 @@ class SupabaseStepsRepository implements StepsRepository {
     final uid = _userId;
     if (uid == null) return const AppSteps(steps: 0, goal: 2000, pointsEarnedToday: 0);
 
-    // There's no more a single account-wide goal column on `users` — the
-    // active goal is today's habits_daily.steps_goal (defaults to 2000 for a
-    // day with no row yet). `pending_steps_goal`/`_date` on `users` is just
-    // the staging area for a change that should take effect starting the
-    // day it names; nothing server-side copies it into habits_daily once
-    // that day arrives (a cron only clears the pending fields), so this is
-    // the one place responsible for actually applying it.
+    // pending_steps_goal/_date on `users` is just staging — nothing
+    // server-side copies it into habits_daily, so this call is what applies it.
     final today = isoDate(DateTime.now());
 
     final userRow = await _client

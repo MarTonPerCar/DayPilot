@@ -39,7 +39,6 @@ class DayPilotReactions extends StatelessWidget {
   }
 }
 
-/// Solo se permite una reacción por usuario.
 class DayPilotReactionPicker extends StatefulWidget {
   final String? selected;
   final void Function(String) onReact;

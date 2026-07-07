@@ -14,7 +14,6 @@ extension TaskDifficultyX on TaskDifficulty {
     };
   }
 
-  /// Fijos: iguales en cualquier tema, no vienen de [ColorScheme].
   Color color(ColorScheme colors) => switch (this) {
         TaskDifficulty.easy => const Color(0xFF4CAF50),
         TaskDifficulty.medium => const Color(0xFFFFA726),

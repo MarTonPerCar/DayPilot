@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../basic/task_category.dart';
 import '../basic/task_dot.dart';
 
-/// La franja superior se divide en dos: mitad dificultad, mitad categoría.
 class CalendarTaskCard extends StatelessWidget {
   final String title;
   final TaskDifficulty difficulty;

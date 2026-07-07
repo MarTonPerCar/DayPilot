@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Compartida entre FriendCard y WeeklyReactionCard para que se vean igual.
 class WeeklyStatsRow extends StatelessWidget {
   final int points;
   final int tasks;

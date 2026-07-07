@@ -1,5 +1,3 @@
-// Placeholder: sustituir por llamadas reales cuando haya backend.
-
 import 'package:flutter/material.dart';
 
 enum TimerMode { pomodoro, fixed, custom }

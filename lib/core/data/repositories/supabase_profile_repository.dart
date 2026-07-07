@@ -14,10 +14,7 @@ class SupabaseProfileRepository implements ProfileRepository {
 
   String? get _userId => _client.auth.currentUser?.id;
 
-  // Same curve as the `fn_update_level` DB trigger: cumulative points needed
-  // to reach level n+1. Used to find where the *current* level started, so
-  // the progress bar reflects progress within this level, not since level 1
-  // (that flat total/threshold ratio is the known bug in the Android app).
+  // Same curve as the `fn_update_level` DB trigger.
   static int _levelThreshold(int level) => 5 * level * (level + 3);
 
   @override
@@ -140,8 +137,6 @@ class SupabaseProfileRepository implements ProfileRepository {
     final uid = _userId;
     if (uid == null) throw StateError('No authenticated user');
 
-    // Path includes a timestamp so re-uploads get a fresh URL (cached images
-    // won't refetch an unchanged URL) — matches the Android app's approach.
     final path = '$uid/${DateTime.now().millisecondsSinceEpoch}.$fileExtension';
     await _client.storage.from('avatars').uploadBinary(
           path,

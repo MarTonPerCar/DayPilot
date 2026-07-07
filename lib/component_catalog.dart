@@ -897,7 +897,6 @@ class _SectionHeader extends StatelessWidget {
   }
 }
 
-// Wraps an AppBar-style widget in a clipped card so it previews correctly inline
 class _Preview extends StatelessWidget {
   final Widget child;
   const _Preview({required this.child});

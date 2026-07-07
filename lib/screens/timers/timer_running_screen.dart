@@ -44,14 +44,8 @@ class _TimerRunningScreenState extends ConsumerState<TimerRunningScreen> with Wi
     WidgetsBinding.instance.addObserver(this);
   }
 
-  // The desktop flyout window hides itself on focus loss (see
-  // DesktopFlyoutScope.onWindowBlur) — a continuously-ticking per-second
-  // Timer while that happens seems to confuse window_manager's hide/refocus
-  // on Linux, leaving the window stuck open. Stopping the ticker whenever
-  // the app isn't in the foreground avoids that entirely. Also flips the
-  // play/pause button back to "paused" so it's immediately correct — and
-  // immediately tappable to resume — once the app is reopened, instead of
-  // showing "running" for a timer that's actually frozen.
+  // A ticking Timer while the desktop flyout is hidden confuses
+  // window_manager's hide/refocus on Linux, leaving the window stuck open.
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state != AppLifecycleState.resumed && _running) {
@@ -146,8 +140,6 @@ class _TimerRunningScreenState extends ConsumerState<TimerRunningScreen> with Wi
     final l10n = AppLocalizations.of(context);
     final total = _phaseDuration.inSeconds;
     final progress = total == 0 ? 0.0 : _remaining.inSeconds / total;
-    // Covers both "already earned earlier today" and "just earned this
-    // session" in one check, since completeTimerSession() refreshes this.
     final pointEarnedToday = (ref.watch(progressNotifierProvider)?.pointsFromTimer ?? 0) > 0;
 
     return Scaffold(
