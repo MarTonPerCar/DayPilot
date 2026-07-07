@@ -21,15 +21,22 @@ class LoginScreen extends ConsumerStatefulWidget {
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
   bool _showRegister = false;
-  bool _registerLoading = false;
   String? _timezone = AppData.timezoneOptions.first;
   final _loginEmailController = TextEditingController();
   final _loginPasswordController = TextEditingController();
+  final _registerNameController = TextEditingController();
+  final _registerUsernameController = TextEditingController();
+  final _registerEmailController = TextEditingController();
+  final _registerPasswordController = TextEditingController();
 
   @override
   void dispose() {
     _loginEmailController.dispose();
     _loginPasswordController.dispose();
+    _registerNameController.dispose();
+    _registerUsernameController.dispose();
+    _registerEmailController.dispose();
+    _registerPasswordController.dispose();
     super.dispose();
   }
 
@@ -46,11 +53,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
   }
 
-  void _submitRegister() async {
-    setState(() => _registerLoading = true);
-    await Future.delayed(const Duration(milliseconds: 800));
+  Future<void> _submitRegister() async {
+    await ref.read(authNotifierProvider.notifier).signUp(
+          name: _registerNameController.text.trim(),
+          username: _registerUsernameController.text.trim(),
+          email: _registerEmailController.text.trim(),
+          password: _registerPasswordController.text,
+          region: _timezone,
+        );
     if (!mounted) return;
-    setState(() => _registerLoading = false);
+    if (ref.read(authNotifierProvider).status == AuthStatus.authenticated) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const MainShell()),
+      );
+    }
   }
 
   @override
@@ -128,7 +144,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           onSubmit: _submitLogin,
                         ),
                         back: _RegisterForm(
-                          loading: _registerLoading,
+                          loading: session.status == AuthStatus.authenticating,
+                          nameController: _registerNameController,
+                          usernameController: _registerUsernameController,
+                          emailController: _registerEmailController,
+                          passwordController: _registerPasswordController,
                           timezone: _timezone,
                           onTimezoneChanged: (v) => setState(() => _timezone = v),
                           onSubmit: _submitRegister,
@@ -306,12 +326,20 @@ class _LoginForm extends StatelessWidget {
 
 class _RegisterForm extends StatelessWidget {
   final bool loading;
+  final TextEditingController nameController;
+  final TextEditingController usernameController;
+  final TextEditingController emailController;
+  final TextEditingController passwordController;
   final String? timezone;
   final ValueChanged<String> onTimezoneChanged;
   final VoidCallback onSubmit;
 
   const _RegisterForm({
     required this.loading,
+    required this.nameController,
+    required this.usernameController,
+    required this.emailController,
+    required this.passwordController,
     required this.timezone,
     required this.onTimezoneChanged,
     required this.onSubmit,
@@ -327,9 +355,9 @@ class _RegisterForm extends StatelessWidget {
       children: [
         Text(l10n.loginSignUpTab, style: text.titleLarge?.copyWith(fontWeight: FontWeight.w800)),
         const SizedBox(height: 20),
-        DayPilotTextField(label: l10n.loginNameLabel),
+        DayPilotTextField(label: l10n.loginNameLabel, controller: nameController),
         const SizedBox(height: 14),
-        DayPilotTextField(label: l10n.loginUsernameLabel),
+        DayPilotTextField(label: l10n.loginUsernameLabel, controller: usernameController),
         const SizedBox(height: 14),
         DayPilotSelectField<String>(
           label: l10n.loginTimezoneLabel,
@@ -341,10 +369,11 @@ class _RegisterForm extends StatelessWidget {
         const SizedBox(height: 14),
         DayPilotTextField(
           label: l10n.profileInfoEmail,
+          controller: emailController,
           keyboardType: TextInputType.emailAddress,
         ),
         const SizedBox(height: 14),
-        DayPilotPasswordField(label: l10n.commonPassword),
+        DayPilotPasswordField(label: l10n.commonPassword, controller: passwordController),
         const SizedBox(height: 20),
         DayPilotButton(label: l10n.loginRegisterSubmit, isLoading: loading, onPressed: onSubmit),
       ],

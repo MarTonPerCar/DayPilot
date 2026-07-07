@@ -319,6 +319,8 @@
   "authErrorWeakPassword": "La contraseña debe tener al menos 6 caracteres.",
   "authErrorInvalidEmail": "Introduce un email válido.",
   "authErrorUnknown": "Ha ocurrido un error. Inténtalo de nuevo.",
+  "authErrorFillAllFields": "Rellena todos los campos.",
+  "authRegisterCheckEmail": "Cuenta creada — revisa tu email para confirmarla antes de iniciar sesión.",
 
   "forgotPasswordTitle": "Recuperar contraseña",
   "forgotPasswordSentBody": "Revisa tu correo, te hemos enviado un enlace para restablecer tu contraseña.",

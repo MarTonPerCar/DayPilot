@@ -1600,6 +1600,18 @@ abstract class AppLocalizations {
   /// **'Ha ocurrido un error. Inténtalo de nuevo.'**
   String get authErrorUnknown;
 
+  /// No description provided for @authErrorFillAllFields.
+  ///
+  /// In es, this message translates to:
+  /// **'Rellena todos los campos.'**
+  String get authErrorFillAllFields;
+
+  /// No description provided for @authRegisterCheckEmail.
+  ///
+  /// In es, this message translates to:
+  /// **'Cuenta creada — revisa tu email para confirmarla antes de iniciar sesión.'**
+  String get authRegisterCheckEmail;
+
   /// No description provided for @forgotPasswordTitle.
   ///
   /// In es, this message translates to:

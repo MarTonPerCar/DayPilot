@@ -853,6 +853,13 @@ class AppLocalizationsDe extends AppLocalizations {
       'Etwas ist schiefgelaufen. Bitte versuche es erneut.';
 
   @override
+  String get authErrorFillAllFields => 'Bitte fülle alle Felder aus.';
+
+  @override
+  String get authRegisterCheckEmail =>
+      'Konto erstellt — bestätige deine E-Mail-Adresse, bevor du dich anmeldest.';
+
+  @override
   String get forgotPasswordTitle => 'Passwort wiederherstellen';
 
   @override

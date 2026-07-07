@@ -849,6 +849,13 @@ class AppLocalizationsEs extends AppLocalizations {
   String get authErrorUnknown => 'Ha ocurrido un error. Inténtalo de nuevo.';
 
   @override
+  String get authErrorFillAllFields => 'Rellena todos los campos.';
+
+  @override
+  String get authRegisterCheckEmail =>
+      'Cuenta creada — revisa tu email para confirmarla antes de iniciar sesión.';
+
+  @override
   String get forgotPasswordTitle => 'Recuperar contraseña';
 
   @override
