@@ -136,6 +136,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Alert at 10pm if you haven\'t opened the app';
 
   @override
+  String get settingsLaunchAtStartup => 'Launch at startup';
+
+  @override
+  String get settingsLaunchAtStartupSubtitle =>
+      'Open DayPilot automatically when you sign in to your PC';
+
+  @override
   String get settingsEditProfile => 'Edit profile';
 
   @override

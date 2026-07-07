@@ -45,6 +45,8 @@
   "settingsTaskRemindersSubtitle": "Tägliche Erinnerung an ausstehende Aufgaben",
   "settingsStreakAlert": "Serien-Erinnerung",
   "settingsStreakAlertSubtitle": "Erinnerung um 22 Uhr, falls die App nicht geöffnet wurde",
+  "settingsLaunchAtStartup": "Beim Start ausführen",
+  "settingsLaunchAtStartupSubtitle": "Öffnet DayPilot automatisch, wenn du dich an deinem PC anmeldest",
   "settingsEditProfile": "Profil bearbeiten",
   "settingsEditProfileSubtitle": "Name, Benutzername, Region und Passwort",
   "settingsChangePhoto": "Foto ändern",

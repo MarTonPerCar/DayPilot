@@ -137,6 +137,13 @@ class AppLocalizationsEs extends AppLocalizations {
       'Aviso a las 22h si no has abierto la app';
 
   @override
+  String get settingsLaunchAtStartup => 'Iniciar con el sistema';
+
+  @override
+  String get settingsLaunchAtStartupSubtitle =>
+      'Abre DayPilot automáticamente al iniciar sesión en tu PC';
+
+  @override
   String get settingsEditProfile => 'Editar perfil';
 
   @override

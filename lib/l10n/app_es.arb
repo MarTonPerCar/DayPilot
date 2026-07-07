@@ -45,6 +45,8 @@
   "settingsTaskRemindersSubtitle": "Aviso diario con tus tareas pendientes",
   "settingsStreakAlert": "Alerta de racha",
   "settingsStreakAlertSubtitle": "Aviso a las 22h si no has abierto la app",
+  "settingsLaunchAtStartup": "Iniciar con el sistema",
+  "settingsLaunchAtStartupSubtitle": "Abre DayPilot automáticamente al iniciar sesión en tu PC",
   "settingsEditProfile": "Editar perfil",
   "settingsEditProfileSubtitle": "Nombre, usuario, región y contraseña",
   "settingsChangePhoto": "Cambiar foto",

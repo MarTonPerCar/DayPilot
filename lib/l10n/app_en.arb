@@ -45,6 +45,8 @@
   "settingsTaskRemindersSubtitle": "Daily alert with your pending tasks",
   "settingsStreakAlert": "Streak alert",
   "settingsStreakAlertSubtitle": "Alert at 10pm if you haven't opened the app",
+  "settingsLaunchAtStartup": "Launch at startup",
+  "settingsLaunchAtStartupSubtitle": "Open DayPilot automatically when you sign in to your PC",
   "settingsEditProfile": "Edit profile",
   "settingsEditProfileSubtitle": "Name, username, region and password",
   "settingsChangePhoto": "Change photo",

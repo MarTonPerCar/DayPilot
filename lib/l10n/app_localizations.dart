@@ -346,6 +346,18 @@ abstract class AppLocalizations {
   /// **'Aviso a las 22h si no has abierto la app'**
   String get settingsStreakAlertSubtitle;
 
+  /// No description provided for @settingsLaunchAtStartup.
+  ///
+  /// In es, this message translates to:
+  /// **'Iniciar con el sistema'**
+  String get settingsLaunchAtStartup;
+
+  /// No description provided for @settingsLaunchAtStartupSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Abre DayPilot automáticamente al iniciar sesión en tu PC'**
+  String get settingsLaunchAtStartupSubtitle;
+
   /// No description provided for @settingsEditProfile.
   ///
   /// In es, this message translates to:

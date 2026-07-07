@@ -137,6 +137,13 @@ class AppLocalizationsDe extends AppLocalizations {
       'Erinnerung um 22 Uhr, falls die App nicht geöffnet wurde';
 
   @override
+  String get settingsLaunchAtStartup => 'Beim Start ausführen';
+
+  @override
+  String get settingsLaunchAtStartupSubtitle =>
+      'Öffnet DayPilot automatisch, wenn du dich an deinem PC anmeldest';
+
+  @override
   String get settingsEditProfile => 'Profil bearbeiten';
 
   @override
