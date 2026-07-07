@@ -215,7 +215,19 @@ Tareas con sus fechas de calendario (JOIN de `tasks` + `task_days`). Expone `occ
 
 ---
 
-## Seed de datos (`03_seed.sql`)
+## Reseteo del esquema (`02_drop_all.sql`)
+
+Deshace por completo lo creado por `01_schema.sql`, pensado para poder partir de cero rápidamente durante el desarrollo. El orden de operaciones es:
+
+1. **Desprogramar los jobs de `pg_cron`** — envuelto en bloques `DO $$ ... EXCEPTION WHEN OTHERS THEN NULL; END $$` para que no falle si algún job todavía no existe (por ejemplo, la primera vez que se ejecuta sobre una base vacía).
+2. **Desactivar triggers y FKs temporalmente** con `SET session_replication_role = replica`, lo que permite eliminar las tablas sin preocuparse por el orden de las claves foráneas.
+3. **Eliminar las 16 tablas** con `DROP TABLE IF EXISTS ... CASCADE`.
+4. **Eliminar las vistas** (`friends_ranking`, `calendar_tasks`) y las 11 funciones listadas explícitamente, con `CASCADE` para arrastrar también los triggers que dependen de cada una.
+5. **Restaurar** `session_replication_role = DEFAULT` al final.
+
+> ⚠️ **Gap detectado:** el script actual desprograma solo 3 de los 4 jobs de `pg_cron` (`close-daily-progress`, `generate-weekly-summary`, `cleanup-completed-tasks`) y elimina solo 11 de las 12 funciones. Falta tanto el `cron.unschedule('apply-pending-steps-goals')` como el `DROP FUNCTION IF EXISTS fn_apply_pending_steps_goals`. Todo indica que esta función y su job se añadieron a `01_schema.sql` en una iteración posterior sin actualizar el script de limpieza en consecuencia. También queda un `DROP VIEW IF EXISTS daily_summary CASCADE` de una vista que ya no existe en el esquema actual — inofensivo gracias al `IF EXISTS`, pero es un resto de una versión anterior del diseño.
+
+---
 
 Todos los usuarios tienen contraseña `password123`.
 
@@ -237,3 +249,14 @@ Solo Ana tiene datos "ricos" — es la cuenta pensada para probar tareas, límit
 El resto de usuarios solo tienen `user_daily_log` histórico y relaciones sociales, para poblar el ranking y las reacciones alrededor de Ana. Reacciones cruzadas: Ana → María (`fire`), Carlos → Ana (`clap`), Lucía → Ana (`star`).
 
 Los `user_daily_log` generados con `random()` usan solo valores que la app realmente otorga: `tasks_points` es siempre `tasks_completed * 20`, `steps_points` sale de subconjuntos de `{0, 10, 30, 60}` (los hitos de pasos), y `wellness_points`/`timer_points`/`tech_health_points` son `0` o `10`.
+
+---
+
+## Inspección completa (`04_show_everything.sql`)
+
+Consulta de solo lectura pensada para depurar sin tener que revisar tabla por tabla. Devuelve **una fila por usuario**, ordenada por `username`, con:
+
+- Los datos de `users`, `user_streaks`, `daily_progress` (progreso de hoy) y `user_weekly_summary` como columnas normales, vía `LEFT JOIN` directo.
+- Doce relaciones uno-a-muchos agregadas mediante `LEFT JOIN LATERAL` + `json_agg(jsonb_build_object(...))`, cada una devuelta como un array JSON en su propia columna: tareas (con sus ocurrencias anidadas un nivel más adentro), hábitos diarios, histórico de 30 días, límites de salud tecnológica individuales y por grupo, log de puntos, solicitudes de amistad enviadas y recibidas, amistades, reacciones enviadas y recibidas, y notificaciones.
+
+El resultado es, por cada usuario, un único documento con absolutamente todo su estado — el equivalente a una consulta a las 16 tablas del esquema, pero en una sola llamada. Útil sobre todo para verificar manualmente que el seed se ha aplicado bien o que una sesión de pruebas ha dejado los datos en el estado esperado, sin tener que abrir el editor de tablas de Supabase tabla por tabla.
