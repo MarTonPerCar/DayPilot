@@ -225,8 +225,6 @@ Deshace por completo lo creado por `01_schema.sql`, pensado para poder partir de
 4. **Eliminar las vistas** (`friends_ranking`, `calendar_tasks`) y las 11 funciones listadas explícitamente, con `CASCADE` para arrastrar también los triggers que dependen de cada una.
 5. **Restaurar** `session_replication_role = DEFAULT` al final.
 
-> ⚠️ **Gap detectado:** el script actual desprograma solo 3 de los 4 jobs de `pg_cron` (`close-daily-progress`, `generate-weekly-summary`, `cleanup-completed-tasks`) y elimina solo 11 de las 12 funciones. Falta tanto el `cron.unschedule('apply-pending-steps-goals')` como el `DROP FUNCTION IF EXISTS fn_apply_pending_steps_goals`. Todo indica que esta función y su job se añadieron a `01_schema.sql` en una iteración posterior sin actualizar el script de limpieza en consecuencia. También queda un `DROP VIEW IF EXISTS daily_summary CASCADE` de una vista que ya no existe en el esquema actual — inofensivo gracias al `IF EXISTS`, pero es un resto de una versión anterior del diseño.
-
 ---
 
 Todos los usuarios tienen contraseña `password123`.
