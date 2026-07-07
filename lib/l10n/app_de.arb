@@ -47,6 +47,19 @@
   "settingsStreakAlertSubtitle": "Erinnerung um 22 Uhr, falls die App nicht geöffnet wurde",
   "settingsEditProfile": "Profil bearbeiten",
   "settingsEditProfileSubtitle": "Name, Benutzername, Region und Passwort",
+  "settingsChangePhoto": "Foto ändern",
+  "settingsChangePhotoPrompt": "Woher möchtest du das Foto auswählen?",
+  "settingsGallery": "Galerie",
+  "settingsCamera": "Kamera",
+  "settingsAdjustPhoto": "Foto anpassen",
+  "settingsPersonalInfo": "Persönliche Informationen",
+  "settingsSecurity": "Sicherheit",
+  "settingsChangePassword": "Passwort ändern",
+  "settingsNewPassword": "Neues Passwort",
+  "settingsConfirmPassword": "Passwort bestätigen",
+  "settingsPasswordMismatch": "Die Passwörter stimmen nicht überein",
+  "settingsPasswordChanged": "Passwort aktualisiert",
+  "settingsAvatarUploadError": "Foto konnte nicht hochgeladen werden",
   "settingsLanguage": "Sprache",
   "settingsChooseLanguage": "Sprache auswählen",
   "settingsDeveloper": "Entwickler",
@@ -201,6 +214,34 @@
   "notifTypeStreak": "Serie",
   "notifTypeReminder": "Erinnerungen",
   "notifTypeAchievement": "Erfolge",
+  "notifTimeJustNow": "gerade eben",
+  "notifTimeMinutesAgo": "vor {n} Min.",
+  "@notifTimeMinutesAgo": {"placeholders": {"n": {"type": "int"}}},
+  "notifTimeHoursAgo": "vor {n} Std.",
+  "@notifTimeHoursAgo": {"placeholders": {"n": {"type": "int"}}},
+  "notifTimeYesterday": "gestern",
+  "notifTimeDaysAgo": "vor {n} Tagen",
+  "@notifTimeDaysAgo": {"placeholders": {"n": {"type": "int"}}},
+
+  "notifFriendRequestTitle": "Neue Freundschaftsanfrage",
+  "notifFriendRequestBody": "{username} möchte mit dir befreundet sein.",
+  "@notifFriendRequestBody": {"placeholders": {"username": {"type": "String"}}},
+  "notifFriendAcceptedTitle": "Anfrage angenommen",
+  "notifFriendAcceptedBody": "{username} hat deine Freundschaftsanfrage angenommen.",
+  "@notifFriendAcceptedBody": {"placeholders": {"username": {"type": "String"}}},
+  "notifReactionTitle": "Neue Reaktion",
+  "notifReactionBody": "{username} hat mit {emoji} auf deine Wochenübersicht reagiert.",
+  "@notifReactionBody": {"placeholders": {"username": {"type": "String"}, "emoji": {"type": "String"}}},
+  "notifTimerDoneTitle": "Timer abgeschlossen! ⏱",
+  "notifTimerDoneBody": "Du hast eine Fokus-Sitzung abgeschlossen und 10 Punkte verdient.",
+  "notifLevelUpTitle": "Level aufgestiegen! 🏆",
+  "notifLevelUpBody": "Du bist jetzt Level {level}. Weiter so!",
+  "@notifLevelUpBody": {"placeholders": {"level": {"type": "int"}}},
+  "notifStepsGoalTitle": "Ziel erreicht! 🎉",
+  "notifStepsGoalBody": "Du hast dein Schrittziel erreicht (+30 Punkte).",
+  "notifTaskCompletedTitle": "Aufgabe erledigt! ✅",
+  "notifTaskCompletedBody": "Du hast \"{title}\" erledigt und 20 Punkte verdient.",
+  "@notifTaskCompletedBody": {"placeholders": {"title": {"type": "String"}}},
 
   "timerPause": "Pausieren",
 
@@ -214,6 +255,7 @@
   "@stepsPendingGoal": {"placeholders": {"goal": {"type": "int"}}},
 
   "notificationsMarkAllRead": "Alle als gelesen markieren",
+  "notificationsEmpty": "Du hast keine Benachrichtigungen",
 
   "friendCardRemoveTooltip": "Freund entfernen",
   "friendCardNoActivity": "Keine Aktivität letzte Woche",
@@ -232,13 +274,16 @@
   "dailySummaryAmongFriends": "unter Freunden",
 
   "weeklyReactionFriendsReactions": "Reaktionen deiner Freunde",
+  "weeklySummaryLastWeek": "Letzte Woche",
 
   "techHealthTitle": "Technische Gesundheit",
-  "techHealthUnavailableTitle": "Auf diesem Gerät nicht verfügbar",
-  "techHealthUnavailableBody": "Technische Gesundheit benötigt Berechtigungen für Nutzungsstatistiken und Bedienungshilfen, die nur unter Android existieren. Diese Funktion ist auf deinem System derzeit nicht verfügbar — sie steht zur Verfügung, sobald du die App auf dem Handy installiert hast.",
+  "techHealthUnavailableTitle": "Auf dieser Plattform noch nicht verfügbar",
+  "techHealthUnavailableBody": "Technische Gesundheit muss die App-Nutzung überwachen und Apps in Echtzeit blockieren — das ist bisher nur für Android umgesetzt. Es wäre technisch möglich, das auch für andere Plattformen zu bauen, wurde aber noch nicht gemacht — im Moment funktioniert diese Funktion nur unter Android.",
   "techHealthPointDialogTitle": "Punkt für technische Gesundheit",
   "techHealthPointDialogBody": "Aktiviere mindestens 3 Einschränkungen und überschreite kein Limit während des Tages. Wenn du das schaffst, erhältst du 10 Extrapunkte, die morgen zu deinen Punkten addiert werden.",
   "techHealthPointBannerLabel": "Punkt verfügbar — tippen für mehr Infos",
+  "techHealthPointLostLabel": "Punkt heute verloren — tippen für mehr Infos",
+  "techHealthPointLostBody": "Du hast heute ein Limit überschritten und erhältst daher nicht den Extrapunkt. Versuch es morgen erneut.",
   "techHealthRestrictionsTitle": "Einschränkungen",
   "techHealthRestrictionsCount": "{n} insgesamt",
   "@techHealthRestrictionsCount": {"placeholders": {"n": {"type": "int"}}},
@@ -282,6 +327,7 @@
   "rivalryTitle": "Rivalität",
   "rivalryPointsThisMonth": "Punkte diesen Monat",
   "rivalryFullRanking": "GESAMTE RANGLISTE",
+  "rivalryEmpty": "Füge Freunde hinzu, um die Rangliste zu sehen",
 
   "progressTitle": "Fortschritt",
 
@@ -296,11 +342,14 @@
   "friendsRequestsTabCount": "Anfragen ({n})",
   "@friendsRequestsTabCount": {"placeholders": {"n": {"type": "int"}}},
   "friendsNoRequests": "Du hast keine ausstehenden Anfragen",
+  "friendsNoFriends": "Du hast noch keine Freunde",
 
   "remindersEmptyState": "Du hast keine Erinnerungen.\nFüge eine hinzu!",
 
   "homeTasksTodayLabel": "{completed}/{total} Aufgaben heute",
   "@homeTasksTodayLabel": {"placeholders": {"completed": {"type": "int"}, "total": {"type": "int"}}},
+  "homeTasksLabel": "{completed}/{total} Aufgaben",
+  "@homeTasksLabel": {"placeholders": {"completed": {"type": "int"}, "total": {"type": "int"}}},
 
   "searchFriendsTitle": "Freunde suchen",
   "searchFriendsHint": "Nach Name oder E-Mail suchen",
@@ -309,8 +358,13 @@
   "@timerSessionOf": {"placeholders": {"current": {"type": "int"}, "total": {"type": "int"}}},
   "timerPhaseMinutes": "{min} Min. {phase}",
   "@timerPhaseMinutes": {"placeholders": {"min": {"type": "int"}, "phase": {"type": "String"}}},
+  "timerPointEarned": "Tagespunkt erreicht",
+  "timerClosedAppWarning": "Der Timer pausiert, wenn du die App schließt oder minimierst",
 
   "homeStepsProgressLabel": "{percent}% Schritte",
   "@homeStepsProgressLabel": {"placeholders": {"percent": {"type": "int"}}},
-  "homeTimerPending": "Timer ausstehend"
+  "homeTimerPending": "Timer ausstehend",
+
+  "trayOpen": "Öffnen",
+  "trayExit": "Beenden"
 }

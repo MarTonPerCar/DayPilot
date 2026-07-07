@@ -358,6 +358,84 @@ abstract class AppLocalizations {
   /// **'Nombre, usuario, región y contraseña'**
   String get settingsEditProfileSubtitle;
 
+  /// No description provided for @settingsChangePhoto.
+  ///
+  /// In es, this message translates to:
+  /// **'Cambiar foto'**
+  String get settingsChangePhoto;
+
+  /// No description provided for @settingsChangePhotoPrompt.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Desde dónde quieres elegir la foto?'**
+  String get settingsChangePhotoPrompt;
+
+  /// No description provided for @settingsGallery.
+  ///
+  /// In es, this message translates to:
+  /// **'Galería'**
+  String get settingsGallery;
+
+  /// No description provided for @settingsCamera.
+  ///
+  /// In es, this message translates to:
+  /// **'Cámara'**
+  String get settingsCamera;
+
+  /// No description provided for @settingsAdjustPhoto.
+  ///
+  /// In es, this message translates to:
+  /// **'Ajustar foto'**
+  String get settingsAdjustPhoto;
+
+  /// No description provided for @settingsPersonalInfo.
+  ///
+  /// In es, this message translates to:
+  /// **'Información personal'**
+  String get settingsPersonalInfo;
+
+  /// No description provided for @settingsSecurity.
+  ///
+  /// In es, this message translates to:
+  /// **'Seguridad'**
+  String get settingsSecurity;
+
+  /// No description provided for @settingsChangePassword.
+  ///
+  /// In es, this message translates to:
+  /// **'Cambiar contraseña'**
+  String get settingsChangePassword;
+
+  /// No description provided for @settingsNewPassword.
+  ///
+  /// In es, this message translates to:
+  /// **'Nueva contraseña'**
+  String get settingsNewPassword;
+
+  /// No description provided for @settingsConfirmPassword.
+  ///
+  /// In es, this message translates to:
+  /// **'Confirmar contraseña'**
+  String get settingsConfirmPassword;
+
+  /// No description provided for @settingsPasswordMismatch.
+  ///
+  /// In es, this message translates to:
+  /// **'Las contraseñas no coinciden'**
+  String get settingsPasswordMismatch;
+
+  /// No description provided for @settingsPasswordChanged.
+  ///
+  /// In es, this message translates to:
+  /// **'Contraseña actualizada'**
+  String get settingsPasswordChanged;
+
+  /// No description provided for @settingsAvatarUploadError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo subir la foto'**
+  String get settingsAvatarUploadError;
+
   /// No description provided for @settingsLanguage.
   ///
   /// In es, this message translates to:
@@ -1042,6 +1120,120 @@ abstract class AppLocalizations {
   /// **'Logros'**
   String get notifTypeAchievement;
 
+  /// No description provided for @notifTimeJustNow.
+  ///
+  /// In es, this message translates to:
+  /// **'ahora mismo'**
+  String get notifTimeJustNow;
+
+  /// No description provided for @notifTimeMinutesAgo.
+  ///
+  /// In es, this message translates to:
+  /// **'hace {n} min'**
+  String notifTimeMinutesAgo(int n);
+
+  /// No description provided for @notifTimeHoursAgo.
+  ///
+  /// In es, this message translates to:
+  /// **'hace {n} h'**
+  String notifTimeHoursAgo(int n);
+
+  /// No description provided for @notifTimeYesterday.
+  ///
+  /// In es, this message translates to:
+  /// **'ayer'**
+  String get notifTimeYesterday;
+
+  /// No description provided for @notifTimeDaysAgo.
+  ///
+  /// In es, this message translates to:
+  /// **'hace {n} días'**
+  String notifTimeDaysAgo(int n);
+
+  /// No description provided for @notifFriendRequestTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Nueva solicitud de amistad'**
+  String get notifFriendRequestTitle;
+
+  /// No description provided for @notifFriendRequestBody.
+  ///
+  /// In es, this message translates to:
+  /// **'{username} quiere ser tu amigo.'**
+  String notifFriendRequestBody(String username);
+
+  /// No description provided for @notifFriendAcceptedTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Solicitud aceptada'**
+  String get notifFriendAcceptedTitle;
+
+  /// No description provided for @notifFriendAcceptedBody.
+  ///
+  /// In es, this message translates to:
+  /// **'{username} aceptó tu solicitud de amistad.'**
+  String notifFriendAcceptedBody(String username);
+
+  /// No description provided for @notifReactionTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Nueva reacción'**
+  String get notifReactionTitle;
+
+  /// No description provided for @notifReactionBody.
+  ///
+  /// In es, this message translates to:
+  /// **'{username} reaccionó a tu resumen semanal con {emoji}.'**
+  String notifReactionBody(String username, String emoji);
+
+  /// No description provided for @notifTimerDoneTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¡Temporizador completado! ⏱'**
+  String get notifTimerDoneTitle;
+
+  /// No description provided for @notifTimerDoneBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Has completado una sesión de concentración y ganado 10 pts.'**
+  String get notifTimerDoneBody;
+
+  /// No description provided for @notifLevelUpTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¡Subiste de nivel! 🏆'**
+  String get notifLevelUpTitle;
+
+  /// No description provided for @notifLevelUpBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Ahora eres nivel {level}. ¡Sigue así!'**
+  String notifLevelUpBody(int level);
+
+  /// No description provided for @notifStepsGoalTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¡Objetivo completado! 🎉'**
+  String get notifStepsGoalTitle;
+
+  /// No description provided for @notifStepsGoalBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Has alcanzado tu objetivo de pasos (+30 pts).'**
+  String get notifStepsGoalBody;
+
+  /// No description provided for @notifTaskCompletedTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¡Tarea completada! ✅'**
+  String get notifTaskCompletedTitle;
+
+  /// No description provided for @notifTaskCompletedBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Completaste \"{title}\" y ganaste 20 pts.'**
+  String notifTaskCompletedBody(String title);
+
   /// No description provided for @timerPause.
   ///
   /// In es, this message translates to:
@@ -1089,6 +1281,12 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Leer todo'**
   String get notificationsMarkAllRead;
+
+  /// No description provided for @notificationsEmpty.
+  ///
+  /// In es, this message translates to:
+  /// **'No tienes avisos'**
+  String get notificationsEmpty;
 
   /// No description provided for @friendCardRemoveTooltip.
   ///
@@ -1162,6 +1360,12 @@ abstract class AppLocalizations {
   /// **'Reacciones de tus amigos'**
   String get weeklyReactionFriendsReactions;
 
+  /// No description provided for @weeklySummaryLastWeek.
+  ///
+  /// In es, this message translates to:
+  /// **'Semana pasada'**
+  String get weeklySummaryLastWeek;
+
   /// No description provided for @techHealthTitle.
   ///
   /// In es, this message translates to:
@@ -1171,13 +1375,13 @@ abstract class AppLocalizations {
   /// No description provided for @techHealthUnavailableTitle.
   ///
   /// In es, this message translates to:
-  /// **'No disponible en este dispositivo'**
+  /// **'Aún no añadido en esta plataforma'**
   String get techHealthUnavailableTitle;
 
   /// No description provided for @techHealthUnavailableBody.
   ///
   /// In es, this message translates to:
-  /// **'La salud tecnológica necesita permisos de estadísticas de uso y accesibilidad que solo existen en Android. Por ahora esta función no está disponible en tu sistema — llegará cuando tengas la app instalada en el móvil.'**
+  /// **'La salud tecnológica necesita vigilar el uso de apps y bloquearlas en tiempo real, algo que por ahora solo está implementado en Android. Añadirlo en otras plataformas es técnicamente posible, pero todavía no se ha hecho — por ahora esta función solo funciona en Android.'**
   String get techHealthUnavailableBody;
 
   /// No description provided for @techHealthPointDialogTitle.
@@ -1197,6 +1401,18 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Punto obtenible — toca para saber más'**
   String get techHealthPointBannerLabel;
+
+  /// No description provided for @techHealthPointLostLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Punto perdido hoy — toca para saber más'**
+  String get techHealthPointLostLabel;
+
+  /// No description provided for @techHealthPointLostBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Has superado el límite de alguna restricción hoy, así que no ganarás el punto extra. Vuelve a intentarlo mañana.'**
+  String get techHealthPointLostBody;
 
   /// No description provided for @techHealthRestrictionsTitle.
   ///
@@ -1420,6 +1636,12 @@ abstract class AppLocalizations {
   /// **'CLASIFICACIÓN COMPLETA'**
   String get rivalryFullRanking;
 
+  /// No description provided for @rivalryEmpty.
+  ///
+  /// In es, this message translates to:
+  /// **'Añade amigos para ver la clasificación'**
+  String get rivalryEmpty;
+
   /// No description provided for @progressTitle.
   ///
   /// In es, this message translates to:
@@ -1480,6 +1702,12 @@ abstract class AppLocalizations {
   /// **'No tienes solicitudes pendientes'**
   String get friendsNoRequests;
 
+  /// No description provided for @friendsNoFriends.
+  ///
+  /// In es, this message translates to:
+  /// **'Aún no tienes amigos'**
+  String get friendsNoFriends;
+
   /// No description provided for @remindersEmptyState.
   ///
   /// In es, this message translates to:
@@ -1491,6 +1719,12 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'{completed}/{total} tareas hoy'**
   String homeTasksTodayLabel(int completed, int total);
+
+  /// No description provided for @homeTasksLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'{completed}/{total} tareas'**
+  String homeTasksLabel(int completed, int total);
 
   /// No description provided for @searchFriendsTitle.
   ///
@@ -1516,6 +1750,18 @@ abstract class AppLocalizations {
   /// **'{min} min {phase}'**
   String timerPhaseMinutes(int min, String phase);
 
+  /// No description provided for @timerPointEarned.
+  ///
+  /// In es, this message translates to:
+  /// **'Punto del día conseguido'**
+  String get timerPointEarned;
+
+  /// No description provided for @timerClosedAppWarning.
+  ///
+  /// In es, this message translates to:
+  /// **'El temporizador se pausa si cierras o minimizas la app'**
+  String get timerClosedAppWarning;
+
   /// No description provided for @homeStepsProgressLabel.
   ///
   /// In es, this message translates to:
@@ -1527,6 +1773,18 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Cronómetro pendiente'**
   String get homeTimerPending;
+
+  /// No description provided for @trayOpen.
+  ///
+  /// In es, this message translates to:
+  /// **'Abrir'**
+  String get trayOpen;
+
+  /// No description provided for @trayExit.
+  ///
+  /// In es, this message translates to:
+  /// **'Salir'**
+  String get trayExit;
 }
 
 class _AppLocalizationsDelegate

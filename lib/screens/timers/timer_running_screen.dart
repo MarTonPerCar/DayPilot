@@ -1,9 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show SystemSound, SystemSoundType;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../components/basic/top_bar.dart';
+import '../../features/progress/progress_notifier.dart';
 import '../../l10n/app_localizations.dart';
 
-class TimerRunningScreen extends StatefulWidget {
+class TimerRunningScreen extends ConsumerStatefulWidget {
   final String title;
   final Color color;
   final bool isPomodoro;
@@ -22,10 +25,10 @@ class TimerRunningScreen extends StatefulWidget {
   });
 
   @override
-  State<TimerRunningScreen> createState() => _TimerRunningScreenState();
+  ConsumerState<TimerRunningScreen> createState() => _TimerRunningScreenState();
 }
 
-class _TimerRunningScreenState extends State<TimerRunningScreen> {
+class _TimerRunningScreenState extends ConsumerState<TimerRunningScreen> with WidgetsBindingObserver {
   Timer? _ticker;
   bool _running = false;
   int _currentSession = 1;
@@ -35,20 +38,48 @@ class _TimerRunningScreenState extends State<TimerRunningScreen> {
   int get _phaseMinutes => _isRestPhase ? widget.restMinutes : widget.workMinutes;
   Duration get _phaseDuration => Duration(minutes: _phaseMinutes);
 
-  void _toggle() {
-    if (_running) {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  // The desktop flyout window hides itself on focus loss (see
+  // DesktopFlyoutScope.onWindowBlur) — a continuously-ticking per-second
+  // Timer while that happens seems to confuse window_manager's hide/refocus
+  // on Linux, leaving the window stuck open. Stopping the ticker whenever
+  // the app isn't in the foreground avoids that entirely. Also flips the
+  // play/pause button back to "paused" so it's immediately correct — and
+  // immediately tappable to resume — once the app is reopened, instead of
+  // showing "running" for a timer that's actually frozen.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed && _running) {
       _ticker?.cancel();
+      _ticker = null;
       setState(() => _running = false);
-      return;
     }
-    setState(() => _running = true);
-    _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
+  }
+
+  Timer _startTicker() {
+    return Timer.periodic(const Duration(seconds: 1), (_) {
       if (_remaining.inSeconds <= 0) {
         _advance();
       } else {
         setState(() => _remaining -= const Duration(seconds: 1));
       }
     });
+  }
+
+  void _toggle() {
+    if (_running) {
+      _ticker?.cancel();
+      _ticker = null;
+      setState(() => _running = false);
+      return;
+    }
+    setState(() => _running = true);
+    _ticker = _startTicker();
   }
 
   void _advance() {
@@ -70,10 +101,13 @@ class _TimerRunningScreenState extends State<TimerRunningScreen> {
       }
     }
     _ticker?.cancel();
+    _ticker = null;
     setState(() {
       _running = false;
       _remaining = Duration.zero;
     });
+    SystemSound.play(SystemSoundType.alert);
+    ref.read(progressNotifierProvider.notifier).completeTimerSession();
   }
 
   void _skip() {
@@ -83,6 +117,7 @@ class _TimerRunningScreenState extends State<TimerRunningScreen> {
 
   void _reset() {
     _ticker?.cancel();
+    _ticker = null;
     setState(() {
       _running = false;
       _currentSession = 1;
@@ -93,6 +128,7 @@ class _TimerRunningScreenState extends State<TimerRunningScreen> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _ticker?.cancel();
     super.dispose();
   }
@@ -110,6 +146,9 @@ class _TimerRunningScreenState extends State<TimerRunningScreen> {
     final l10n = AppLocalizations.of(context);
     final total = _phaseDuration.inSeconds;
     final progress = total == 0 ? 0.0 : _remaining.inSeconds / total;
+    // Covers both "already earned earlier today" and "just earned this
+    // session" in one check, since completeTimerSession() refreshes this.
+    final pointEarnedToday = (ref.watch(progressNotifierProvider)?.pointsFromTimer ?? 0) > 0;
 
     return Scaffold(
       appBar: DayPilotTopBar(title: widget.title, showBack: true),
@@ -179,6 +218,21 @@ class _TimerRunningScreenState extends State<TimerRunningScreen> {
                 ),
               ),
             ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.info_outline_rounded, size: 14, color: colors.onSurfaceVariant),
+                const SizedBox(width: 6),
+                Flexible(
+                  child: Text(
+                    l10n.timerClosedAppWarning,
+                    textAlign: TextAlign.center,
+                    style: text.labelSmall?.copyWith(color: colors.onSurfaceVariant),
+                  ),
+                ),
+              ],
+            ),
             const Spacer(),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -210,6 +264,27 @@ class _TimerRunningScreenState extends State<TimerRunningScreen> {
                 ],
               ],
             ),
+            if (pointEarnedToday) ...[
+              const SizedBox(height: 20),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: colors.primary.withAlpha(38),
+                  borderRadius: BorderRadius.circular(50),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text('⭐', style: TextStyle(fontSize: 16)),
+                    const SizedBox(width: 8),
+                    Text(
+                      l10n.timerPointEarned,
+                      style: text.labelMedium?.copyWith(color: colors.primary, fontWeight: FontWeight.w600),
+                    ),
+                  ],
+                ),
+              ),
+            ],
             const SizedBox(height: 40),
           ],
         ),

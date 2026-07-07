@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../l10n/app_localizations.dart';
 import '../basic/avatar.dart';
 
 class RankingCard extends StatelessWidget {
@@ -30,6 +31,8 @@ class RankingCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final text = Theme.of(context).textTheme;
+
+    final l10n = AppLocalizations.of(context);
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
@@ -78,7 +81,7 @@ class RankingCard extends StatelessWidget {
                           size: 14, color: colors.error),
                       const SizedBox(width: 2),
                       Text(
-                        '$streak días',
+                        l10n.dailySummaryStreakDays(streak),
                         style: text.labelSmall
                             ?.copyWith(color: colors.onSurfaceVariant),
                       ),

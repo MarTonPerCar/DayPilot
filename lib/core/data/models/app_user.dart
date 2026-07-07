@@ -1,5 +1,7 @@
-/// Mirrors `users` (see `01_schema_v004.sql`) — stats like streaks live in
-/// separate tables, fetched elsewhere.
+/// Mirrors `users` — stats like streaks live in separate tables, fetched
+/// elsewhere. Theme and steps goal aren't account-wide columns here anymore
+/// (theme is a local-only preference; steps goal lives per-day on
+/// habits_daily), so this only carries identity fields.
 class AppUser {
   const AppUser({
     required this.id,
@@ -7,11 +9,8 @@ class AppUser {
     required this.name,
     required this.username,
     required this.level,
-    required this.themeColor,
-    required this.defaultStepsGoal,
     this.photoUrl,
     this.region,
-    this.zoneId,
   });
 
   final String id;
@@ -20,10 +19,7 @@ class AppUser {
   final String username;
   final String? photoUrl;
   final String? region;
-  final String? zoneId;
   final int level;
-  final String themeColor;
-  final int defaultStepsGoal;
 
   factory AppUser.fromMap(Map<String, dynamic> map) {
     return AppUser(
@@ -33,10 +29,7 @@ class AppUser {
       username: map['username'] as String,
       photoUrl: map['photo_url'] as String?,
       region: map['region'] as String?,
-      zoneId: map['zone_id'] as String?,
       level: map['level'] as int,
-      themeColor: map['theme_color'] as String,
-      defaultStepsGoal: map['default_steps_goal'] as int,
     );
   }
 }

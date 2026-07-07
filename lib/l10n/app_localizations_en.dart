@@ -143,6 +143,46 @@ class AppLocalizationsEn extends AppLocalizations {
       'Name, username, region and password';
 
   @override
+  String get settingsChangePhoto => 'Change photo';
+
+  @override
+  String get settingsChangePhotoPrompt =>
+      'Where do you want to choose the photo from?';
+
+  @override
+  String get settingsGallery => 'Gallery';
+
+  @override
+  String get settingsCamera => 'Camera';
+
+  @override
+  String get settingsAdjustPhoto => 'Adjust photo';
+
+  @override
+  String get settingsPersonalInfo => 'Personal information';
+
+  @override
+  String get settingsSecurity => 'Security';
+
+  @override
+  String get settingsChangePassword => 'Change password';
+
+  @override
+  String get settingsNewPassword => 'New password';
+
+  @override
+  String get settingsConfirmPassword => 'Confirm password';
+
+  @override
+  String get settingsPasswordMismatch => 'Passwords don\'t match';
+
+  @override
+  String get settingsPasswordChanged => 'Password updated';
+
+  @override
+  String get settingsAvatarUploadError => 'Couldn\'t upload the photo';
+
+  @override
   String get settingsLanguage => 'Language';
 
   @override
@@ -525,6 +565,80 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notifTypeAchievement => 'Achievements';
 
   @override
+  String get notifTimeJustNow => 'just now';
+
+  @override
+  String notifTimeMinutesAgo(int n) {
+    return '$n min ago';
+  }
+
+  @override
+  String notifTimeHoursAgo(int n) {
+    return '$n h ago';
+  }
+
+  @override
+  String get notifTimeYesterday => 'yesterday';
+
+  @override
+  String notifTimeDaysAgo(int n) {
+    return '$n days ago';
+  }
+
+  @override
+  String get notifFriendRequestTitle => 'New friend request';
+
+  @override
+  String notifFriendRequestBody(String username) {
+    return '$username wants to be your friend.';
+  }
+
+  @override
+  String get notifFriendAcceptedTitle => 'Request accepted';
+
+  @override
+  String notifFriendAcceptedBody(String username) {
+    return '$username accepted your friend request.';
+  }
+
+  @override
+  String get notifReactionTitle => 'New reaction';
+
+  @override
+  String notifReactionBody(String username, String emoji) {
+    return '$username reacted to your weekly summary with $emoji.';
+  }
+
+  @override
+  String get notifTimerDoneTitle => 'Timer completed! ⏱';
+
+  @override
+  String get notifTimerDoneBody =>
+      'You completed a focus session and earned 10 pts.';
+
+  @override
+  String get notifLevelUpTitle => 'You leveled up! 🏆';
+
+  @override
+  String notifLevelUpBody(int level) {
+    return 'You\'re now level $level. Keep it up!';
+  }
+
+  @override
+  String get notifStepsGoalTitle => 'Goal reached! 🎉';
+
+  @override
+  String get notifStepsGoalBody => 'You reached your steps goal (+30 pts).';
+
+  @override
+  String get notifTaskCompletedTitle => 'Task completed! ✅';
+
+  @override
+  String notifTaskCompletedBody(String title) {
+    return 'You completed \"$title\" and earned 20 pts.';
+  }
+
+  @override
   String get timerPause => 'Pause';
 
   @override
@@ -551,6 +665,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notificationsMarkAllRead => 'Mark all read';
+
+  @override
+  String get notificationsEmpty => 'You have no notifications';
 
   @override
   String get friendCardRemoveTooltip => 'Remove friend';
@@ -595,14 +712,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get weeklyReactionFriendsReactions => 'Your friends\' reactions';
 
   @override
+  String get weeklySummaryLastWeek => 'Last week';
+
+  @override
   String get techHealthTitle => 'Tech Health';
 
   @override
-  String get techHealthUnavailableTitle => 'Not available on this device';
+  String get techHealthUnavailableTitle => 'Not added on this platform yet';
 
   @override
   String get techHealthUnavailableBody =>
-      'Tech health needs usage-stats and accessibility permissions that only exist on Android. This feature isn\'t available on your system for now — it\'ll be there once you have the app installed on your phone.';
+      'Tech health needs to watch app usage and block apps in real time, which today is only wired up for Android. It\'s technically possible to add this for other platforms later, but that hasn\'t been built yet — for now this feature only works on Android.';
 
   @override
   String get techHealthPointDialogTitle => 'Tech health point';
@@ -614,6 +734,13 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get techHealthPointBannerLabel =>
       'Point available — tap to learn more';
+
+  @override
+  String get techHealthPointLostLabel => 'Point lost today — tap to learn more';
+
+  @override
+  String get techHealthPointLostBody =>
+      'You went over the limit on a restriction today, so you won\'t earn the extra point. Try again tomorrow.';
 
   @override
   String get techHealthRestrictionsTitle => 'Restrictions';
@@ -737,6 +864,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get rivalryFullRanking => 'FULL RANKING';
 
   @override
+  String get rivalryEmpty => 'Add friends to see the ranking';
+
+  @override
   String get progressTitle => 'Progress';
 
   @override
@@ -769,11 +899,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get friendsNoRequests => 'You have no pending requests';
 
   @override
+  String get friendsNoFriends => 'You don\'t have any friends yet';
+
+  @override
   String get remindersEmptyState => 'You have no reminders.\nAdd one!';
 
   @override
   String homeTasksTodayLabel(int completed, int total) {
     return '$completed/$total tasks today';
+  }
+
+  @override
+  String homeTasksLabel(int completed, int total) {
+    return '$completed/$total tasks';
   }
 
   @override
@@ -793,10 +931,23 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get timerPointEarned => 'Daily point earned';
+
+  @override
+  String get timerClosedAppWarning =>
+      'The timer pauses if you close or minimize the app';
+
+  @override
   String homeStepsProgressLabel(int percent) {
     return '$percent% steps';
   }
 
   @override
   String get homeTimerPending => 'Timer pending';
+
+  @override
+  String get trayOpen => 'Open';
+
+  @override
+  String get trayExit => 'Exit';
 }

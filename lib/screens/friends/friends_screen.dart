@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../components/cards/friend_card.dart';
-import '../../data/app_data.dart';
+import '../../core/data/models/app_friend.dart';
+import '../../features/friends/friends_notifier.dart';
+import '../../features/rivalry/ranking_notifier.dart';
 import '../../l10n/app_localizations.dart';
 import 'search_friends_screen.dart';
 
-class FriendsScreen extends StatefulWidget {
+class FriendsScreen extends ConsumerStatefulWidget {
   const FriendsScreen({super.key});
 
   @override
-  State<FriendsScreen> createState() => _FriendsScreenState();
+  ConsumerState<FriendsScreen> createState() => _FriendsScreenState();
 }
 
-class _FriendsScreenState extends State<FriendsScreen> with SingleTickerProviderStateMixin {
+class _FriendsScreenState extends ConsumerState<FriendsScreen> with SingleTickerProviderStateMixin {
   late final TabController _tabController = TabController(length: 2, vsync: this);
-
-  static const _friends = AppData.friends;
-  static const _requests = AppData.friendRequests;
 
   @override
   void dispose() {
@@ -28,6 +28,8 @@ class _FriendsScreenState extends State<FriendsScreen> with SingleTickerProvider
     final colors = Theme.of(context).colorScheme;
     final text = Theme.of(context).textTheme;
     final l10n = AppLocalizations.of(context);
+    final state = ref.watch(friendsNotifierProvider);
+    final requests = state.requests;
 
     return Scaffold(
       body: SafeArea(
@@ -60,15 +62,17 @@ class _FriendsScreenState extends State<FriendsScreen> with SingleTickerProvider
               indicatorColor: colors.primary,
               tabs: [
                 Tab(text: l10n.navAmigos),
-                Tab(text: _requests.isNotEmpty
-                    ? l10n.friendsRequestsTabCount(_requests.length)
-                    : l10n.friendsRequestsTab),
+                Tab(
+                  text: requests.isNotEmpty
+                      ? l10n.friendsRequestsTabCount(requests.length)
+                      : l10n.friendsRequestsTab,
+                ),
               ],
             ),
             Expanded(
               child: TabBarView(
                 controller: _tabController,
-                children: [_buildFriends(), _buildRequests(context)],
+                children: [_buildFriends(state), _buildRequests(context, requests)],
               ),
             ),
           ],
@@ -77,45 +81,58 @@ class _FriendsScreenState extends State<FriendsScreen> with SingleTickerProvider
     );
   }
 
-  Widget _buildFriends() {
-    return ListView.separated(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
-      itemCount: _friends.length,
-      separatorBuilder: (_, _) => const SizedBox(height: 12),
-      itemBuilder: (ctx, i) {
-        final f = _friends[i];
-        return FriendCard(
-          name: f.name,
-          email: f.email,
-          points: f.points,
-          streak: f.streak,
-          weeklyPoints: f.weeklyPoints,
-          weeklyTasks: f.weeklyTasks,
-          weeklySteps: f.weeklySteps,
-          weeklyStreak: f.weeklyStreak,
-          reactionSelected: f.reactionSelected,
-          onReact: (emoji) {},
-          onRemove: () {},
-        );
+  Widget _buildFriends(FriendsState state) {
+    if (state.friends.isEmpty) {
+      return Center(child: Text(AppLocalizations.of(context).friendsNoFriends));
+    }
+    return RefreshIndicator(
+      onRefresh: () async {
+        await ref.read(friendsNotifierProvider.notifier).refresh();
+        await ref.read(rankingNotifierProvider.notifier).refresh();
       },
+      child: ListView.separated(
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
+        itemCount: state.friends.length,
+        separatorBuilder: (_, _) => const SizedBox(height: 12),
+        itemBuilder: (ctx, i) {
+          final f = state.friends[i];
+          return FriendCard(
+            name: f.name,
+            email: f.username,
+            avatarUrl: f.avatarUrl,
+            points: f.points,
+            streak: f.streak,
+            weeklyPoints: f.weeklyPoints,
+            weeklyTasks: f.weeklyTasks,
+            weeklySteps: f.weeklySteps,
+            weeklyStreak: f.weeklyStreak,
+            reactionSelected: f.reactionSelected,
+            onReact: f.weeklySummaryId == null
+                ? null
+                : (emoji) => ref.read(friendsNotifierProvider.notifier).react(f, emoji),
+            onRemove: () => ref.read(friendsNotifierProvider.notifier).removeFriend(f.friendRowId),
+          );
+        },
+      ),
     );
   }
 
-  Widget _buildRequests(BuildContext context) {
-    if (_requests.isEmpty) {
+  Widget _buildRequests(BuildContext context, List<AppFriendRequest> requests) {
+    if (requests.isEmpty) {
       return Center(child: Text(AppLocalizations.of(context).friendsNoRequests));
     }
     return ListView.separated(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
-      itemCount: _requests.length,
+      itemCount: requests.length,
       separatorBuilder: (_, _) => const SizedBox(height: 12),
       itemBuilder: (ctx, i) {
-        final r = _requests[i];
+        final r = requests[i];
         return FriendRequestCard(
           name: r.name,
-          email: r.email,
-          onAccept: () {},
-          onDecline: () {},
+          email: r.username,
+          avatarUrl: r.avatarUrl,
+          onAccept: () => ref.read(friendsNotifierProvider.notifier).acceptRequest(r),
+          onDecline: () => ref.read(friendsNotifierProvider.notifier).declineRequest(r.requestId),
         );
       },
     );

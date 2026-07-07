@@ -78,7 +78,10 @@ class DayPilotSelectField<T> extends StatelessWidget {
           hintText: hint,
           prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
           suffixIcon: const Icon(Icons.expand_more_rounded),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: colors.outline),
+          ),
           filled: true,
           fillColor: colors.surfaceContainerHighest.withAlpha(80),
         ),

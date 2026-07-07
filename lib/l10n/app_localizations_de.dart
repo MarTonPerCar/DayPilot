@@ -144,6 +144,47 @@ class AppLocalizationsDe extends AppLocalizations {
       'Name, Benutzername, Region und Passwort';
 
   @override
+  String get settingsChangePhoto => 'Foto ändern';
+
+  @override
+  String get settingsChangePhotoPrompt =>
+      'Woher möchtest du das Foto auswählen?';
+
+  @override
+  String get settingsGallery => 'Galerie';
+
+  @override
+  String get settingsCamera => 'Kamera';
+
+  @override
+  String get settingsAdjustPhoto => 'Foto anpassen';
+
+  @override
+  String get settingsPersonalInfo => 'Persönliche Informationen';
+
+  @override
+  String get settingsSecurity => 'Sicherheit';
+
+  @override
+  String get settingsChangePassword => 'Passwort ändern';
+
+  @override
+  String get settingsNewPassword => 'Neues Passwort';
+
+  @override
+  String get settingsConfirmPassword => 'Passwort bestätigen';
+
+  @override
+  String get settingsPasswordMismatch => 'Die Passwörter stimmen nicht überein';
+
+  @override
+  String get settingsPasswordChanged => 'Passwort aktualisiert';
+
+  @override
+  String get settingsAvatarUploadError =>
+      'Foto konnte nicht hochgeladen werden';
+
+  @override
   String get settingsLanguage => 'Sprache';
 
   @override
@@ -526,6 +567,81 @@ class AppLocalizationsDe extends AppLocalizations {
   String get notifTypeAchievement => 'Erfolge';
 
   @override
+  String get notifTimeJustNow => 'gerade eben';
+
+  @override
+  String notifTimeMinutesAgo(int n) {
+    return 'vor $n Min.';
+  }
+
+  @override
+  String notifTimeHoursAgo(int n) {
+    return 'vor $n Std.';
+  }
+
+  @override
+  String get notifTimeYesterday => 'gestern';
+
+  @override
+  String notifTimeDaysAgo(int n) {
+    return 'vor $n Tagen';
+  }
+
+  @override
+  String get notifFriendRequestTitle => 'Neue Freundschaftsanfrage';
+
+  @override
+  String notifFriendRequestBody(String username) {
+    return '$username möchte mit dir befreundet sein.';
+  }
+
+  @override
+  String get notifFriendAcceptedTitle => 'Anfrage angenommen';
+
+  @override
+  String notifFriendAcceptedBody(String username) {
+    return '$username hat deine Freundschaftsanfrage angenommen.';
+  }
+
+  @override
+  String get notifReactionTitle => 'Neue Reaktion';
+
+  @override
+  String notifReactionBody(String username, String emoji) {
+    return '$username hat mit $emoji auf deine Wochenübersicht reagiert.';
+  }
+
+  @override
+  String get notifTimerDoneTitle => 'Timer abgeschlossen! ⏱';
+
+  @override
+  String get notifTimerDoneBody =>
+      'Du hast eine Fokus-Sitzung abgeschlossen und 10 Punkte verdient.';
+
+  @override
+  String get notifLevelUpTitle => 'Level aufgestiegen! 🏆';
+
+  @override
+  String notifLevelUpBody(int level) {
+    return 'Du bist jetzt Level $level. Weiter so!';
+  }
+
+  @override
+  String get notifStepsGoalTitle => 'Ziel erreicht! 🎉';
+
+  @override
+  String get notifStepsGoalBody =>
+      'Du hast dein Schrittziel erreicht (+30 Punkte).';
+
+  @override
+  String get notifTaskCompletedTitle => 'Aufgabe erledigt! ✅';
+
+  @override
+  String notifTaskCompletedBody(String title) {
+    return 'Du hast \"$title\" erledigt und 20 Punkte verdient.';
+  }
+
+  @override
   String get timerPause => 'Pausieren';
 
   @override
@@ -552,6 +668,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get notificationsMarkAllRead => 'Alle als gelesen markieren';
+
+  @override
+  String get notificationsEmpty => 'Du hast keine Benachrichtigungen';
 
   @override
   String get friendCardRemoveTooltip => 'Freund entfernen';
@@ -596,14 +715,18 @@ class AppLocalizationsDe extends AppLocalizations {
   String get weeklyReactionFriendsReactions => 'Reaktionen deiner Freunde';
 
   @override
+  String get weeklySummaryLastWeek => 'Letzte Woche';
+
+  @override
   String get techHealthTitle => 'Technische Gesundheit';
 
   @override
-  String get techHealthUnavailableTitle => 'Auf diesem Gerät nicht verfügbar';
+  String get techHealthUnavailableTitle =>
+      'Auf dieser Plattform noch nicht verfügbar';
 
   @override
   String get techHealthUnavailableBody =>
-      'Technische Gesundheit benötigt Berechtigungen für Nutzungsstatistiken und Bedienungshilfen, die nur unter Android existieren. Diese Funktion ist auf deinem System derzeit nicht verfügbar — sie steht zur Verfügung, sobald du die App auf dem Handy installiert hast.';
+      'Technische Gesundheit muss die App-Nutzung überwachen und Apps in Echtzeit blockieren — das ist bisher nur für Android umgesetzt. Es wäre technisch möglich, das auch für andere Plattformen zu bauen, wurde aber noch nicht gemacht — im Moment funktioniert diese Funktion nur unter Android.';
 
   @override
   String get techHealthPointDialogTitle => 'Punkt für technische Gesundheit';
@@ -615,6 +738,14 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get techHealthPointBannerLabel =>
       'Punkt verfügbar — tippen für mehr Infos';
+
+  @override
+  String get techHealthPointLostLabel =>
+      'Punkt heute verloren — tippen für mehr Infos';
+
+  @override
+  String get techHealthPointLostBody =>
+      'Du hast heute ein Limit überschritten und erhältst daher nicht den Extrapunkt. Versuch es morgen erneut.';
 
   @override
   String get techHealthRestrictionsTitle => 'Einschränkungen';
@@ -741,6 +872,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get rivalryFullRanking => 'GESAMTE RANGLISTE';
 
   @override
+  String get rivalryEmpty => 'Füge Freunde hinzu, um die Rangliste zu sehen';
+
+  @override
   String get progressTitle => 'Fortschritt';
 
   @override
@@ -773,12 +907,20 @@ class AppLocalizationsDe extends AppLocalizations {
   String get friendsNoRequests => 'Du hast keine ausstehenden Anfragen';
 
   @override
+  String get friendsNoFriends => 'Du hast noch keine Freunde';
+
+  @override
   String get remindersEmptyState =>
       'Du hast keine Erinnerungen.\nFüge eine hinzu!';
 
   @override
   String homeTasksTodayLabel(int completed, int total) {
     return '$completed/$total Aufgaben heute';
+  }
+
+  @override
+  String homeTasksLabel(int completed, int total) {
+    return '$completed/$total Aufgaben';
   }
 
   @override
@@ -798,10 +940,23 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get timerPointEarned => 'Tagespunkt erreicht';
+
+  @override
+  String get timerClosedAppWarning =>
+      'Der Timer pausiert, wenn du die App schließt oder minimierst';
+
+  @override
   String homeStepsProgressLabel(int percent) {
     return '$percent% Schritte';
   }
 
   @override
   String get homeTimerPending => 'Timer ausstehend';
+
+  @override
+  String get trayOpen => 'Öffnen';
+
+  @override
+  String get trayExit => 'Beenden';
 }

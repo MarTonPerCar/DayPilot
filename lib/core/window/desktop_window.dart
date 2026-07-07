@@ -6,6 +6,9 @@ import 'package:screen_retriever/screen_retriever.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
 
+import '../data/notification_l10n.dart';
+import '../../l10n/locale_notifier.dart';
+
 const Size mobileWindowSize = Size(390, 844);
 const double _screenEdgeMargin = 24;
 const Duration _popDuration = Duration(milliseconds: 220);
@@ -14,6 +17,11 @@ const Curve _popOutCurve = Curves.easeIn;
 
 bool get isDesktopPlatform =>
     !kIsWeb && (Platform.isLinux || Platform.isWindows || Platform.isMacOS);
+
+/// Set to true while a native OS dialog (file picker, etc.) is open, so the
+/// flyout's onWindowBlur doesn't mistake the resulting focus loss for the
+/// user dismissing the flyout.
+final isPickingFileNotifier = ValueNotifier<bool>(false);
 
 Future<void> initDesktopWindow() async {
   if (!isDesktopPlatform) return;
@@ -42,12 +50,22 @@ Future<void> initDesktopWindow() async {
         ? 'assets/images/tray_icon.ico'
         : 'assets/images/tray_icon.png',
   );
+
+  // Locale isn't restored from prefs until after this runs (see main.dart),
+  // and can change later from Settings — rebuild the menu on every change so
+  // it's never stuck showing the startup-default locale.
+  await _setTrayMenu();
+  dayPilotLocaleNotifier.addListener(_setTrayMenu);
+}
+
+Future<void> _setTrayMenu() async {
+  final l10n = currentL10n();
   await trayManager.setContextMenu(
     Menu(
       items: [
-        MenuItem(key: 'open_app', label: 'Abrir'),
+        MenuItem(key: 'open_app', label: l10n.trayOpen),
         MenuItem.separator(),
-        MenuItem(key: 'exit_app', label: 'Salir'),
+        MenuItem(key: 'exit_app', label: l10n.trayExit),
       ],
     ),
   );
@@ -121,6 +139,7 @@ class _DesktopFlyoutScopeState extends State<DesktopFlyoutScope>
 
   @override
   void onWindowBlur() {
+    if (isPickingFileNotifier.value) return;
     if (_contentVisible) _close();
   }
 

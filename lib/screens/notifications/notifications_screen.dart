@@ -1,35 +1,57 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../components/basic/top_bar.dart';
 import '../../components/cards/notification_card.dart';
-import '../../data/app_data.dart';
+import '../../core/data/models/app_notification_item.dart';
+import '../../features/notifications/notifications_notifier.dart';
 import '../../l10n/app_localizations.dart';
 
-class NotificationsScreen extends StatefulWidget {
+/// Maps the DB's fine-grained event type onto the shared UI category
+/// (icon/color/filter chip) used by NotificationCard.
+NotificationType _uiType(AppNotificationType type) => switch (type) {
+      AppNotificationType.friendRequest => NotificationType.social,
+      AppNotificationType.friendAccepted => NotificationType.social,
+      AppNotificationType.reaction => NotificationType.social,
+      AppNotificationType.levelUp => NotificationType.achievement,
+      AppNotificationType.streakRisk => NotificationType.streak,
+      AppNotificationType.stepsGoal => NotificationType.steps,
+      AppNotificationType.taskCompleted => NotificationType.task,
+      AppNotificationType.timerDone => NotificationType.task,
+      AppNotificationType.taskReminder => NotificationType.reminder,
+      AppNotificationType.dailySummary => NotificationType.reminder,
+    };
+
+String _relativeTime(AppLocalizations l10n, DateTime createdAt) {
+  final diff = DateTime.now().difference(createdAt);
+  if (diff.inMinutes < 1) return l10n.notifTimeJustNow;
+  if (diff.inMinutes < 60) return l10n.notifTimeMinutesAgo(diff.inMinutes);
+  if (diff.inHours < 24) return l10n.notifTimeHoursAgo(diff.inHours);
+  if (diff.inDays == 1) return l10n.notifTimeYesterday;
+  return l10n.notifTimeDaysAgo(diff.inDays);
+}
+
+class NotificationsScreen extends ConsumerStatefulWidget {
   const NotificationsScreen({super.key});
 
   @override
-  State<NotificationsScreen> createState() => _NotificationsScreenState();
+  ConsumerState<NotificationsScreen> createState() => _NotificationsScreenState();
 }
 
-class _NotificationsScreenState extends State<NotificationsScreen> {
+class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
   NotificationType? _filter;
-
-  static const _items = AppData.notifications;
-
-  List<AppNotification> get _filtered =>
-      _filter == null ? _items : _items.where((n) => n.type == _filter).toList();
 
   @override
   Widget build(BuildContext context) {
-    final items = _filtered;
     final l10n = AppLocalizations.of(context);
+    final items = ref.watch(notificationsNotifierProvider);
+    final filtered = _filter == null ? items : items.where((n) => _uiType(n.type) == _filter).toList();
 
     return Scaffold(
       appBar: DayPilotTopBarWithActions(
         title: l10n.navAvisos,
         actions: [
           TextButton(
-            onPressed: () {},
+            onPressed: () => ref.read(notificationsNotifierProvider.notifier).markAllAsRead(),
             child: Text(l10n.notificationsMarkAllRead),
           ),
         ],
@@ -59,22 +81,27 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             ),
           ),
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
-              itemCount: items.length,
-              itemBuilder: (ctx, i) {
-                final n = items[i];
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: NotificationCard(
-                    type: n.type,
-                    content: n.content,
-                    timestamp: n.time,
-                    read: n.read,
+            child: filtered.isEmpty
+                ? Center(child: Text(l10n.notificationsEmpty))
+                : ListView.builder(
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
+                    itemCount: filtered.length,
+                    itemBuilder: (ctx, i) {
+                      final n = filtered[i];
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: NotificationCard(
+                          type: _uiType(n.type),
+                          content: n.body,
+                          timestamp: _relativeTime(l10n, n.createdAt),
+                          read: n.isRead,
+                          onTap: n.isRead
+                              ? null
+                              : () => ref.read(notificationsNotifierProvider.notifier).markAsRead(n.id),
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
           ),
         ],
       ),

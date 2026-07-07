@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../features/notifications/notifications_notifier.dart';
 import '../l10n/app_localizations.dart';
 import 'home/home_screen.dart';
 import 'friends/friends_screen.dart';
 import 'notifications/notifications_screen.dart';
 import 'profile/profile_screen.dart';
 
-class MainShell extends StatefulWidget {
+class MainShell extends ConsumerStatefulWidget {
   const MainShell({super.key});
 
   @override
-  State<MainShell> createState() => _MainShellState();
+  ConsumerState<MainShell> createState() => _MainShellState();
 }
 
-class _MainShellState extends State<MainShell> {
+class _MainShellState extends ConsumerState<MainShell> {
   int _index = 0;
 
   static const _tabs = [
@@ -25,6 +27,7 @@ class _MainShellState extends State<MainShell> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final unreadCount = ref.watch(notificationsNotifierProvider).where((n) => !n.isRead).length;
 
     return Scaffold(
       body: IndexedStack(
@@ -46,8 +49,16 @@ class _MainShellState extends State<MainShell> {
             label: l10n.navAmigos,
           ),
           NavigationDestination(
-            icon: const Icon(Icons.notifications_outlined),
-            selectedIcon: const Icon(Icons.notifications_rounded),
+            icon: Badge.count(
+              count: unreadCount,
+              isLabelVisible: unreadCount > 0,
+              child: const Icon(Icons.notifications_outlined),
+            ),
+            selectedIcon: Badge.count(
+              count: unreadCount,
+              isLabelVisible: unreadCount > 0,
+              child: const Icon(Icons.notifications_rounded),
+            ),
             label: l10n.navAvisos,
           ),
           NavigationDestination(

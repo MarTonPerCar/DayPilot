@@ -5,6 +5,7 @@ import '../../core/data/models/app_task.dart';
 import '../../core/data/models/task_category.dart';
 import '../../core/data/models/task_difficulty.dart';
 import '../../core/data/repositories/providers.dart';
+import '../progress/progress_notifier.dart';
 import 'task_error.dart';
 import 'tasks_state.dart';
 
@@ -107,6 +108,9 @@ class TasksNotifier extends Notifier<TasksState> {
     try {
       await ref.read(taskRepositoryProvider).toggleTask(occurrenceId: occurrenceId, isDone: isDone);
       ref.read(tasksCacheProvider.notifier).state = state.tasks;
+      // Marking done can award points (see SupabaseTaskRepository) — refresh
+      // so Home/Progress reflect it without waiting for the periodic timer.
+      if (isDone) await ref.read(progressNotifierProvider.notifier).refresh();
     } catch (_) {
       state = state.copyWith(tasks: previous, errorType: TaskErrorType.toggle);
     }

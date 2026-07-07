@@ -5,6 +5,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'core/auth/auth_gate.dart';
+import 'core/prefs/app_prefs.dart';
 import 'core/window/desktop_window.dart';
 import 'l10n/app_localizations.dart';
 import 'l10n/locale_notifier.dart';
@@ -20,11 +21,34 @@ void main() async {
     publishableKey: env['SUPABASE_KEY'] as String,
   );
 
+  await _restorePersistedPreferences();
+
   runApp(
     const ProviderScope(
       child: DesktopFlyoutScope(child: DayPilotApp()),
     ),
   );
+}
+
+Future<void> _restorePersistedPreferences() async {
+  final prefs = await AppPrefs.load();
+
+  final theme = prefs.theme;
+  if (theme != null) {
+    dayPilotThemeNotifier.value = DayPilotTheme.values.byName(theme);
+  }
+  final themeMode = prefs.themeMode;
+  if (themeMode != null) {
+    dayPilotThemeModeNotifier.value = ThemeMode.values.byName(themeMode);
+  }
+  final locale = prefs.locale;
+  if (locale != null) {
+    dayPilotLocaleNotifier.value = Locale(locale);
+  }
+
+  dayPilotThemeNotifier.addListener(() => prefs.setTheme(dayPilotThemeNotifier.value.name));
+  dayPilotThemeModeNotifier.addListener(() => prefs.setThemeMode(dayPilotThemeModeNotifier.value.name));
+  dayPilotLocaleNotifier.addListener(() => prefs.setLocale(dayPilotLocaleNotifier.value.languageCode));
 }
 
 class DayPilotApp extends StatelessWidget {

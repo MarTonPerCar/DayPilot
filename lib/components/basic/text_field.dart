@@ -30,7 +30,11 @@ class DayPilotTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final border = OutlineInputBorder(borderRadius: BorderRadius.circular(12));
+    final colors = Theme.of(context).colorScheme;
+    final radius = BorderRadius.circular(12);
+    OutlineInputBorder side(Color color, [double width = 1]) =>
+        OutlineInputBorder(borderRadius: radius, borderSide: BorderSide(color: color, width: width));
+
     return TextFormField(
       controller: controller,
       keyboardType: keyboardType,
@@ -45,11 +49,11 @@ class DayPilotTextField extends StatelessWidget {
         suffixIcon: suffixIcon != null
             ? IconButton(icon: Icon(suffixIcon), onPressed: onSuffixTap)
             : null,
-        border: border,
-        enabledBorder: border,
-        focusedBorder: border,
-        errorBorder: border,
-        focusedErrorBorder: border,
+        border: side(colors.outline),
+        enabledBorder: side(colors.outline),
+        focusedBorder: side(colors.primary, 2),
+        errorBorder: side(colors.error),
+        focusedErrorBorder: side(colors.error, 2),
       ),
     );
   }
@@ -76,6 +80,11 @@ class _DayPilotPasswordFieldState extends State<DayPilotPasswordField> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final radius = BorderRadius.circular(12);
+    OutlineInputBorder side(Color color, [double width = 1]) =>
+        OutlineInputBorder(borderRadius: radius, borderSide: BorderSide(color: color, width: width));
+
     return TextFormField(
       controller: widget.controller,
       obscureText: _obscure,
@@ -91,7 +100,11 @@ class _DayPilotPasswordFieldState extends State<DayPilotPasswordField> {
           ),
           onPressed: () => setState(() => _obscure = !_obscure),
         ),
-        border: const OutlineInputBorder(),
+        border: side(colors.outline),
+        enabledBorder: side(colors.outline),
+        focusedBorder: side(colors.primary, 2),
+        errorBorder: side(colors.error),
+        focusedErrorBorder: side(colors.error, 2),
       ),
     );
   }

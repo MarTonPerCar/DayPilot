@@ -47,6 +47,19 @@
   "settingsStreakAlertSubtitle": "Aviso a las 22h si no has abierto la app",
   "settingsEditProfile": "Editar perfil",
   "settingsEditProfileSubtitle": "Nombre, usuario, región y contraseña",
+  "settingsChangePhoto": "Cambiar foto",
+  "settingsChangePhotoPrompt": "¿Desde dónde quieres elegir la foto?",
+  "settingsGallery": "Galería",
+  "settingsCamera": "Cámara",
+  "settingsAdjustPhoto": "Ajustar foto",
+  "settingsPersonalInfo": "Información personal",
+  "settingsSecurity": "Seguridad",
+  "settingsChangePassword": "Cambiar contraseña",
+  "settingsNewPassword": "Nueva contraseña",
+  "settingsConfirmPassword": "Confirmar contraseña",
+  "settingsPasswordMismatch": "Las contraseñas no coinciden",
+  "settingsPasswordChanged": "Contraseña actualizada",
+  "settingsAvatarUploadError": "No se pudo subir la foto",
   "settingsLanguage": "Idioma",
   "settingsChooseLanguage": "Elige un idioma",
   "settingsDeveloper": "Desarrollador",
@@ -201,6 +214,34 @@
   "notifTypeStreak": "Racha",
   "notifTypeReminder": "Recordatorios",
   "notifTypeAchievement": "Logros",
+  "notifTimeJustNow": "ahora mismo",
+  "notifTimeMinutesAgo": "hace {n} min",
+  "@notifTimeMinutesAgo": {"placeholders": {"n": {"type": "int"}}},
+  "notifTimeHoursAgo": "hace {n} h",
+  "@notifTimeHoursAgo": {"placeholders": {"n": {"type": "int"}}},
+  "notifTimeYesterday": "ayer",
+  "notifTimeDaysAgo": "hace {n} días",
+  "@notifTimeDaysAgo": {"placeholders": {"n": {"type": "int"}}},
+
+  "notifFriendRequestTitle": "Nueva solicitud de amistad",
+  "notifFriendRequestBody": "{username} quiere ser tu amigo.",
+  "@notifFriendRequestBody": {"placeholders": {"username": {"type": "String"}}},
+  "notifFriendAcceptedTitle": "Solicitud aceptada",
+  "notifFriendAcceptedBody": "{username} aceptó tu solicitud de amistad.",
+  "@notifFriendAcceptedBody": {"placeholders": {"username": {"type": "String"}}},
+  "notifReactionTitle": "Nueva reacción",
+  "notifReactionBody": "{username} reaccionó a tu resumen semanal con {emoji}.",
+  "@notifReactionBody": {"placeholders": {"username": {"type": "String"}, "emoji": {"type": "String"}}},
+  "notifTimerDoneTitle": "¡Temporizador completado! ⏱",
+  "notifTimerDoneBody": "Has completado una sesión de concentración y ganado 10 pts.",
+  "notifLevelUpTitle": "¡Subiste de nivel! 🏆",
+  "notifLevelUpBody": "Ahora eres nivel {level}. ¡Sigue así!",
+  "@notifLevelUpBody": {"placeholders": {"level": {"type": "int"}}},
+  "notifStepsGoalTitle": "¡Objetivo completado! 🎉",
+  "notifStepsGoalBody": "Has alcanzado tu objetivo de pasos (+30 pts).",
+  "notifTaskCompletedTitle": "¡Tarea completada! ✅",
+  "notifTaskCompletedBody": "Completaste \"{title}\" y ganaste 20 pts.",
+  "@notifTaskCompletedBody": {"placeholders": {"title": {"type": "String"}}},
 
   "timerPause": "Pausar",
 
@@ -214,6 +255,7 @@
   "@stepsPendingGoal": {"placeholders": {"goal": {"type": "int"}}},
 
   "notificationsMarkAllRead": "Leer todo",
+  "notificationsEmpty": "No tienes avisos",
 
   "friendCardRemoveTooltip": "Eliminar amigo",
   "friendCardNoActivity": "Sin actividad la semana pasada",
@@ -232,13 +274,16 @@
   "dailySummaryAmongFriends": "entre amigos",
 
   "weeklyReactionFriendsReactions": "Reacciones de tus amigos",
+  "weeklySummaryLastWeek": "Semana pasada",
 
   "techHealthTitle": "Salud Tecnológica",
-  "techHealthUnavailableTitle": "No disponible en este dispositivo",
-  "techHealthUnavailableBody": "La salud tecnológica necesita permisos de estadísticas de uso y accesibilidad que solo existen en Android. Por ahora esta función no está disponible en tu sistema — llegará cuando tengas la app instalada en el móvil.",
+  "techHealthUnavailableTitle": "Aún no añadido en esta plataforma",
+  "techHealthUnavailableBody": "La salud tecnológica necesita vigilar el uso de apps y bloquearlas en tiempo real, algo que por ahora solo está implementado en Android. Añadirlo en otras plataformas es técnicamente posible, pero todavía no se ha hecho — por ahora esta función solo funciona en Android.",
   "techHealthPointDialogTitle": "Punto de salud tecnológica",
   "techHealthPointDialogBody": "Activa al menos 3 restricciones y no superes ningún límite durante el día. Si lo consigues, ganarás 10 puntos extra que se sumarán a tus puntos de mañana.",
   "techHealthPointBannerLabel": "Punto obtenible — toca para saber más",
+  "techHealthPointLostLabel": "Punto perdido hoy — toca para saber más",
+  "techHealthPointLostBody": "Has superado el límite de alguna restricción hoy, así que no ganarás el punto extra. Vuelve a intentarlo mañana.",
   "techHealthRestrictionsTitle": "Restricciones",
   "techHealthRestrictionsCount": "{n} en total",
   "@techHealthRestrictionsCount": {"placeholders": {"n": {"type": "int"}}},
@@ -282,6 +327,7 @@
   "rivalryTitle": "Rivalidad",
   "rivalryPointsThisMonth": "Puntos de este mes",
   "rivalryFullRanking": "CLASIFICACIÓN COMPLETA",
+  "rivalryEmpty": "Añade amigos para ver la clasificación",
 
   "progressTitle": "Progreso",
 
@@ -296,11 +342,14 @@
   "friendsRequestsTabCount": "Solicitudes ({n})",
   "@friendsRequestsTabCount": {"placeholders": {"n": {"type": "int"}}},
   "friendsNoRequests": "No tienes solicitudes pendientes",
+  "friendsNoFriends": "Aún no tienes amigos",
 
   "remindersEmptyState": "No tienes recordatorios.\n¡Añade uno!",
 
   "homeTasksTodayLabel": "{completed}/{total} tareas hoy",
   "@homeTasksTodayLabel": {"placeholders": {"completed": {"type": "int"}, "total": {"type": "int"}}},
+  "homeTasksLabel": "{completed}/{total} tareas",
+  "@homeTasksLabel": {"placeholders": {"completed": {"type": "int"}, "total": {"type": "int"}}},
 
   "searchFriendsTitle": "Buscar amigos",
   "searchFriendsHint": "Buscar por nombre o email",
@@ -309,8 +358,13 @@
   "@timerSessionOf": {"placeholders": {"current": {"type": "int"}, "total": {"type": "int"}}},
   "timerPhaseMinutes": "{min} min {phase}",
   "@timerPhaseMinutes": {"placeholders": {"min": {"type": "int"}, "phase": {"type": "String"}}},
+  "timerPointEarned": "Punto del día conseguido",
+  "timerClosedAppWarning": "El temporizador se pausa si cierras o minimizas la app",
 
   "homeStepsProgressLabel": "{percent}% pasos",
   "@homeStepsProgressLabel": {"placeholders": {"percent": {"type": "int"}}},
-  "homeTimerPending": "Cronómetro pendiente"
+  "homeTimerPending": "Cronómetro pendiente",
+
+  "trayOpen": "Abrir",
+  "trayExit": "Salir"
 }

@@ -144,6 +144,46 @@ class AppLocalizationsEs extends AppLocalizations {
       'Nombre, usuario, región y contraseña';
 
   @override
+  String get settingsChangePhoto => 'Cambiar foto';
+
+  @override
+  String get settingsChangePhotoPrompt =>
+      '¿Desde dónde quieres elegir la foto?';
+
+  @override
+  String get settingsGallery => 'Galería';
+
+  @override
+  String get settingsCamera => 'Cámara';
+
+  @override
+  String get settingsAdjustPhoto => 'Ajustar foto';
+
+  @override
+  String get settingsPersonalInfo => 'Información personal';
+
+  @override
+  String get settingsSecurity => 'Seguridad';
+
+  @override
+  String get settingsChangePassword => 'Cambiar contraseña';
+
+  @override
+  String get settingsNewPassword => 'Nueva contraseña';
+
+  @override
+  String get settingsConfirmPassword => 'Confirmar contraseña';
+
+  @override
+  String get settingsPasswordMismatch => 'Las contraseñas no coinciden';
+
+  @override
+  String get settingsPasswordChanged => 'Contraseña actualizada';
+
+  @override
+  String get settingsAvatarUploadError => 'No se pudo subir la foto';
+
+  @override
   String get settingsLanguage => 'Idioma';
 
   @override
@@ -526,6 +566,81 @@ class AppLocalizationsEs extends AppLocalizations {
   String get notifTypeAchievement => 'Logros';
 
   @override
+  String get notifTimeJustNow => 'ahora mismo';
+
+  @override
+  String notifTimeMinutesAgo(int n) {
+    return 'hace $n min';
+  }
+
+  @override
+  String notifTimeHoursAgo(int n) {
+    return 'hace $n h';
+  }
+
+  @override
+  String get notifTimeYesterday => 'ayer';
+
+  @override
+  String notifTimeDaysAgo(int n) {
+    return 'hace $n días';
+  }
+
+  @override
+  String get notifFriendRequestTitle => 'Nueva solicitud de amistad';
+
+  @override
+  String notifFriendRequestBody(String username) {
+    return '$username quiere ser tu amigo.';
+  }
+
+  @override
+  String get notifFriendAcceptedTitle => 'Solicitud aceptada';
+
+  @override
+  String notifFriendAcceptedBody(String username) {
+    return '$username aceptó tu solicitud de amistad.';
+  }
+
+  @override
+  String get notifReactionTitle => 'Nueva reacción';
+
+  @override
+  String notifReactionBody(String username, String emoji) {
+    return '$username reaccionó a tu resumen semanal con $emoji.';
+  }
+
+  @override
+  String get notifTimerDoneTitle => '¡Temporizador completado! ⏱';
+
+  @override
+  String get notifTimerDoneBody =>
+      'Has completado una sesión de concentración y ganado 10 pts.';
+
+  @override
+  String get notifLevelUpTitle => '¡Subiste de nivel! 🏆';
+
+  @override
+  String notifLevelUpBody(int level) {
+    return 'Ahora eres nivel $level. ¡Sigue así!';
+  }
+
+  @override
+  String get notifStepsGoalTitle => '¡Objetivo completado! 🎉';
+
+  @override
+  String get notifStepsGoalBody =>
+      'Has alcanzado tu objetivo de pasos (+30 pts).';
+
+  @override
+  String get notifTaskCompletedTitle => '¡Tarea completada! ✅';
+
+  @override
+  String notifTaskCompletedBody(String title) {
+    return 'Completaste \"$title\" y ganaste 20 pts.';
+  }
+
+  @override
   String get timerPause => 'Pausar';
 
   @override
@@ -552,6 +667,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get notificationsMarkAllRead => 'Leer todo';
+
+  @override
+  String get notificationsEmpty => 'No tienes avisos';
 
   @override
   String get friendCardRemoveTooltip => 'Eliminar amigo';
@@ -596,14 +714,17 @@ class AppLocalizationsEs extends AppLocalizations {
   String get weeklyReactionFriendsReactions => 'Reacciones de tus amigos';
 
   @override
+  String get weeklySummaryLastWeek => 'Semana pasada';
+
+  @override
   String get techHealthTitle => 'Salud Tecnológica';
 
   @override
-  String get techHealthUnavailableTitle => 'No disponible en este dispositivo';
+  String get techHealthUnavailableTitle => 'Aún no añadido en esta plataforma';
 
   @override
   String get techHealthUnavailableBody =>
-      'La salud tecnológica necesita permisos de estadísticas de uso y accesibilidad que solo existen en Android. Por ahora esta función no está disponible en tu sistema — llegará cuando tengas la app instalada en el móvil.';
+      'La salud tecnológica necesita vigilar el uso de apps y bloquearlas en tiempo real, algo que por ahora solo está implementado en Android. Añadirlo en otras plataformas es técnicamente posible, pero todavía no se ha hecho — por ahora esta función solo funciona en Android.';
 
   @override
   String get techHealthPointDialogTitle => 'Punto de salud tecnológica';
@@ -615,6 +736,14 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get techHealthPointBannerLabel =>
       'Punto obtenible — toca para saber más';
+
+  @override
+  String get techHealthPointLostLabel =>
+      'Punto perdido hoy — toca para saber más';
+
+  @override
+  String get techHealthPointLostBody =>
+      'Has superado el límite de alguna restricción hoy, así que no ganarás el punto extra. Vuelve a intentarlo mañana.';
 
   @override
   String get techHealthRestrictionsTitle => 'Restricciones';
@@ -739,6 +868,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get rivalryFullRanking => 'CLASIFICACIÓN COMPLETA';
 
   @override
+  String get rivalryEmpty => 'Añade amigos para ver la clasificación';
+
+  @override
   String get progressTitle => 'Progreso';
 
   @override
@@ -771,11 +903,19 @@ class AppLocalizationsEs extends AppLocalizations {
   String get friendsNoRequests => 'No tienes solicitudes pendientes';
 
   @override
+  String get friendsNoFriends => 'Aún no tienes amigos';
+
+  @override
   String get remindersEmptyState => 'No tienes recordatorios.\n¡Añade uno!';
 
   @override
   String homeTasksTodayLabel(int completed, int total) {
     return '$completed/$total tareas hoy';
+  }
+
+  @override
+  String homeTasksLabel(int completed, int total) {
+    return '$completed/$total tareas';
   }
 
   @override
@@ -795,10 +935,23 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get timerPointEarned => 'Punto del día conseguido';
+
+  @override
+  String get timerClosedAppWarning =>
+      'El temporizador se pausa si cierras o minimizas la app';
+
+  @override
   String homeStepsProgressLabel(int percent) {
     return '$percent% pasos';
   }
 
   @override
   String get homeTimerPending => 'Cronómetro pendiente';
+
+  @override
+  String get trayOpen => 'Abrir';
+
+  @override
+  String get trayExit => 'Salir';
 }

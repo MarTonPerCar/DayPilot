@@ -3,12 +3,18 @@ import '../../data/app_data.dart';
 import '../../l10n/app_localizations.dart';
 import '../basic/quick_pick_chip.dart';
 import '../basic/sheet_handle.dart';
-import '../basic/text_field.dart';
 import 'dotted_slider.dart';
 
+/// Groups aren't synced to Supabase in the Android reference app either
+/// (tech_health_group_config exists in the schema but nothing writes to it
+/// yet), so this only supports creating single-app restrictions for now.
 Future<void> showAddRestrictionSheet(
   BuildContext context, {
-  required void Function(TechRestriction restriction) onCreate,
+  required Future<void> Function({
+    required String appPackage,
+    required String appName,
+    required int limitMinutes,
+  }) onCreate,
 }) {
   return showModalBottomSheet(
     context: context,
@@ -20,72 +26,51 @@ Future<void> showAddRestrictionSheet(
   );
 }
 
-Future<List<int>?> _showAppPicker(BuildContext context, {required bool multi}) {
+Future<int?> _showAppPicker(BuildContext context) {
   final apps = AppData.mockInstallableApps;
-  final selected = <int>{};
-  return showModalBottomSheet<List<int>>(
+  return showModalBottomSheet<int>(
     context: context,
     isScrollControlled: true,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
     ),
     builder: (context) {
-      return StatefulBuilder(
-        builder: (context, setState) {
-          final l10n = AppLocalizations.of(context);
-          return SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    child: Text(
-                      multi ? l10n.restrictionPickApps : l10n.restrictionPickApp,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
-                    ),
-                  ),
-                  ...List.generate(apps.length, (i) {
-                    final (name, icon, color) = apps[i];
-                    final isSelected = selected.contains(i);
-                    return ListTile(
-                      leading: CircleAvatar(backgroundColor: color.withAlpha(40), child: Icon(icon, color: color)),
-                      title: Text(name),
-                      trailing: multi ? Checkbox(value: isSelected, onChanged: (_) {
-                        setState(() => isSelected ? selected.remove(i) : selected.add(i));
-                      }) : null,
-                      onTap: () {
-                        if (multi) {
-                          setState(() => isSelected ? selected.remove(i) : selected.add(i));
-                        } else {
-                          Navigator.pop(context, [i]);
-                        }
-                      },
-                    );
-                  }),
-                  if (multi) ...[
-                    const SizedBox(height: 8),
-                    SizedBox(
-                      width: double.infinity,
-                      child: FilledButton(
-                        onPressed: selected.isEmpty ? null : () => Navigator.pop(context, selected.toList()),
-                        child: Text(l10n.restrictionDone),
-                      ),
-                    ),
-                  ],
-                ],
+      final l10n = AppLocalizations.of(context);
+      return SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                child: Text(
+                  l10n.restrictionPickApp,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+                ),
               ),
-            ),
-          );
-        },
+              ...List.generate(apps.length, (i) {
+                final (name, icon, color) = apps[i];
+                return ListTile(
+                  leading: CircleAvatar(backgroundColor: color.withAlpha(40), child: Icon(icon, color: color)),
+                  title: Text(name),
+                  onTap: () => Navigator.pop(context, i),
+                );
+              }),
+            ],
+          ),
+        ),
       );
     },
   );
 }
 
 class _RestrictionFormSheet extends StatefulWidget {
-  final void Function(TechRestriction restriction) onCreate;
+  final Future<void> Function({
+    required String appPackage,
+    required String appName,
+    required int limitMinutes,
+  }) onCreate;
   const _RestrictionFormSheet({required this.onCreate});
 
   @override
@@ -93,20 +78,15 @@ class _RestrictionFormSheet extends StatefulWidget {
 }
 
 class _RestrictionFormSheetState extends State<_RestrictionFormSheet> {
-  RestrictionType _type = RestrictionType.app;
-  final _groupNameCtrl = TextEditingController();
   int? _selectedAppIndex;
-  final List<int> _selectedGroupApps = [];
   int _limitMinutes = 60;
+  bool _saving = false;
 
-  bool get _appRange => _type == RestrictionType.app;
-  double get _min => _appRange ? 30 : 90;
-  double get _max => _appRange ? 360 : 600;
-  List<int> get _quickOptions => _appRange ? [30, 60, 120, 360] : [90, 120, 240, 600];
+  static const _min = 30.0;
+  static const _max = 360.0;
+  static const _quickOptions = [30, 60, 120, 360];
 
-  bool get _canCreate => _type == RestrictionType.app
-      ? _selectedAppIndex != null
-      : _groupNameCtrl.text.trim().isNotEmpty && _selectedGroupApps.isNotEmpty;
+  bool get _canCreate => _selectedAppIndex != null && !_saving;
 
   String _fmt(int minutes) {
     if (minutes < 60) return '${minutes}m';
@@ -114,39 +94,18 @@ class _RestrictionFormSheetState extends State<_RestrictionFormSheet> {
     return '${h % 1 == 0 ? h.toStringAsFixed(0) : h.toStringAsFixed(1)}h';
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     if (!_canCreate) return;
     final apps = AppData.mockInstallableApps;
-    if (_type == RestrictionType.app) {
-      final (name, icon, color) = apps[_selectedAppIndex!];
-      widget.onCreate(TechRestriction(
-        id: DateTime.now().microsecondsSinceEpoch.toString(),
-        name: name,
-        identifier: 'com.demo.${name.toLowerCase()}',
-        icon: icon,
-        color: color,
-        usedMinutesToday: 0,
-        limitMinutes: _limitMinutes,
-      ));
-    } else {
-      widget.onCreate(TechRestriction(
-        id: DateTime.now().microsecondsSinceEpoch.toString(),
-        name: _groupNameCtrl.text.trim(),
-        identifier: '${_selectedGroupApps.length} apps',
-        icon: Icons.folder_rounded,
-        color: Theme.of(context).colorScheme.primary,
-        type: RestrictionType.group,
-        usedMinutesToday: 0,
-        limitMinutes: _limitMinutes,
-      ));
-    }
+    final (name, _, _) = apps[_selectedAppIndex!];
+    setState(() => _saving = true);
+    await widget.onCreate(
+      appPackage: 'com.demo.${name.toLowerCase().replaceAll(' ', '')}',
+      appName: name,
+      limitMinutes: _limitMinutes,
+    );
+    if (!mounted) return;
     Navigator.pop(context);
-  }
-
-  @override
-  void dispose() {
-    _groupNameCtrl.dispose();
-    super.dispose();
   }
 
   @override
@@ -168,72 +127,18 @@ class _RestrictionFormSheetState extends State<_RestrictionFormSheet> {
               const DayPilotSheetHandle(),
               const SizedBox(height: 20),
               Text(l10n.restrictionNewTitle, style: text.titleLarge?.copyWith(fontWeight: FontWeight.w700)),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: QuickPickChip(
-                      label: l10n.techRestrictionTypeApp,
-                      selected: _type == RestrictionType.app,
-                      onTap: () => setState(() {
-                        _type = RestrictionType.app;
-                        _limitMinutes = 60;
-                      }),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: QuickPickChip(
-                      label: l10n.techRestrictionTypeGroup,
-                      selected: _type == RestrictionType.group,
-                      onTap: () => setState(() {
-                        _type = RestrictionType.group;
-                        _limitMinutes = 90;
-                      }),
-                    ),
-                  ),
-                ],
-              ),
               const SizedBox(height: 20),
-              if (_type == RestrictionType.app) ...[
-                Text(l10n.restrictionApplication, style: text.bodyMedium?.copyWith(color: colors.onSurfaceVariant)),
-                const SizedBox(height: 8),
-                OutlinedButton.icon(
-                  onPressed: () async {
-                    final result = await _showAppPicker(context, multi: false);
-                    if (result != null) setState(() => _selectedAppIndex = result.first);
-                  },
-                  icon: const Icon(Icons.smartphone_rounded, size: 18),
-                  label: Text(_selectedAppIndex == null ? l10n.restrictionPickApp : apps[_selectedAppIndex!].$1),
-                  style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(48)),
-                ),
-              ] else ...[
-                DayPilotTextField(
-                  controller: _groupNameCtrl,
-                  label: l10n.restrictionGroupName,
-                  onChanged: (_) => setState(() {}),
-                ),
-                const SizedBox(height: 16),
-                Text(l10n.restrictionGroupApps, style: text.bodyMedium?.copyWith(color: colors.onSurfaceVariant)),
-                const SizedBox(height: 8),
-                OutlinedButton.icon(
-                  onPressed: () async {
-                    final result = await _showAppPicker(context, multi: true);
-                    if (result != null) {
-                      setState(() {
-                        _selectedGroupApps
-                          ..clear()
-                          ..addAll(result);
-                      });
-                    }
-                  },
-                  icon: const Icon(Icons.add_rounded, size: 18),
-                  label: Text(_selectedGroupApps.isEmpty
-                      ? l10n.restrictionPickApps
-                      : l10n.restrictionAppsSelected(_selectedGroupApps.length)),
-                  style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(48)),
-                ),
-              ],
+              Text(l10n.restrictionApplication, style: text.bodyMedium?.copyWith(color: colors.onSurfaceVariant)),
+              const SizedBox(height: 8),
+              OutlinedButton.icon(
+                onPressed: () async {
+                  final result = await _showAppPicker(context);
+                  if (result != null) setState(() => _selectedAppIndex = result);
+                },
+                icon: const Icon(Icons.smartphone_rounded, size: 18),
+                label: Text(_selectedAppIndex == null ? l10n.restrictionPickApp : apps[_selectedAppIndex!].$1),
+                style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(48)),
+              ),
               const SizedBox(height: 20),
               Text(
                 l10n.restrictionDailyLimitRange(_fmt(_min.toInt()), _fmt(_max.toInt())),
@@ -276,7 +181,9 @@ class _RestrictionFormSheetState extends State<_RestrictionFormSheet> {
                   Expanded(
                     child: FilledButton(
                       onPressed: _canCreate ? _submit : null,
-                      child: Text(l10n.commonCreate),
+                      child: _saving
+                          ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
+                          : Text(l10n.commonCreate),
                     ),
                   ),
                 ],

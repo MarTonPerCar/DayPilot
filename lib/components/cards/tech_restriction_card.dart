@@ -99,13 +99,21 @@ class TechRestrictionCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  l10n.techRestrictionUsageToday(restriction.usedMinutesToday, restriction.limitMinutes),
-                  style: text.labelMedium?.copyWith(color: over ? colors.error : colors.onSurfaceVariant),
+                Flexible(
+                  child: Text(
+                    l10n.techRestrictionUsageToday(restriction.usedMinutesToday, restriction.limitMinutes),
+                    style: text.labelMedium?.copyWith(color: over ? colors.error : colors.onSurfaceVariant),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-                Text(
-                  l10n.techRestrictionNotifyEvery(restriction.notifyIntervalSeconds),
-                  style: text.labelMedium?.copyWith(color: colors.onSurfaceVariant),
+                const SizedBox(width: 8),
+                Flexible(
+                  child: Text(
+                    l10n.techRestrictionNotifyEvery(restriction.notifyIntervalSeconds),
+                    style: text.labelMedium?.copyWith(color: colors.onSurfaceVariant),
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.end,
+                  ),
                 ),
               ],
             ),

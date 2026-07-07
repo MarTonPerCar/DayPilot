@@ -1,67 +1,6 @@
 // Placeholder: sustituir por llamadas reales cuando haya backend.
 
 import 'package:flutter/material.dart';
-import '../components/cards/notification_card.dart';
-import '../components/cards/weekly_reaction_card.dart';
-
-class AppFriend {
-  final String name;
-  final String email;
-  final int points;
-  final int streak;
-  final int? weeklyPoints;
-  final int? weeklyTasks;
-  final int? weeklySteps;
-  final int? weeklyStreak;
-  final String? reactionSelected;
-
-  const AppFriend(
-    this.name,
-    this.email,
-    this.points,
-    this.streak, {
-    this.weeklyPoints,
-    this.weeklyTasks,
-    this.weeklySteps,
-    this.weeklyStreak,
-    this.reactionSelected,
-  });
-}
-
-class AppFriendRequest {
-  final String name;
-  final String email;
-  const AppFriendRequest(this.name, this.email);
-}
-
-class AppSearchResult {
-  final String name;
-  final String email;
-  final bool isFriend;
-  final bool isPending;
-  const AppSearchResult(this.name, this.email, this.isFriend, this.isPending);
-}
-
-class AppNotification {
-  final NotificationType type;
-  final String content;
-  final String time;
-  final bool read;
-  const AppNotification({
-    required this.type,
-    required this.content,
-    required this.time,
-    required this.read,
-  });
-}
-
-class AppRankingUser {
-  final String name;
-  final int points;
-  final int streak;
-  final bool isCurrentUser;
-  const AppRankingUser(this.name, this.points, this.streak, this.isCurrentUser);
-}
 
 enum TimerMode { pomodoro, fixed, custom }
 
@@ -138,23 +77,8 @@ class TechRestriction {
 class AppData {
   AppData._();
 
-  static const currentUserName = 'Mario García';
-  static const currentUserUsername = 'mario_garcia';
-  static const currentUserEmail = 'unNobleXD@hotmail.com';
-  static const currentUserMemberSince = 'jun 2024';
-  static const currentUserLevel = 8;
-  static const currentUserXp = 640;
-  static const currentUserXpToNextLevel = 1000;
-  static const currentUserTotalPoints = 12840;
-  static const currentUserStreak = 12;
-  static const currentUserBestStreak = 18;
-
   static const stepsToday = 7432;
   static const stepsGoal = 10000;
-  static const tasksCompletedToday = 5;
-  static const tasksTotalToday = 8;
-  static const pointsToday = 237;
-  static const rankingPositionToday = 4;
   static const pointsTodayFromTasks = 120;
   static const pointsTodayFromSteps = 62;
   static const pointsTodayFromHabits = 35;
@@ -172,96 +96,6 @@ class AppData {
   ];
   static const List<int> last30DaysLabels = [
     1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
-  ];
-
-  static const lastWeekLabel = 'Semana pasada';
-  static const lastWeekPoints = 1640;
-  static const lastWeekSteps = 58200;
-  static const lastWeekTasks = 34;
-  static const lastWeekStreak = 6;
-  static const lastWeekReactions = [
-    WeeklyReaction(name: 'Ana López', emoji: '🔥'),
-    WeeklyReaction(name: 'Carlos Ruiz', emoji: '👍'),
-    WeeklyReaction(name: 'Lucía Fdez', emoji: '⭐'),
-  ];
-
-  static const List<double> homeWeeklyPointsTrend = [120, 180, 95, 210, 160, 240, 237];
-  static int get homeStepsProgressPercent =>
-      stepsGoal > 0 ? ((stepsToday / stepsGoal) * 100).round() : 0;
-  static const homeRivalryPosition = 2;
-  static const homeRivalryTotal = 4;
-
-  static const friends = [
-    AppFriend('Carlos Ruiz', 'carlos.ruiz@daypilot.test', 80, 1,
-        weeklyPoints: 145,
-        weeklyTasks: 11,
-        weeklySteps: 22878,
-        weeklyStreak: 5,
-        reactionSelected: '👏'),
-    AppFriend('María López', 'maria.lopez@daypilot.test', 200, 4,
-        weeklyPoints: 262, weeklyTasks: 17, weeklySteps: 30569, weeklyStreak: 4),
-    AppFriend('Lucía Fernández', 'lucia.fernandez@daypilot.test', 430, 1,
-        weeklyPoints: 401,
-        weeklyTasks: 30,
-        weeklySteps: 52111,
-        weeklyStreak: 20,
-        reactionSelected: '🔥'),
-  ];
-
-  static const friendRequests = [
-    AppFriendRequest('Sofía Martín', 'sofia.martin@daypilot.test'),
-  ];
-
-  static const friendSearchResults = [
-    AppSearchResult('Elena Vega', 'elena.vega@daypilot.test', false, false),
-    AppSearchResult('Pedro Gómez', 'pedro.gomez@daypilot.test', false, false),
-    AppSearchResult('Javier Prieto', 'javier.prieto@daypilot.test', false, true),
-  ];
-
-  static const notifications = [
-    AppNotification(
-      type: NotificationType.achievement,
-      content: 'Nuevo logro desbloqueado: 7 días seguidos de actividad.',
-      time: 'hace 5 min',
-      read: false,
-    ),
-    AppNotification(
-      type: NotificationType.social,
-      content: 'sofia_mn quiere ser tu amiga.',
-      time: 'hace 1 h',
-      read: false,
-    ),
-    AppNotification(
-      type: NotificationType.task,
-      content: 'Revisar documentación de Flutter venció ayer.',
-      time: 'ayer',
-      read: true,
-    ),
-    AppNotification(
-      type: NotificationType.streak,
-      content: 'Tu racha de 12 días está en riesgo, completa una tarea hoy.',
-      time: 'ayer',
-      read: true,
-    ),
-    AppNotification(
-      type: NotificationType.steps,
-      content: 'Completaste tus 10 000 pasos diarios.',
-      time: 'hace 2 días',
-      read: true,
-    ),
-    AppNotification(
-      type: NotificationType.reminder,
-      content: 'Tu sesión de Pomodoro empieza en 10 minutos.',
-      time: 'hace 3 días',
-      read: true,
-    ),
-  ];
-
-  static const rankingUsers = [
-    AppRankingUser('Lucía Fernández', 430, 1, false),
-    AppRankingUser('Mario García', 320, 12, true),
-    AppRankingUser('María López', 200, 4, false),
-    AppRankingUser('Carlos Ruiz', 80, 1, false),
   ];
 
   static const timerPresets = [

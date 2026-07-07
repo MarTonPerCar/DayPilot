@@ -47,6 +47,19 @@
   "settingsStreakAlertSubtitle": "Alert at 10pm if you haven't opened the app",
   "settingsEditProfile": "Edit profile",
   "settingsEditProfileSubtitle": "Name, username, region and password",
+  "settingsChangePhoto": "Change photo",
+  "settingsChangePhotoPrompt": "Where do you want to choose the photo from?",
+  "settingsGallery": "Gallery",
+  "settingsCamera": "Camera",
+  "settingsAdjustPhoto": "Adjust photo",
+  "settingsPersonalInfo": "Personal information",
+  "settingsSecurity": "Security",
+  "settingsChangePassword": "Change password",
+  "settingsNewPassword": "New password",
+  "settingsConfirmPassword": "Confirm password",
+  "settingsPasswordMismatch": "Passwords don't match",
+  "settingsPasswordChanged": "Password updated",
+  "settingsAvatarUploadError": "Couldn't upload the photo",
   "settingsLanguage": "Language",
   "settingsChooseLanguage": "Choose a language",
   "settingsDeveloper": "Developer",
@@ -201,6 +214,34 @@
   "notifTypeStreak": "Streak",
   "notifTypeReminder": "Reminders",
   "notifTypeAchievement": "Achievements",
+  "notifTimeJustNow": "just now",
+  "notifTimeMinutesAgo": "{n} min ago",
+  "@notifTimeMinutesAgo": {"placeholders": {"n": {"type": "int"}}},
+  "notifTimeHoursAgo": "{n} h ago",
+  "@notifTimeHoursAgo": {"placeholders": {"n": {"type": "int"}}},
+  "notifTimeYesterday": "yesterday",
+  "notifTimeDaysAgo": "{n} days ago",
+  "@notifTimeDaysAgo": {"placeholders": {"n": {"type": "int"}}},
+
+  "notifFriendRequestTitle": "New friend request",
+  "notifFriendRequestBody": "{username} wants to be your friend.",
+  "@notifFriendRequestBody": {"placeholders": {"username": {"type": "String"}}},
+  "notifFriendAcceptedTitle": "Request accepted",
+  "notifFriendAcceptedBody": "{username} accepted your friend request.",
+  "@notifFriendAcceptedBody": {"placeholders": {"username": {"type": "String"}}},
+  "notifReactionTitle": "New reaction",
+  "notifReactionBody": "{username} reacted to your weekly summary with {emoji}.",
+  "@notifReactionBody": {"placeholders": {"username": {"type": "String"}, "emoji": {"type": "String"}}},
+  "notifTimerDoneTitle": "Timer completed! ⏱",
+  "notifTimerDoneBody": "You completed a focus session and earned 10 pts.",
+  "notifLevelUpTitle": "You leveled up! 🏆",
+  "notifLevelUpBody": "You're now level {level}. Keep it up!",
+  "@notifLevelUpBody": {"placeholders": {"level": {"type": "int"}}},
+  "notifStepsGoalTitle": "Goal reached! 🎉",
+  "notifStepsGoalBody": "You reached your steps goal (+30 pts).",
+  "notifTaskCompletedTitle": "Task completed! ✅",
+  "notifTaskCompletedBody": "You completed \"{title}\" and earned 20 pts.",
+  "@notifTaskCompletedBody": {"placeholders": {"title": {"type": "String"}}},
 
   "timerPause": "Pause",
 
@@ -214,6 +255,7 @@
   "@stepsPendingGoal": {"placeholders": {"goal": {"type": "int"}}},
 
   "notificationsMarkAllRead": "Mark all read",
+  "notificationsEmpty": "You have no notifications",
 
   "friendCardRemoveTooltip": "Remove friend",
   "friendCardNoActivity": "No activity last week",
@@ -232,13 +274,16 @@
   "dailySummaryAmongFriends": "among friends",
 
   "weeklyReactionFriendsReactions": "Your friends' reactions",
+  "weeklySummaryLastWeek": "Last week",
 
   "techHealthTitle": "Tech Health",
-  "techHealthUnavailableTitle": "Not available on this device",
-  "techHealthUnavailableBody": "Tech health needs usage-stats and accessibility permissions that only exist on Android. This feature isn't available on your system for now — it'll be there once you have the app installed on your phone.",
+  "techHealthUnavailableTitle": "Not added on this platform yet",
+  "techHealthUnavailableBody": "Tech health needs to watch app usage and block apps in real time, which today is only wired up for Android. It's technically possible to add this for other platforms later, but that hasn't been built yet — for now this feature only works on Android.",
   "techHealthPointDialogTitle": "Tech health point",
   "techHealthPointDialogBody": "Turn on at least 3 restrictions and don't exceed any limit during the day. If you manage it, you'll earn 10 extra points added to tomorrow's points.",
   "techHealthPointBannerLabel": "Point available — tap to learn more",
+  "techHealthPointLostLabel": "Point lost today — tap to learn more",
+  "techHealthPointLostBody": "You went over the limit on a restriction today, so you won't earn the extra point. Try again tomorrow.",
   "techHealthRestrictionsTitle": "Restrictions",
   "techHealthRestrictionsCount": "{n} total",
   "@techHealthRestrictionsCount": {"placeholders": {"n": {"type": "int"}}},
@@ -282,6 +327,7 @@
   "rivalryTitle": "Rivalry",
   "rivalryPointsThisMonth": "Points this month",
   "rivalryFullRanking": "FULL RANKING",
+  "rivalryEmpty": "Add friends to see the ranking",
 
   "progressTitle": "Progress",
 
@@ -296,11 +342,14 @@
   "friendsRequestsTabCount": "Requests ({n})",
   "@friendsRequestsTabCount": {"placeholders": {"n": {"type": "int"}}},
   "friendsNoRequests": "You have no pending requests",
+  "friendsNoFriends": "You don't have any friends yet",
 
   "remindersEmptyState": "You have no reminders.\nAdd one!",
 
   "homeTasksTodayLabel": "{completed}/{total} tasks today",
   "@homeTasksTodayLabel": {"placeholders": {"completed": {"type": "int"}, "total": {"type": "int"}}},
+  "homeTasksLabel": "{completed}/{total} tasks",
+  "@homeTasksLabel": {"placeholders": {"completed": {"type": "int"}, "total": {"type": "int"}}},
 
   "searchFriendsTitle": "Search friends",
   "searchFriendsHint": "Search by name or email",
@@ -309,8 +358,13 @@
   "@timerSessionOf": {"placeholders": {"current": {"type": "int"}, "total": {"type": "int"}}},
   "timerPhaseMinutes": "{min} min {phase}",
   "@timerPhaseMinutes": {"placeholders": {"min": {"type": "int"}, "phase": {"type": "String"}}},
+  "timerPointEarned": "Daily point earned",
+  "timerClosedAppWarning": "The timer pauses if you close or minimize the app",
 
   "homeStepsProgressLabel": "{percent}% steps",
   "@homeStepsProgressLabel": {"placeholders": {"percent": {"type": "int"}}},
-  "homeTimerPending": "Timer pending"
+  "homeTimerPending": "Timer pending",
+
+  "trayOpen": "Open",
+  "trayExit": "Exit"
 }

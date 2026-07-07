@@ -1,26 +1,46 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../components/basic/top_bar.dart';
 import '../../components/basic/divider.dart';
 import '../../components/forms/form_section.dart';
 import '../../components/forms/switch_tile.dart';
 import '../../components/forms/theme_swatch_picker.dart';
 import '../../component_catalog.dart';
+import '../../core/prefs/app_prefs.dart';
+import '../../features/auth/auth_notifier.dart';
+import '../../features/profile/profile_notifier.dart';
 import '../../l10n/app_localizations.dart';
 import '../../l10n/locale_notifier.dart';
 import '../../theme/app_theme.dart';
 import '../auth/login_screen.dart';
+import 'edit_profile_screen.dart';
 
-class SettingsScreen extends StatefulWidget {
+class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
   @override
-  State<SettingsScreen> createState() => _SettingsScreenState();
+  ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _SettingsScreenState extends State<SettingsScreen> {
+class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   bool _notifications = true;
   bool _taskReminders = true;
   bool _streakAlerts = true;
+  AppPrefs? _prefs;
+
+  @override
+  void initState() {
+    super.initState();
+    AppPrefs.load().then((prefs) {
+      if (!mounted) return;
+      setState(() {
+        _prefs = prefs;
+        _notifications = prefs.notificationsEnabled;
+        _taskReminders = prefs.taskRemindersEnabled;
+        _streakAlerts = prefs.streakAlertsEnabled;
+      });
+    });
+  }
 
   static const _themeColors = {
     DayPilotTheme.sageGreen: Color(0xFF4A7C59),
@@ -90,6 +110,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final l10n = AppLocalizations.of(context);
+    final stats = ref.watch(profileStatsNotifierProvider);
 
     return Scaffold(
       appBar: DayPilotTopBar(title: l10n.settingsTitle, showBack: true),
@@ -121,7 +142,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     icon: Icons.dark_mode_outlined,
                     value: activeThemeMode == ThemeMode.dark,
                     onChanged: (v) => dayPilotThemeModeNotifier.value =
-                        v ? ThemeMode.dark : ThemeMode.system,
+                        v ? ThemeMode.dark : ThemeMode.light,
                   ),
                 ],
               );
@@ -136,7 +157,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 subtitle: l10n.settingsNotificationsSubtitle,
                 icon: Icons.notifications_outlined,
                 value: _notifications,
-                onChanged: (v) => setState(() => _notifications = v),
+                onChanged: (v) {
+                  setState(() => _notifications = v);
+                  _prefs?.setNotificationsEnabled(v);
+                },
               ),
               DayPilotSwitchTile(
                 label: l10n.settingsTaskReminders,
@@ -144,7 +168,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 icon: Icons.calendar_today_outlined,
                 value: _notifications && _taskReminders,
                 onChanged: _notifications
-                    ? (v) => setState(() => _taskReminders = v)
+                    ? (v) {
+                        setState(() => _taskReminders = v);
+                        _prefs?.setTaskRemindersEnabled(v);
+                      }
                     : null,
               ),
               DayPilotSwitchTile(
@@ -153,7 +180,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 icon: Icons.local_fire_department_outlined,
                 value: _notifications && _streakAlerts,
                 onChanged: _notifications
-                    ? (v) => setState(() => _streakAlerts = v)
+                    ? (v) {
+                        setState(() => _streakAlerts = v);
+                        _prefs?.setStreakAlertsEnabled(v);
+                      }
                     : null,
               ),
             ],
@@ -167,7 +197,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: Text(l10n.settingsEditProfile),
                 subtitle: Text(l10n.settingsEditProfileSubtitle),
                 trailing: const Icon(Icons.chevron_right_rounded),
-                onTap: () {},
+                onTap: stats == null
+                    ? null
+                    : () => Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => EditProfileScreen(stats: stats)),
+                        ),
               ),
             ],
           ),
@@ -215,11 +250,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const SizedBox(height: 16),
 
           FilledButton.icon(
-            onPressed: () => Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (_) => const LoginScreen()),
-              (_) => false,
-            ),
+            onPressed: () async {
+              await ref.read(authNotifierProvider.notifier).logout();
+              if (!context.mounted) return;
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (_) => const LoginScreen()),
+                (_) => false,
+              );
+            },
             icon: const Icon(Icons.logout_rounded),
             label: Text(l10n.settingsSignOut),
             style: FilledButton.styleFrom(

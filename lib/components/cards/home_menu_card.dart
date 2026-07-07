@@ -142,6 +142,7 @@ class HomeMenuMiniBarChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (values.isEmpty) return const SizedBox.shrink();
     final max = values.reduce((a, b) => a > b ? a : b);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.end,

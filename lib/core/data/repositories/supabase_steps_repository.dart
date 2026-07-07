@@ -1,8 +1,25 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../utils/iso_date.dart';
+import '../models/app_notification_item.dart';
 import '../models/app_steps.dart';
+import '../notification_l10n.dart';
+import '../notification_writer.dart';
+import '../points_writer.dart';
 import 'steps_repository.dart';
+
+typedef _Milestone = ({double threshold, int points, int cumulative});
+
+// 50/75/100% of goal, matching Android's thresholds — gated by the actual
+// accumulated steps_points (server-authoritative) instead of in-memory
+// flags, so it's correct regardless of which client/device notices the
+// crossing first, and survives restarts (Android's own in-memory
+// milestone1Awarded-style flags don't).
+const _stepMilestones = <_Milestone>[
+  (threshold: 0.5, points: 10, cumulative: 10),
+  (threshold: 0.75, points: 20, cumulative: 30),
+  (threshold: 1.0, points: 30, cumulative: 60),
+];
 
 class SupabaseStepsRepository implements StepsRepository {
   SupabaseStepsRepository(this._client);
@@ -16,21 +33,65 @@ class SupabaseStepsRepository implements StepsRepository {
     final uid = _userId;
     if (uid == null) return const AppSteps(steps: 0, goal: 2000, pointsEarnedToday: 0);
 
+    // There's no more a single account-wide goal column on `users` — the
+    // active goal is today's habits_daily.steps_goal (defaults to 2000 for a
+    // day with no row yet). `pending_steps_goal`/`_date` on `users` is just
+    // the staging area for a change that should take effect starting the
+    // day it names; nothing server-side copies it into habits_daily once
+    // that day arrives (a cron only clears the pending fields), so this is
+    // the one place responsible for actually applying it.
+    final today = isoDate(DateTime.now());
+
     final userRow = await _client
         .from('users')
-        .select('default_steps_goal, pending_steps_goal')
+        .select('pending_steps_goal, pending_steps_goal_date')
         .eq('id', uid)
         .single();
+    final pendingGoal = userRow['pending_steps_goal'] as int?;
+    final pendingDate = userRow['pending_steps_goal_date'] as String?;
+    final pendingIsDue = pendingGoal != null && pendingDate != null && pendingDate.compareTo(today) <= 0;
+
+    final habitsRows =
+        await _client.from('habits_daily').select('steps_goal').eq('user_id', uid).eq('date', today);
+    var goal = habitsRows.isEmpty ? 2000 : habitsRows.first['steps_goal'] as int;
+
+    if (pendingIsDue) {
+      goal = pendingGoal;
+      await _client.from('habits_daily').upsert(
+        {'user_id': uid, 'date': today, 'steps_goal': goal},
+        onConflict: 'user_id, date',
+      );
+    }
 
     final progressRows =
         await _client.from('daily_progress').select('steps, steps_points').eq('user_id', uid);
     final progress = progressRows.isEmpty ? null : progressRows.first;
+    final steps = progress?['steps'] as int? ?? 0;
+    var pointsEarnedToday = progress?['steps_points'] as int? ?? 0;
+
+    if (goal > 0) {
+      for (final m in _stepMilestones) {
+        if (steps < goal * m.threshold || pointsEarnedToday >= m.cumulative) continue;
+        await logPointsAndCheckLevelUp(_client, userId: uid, points: m.points, source: 'STEPS');
+        pointsEarnedToday += m.points;
+        if (m.cumulative == 60) {
+          final l10n = currentL10n();
+          await writeNotification(
+            _client,
+            userId: uid,
+            type: AppNotificationType.stepsGoal,
+            title: l10n.notifStepsGoalTitle,
+            body: l10n.notifStepsGoalBody,
+          );
+        }
+      }
+    }
 
     return AppSteps(
-      steps: progress?['steps'] as int? ?? 0,
-      goal: userRow['default_steps_goal'] as int,
-      pointsEarnedToday: progress?['steps_points'] as int? ?? 0,
-      pendingGoal: userRow['pending_steps_goal'] as int?,
+      steps: steps,
+      goal: goal,
+      pointsEarnedToday: pointsEarnedToday,
+      pendingGoal: pendingIsDue ? null : pendingGoal,
     );
   }
 

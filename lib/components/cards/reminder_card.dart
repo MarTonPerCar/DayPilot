@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import '../../l10n/app_localizations.dart';
 
 class ReminderCard extends StatelessWidget {
   final String title;
@@ -16,23 +18,23 @@ class ReminderCard extends StatelessWidget {
     required this.onDelete,
   });
 
-  static String formatWhen(DateTime dt, DateTime now) {
+  static String formatWhen(AppLocalizations l10n, String locale, DateTime dt, DateTime now) {
     final time = '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
     final today = DateTime(now.year, now.month, now.day);
     final target = DateTime(dt.year, dt.month, dt.day);
     final diff = target.difference(today).inDays;
-    if (diff == 0) return 'Hoy, $time';
-    if (diff == 1) return 'Mañana, $time';
-    const months = [
-      'ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic',
-    ];
-    return '${dt.day} ${months[dt.month - 1]}, $time';
+    if (diff == 0) return '${l10n.commonToday}, $time';
+    if (diff == 1) return '${l10n.commonTomorrow}, $time';
+    final month = DateFormat.MMM(locale).format(dt);
+    return '${dt.day} $month, $time';
   }
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final text = Theme.of(context).textTheme;
+    final l10n = AppLocalizations.of(context);
+    final locale = Localizations.localeOf(context).languageCode;
 
     return Card.filled(
       clipBehavior: Clip.hardEdge,
@@ -47,7 +49,7 @@ class ReminderCard extends StatelessWidget {
                 children: [
                   Text(title, style: text.bodyLarge?.copyWith(fontWeight: FontWeight.w700)),
                   Text(
-                    formatWhen(dateTime, DateTime.now()),
+                    formatWhen(l10n, locale, dateTime, DateTime.now()),
                     style: text.bodySmall?.copyWith(color: colors.onSurfaceVariant),
                   ),
                 ],

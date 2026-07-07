@@ -1,6 +1,11 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../utils/iso_date.dart';
+import '../models/app_notification_item.dart';
 import '../models/app_progress.dart';
+import '../notification_l10n.dart';
+import '../notification_writer.dart';
+import '../points_writer.dart';
 import 'progress_repository.dart';
 
 class SupabaseProgressRepository implements ProgressRepository {
@@ -58,5 +63,34 @@ class SupabaseProgressRepository implements ProgressRepository {
         DateTime.now().day,
       ],
     );
+  }
+
+  @override
+  Future<bool> completeTimerSession() async {
+    final uid = _userId;
+    if (uid == null) return false;
+
+    final today = isoDate(DateTime.now());
+    final habitRows =
+        await _client.from('habits_daily').select('timer_point_earned').eq('user_id', uid).eq('date', today);
+    final alreadyEarned = habitRows.isNotEmpty && habitRows.first['timer_point_earned'] == true;
+    if (alreadyEarned) return false;
+
+    await logPointsAndCheckLevelUp(_client, userId: uid, points: 10, source: 'TIMER');
+    await _client.from('habits_daily').upsert(
+      {'user_id': uid, 'date': today, 'timer_point_earned': true},
+      onConflict: 'user_id, date',
+    );
+
+    final l10n = currentL10n();
+    await writeNotification(
+      _client,
+      userId: uid,
+      type: AppNotificationType.timerDone,
+      title: l10n.notifTimerDoneTitle,
+      body: l10n.notifTimerDoneBody,
+    );
+
+    return true;
   }
 }
