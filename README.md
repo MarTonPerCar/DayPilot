@@ -113,3 +113,11 @@ Durante la revisión de código se identificaron y corrigieron los siguientes pr
 - Commits por bloque funcional, no por archivo
 - Las pantallas no conocen los repositorios — solo hablan con el ViewModel
 - `SessionCache` es la única fuente de verdad en memoria; la BD es la fuente de verdad persistente
+
+---
+
+## Descargas
+
+- [⬇️ Descargar DayPilot (Incremento-Android-TestFinal)](https://github.com/MarTonPerCar/DayPilot/releases/download/incremento-android-testfinal-v1.0.0/DayPilot-Incremento-Android-TestFinal.apk)
+
+> **Nota:** esta es la rama de trabajo y testing — puede contener errores todavía sin corregir, o ser idéntica a la última versión de `Incremento-Android` si no ha habido cambios recientes. Para la versión estable, usa la descarga de `Incremento-Android`.
