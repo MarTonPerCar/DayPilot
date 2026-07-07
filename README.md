@@ -128,3 +128,11 @@ Los resultados de esta rama alimentan directamente el **Incremento 2** de la app
 1. Añadir el cliente Supabase y las dependencias correctas a la app principal.
 2. Implementar `SupabaseXRepository` para cada repositorio existente (uno por uno, empezando por `TaskRepository`).
 3. Sustituir en `DayPilotNavGraph.kt` la instanciación de `FakeXRepository` por `SupabaseXRepository` — los ViewModels y las Screens no requieren ningún cambio gracias al patrón Repository.
+
+---
+
+## Descargas
+
+- [⬇️ Descargar DayPilot (Test Supabase)](https://github.com/MarTonPerCar/DayPilot/releases/download/test-supabase-android-v1.0.0/DayPilot-Test-Supabase-Android.apk)
+
+Este es el proyecto mínimo de validación descrito arriba, no la app principal — solo confirma login, SELECT e INSERT contra el esquema real.
