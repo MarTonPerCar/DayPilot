@@ -118,14 +118,13 @@ class _DesktopFlyoutScopeState extends State<DesktopFlyoutScope>
     await windowManager.show();
     await windowManager.focus();
     if (Platform.isWindows) {
-      // waitUntilReadyToShow applies size/min/max using window.devicePixelRatio
-      // at call time — before the window has a real monitor, so on Windows it
-      // often reads 1.0 instead of the actual scale factor. That locks the
-      // window's physical size wrong while Flutter later renders content for
-      // the real DPI, squeezing it into a fraction of the window. Reapplying
-      // here (now that DPI is known) corrects it.
-      await windowManager.setMinimumSize(mobileWindowSize);
-      await windowManager.setMaximumSize(mobileWindowSize);
+      // The win32 Flutter embedder resizes its child view off a real WM_SIZE
+      // message, which setting the same size again doesn't reliably send.
+      // Nudging the size by a pixel and back forces a genuine one, so the
+      // child view actually gets resized to match the window.
+      await windowManager.setSize(
+        Size(mobileWindowSize.width + 1, mobileWindowSize.height),
+      );
       await windowManager.setSize(mobileWindowSize);
     }
     setState(() => _contentVisible = true);
