@@ -117,6 +117,17 @@ class _DesktopFlyoutScopeState extends State<DesktopFlyoutScope>
     await windowManager.setPosition(await _cornerPosition());
     await windowManager.show();
     await windowManager.focus();
+    if (Platform.isWindows) {
+      // waitUntilReadyToShow applies size/min/max using window.devicePixelRatio
+      // at call time — before the window has a real monitor, so on Windows it
+      // often reads 1.0 instead of the actual scale factor. That locks the
+      // window's physical size wrong while Flutter later renders content for
+      // the real DPI, squeezing it into a fraction of the window. Reapplying
+      // here (now that DPI is known) corrects it.
+      await windowManager.setMinimumSize(mobileWindowSize);
+      await windowManager.setMaximumSize(mobileWindowSize);
+      await windowManager.setSize(mobileWindowSize);
+    }
     setState(() => _contentVisible = true);
   }
 
