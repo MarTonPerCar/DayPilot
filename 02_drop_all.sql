@@ -21,6 +21,13 @@ EXCEPTION WHEN OTHERS THEN
     NULL;
 END $$;
 
+DO $$
+BEGIN
+    PERFORM cron.unschedule('apply-pending-steps-goals');
+EXCEPTION WHEN OTHERS THEN
+    NULL;
+END $$;
+
 DROP TABLE IF EXISTS notifications CASCADE;
 
 DROP TABLE IF EXISTS reactions CASCADE;
@@ -47,7 +54,6 @@ DROP TABLE IF EXISTS user_streaks CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
 
 DROP VIEW IF EXISTS friends_ranking CASCADE;
-DROP VIEW IF EXISTS daily_summary CASCADE;
 DROP VIEW IF EXISTS calendar_tasks CASCADE;
 
 DROP FUNCTION IF EXISTS fn_sync_habits_to_progress CASCADE;
@@ -61,5 +67,6 @@ DROP FUNCTION IF EXISTS fn_cleanup_completed_tasks CASCADE;
 DROP FUNCTION IF EXISTS fn_cleanup_points_log CASCADE;
 DROP FUNCTION IF EXISTS fn_close_daily_progress CASCADE;
 DROP FUNCTION IF EXISTS fn_generate_weekly_summary CASCADE;
+DROP FUNCTION IF EXISTS fn_apply_pending_steps_goals CASCADE;
 
 SET session_replication_role = DEFAULT;
