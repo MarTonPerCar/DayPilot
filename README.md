@@ -1,24 +1,43 @@
-# DayPilot
+# DayPilot (Flutter)
 
-Android productivity app built with Kotlin and Jetpack Compose, backed by Supabase.
+Flutter port of DayPilot, a productivity app (tasks, steps, Pomodoro timers, app usage limits, social ranking) originally built for Android with Kotlin and Jetpack Compose, backed by Supabase.
 
 Users track daily tasks, steps, and app usage limits, and compete with friends on a 30-day points ranking. The app includes timers (Pomodoro and custom), reminders, a real-time notification system, and a weekly progress summary.
 
-## Branches
+This branch is the **final increment**: real UI, real Riverpod architecture, and a real Supabase backend, built on top of the design system from `Test-Diseño-Flutter`.
 
-| Branch | Purpose |
-|---|---|
-| `Incremento-Android` | Main development branch — base for future increments |
-| `Incremento-Android-TestFinal` | Final state of the first completed increment |
-| `Intensive-Android-Testing` | Same app with all timers and thresholds reduced for rapid testing |
-| `Supabase-Information` | SQL migration files (schema, seed data, drop script) |
-| `original-version` | Original codebase before the Android increment |
-| `Test-Funcional-Android` | Functional testing branch |
+## Features
+
+- Tasks (create/edit/complete, recurrence, points on completion)
+- Steps tracking with daily goals and milestone bonuses
+- Pomodoro and custom timers, with a once-per-day point bonus
+- Tech Health: per-app usage restrictions (configuration only — enforcement/blocking isn't built yet on any platform but Android's native app)
+- Friends, friend requests, and a 30-day points ranking
+- Real-time in-app notifications (friend activity, level-ups, goals, tasks)
+- Weekly progress summary with reactions
+- Spanish, English, and German localization
+- Desktop support (Windows/Linux): runs as a tray-icon flyout window sized like a phone
 
 ## Stack
 
-- **Language:** Kotlin
-- **UI:** Jetpack Compose + Material 3
+- **Language:** Dart
+- **Framework:** Flutter
+- **State management:** Riverpod (`Notifier`/`NotifierProvider`, no codegen)
 - **Backend:** Supabase (PostgreSQL, Auth, Storage, Realtime)
-- **Architecture:** MVVM with repository pattern
-- **CI/CD:** GitHub Actions
+- **Architecture:** one repository interface + one notifier per domain
+- **Localization:** `flutter_localizations`, ARB files (es/en/de)
+- **CI/CD:** GitHub Actions — builds Windows and Linux executables on every push, publishes them to a GitHub Release on tagged commits
+
+## Running locally
+
+1. Copy `env.json.example` to `env.json` and fill in your Supabase project's URL and publishable key.
+2. `flutter pub get`
+3. `flutter run -d <windows|linux|macos|android|chrome>`
+
+## Related branches
+
+| Branch | Purpose |
+|---|---|
+| `Test-Diseño-Flutter` | Design-system-only base this branch builds on |
+| `Incremento-Flutter-TestFinal` | Working branch this increment was developed on before merging here |
+| `Test-Supabase-Flutter` | Standalone spike validating `supabase_flutter` against the real project database |
