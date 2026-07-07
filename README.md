@@ -4,7 +4,7 @@ Flutter port of DayPilot, a productivity app (tasks, steps, Pomodoro timers, app
 
 Users track daily tasks, steps, and app usage limits, and compete with friends on a 30-day points ranking. The app includes timers (Pomodoro and custom), reminders, a real-time notification system, and a weekly progress summary.
 
-This is the active working branch for the final increment: real UI, real Riverpod architecture, and a real Supabase backend, built on top of the design system from `Test-Diseño-Flutter`. It's merged into `Incremento-Flutter` periodically.
+This branch is the **final increment**: real UI, real Riverpod architecture, and a real Supabase backend, built on top of the design system from `Test-Diseño-Flutter`.
 
 ## Features
 
@@ -26,6 +26,7 @@ This is the active working branch for the final increment: real UI, real Riverpo
 - **Backend:** Supabase (PostgreSQL, Auth, Storage, Realtime)
 - **Architecture:** one repository interface + one notifier per domain
 - **Localization:** `flutter_localizations`, ARB files (es/en/de)
+- **CI/CD:** GitHub Actions — builds Windows and Linux executables on every push, publishes them to a GitHub Release on tagged commits
 
 ## Running locally
 
@@ -37,6 +38,6 @@ This is the active working branch for the final increment: real UI, real Riverpo
 
 | Branch | Purpose |
 |---|---|
-| `Incremento-Flutter` | Permanent branch this work is periodically merged into |
 | `Test-Diseño-Flutter` | Design-system-only base this branch builds on |
+| `Incremento-Flutter-TestFinal` | Working branch this increment was developed on before merging here |
 | `Test-Supabase-Flutter` | Standalone spike validating `supabase_flutter` against the real project database |
