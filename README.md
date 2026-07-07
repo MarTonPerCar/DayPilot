@@ -12,7 +12,7 @@ Users track daily tasks, steps, and app usage limits, and compete with friends o
 |---|---|
 | `Incremento-Android` | Main development branch — base for future increments |
 | `Incremento-Android-TestFinal` | Final state of the first completed increment |
-| `Supabase-Information` | SQL migration files (schema, seed data, drop script) |
+| `Informacion-Supabase` | SQL migration files (schema, seed data, drop script) |
 | `Version-Original` | Original codebase before the Android increment |
 | `Test-Funcional-Android` | Functional testing branch |
 
