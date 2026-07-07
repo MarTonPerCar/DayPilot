@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'calendar_day_card.dart';
 
-/// Las celdas usan altura fija (no aspect ratio) para que el calendario no
-/// crezca en alto al ensanchar la pantalla.
 class MonthCalendarCard extends StatelessWidget {
   final DateTime month;
   final DateTime selectedDay;

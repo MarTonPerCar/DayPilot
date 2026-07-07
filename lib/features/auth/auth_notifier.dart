@@ -18,9 +18,6 @@ class AuthNotifier extends Notifier<AuthSession> {
   @override
   AuthSession build() => AuthSession.initial;
 
-  // These hold per-user state fetched once on first read, so switching
-  // accounts within the same running app (no restart) would otherwise keep
-  // showing whichever user's data was fetched first.
   void _invalidateUserScopedProviders() {
     ref.invalidate(profileStatsNotifierProvider);
     ref.invalidate(weeklySummaryNotifierProvider);
@@ -31,9 +28,7 @@ class AuthNotifier extends Notifier<AuthSession> {
     ref.invalidate(rankingNotifierProvider);
     ref.invalidate(notificationsNotifierProvider);
     ref.invalidate(techHealthNotifierProvider);
-    // SupabaseTaskRepository.getTasks() short-circuits through this cache
-    // before ever touching Supabase — invalidating tasksNotifierProvider
-    // alone still hands the new user the previous one's cached list back.
+    // getTasks() short-circuits through this cache before hitting Supabase.
     ref.invalidate(tasksCacheProvider);
   }
 

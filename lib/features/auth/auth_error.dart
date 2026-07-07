@@ -2,7 +2,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../l10n/app_localizations.dart';
 
-/// Never reaches the network — caught before calling Supabase.
 class EmptyCredentialsError implements Exception {
   const EmptyCredentialsError();
 }

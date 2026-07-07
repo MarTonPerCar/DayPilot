@@ -5,8 +5,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../screens/auth/login_screen.dart';
 import '../../screens/main_shell.dart';
 
-/// Only handles cold-start session restore — the login form navigates
-/// directly on success instead of relying on this to rebuild.
 final authStateChangesProvider = StreamProvider<AuthState>((ref) {
   return Supabase.instance.client.auth.onAuthStateChange;
 });

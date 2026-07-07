@@ -18,9 +18,7 @@ const Curve _popOutCurve = Curves.easeIn;
 bool get isDesktopPlatform =>
     !kIsWeb && (Platform.isLinux || Platform.isWindows || Platform.isMacOS);
 
-/// Set to true while a native OS dialog (file picker, etc.) is open, so the
-/// flyout's onWindowBlur doesn't mistake the resulting focus loss for the
-/// user dismissing the flyout.
+/// True while a native OS dialog is open, so onWindowBlur doesn't close the flyout.
 final isPickingFileNotifier = ValueNotifier<bool>(false);
 
 Future<void> initDesktopWindow() async {
@@ -41,7 +39,6 @@ Future<void> initDesktopWindow() async {
       await windowManager.setAsFrameless();
       await windowManager.setResizable(false);
       await windowManager.setAlwaysOnTop(true);
-      // stays hidden — only the tray icon opens it
     },
   );
 
@@ -51,9 +48,6 @@ Future<void> initDesktopWindow() async {
         : 'assets/images/tray_icon.png',
   );
 
-  // Locale isn't restored from prefs until after this runs (see main.dart),
-  // and can change later from Settings — rebuild the menu on every change so
-  // it's never stuck showing the startup-default locale.
   await _setTrayMenu();
   dayPilotLocaleNotifier.addListener(_setTrayMenu);
 }
@@ -71,8 +65,7 @@ Future<void> _setTrayMenu() async {
   );
 }
 
-/// Linux's tray backend never reports the icon's position, so this always
-/// opens bottom-right instead of anchoring to the click point.
+/// Linux never reports the tray icon's position, so this opens bottom-right.
 Future<Offset> _cornerPosition() async {
   final display = await screenRetriever.getPrimaryDisplay();
   final areaOrigin = display.visiblePosition ?? Offset.zero;
@@ -83,8 +76,6 @@ Future<Offset> _cornerPosition() async {
   );
 }
 
-/// Pops in/out via scale+fade rather than moving the window — window
-/// managers (especially Linux) don't animate position reliably.
 class DesktopFlyoutScope extends StatefulWidget {
   const DesktopFlyoutScope({super.key, required this.child});
 

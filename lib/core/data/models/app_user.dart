@@ -1,7 +1,3 @@
-/// Mirrors `users` — stats like streaks live in separate tables, fetched
-/// elsewhere. Theme and steps goal aren't account-wide columns here anymore
-/// (theme is a local-only preference; steps goal lives per-day on
-/// habits_daily), so this only carries identity fields.
 class AppUser {
   const AppUser({
     required this.id,

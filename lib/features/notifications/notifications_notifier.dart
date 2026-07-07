@@ -19,11 +19,7 @@ class NotificationsNotifier extends Notifier<List<AppNotificationItem>> {
     _subscribeToRealtimeOnce();
   }
 
-  // "Small" notifications (friend requests, reactions, level-up, etc.) never
-  // produce an OS banner — the in-app list/badge is the only delivery
-  // mechanism, so it must update live. One channel per notifier lifetime;
-  // refresh() can be called repeatedly (e.g. after awarding points elsewhere)
-  // without re-subscribing each time.
+  // These notifications never produce an OS banner, so the in-app list must update live.
   void _subscribeToRealtimeOnce() {
     if (_channel != null) return;
     final uid = ref.read(supabaseClientProvider).auth.currentUser?.id;

@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import '../../components/basic/top_bar.dart';
 import '../../l10n/app_localizations.dart';
 
-/// Salud tecnológica depende de permisos/APIs (accesibilidad, uso de apps)
-/// que no existen fuera de Android/iOS.
 class TechHealthUnavailableScreen extends StatelessWidget {
   const TechHealthUnavailableScreen({super.key});
 

@@ -25,9 +25,8 @@ class NewTaskData {
   final int recurrenceDays;
 }
 
-/// Mirrors a row of the `calendar_tasks` view (tasks joined to task_days).
-/// [id] is the whole recurring series (`tasks.id`) — used for edit/delete.
-/// [occurrenceId] is a single date (`task_days.id`) — used to toggle done.
+/// [id] is the recurring series (`tasks.id`); [occurrenceId] is a single date
+/// (`task_days.id`), used to toggle done.
 class AppTask {
   const AppTask({
     required this.id,

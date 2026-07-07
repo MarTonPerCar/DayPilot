@@ -242,7 +242,6 @@ class HomeMenuRivalryIndicator extends StatelessWidget {
     required this.color,
   });
 
-  /// 1º/2º/3º si estás en el podio; si no, "···+posición".
   String get _label => switch (position) {
         1 => '1º',
         2 => '2º',

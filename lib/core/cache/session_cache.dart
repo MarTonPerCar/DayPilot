@@ -16,8 +16,6 @@ class TtlEntry<T> {
       fetchedAt == null || DateTime.now().difference(fetchedAt!) > ttl;
 }
 
-// No TTL: repositories overwrite these directly after each write, so they're
-// always as fresh as the last write/read.
 final todayProgressCacheProvider = StateProvider<dynamic>((ref) => null);
 final tasksCacheProvider = StateProvider<List<dynamic>?>((ref) => null);
 final userProfileCacheProvider = StateProvider<AppUser?>((ref) => null);
@@ -29,7 +27,6 @@ final friendsCacheProvider =
 final rankingCacheProvider =
     StateProvider<TtlEntry<List<dynamic>>>((ref) => const TtlEntry());
 
-/// Call on logout so the next session starts blank.
 void clearSessionCache(Ref ref) {
   ref.invalidate(todayProgressCacheProvider);
   ref.invalidate(tasksCacheProvider);

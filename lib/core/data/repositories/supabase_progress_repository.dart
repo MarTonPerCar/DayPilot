@@ -15,8 +15,6 @@ class SupabaseProgressRepository implements ProgressRepository {
 
   String? get _userId => _client.auth.currentUser?.id;
 
-  // Matches the chart's fixed 30-slot width: 29 closed days from
-  // user_daily_log + today's live daily_progress row.
   static const _historyDays = 30;
 
   @override

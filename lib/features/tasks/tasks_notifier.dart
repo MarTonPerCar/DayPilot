@@ -12,8 +12,6 @@ import 'tasks_state.dart';
 class TasksNotifier extends Notifier<TasksState> {
   @override
   TasksState build() {
-    // Deferred: `state` can't be touched synchronously inside build() itself,
-    // only once the provider has actually finished initializing.
     Future.microtask(_load);
     return const TasksState(isLoading: true);
   }
@@ -46,8 +44,6 @@ class TasksNotifier extends Notifier<TasksState> {
     state = state.copyWith(tasks: [...state.tasks, placeholder]);
     try {
       await ref.read(taskRepositoryProvider).addTask(data);
-      // Recurring tasks create several rows with server-assigned ids that
-      // the placeholder can't represent, so refetch instead of patching it.
       ref.invalidate(tasksCacheProvider);
       await _load();
     } catch (_) {
@@ -108,8 +104,6 @@ class TasksNotifier extends Notifier<TasksState> {
     try {
       await ref.read(taskRepositoryProvider).toggleTask(occurrenceId: occurrenceId, isDone: isDone);
       ref.read(tasksCacheProvider.notifier).state = state.tasks;
-      // Marking done can award points (see SupabaseTaskRepository) — refresh
-      // so Home/Progress reflect it without waiting for the periodic timer.
       if (isDone) await ref.read(progressNotifierProvider.notifier).refresh();
     } catch (_) {
       state = state.copyWith(tasks: previous, errorType: TaskErrorType.toggle);

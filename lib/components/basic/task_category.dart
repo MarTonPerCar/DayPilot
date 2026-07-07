@@ -28,7 +28,6 @@ extension TaskCategoryX on TaskCategory {
         TaskCategory.otro => Icons.star_rounded,
       };
 
-  /// Fijos: iguales en cualquier tema, no vienen de [ColorScheme].
   Color get color => switch (this) {
         TaskCategory.trabajo => const Color(0xFF4A90D9),
         TaskCategory.estudio => const Color(0xFFAB6FDB),
