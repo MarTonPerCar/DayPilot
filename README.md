@@ -132,4 +132,16 @@ Las notificaciones periódicas de salud tecnológica ("llevas X minutos en esta 
 
 ### Rama de continuación
 
-Esta rama (`Incremento-Android`) queda como base para el siguiente incremento. Para testing exhaustivo con tiempos acelerados existe la rama `Intensive-Android-Testing`.
+Esta rama (`Incremento-Android`) queda como base para el siguiente incremento.
+
+## Convenciones de esta rama
+
+- Commits por bloque funcional, no por archivo
+- Las pantallas no conocen los repositorios — solo hablan con el ViewModel
+- `SessionCache` es la única fuente de verdad en memoria; la BD es la fuente de verdad persistente
+
+---
+
+## Descargas
+
+- [⬇️ Descargar DayPilot (Incremento-Android)](https://github.com/MarTonPerCar/DayPilot/releases/download/incremento-android-v1.0.1/DayPilot-Incremento-Android.apk)
