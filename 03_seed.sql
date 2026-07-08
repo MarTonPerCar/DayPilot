@@ -37,13 +37,22 @@ WHERE u.id IN (
 )
 ON CONFLICT (id) DO NOTHING;
 
+-- trg_create_user_profile already created a placeholder row for each of
+-- these from the auth.users insert above (empty raw_user_meta_data, so it
+-- falls back to an email-derived username) — DO UPDATE so the curated seed
+-- names/usernames/regions actually win instead of being silently skipped.
 INSERT INTO users (id, email, name, username, username_lower, region) VALUES
     ('a0000000-0000-0000-0000-000000000001', 'ana.garcia@daypilot.test',      'Ana García',      'anagarcia',       'anagarcia',       'Canarias'),
     ('a0000000-0000-0000-0000-000000000002', 'carlos.ruiz@daypilot.test',     'Carlos Ruiz',     'carlosruiz',      'carlosruiz',      'Madrid'),
     ('a0000000-0000-0000-0000-000000000003', 'maria.lopez@daypilot.test',     'María López',     'marialopez',      'marialopez',      'Cataluña'),
     ('a0000000-0000-0000-0000-000000000004', 'javier.moreno@daypilot.test',   'Javier Moreno',   'javiermoreno',    'javiermoreno',    'Andalucía'),
     ('a0000000-0000-0000-0000-000000000005', 'lucia.fernandez@daypilot.test', 'Lucía Fernández', 'luciafernandez',  'luciafernandez',  'Galicia')
-ON CONFLICT (id) DO NOTHING;
+ON CONFLICT (id) DO UPDATE SET
+    email = EXCLUDED.email,
+    name = EXCLUDED.name,
+    username = EXCLUDED.username,
+    username_lower = EXCLUDED.username_lower,
+    region = EXCLUDED.region;
 
 INSERT INTO user_daily_log (user_id, date, steps, steps_goal, tasks_completed, tasks_points, steps_points, wellness_points, timer_points, tech_health_points, total_points)
 SELECT user_id, date, steps, steps_goal, tasks_completed,

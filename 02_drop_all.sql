@@ -62,6 +62,7 @@ DROP FUNCTION IF EXISTS fn_sync_points_to_progress CASCADE;
 DROP FUNCTION IF EXISTS fn_update_level CASCADE;
 DROP FUNCTION IF EXISTS fn_update_streak CASCADE;
 DROP FUNCTION IF EXISTS fn_limit_daily_log CASCADE;
+DROP FUNCTION IF EXISTS fn_create_user_profile CASCADE;
 DROP FUNCTION IF EXISTS fn_seed_daily_progress CASCADE;
 DROP FUNCTION IF EXISTS fn_cleanup_completed_tasks CASCADE;
 DROP FUNCTION IF EXISTS fn_cleanup_points_log CASCADE;

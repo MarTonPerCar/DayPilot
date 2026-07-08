@@ -201,6 +201,7 @@ Tareas con sus fechas de calendario (JOIN de `tasks` + `task_days`). Expone `occ
 | `trg_update_level` | `users` | BEFORE UPDATE de `total_points_historical` | Recalcula y actualiza `level`/`points_to_next_level` |
 | `trg_update_streak` | `user_daily_log` | INSERT | Incrementa o resetea la racha en `user_streaks` |
 | `trg_limit_daily_log` | `user_daily_log` | INSERT | Elimina la fila más antigua si hay más de 30 por usuario |
+| `trg_create_user_profile` | `auth.users` | INSERT | Crea la fila de `users` a partir de `raw_user_meta_data` (name/username/region) — funciona sin depender de que el cliente vuelva a iniciar sesión tras confirmar el email |
 | `trg_seed_daily_progress` | `users` | INSERT | Crea la fila de `daily_progress` del nuevo usuario |
 | `trg_cleanup_points_log` | `points_log` | INSERT | Elimina puntos con más de 30 días |
 

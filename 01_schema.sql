@@ -397,6 +397,50 @@ CREATE TRIGGER trg_limit_daily_log
 AFTER INSERT ON user_daily_log
 FOR EACH ROW EXECUTE FUNCTION fn_limit_daily_log();
 
+-- Creates the public.users profile row the moment an auth.users row is
+-- created (signup), instead of relying on the client to do it later —
+-- works regardless of email confirmation timing.
+CREATE OR REPLACE FUNCTION fn_create_user_profile()
+RETURNS TRIGGER
+SECURITY DEFINER SET search_path = public
+AS $$
+DECLARE
+    v_username TEXT;
+BEGIN
+    v_username := COALESCE(NEW.raw_user_meta_data->>'username', split_part(NEW.email, '@', 1));
+
+    BEGIN
+        INSERT INTO users (id, email, name, username, username_lower, region)
+        VALUES (
+            NEW.id,
+            NEW.email,
+            COALESCE(NEW.raw_user_meta_data->>'name', v_username),
+            v_username,
+            lower(v_username),
+            NEW.raw_user_meta_data->>'region'
+        );
+    EXCEPTION WHEN unique_violation THEN
+        -- Username taken — fall back to a suffixed one rather than failing
+        -- the whole signup transaction.
+        INSERT INTO users (id, email, name, username, username_lower, region)
+        VALUES (
+            NEW.id,
+            NEW.email,
+            COALESCE(NEW.raw_user_meta_data->>'name', v_username),
+            v_username || '_' || substr(NEW.id::text, 1, 6),
+            lower(v_username || '_' || substr(NEW.id::text, 1, 6)),
+            NEW.raw_user_meta_data->>'region'
+        );
+    END;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_create_user_profile
+AFTER INSERT ON auth.users
+FOR EACH ROW EXECUTE FUNCTION fn_create_user_profile();
+
 CREATE OR REPLACE FUNCTION fn_seed_daily_progress()
 RETURNS TRIGGER AS $$
 BEGIN
