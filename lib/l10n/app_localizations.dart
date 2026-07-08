@@ -1612,6 +1612,12 @@ abstract class AppLocalizations {
   /// **'Cuenta creada — revisa tu email para confirmarla antes de iniciar sesión.'**
   String get authRegisterCheckEmail;
 
+  /// No description provided for @authErrorRateLimited.
+  ///
+  /// In es, this message translates to:
+  /// **'Demasiados intentos — espera unos minutos antes de volver a intentarlo.'**
+  String get authErrorRateLimited;
+
   /// No description provided for @forgotPasswordTitle.
   ///
   /// In es, this message translates to:

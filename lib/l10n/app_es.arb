@@ -321,6 +321,7 @@
   "authErrorUnknown": "Ha ocurrido un error. Inténtalo de nuevo.",
   "authErrorFillAllFields": "Rellena todos los campos.",
   "authRegisterCheckEmail": "Cuenta creada — revisa tu email para confirmarla antes de iniciar sesión.",
+  "authErrorRateLimited": "Demasiados intentos — espera unos minutos antes de volver a intentarlo.",
 
   "forgotPasswordTitle": "Recuperar contraseña",
   "forgotPasswordSentBody": "Revisa tu correo, te hemos enviado un enlace para restablecer tu contraseña.",

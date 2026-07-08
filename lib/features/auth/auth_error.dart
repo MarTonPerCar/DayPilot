@@ -38,5 +38,8 @@ String friendlyAuthError(Object error, AppLocalizations l10n) {
   if (lower.contains('unable to validate email')) {
     return l10n.authErrorInvalidEmail;
   }
+  if (lower.contains('rate limit')) {
+    return l10n.authErrorRateLimited;
+  }
   return l10n.authErrorUnknown;
 }

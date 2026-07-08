@@ -860,6 +860,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Konto erstellt — bestätige deine E-Mail-Adresse, bevor du dich anmeldest.';
 
   @override
+  String get authErrorRateLimited =>
+      'Zu viele Versuche — bitte warte einige Minuten, bevor du es erneut versuchst.';
+
+  @override
   String get forgotPasswordTitle => 'Passwort wiederherstellen';
 
   @override

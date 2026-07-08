@@ -321,6 +321,7 @@
   "authErrorUnknown": "Something went wrong. Please try again.",
   "authErrorFillAllFields": "Please fill in all fields.",
   "authRegisterCheckEmail": "Account created — check your email to confirm before logging in.",
+  "authErrorRateLimited": "Too many attempts — please wait a few minutes before trying again.",
 
   "forgotPasswordTitle": "Recover password",
   "forgotPasswordSentBody": "Check your email, we've sent you a link to reset your password.",

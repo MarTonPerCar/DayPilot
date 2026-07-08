@@ -856,6 +856,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'Cuenta creada — revisa tu email para confirmarla antes de iniciar sesión.';
 
   @override
+  String get authErrorRateLimited =>
+      'Demasiados intentos — espera unos minutos antes de volver a intentarlo.';
+
+  @override
   String get forgotPasswordTitle => 'Recuperar contraseña';
 
   @override

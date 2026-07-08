@@ -852,6 +852,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Account created — check your email to confirm before logging in.';
 
   @override
+  String get authErrorRateLimited =>
+      'Too many attempts — please wait a few minutes before trying again.';
+
+  @override
   String get forgotPasswordTitle => 'Recover password';
 
   @override
