@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:launch_at_startup/launch_at_startup.dart';
 import '../../components/basic/top_bar.dart';
 import '../../components/basic/divider.dart';
 import '../../components/forms/form_section.dart';
@@ -7,6 +8,7 @@ import '../../components/forms/switch_tile.dart';
 import '../../components/forms/theme_swatch_picker.dart';
 import '../../component_catalog.dart';
 import '../../core/prefs/app_prefs.dart';
+import '../../core/window/desktop_window.dart';
 import '../../features/auth/auth_notifier.dart';
 import '../../features/profile/profile_notifier.dart';
 import '../../l10n/app_localizations.dart';
@@ -26,6 +28,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   bool _notifications = true;
   bool _taskReminders = true;
   bool _streakAlerts = true;
+  bool _launchAtStartup = false;
   AppPrefs? _prefs;
 
   @override
@@ -40,6 +43,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         _streakAlerts = prefs.streakAlertsEnabled;
       });
     });
+    if (isDesktopPlatform) {
+      launchAtStartup.isEnabled().then((enabled) {
+        if (!mounted) return;
+        setState(() => _launchAtStartup = enabled);
+      });
+    }
   }
 
   static const _themeColors = {
@@ -189,6 +198,28 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ],
           ),
           const SizedBox(height: 16),
+
+          if (isDesktopPlatform) ...[
+            DayPilotFormSection(
+              children: [
+                DayPilotSwitchTile(
+                  label: l10n.settingsLaunchAtStartup,
+                  subtitle: l10n.settingsLaunchAtStartupSubtitle,
+                  icon: Icons.power_settings_new_rounded,
+                  value: _launchAtStartup,
+                  onChanged: (v) async {
+                    setState(() => _launchAtStartup = v);
+                    if (v) {
+                      await launchAtStartup.enable();
+                    } else {
+                      await launchAtStartup.disable();
+                    }
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+          ],
 
           DayPilotFormSection(
             children: [

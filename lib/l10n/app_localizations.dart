@@ -346,6 +346,18 @@ abstract class AppLocalizations {
   /// **'Aviso a las 22h si no has abierto la app'**
   String get settingsStreakAlertSubtitle;
 
+  /// No description provided for @settingsLaunchAtStartup.
+  ///
+  /// In es, this message translates to:
+  /// **'Iniciar con el sistema'**
+  String get settingsLaunchAtStartup;
+
+  /// No description provided for @settingsLaunchAtStartupSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Abre DayPilot automáticamente al iniciar sesión en tu PC'**
+  String get settingsLaunchAtStartupSubtitle;
+
   /// No description provided for @settingsEditProfile.
   ///
   /// In es, this message translates to:
@@ -1587,6 +1599,24 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Ha ocurrido un error. Inténtalo de nuevo.'**
   String get authErrorUnknown;
+
+  /// No description provided for @authErrorFillAllFields.
+  ///
+  /// In es, this message translates to:
+  /// **'Rellena todos los campos.'**
+  String get authErrorFillAllFields;
+
+  /// No description provided for @authRegisterCheckEmail.
+  ///
+  /// In es, this message translates to:
+  /// **'Cuenta creada — revisa tu email para confirmarla antes de iniciar sesión.'**
+  String get authRegisterCheckEmail;
+
+  /// No description provided for @authErrorRateLimited.
+  ///
+  /// In es, this message translates to:
+  /// **'Demasiados intentos — espera unos minutos antes de volver a intentarlo.'**
+  String get authErrorRateLimited;
 
   /// No description provided for @forgotPasswordTitle.
   ///

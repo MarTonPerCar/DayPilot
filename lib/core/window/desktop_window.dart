@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
+import 'package:launch_at_startup/launch_at_startup.dart';
 import 'package:screen_retriever/screen_retriever.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
@@ -24,15 +25,20 @@ final isPickingFileNotifier = ValueNotifier<bool>(false);
 Future<void> initDesktopWindow() async {
   if (!isDesktopPlatform) return;
 
+  launchAtStartup.setup(appName: 'DayPilot', appPath: Platform.resolvedExecutable);
+
   await windowManager.ensureInitialized();
   await windowManager.waitUntilReadyToShow(
-    const WindowOptions(
+    WindowOptions(
       size: mobileWindowSize,
       minimumSize: mobileWindowSize,
       maximumSize: mobileWindowSize,
       skipTaskbar: true,
       titleBarStyle: TitleBarStyle.hidden,
-      backgroundColor: Color(0x00000000), // transparent, for the pop-in fade
+      // True per-pixel transparency isn't reliably compositied on Windows —
+      // it can leave stale/garbled content from whatever's behind the
+      // window instead of blending properly. Linux/macOS handle it fine.
+      backgroundColor: Platform.isWindows ? const Color(0xFF4A7C59) : const Color(0x00000000),
       title: 'DayPilot',
     ),
     () async {
@@ -111,6 +117,16 @@ class _DesktopFlyoutScopeState extends State<DesktopFlyoutScope>
     await windowManager.setPosition(await _cornerPosition());
     await windowManager.show();
     await windowManager.focus();
+    if (Platform.isWindows) {
+      // The win32 Flutter embedder resizes its child view off a real WM_SIZE
+      // message, which setting the same size again doesn't reliably send.
+      // Nudging the size by a pixel and back forces a genuine one, so the
+      // child view actually gets resized to match the window.
+      await windowManager.setSize(
+        Size(mobileWindowSize.width + 1, mobileWindowSize.height),
+      );
+      await windowManager.setSize(mobileWindowSize);
+    }
     setState(() => _contentVisible = true);
   }
 

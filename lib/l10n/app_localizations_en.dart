@@ -136,6 +136,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Alert at 10pm if you haven\'t opened the app';
 
   @override
+  String get settingsLaunchAtStartup => 'Launch at startup';
+
+  @override
+  String get settingsLaunchAtStartupSubtitle =>
+      'Open DayPilot automatically when you sign in to your PC';
+
+  @override
   String get settingsEditProfile => 'Edit profile';
 
   @override
@@ -836,6 +843,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get authErrorUnknown => 'Something went wrong. Please try again.';
+
+  @override
+  String get authErrorFillAllFields => 'Please fill in all fields.';
+
+  @override
+  String get authRegisterCheckEmail =>
+      'Account created — check your email to confirm before logging in.';
+
+  @override
+  String get authErrorRateLimited =>
+      'Too many attempts — please wait a few minutes before trying again.';
 
   @override
   String get forgotPasswordTitle => 'Recover password';

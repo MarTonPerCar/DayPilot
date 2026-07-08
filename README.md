@@ -41,3 +41,10 @@ This branch is the **final increment**: real UI, real Riverpod architecture, and
 | `Test-Diseño-Flutter` | Design-system-only base this branch builds on |
 | `Incremento-Flutter-TestFinal` | Working branch this increment was developed on before merging here |
 | `Test-Supabase-Flutter` | Standalone spike validating `supabase_flutter` against the real project database |
+
+## Downloads
+
+- [⬇️ Download DayPilot for Windows](https://github.com/MarTonPerCar/DayPilot/releases/download/incremento-flutter-testfinal-v1.0.2/DayPilot-Windows.zip)
+- [⬇️ Download DayPilot for Linux](https://github.com/MarTonPerCar/DayPilot/releases/download/incremento-flutter-testfinal-v1.0.2/DayPilot-Linux.zip)
+
+> **Note:** this is the active working branch — builds here may contain bugs still being worked out, or may be identical to the latest `Incremento-Flutter` release if nothing has changed yet. For the stable version, use the downloads on `Incremento-Flutter` instead.

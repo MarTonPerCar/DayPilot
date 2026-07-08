@@ -45,6 +45,8 @@
   "settingsTaskRemindersSubtitle": "Daily alert with your pending tasks",
   "settingsStreakAlert": "Streak alert",
   "settingsStreakAlertSubtitle": "Alert at 10pm if you haven't opened the app",
+  "settingsLaunchAtStartup": "Launch at startup",
+  "settingsLaunchAtStartupSubtitle": "Open DayPilot automatically when you sign in to your PC",
   "settingsEditProfile": "Edit profile",
   "settingsEditProfileSubtitle": "Name, username, region and password",
   "settingsChangePhoto": "Change photo",
@@ -317,6 +319,9 @@
   "authErrorWeakPassword": "Password must be at least 6 characters.",
   "authErrorInvalidEmail": "Please enter a valid email address.",
   "authErrorUnknown": "Something went wrong. Please try again.",
+  "authErrorFillAllFields": "Please fill in all fields.",
+  "authRegisterCheckEmail": "Account created — check your email to confirm before logging in.",
+  "authErrorRateLimited": "Too many attempts — please wait a few minutes before trying again.",
 
   "forgotPasswordTitle": "Recover password",
   "forgotPasswordSentBody": "Check your email, we've sent you a link to reset your password.",

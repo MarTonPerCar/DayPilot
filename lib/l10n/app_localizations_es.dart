@@ -137,6 +137,13 @@ class AppLocalizationsEs extends AppLocalizations {
       'Aviso a las 22h si no has abierto la app';
 
   @override
+  String get settingsLaunchAtStartup => 'Iniciar con el sistema';
+
+  @override
+  String get settingsLaunchAtStartupSubtitle =>
+      'Abre DayPilot automáticamente al iniciar sesión en tu PC';
+
+  @override
   String get settingsEditProfile => 'Editar perfil';
 
   @override
@@ -840,6 +847,17 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get authErrorUnknown => 'Ha ocurrido un error. Inténtalo de nuevo.';
+
+  @override
+  String get authErrorFillAllFields => 'Rellena todos los campos.';
+
+  @override
+  String get authRegisterCheckEmail =>
+      'Cuenta creada — revisa tu email para confirmarla antes de iniciar sesión.';
+
+  @override
+  String get authErrorRateLimited =>
+      'Demasiados intentos — espera unos minutos antes de volver a intentarlo.';
 
   @override
   String get forgotPasswordTitle => 'Recuperar contraseña';
