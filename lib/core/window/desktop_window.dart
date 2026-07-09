@@ -42,7 +42,15 @@ Future<void> initDesktopWindow() async {
       title: 'DayPilot',
     ),
     () async {
-      await windowManager.setAsFrameless();
+      // TitleBarStyle.hidden (above) already gives a borderless window.
+      // Calling setAsFrameless() too is redundant — it's a second frame
+      // style change back to back, and window_manager's own Windows code
+      // has history of setAsFrameless conflicting with titleBarStyle,
+      // leaving the embedded Flutter view sized wrong. Skip it on Windows;
+      // Linux/macOS keep it since they're confirmed working already.
+      if (!Platform.isWindows) {
+        await windowManager.setAsFrameless();
+      }
       await windowManager.setResizable(false);
       await windowManager.setAlwaysOnTop(true);
     },
@@ -117,16 +125,6 @@ class _DesktopFlyoutScopeState extends State<DesktopFlyoutScope>
     await windowManager.setPosition(await _cornerPosition());
     await windowManager.show();
     await windowManager.focus();
-    if (Platform.isWindows) {
-      // The win32 Flutter embedder resizes its child view off a real WM_SIZE
-      // message, which setting the same size again doesn't reliably send.
-      // Nudging the size by a pixel and back forces a genuine one, so the
-      // child view actually gets resized to match the window.
-      await windowManager.setSize(
-        Size(mobileWindowSize.width + 1, mobileWindowSize.height),
-      );
-      await windowManager.setSize(mobileWindowSize);
-    }
     setState(() => _contentVisible = true);
   }
 
