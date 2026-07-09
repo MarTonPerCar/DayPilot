@@ -3,15 +3,14 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:launch_at_startup/launch_at_startup.dart';
-import 'package:screen_retriever/screen_retriever.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
 
 import '../data/notification_l10n.dart';
+import '../logging/app_logger.dart';
 import '../../l10n/locale_notifier.dart';
 
 const Size mobileWindowSize = Size(390, 844);
-const double _screenEdgeMargin = 24;
 const Duration _popDuration = Duration(milliseconds: 220);
 const Curve _popInCurve = Curves.easeOutBack;
 const Curve _popOutCurve = Curves.easeIn;
@@ -22,12 +21,29 @@ bool get isDesktopPlatform =>
 /// True while a native OS dialog is open, so onWindowBlur doesn't close the flyout.
 final isPickingFileNotifier = ValueNotifier<bool>(false);
 
+Future<void> _logWindowState(String label) async {
+  try {
+    final size = await windowManager.getSize();
+    final position = await windowManager.getPosition();
+    final visible = await windowManager.isVisible();
+    AppLogger.log('[$label] size=$size position=$position visible=$visible');
+  } catch (e, st) {
+    AppLogger.logError('_logWindowState($label)', e, st);
+  }
+}
+
 Future<void> initDesktopWindow() async {
-  if (!isDesktopPlatform) return;
+  if (!isDesktopPlatform) {
+    AppLogger.log('initDesktopWindow: not a desktop platform, skipping');
+    return;
+  }
 
   launchAtStartup.setup(appName: 'DayPilot', appPath: Platform.resolvedExecutable);
+  AppLogger.log('launchAtStartup configured');
 
   await windowManager.ensureInitialized();
+  AppLogger.log('windowManager.ensureInitialized() done');
+
   await windowManager.waitUntilReadyToShow(
     WindowOptions(
       size: mobileWindowSize,
@@ -42,28 +58,32 @@ Future<void> initDesktopWindow() async {
       title: 'DayPilot',
     ),
     () async {
-      // TitleBarStyle.hidden (above) already gives a borderless window.
-      // Calling setAsFrameless() too is redundant — it's a second frame
-      // style change back to back, and window_manager's own Windows code
-      // has history of setAsFrameless conflicting with titleBarStyle,
-      // leaving the embedded Flutter view sized wrong. Skip it on Windows;
-      // Linux/macOS keep it since they're confirmed working already.
+      AppLogger.log('waitUntilReadyToShow callback entered');
+      await _logWindowState('after waitUntilReadyToShow, before frame changes');
+
       if (!Platform.isWindows) {
         await windowManager.setAsFrameless();
+        AppLogger.log('setAsFrameless() called');
+      } else {
+        AppLogger.log('setAsFrameless() skipped on Windows');
       }
       await windowManager.setResizable(false);
       await windowManager.setAlwaysOnTop(true);
+      await _logWindowState('after setResizable/setAlwaysOnTop');
     },
   );
+  await _logWindowState('after waitUntilReadyToShow returned');
 
   await trayManager.setIcon(
     Platform.isWindows
         ? 'assets/images/tray_icon.ico'
         : 'assets/images/tray_icon.png',
   );
+  AppLogger.log('Tray icon set');
 
   await _setTrayMenu();
   dayPilotLocaleNotifier.addListener(_setTrayMenu);
+  AppLogger.log('initDesktopWindow complete');
 }
 
 Future<void> _setTrayMenu() async {
@@ -76,17 +96,6 @@ Future<void> _setTrayMenu() async {
         MenuItem(key: 'exit_app', label: l10n.trayExit),
       ],
     ),
-  );
-}
-
-/// Linux never reports the tray icon's position, so this opens bottom-right.
-Future<Offset> _cornerPosition() async {
-  final display = await screenRetriever.getPrimaryDisplay();
-  final areaOrigin = display.visiblePosition ?? Offset.zero;
-  final areaSize = display.visibleSize ?? display.size;
-  return Offset(
-    areaOrigin.dx + areaSize.width - mobileWindowSize.width - _screenEdgeMargin,
-    areaOrigin.dy + areaSize.height - mobileWindowSize.height - _screenEdgeMargin,
   );
 }
 
@@ -122,20 +131,30 @@ class _DesktopFlyoutScopeState extends State<DesktopFlyoutScope>
   }
 
   Future<void> _open() async {
-    await windowManager.setPosition(await _cornerPosition());
+    AppLogger.log('_open() called');
+    await _logWindowState('_open: before setAlignment');
+    // window_manager's own alignment helper (uses the native monitor work
+    // area directly) instead of our own screenRetriever-based calculation,
+    // in case that calculation was ever wrong on some monitor setups.
+    await windowManager.setAlignment(Alignment.bottomRight);
+    await _logWindowState('_open: after setAlignment');
     await windowManager.show();
     await windowManager.focus();
+    await _logWindowState('_open: after show+focus');
     setState(() => _contentVisible = true);
   }
 
   Future<void> _close() async {
+    AppLogger.log('_close() called');
     setState(() => _contentVisible = false);
     await Future.delayed(_popDuration);
     await windowManager.hide();
   }
 
   Future<void> _toggle() async {
-    if (await windowManager.isVisible()) {
+    final visible = await windowManager.isVisible();
+    AppLogger.log('_toggle() called, currently visible=$visible');
+    if (visible) {
       await _close();
     } else {
       await _open();
@@ -144,12 +163,14 @@ class _DesktopFlyoutScopeState extends State<DesktopFlyoutScope>
 
   @override
   void onWindowBlur() {
+    AppLogger.log('onWindowBlur, isPickingFile=${isPickingFileNotifier.value}, contentVisible=$_contentVisible');
     if (isPickingFileNotifier.value) return;
     if (_contentVisible) _close();
   }
 
   @override
   void onTrayIconMouseDown() {
+    AppLogger.log('onTrayIconMouseDown');
     _toggle();
   }
 
@@ -160,6 +181,7 @@ class _DesktopFlyoutScopeState extends State<DesktopFlyoutScope>
 
   @override
   void onTrayMenuItemClick(MenuItem menuItem) {
+    AppLogger.log('onTrayMenuItemClick: ${menuItem.key}');
     switch (menuItem.key) {
       case 'open_app':
         _toggle();
