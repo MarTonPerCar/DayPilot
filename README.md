@@ -1,3 +1,7 @@
+# DayPilot (Flutter) — Windows debugging scratch branch
+
+Throwaway branch to iterate on a Windows-only layout bug without spamming releases on `Incremento-Flutter-TestFinal`. Not a real branch, don't build on it.
+
 # DayPilot (Flutter)
 
 Flutter port of DayPilot, a productivity app (tasks, steps, Pomodoro timers, app usage limits, social ranking) originally built for Android with Kotlin and Jetpack Compose, backed by Supabase.

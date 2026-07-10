@@ -13,6 +13,7 @@ class AppPrefs {
   static const _notificationsKey = 'notifications_enabled';
   static const _taskRemindersKey = 'task_reminders_enabled';
   static const _streakAlertsKey = 'streak_alerts_enabled';
+  static const _launchAtStartupConfiguredKey = 'launch_at_startup_configured';
 
   String? get theme => _prefs.getString(_themeKey);
   Future<void> setTheme(String value) => _prefs.setString(_themeKey, value);
@@ -31,4 +32,8 @@ class AppPrefs {
 
   bool get streakAlertsEnabled => _prefs.getBool(_streakAlertsKey) ?? true;
   Future<void> setStreakAlertsEnabled(bool value) => _prefs.setBool(_streakAlertsKey, value);
+
+  bool get launchAtStartupConfigured => _prefs.getBool(_launchAtStartupConfiguredKey) ?? false;
+  Future<void> setLaunchAtStartupConfigured(bool value) =>
+      _prefs.setBool(_launchAtStartupConfiguredKey, value);
 }
