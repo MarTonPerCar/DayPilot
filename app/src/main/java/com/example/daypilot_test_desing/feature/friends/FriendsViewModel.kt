@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.core.cache.SessionCache
+import com.example.daypilot_test_desing.core.data.local.NotificationHub
 import com.example.daypilot_test_desing.core.data.model.ReactionType
 import com.example.daypilot_test_desing.core.data.repository.FriendRepository
 import com.example.daypilot_test_desing.data.supabase.SupabaseNotificationRepository
@@ -12,6 +13,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -20,7 +23,13 @@ class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
     private val _uiState = MutableStateFlow(FriendsUiState())
     val uiState: StateFlow<FriendsUiState> = _uiState.asStateFlow()
 
-    init { viewModelScope.launch { load() } }
+    init {
+        viewModelScope.launch { load() }
+        // Fires when a FRIEND_REQUEST/FRIEND_ACCEPTED notification arrives via the
+        // always-on notifications realtime channel (see NotificationsViewModel) —
+        // this screen has no realtime channel of its own.
+        NotificationHub.friendsShouldRefresh.onEach { load() }.launchIn(viewModelScope)
+    }
 
     fun refresh(): Job = viewModelScope.launch { load() }
 

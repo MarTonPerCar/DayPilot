@@ -3,6 +3,7 @@ package com.example.daypilot_test_desing.feature.notifications
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.daypilot_test_desing.core.cache.SessionCache
 import com.example.daypilot_test_desing.core.data.local.NotificationHub
 import com.example.daypilot_test_desing.core.data.repository.NotificationRepository
 import com.example.daypilot_test_desing.data.supabase.SupabaseNotificationRepository.toModel
@@ -62,6 +63,13 @@ class NotificationsViewModel(private val repo: NotificationRepository) : ViewMod
                 runCatching {
                     val dto = json.decodeFromJsonElement<NotificationDto>(change.record)
                     NotificationHub.repo.add(dto.toModel())
+                    if (dto.type == "FRIEND_REQUEST" || dto.type == "FRIEND_ACCEPTED") {
+                        // getFriends() is cache-first with a 5min TTL (see SessionCache) —
+                        // drop it so the refresh this triggers actually fetches fresh data.
+                        SessionCache.friends.value    = null
+                        SessionCache.friendsFetchedAt = 0L
+                        NotificationHub.notifyFriendsChanged()
+                    }
                 }
             }.launchIn(viewModelScope)
 
