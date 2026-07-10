@@ -3,23 +3,34 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:launch_at_startup/launch_at_startup.dart';
+import 'package:screen_retriever/screen_retriever.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
 
 import '../data/notification_l10n.dart';
 import '../logging/app_logger.dart';
+import '../prefs/app_prefs.dart';
 import '../../l10n/locale_notifier.dart';
 
 const Size mobileWindowSize = Size(390, 844);
-const Duration _popDuration = Duration(milliseconds: 220);
-const Curve _popInCurve = Curves.easeOutBack;
-const Curve _popOutCurve = Curves.easeIn;
+const Duration _popDuration = Duration(milliseconds: 260);
+const Curve _popInCurve = Curves.easeOutCubic;
+const Curve _popOutCurve = Curves.easeInCubic;
 
 bool get isDesktopPlatform =>
     !kIsWeb && (Platform.isLinux || Platform.isWindows || Platform.isMacOS);
 
-/// True while a native OS dialog is open, so onWindowBlur doesn't close the flyout.
+/// Kept for compatibility with edit_profile_screen.dart's file-picker guard.
 final isPickingFileNotifier = ValueNotifier<bool>(false);
+
+/// Drives the pop-in/pop-out animation in [DesktopFlyoutAnimator]. Toggled
+/// from here (not from a widget's setState) because the tray/window-close
+/// handlers below are the ones that know when a hide/show is happening.
+final flyoutVisibleNotifier = ValueNotifier<bool>(true);
+
+DateTime? _lastShowAt;
+bool _isHiding = false;
+bool _isShowing = false;
 
 Future<void> _logWindowState(String label) async {
   try {
@@ -35,24 +46,90 @@ Future<void> _logWindowState(String label) async {
   }
 }
 
+Future<void> _alignToPrimaryTaskbarCorner() async {
+  final primary = await screenRetriever.getPrimaryDisplay();
+  final workPos = primary.visiblePosition ?? const Offset(0, 0);
+  final workSize = primary.visibleSize ?? primary.size;
+  final windowSize = await windowManager.getSize();
+
+  final x = workPos.dx + workSize.width - windowSize.width;
+  final y = workPos.dy + workSize.height - windowSize.height;
+
+  await windowManager.setPosition(Offset(x, y));
+}
+
+/// Plays the pop-out animation, THEN hides the native window — the window
+/// has to still be on screen while the animation runs, or there'd be
+/// nothing visible to animate.
+Future<void> _hideWithAnimation(String reason) async {
+  if (_isHiding) {
+    AppLogger.log('_hideWithAnimation($reason) ignored — already hiding');
+    return;
+  }
+  if (_lastShowAt != null &&
+      DateTime.now().difference(_lastShowAt!) < const Duration(milliseconds: 400)) {
+    AppLogger.log('_hideWithAnimation($reason) ignored — too soon after show()');
+    return;
+  }
+  _isHiding = true;
+  AppLogger.log('_hideWithAnimation($reason)');
+  // Force topmost just for the closing animation, so whatever window just
+  // took focus (e.g. an app the user clicked) doesn't instantly cover ours
+  // and cut the animation off before it's even visible.
+  await windowManager.setAlwaysOnTop(true);
+  flyoutVisibleNotifier.value = false;
+  await Future.delayed(_popDuration);
+  await windowManager.setAlwaysOnTop(false);
+  await windowManager.hide();
+  await _logWindowState('after $reason -> hide()');
+  _isHiding = false;
+}
+
+/// Shows the native window first, THEN plays the pop-in animation.
+Future<void> _showWithAnimation(String reason) async {
+  if (_isShowing) {
+    AppLogger.log('_showWithAnimation($reason) ignored — already showing');
+    return;
+  }
+  _isShowing = true;
+  // Set the grace-period timestamp BEFORE the native show()/focus() calls —
+  // a spurious blur can fire while they're still in flight, and if we only
+  // stamp the time afterward, that blur slips through uncovered.
+  _lastShowAt = DateTime.now();
+  AppLogger.log('_showWithAnimation($reason)');
+  await _alignToPrimaryTaskbarCorner();
+  await windowManager.show();
+  flyoutVisibleNotifier.value = true;
+  await windowManager.focus();
+  await _logWindowState('after $reason -> show()');
+  _isShowing = false;
+}
+
+Future<void> _configureLaunchAtStartup() async {
+  launchAtStartup.setup(appName: 'DayPilot', appPath: Platform.resolvedExecutable);
+  AppLogger.log('launchAtStartup configured');
+
+  final prefs = await AppPrefs.load();
+  if (!prefs.launchAtStartupConfigured) {
+    // First run ever: default to enabled, like most tray apps do. On every
+    // later run we leave it alone and respect whatever the user chose via
+    // the Settings toggle, instead of silently re-enabling it each launch.
+    await launchAtStartup.enable();
+    await prefs.setLaunchAtStartupConfigured(true);
+    AppLogger.log('launchAtStartup: first run, enabled by default');
+  }
+}
+
 Future<void> initDesktopWindow() async {
   if (!isDesktopPlatform) {
     AppLogger.log('initDesktopWindow: not a desktop platform, skipping');
     return;
   }
 
-  launchAtStartup.setup(appName: 'DayPilot', appPath: Platform.resolvedExecutable);
-  AppLogger.log('launchAtStartup configured');
-
   await windowManager.ensureInitialized();
   AppLogger.log('windowManager.ensureInitialized() done');
   await _logWindowState('right after ensureInitialized');
 
-  // The native Windows runner shows its window immediately on creation
-  // (standard win32_window.cpp behavior) — independent of window_manager's
-  // waitUntilReadyToShow, which assumes the window starts hidden. Force it
-  // hidden explicitly so the raw/unpositioned window never flashes visible
-  // before we've had a chance to size, position, and style it.
   await windowManager.hide();
   AppLogger.log('windowManager.hide() called explicitly');
   await _logWindowState('after explicit hide()');
@@ -63,29 +140,21 @@ Future<void> initDesktopWindow() async {
       minimumSize: mobileWindowSize,
       maximumSize: mobileWindowSize,
       skipTaskbar: true,
-      titleBarStyle: TitleBarStyle.hidden,
-      // True per-pixel transparency isn't reliably compositied on Windows —
-      // it can leave stale/garbled content from whatever's behind the
-      // window instead of blending properly. Linux/macOS handle it fine.
-      backgroundColor: Platform.isWindows ? const Color(0xFF4A7C59) : const Color(0x00000000),
+      backgroundColor: const Color(0x00000000),
       title: 'DayPilot',
     ),
     () async {
       AppLogger.log('waitUntilReadyToShow callback entered');
-      await _logWindowState('after waitUntilReadyToShow, before frame changes');
-
-      if (!Platform.isWindows) {
-        await windowManager.setAsFrameless();
-        AppLogger.log('setAsFrameless() called');
-      } else {
-        AppLogger.log('setAsFrameless() skipped on Windows');
-      }
+      await windowManager.setAsFrameless();
       await windowManager.setResizable(false);
-      await windowManager.setAlwaysOnTop(true);
-      await _logWindowState('after setResizable/setAlwaysOnTop');
+      await _alignToPrimaryTaskbarCorner();
+      await windowManager.show();
+      await windowManager.focus();
+      flyoutVisibleNotifier.value = true;
+      await _logWindowState('after show+focus');
     },
   );
-  await _logWindowState('after waitUntilReadyToShow returned');
+  AppLogger.log('initDesktopWindow complete');
 
   await trayManager.setIcon(
     Platform.isWindows
@@ -96,7 +165,14 @@ Future<void> initDesktopWindow() async {
 
   await _setTrayMenu();
   dayPilotLocaleNotifier.addListener(_setTrayMenu);
-  AppLogger.log('initDesktopWindow complete');
+
+  TrayIconClickHandler.register();
+
+  await windowManager.setPreventClose(true);
+  AppLogger.log('setPreventClose(true) set');
+  WindowCloseHandler.register();
+
+  await _configureLaunchAtStartup();
 }
 
 Future<void> _setTrayMenu() async {
@@ -112,79 +188,29 @@ Future<void> _setTrayMenu() async {
   );
 }
 
-class DesktopFlyoutScope extends StatefulWidget {
-  const DesktopFlyoutScope({super.key, required this.child});
+class TrayIconClickHandler with TrayListener {
+  TrayIconClickHandler._();
 
-  final Widget child;
-
-  @override
-  State<DesktopFlyoutScope> createState() => _DesktopFlyoutScopeState();
-}
-
-class _DesktopFlyoutScopeState extends State<DesktopFlyoutScope>
-    with WindowListener, TrayListener {
-  bool _contentVisible = false;
-
-  @override
-  void initState() {
-    super.initState();
-    if (isDesktopPlatform) {
-      windowManager.addListener(this);
-      trayManager.addListener(this);
-    }
+  static void register() {
+    trayManager.addListener(TrayIconClickHandler._());
   }
 
-  @override
-  void dispose() {
-    if (isDesktopPlatform) {
-      windowManager.removeListener(this);
-      trayManager.removeListener(this);
-    }
-    super.dispose();
-  }
-
-  Future<void> _open() async {
-    AppLogger.log('_open() called');
-    await _logWindowState('_open: before setAlignment');
-    // window_manager's own alignment helper (uses the native monitor work
-    // area directly) instead of our own screenRetriever-based calculation,
-    // in case that calculation was ever wrong on some monitor setups.
-    await windowManager.setAlignment(Alignment.bottomRight);
-    await _logWindowState('_open: after setAlignment');
-    await windowManager.show();
-    await windowManager.focus();
-    await _logWindowState('_open: after show+focus');
-    setState(() => _contentVisible = true);
-  }
-
-  Future<void> _close() async {
-    AppLogger.log('_close() called');
-    setState(() => _contentVisible = false);
-    await Future.delayed(_popDuration);
-    await windowManager.hide();
-  }
-
-  Future<void> _toggle() async {
+  Future<void> _showOrFocus() async {
     final visible = await windowManager.isVisible();
-    AppLogger.log('_toggle() called, currently visible=$visible');
-    if (visible) {
-      await _close();
+    AppLogger.log('_showOrFocus, currently visible=$visible');
+    if (!visible) {
+      await _showWithAnimation('_showOrFocus');
     } else {
-      await _open();
+      _lastShowAt = DateTime.now();
+      await windowManager.focus();
     }
-  }
-
-  @override
-  void onWindowBlur() {
-    AppLogger.log('onWindowBlur, isPickingFile=${isPickingFileNotifier.value}, contentVisible=$_contentVisible');
-    if (isPickingFileNotifier.value) return;
-    if (_contentVisible) _close();
+    await _logWindowState('after _showOrFocus');
   }
 
   @override
   void onTrayIconMouseDown() {
     AppLogger.log('onTrayIconMouseDown');
-    _toggle();
+    _showOrFocus();
   }
 
   @override
@@ -197,30 +223,86 @@ class _DesktopFlyoutScopeState extends State<DesktopFlyoutScope>
     AppLogger.log('onTrayMenuItemClick: ${menuItem.key}');
     switch (menuItem.key) {
       case 'open_app':
-        _toggle();
+        _showOrFocus();
       case 'exit_app':
+        windowManager.setPreventClose(false);
         windowManager.close();
     }
   }
+}
+
+/// Intercepts the native close (X button / Alt+F4) and hides the window
+/// instead of letting the app exit. Also hides on blur (click outside),
+/// unless a native file picker is currently open. Both use the animated
+/// hide so the pop-out plays before the window actually disappears.
+class WindowCloseHandler with WindowListener {
+  WindowCloseHandler._();
+
+  static void register() {
+    windowManager.addListener(WindowCloseHandler._());
+  }
+
+  @override
+  void onWindowClose() async {
+    await _hideWithAnimation('onWindowClose');
+  }
+
+  @override
+  void onWindowBlur() async {
+    AppLogger.log(
+      'onWindowBlur, isPickingFile=${isPickingFileNotifier.value}',
+    );
+    if (isPickingFileNotifier.value) return;
+    await _hideWithAnimation('onWindowBlur');
+  }
+
+  @override
+  void onWindowFocus() {
+    AppLogger.log('onWindowFocus');
+  }
+}
+
+/// Wraps the app in the pop-in/pop-out grow-from-corner animation.
+class DesktopFlyoutAnimator extends StatelessWidget {
+  const DesktopFlyoutAnimator({super.key, required this.child});
+
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    if (!isDesktopPlatform) return widget.child;
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0, end: _contentVisible ? 1.0 : 0.0),
-      duration: _popDuration,
-      curve: _contentVisible ? _popInCurve : _popOutCurve,
-      builder: (context, t, child) {
-        return Opacity(
-          opacity: t.clamp(0.0, 1.0),
-          child: Transform.scale(
-            scale: 0.92 + (t * 0.08),
-            alignment: Alignment.bottomRight,
-            child: child,
+    if (!isDesktopPlatform) return child;
+    return ValueListenableBuilder<bool>(
+      valueListenable: flyoutVisibleNotifier,
+      builder: (context, visible, child) {
+        return Directionality(
+          textDirection: TextDirection.ltr,
+          child: Stack(
+            children: [
+              // Paints the full window every frame so shrinking/growing
+              // never leaves a stale, unrepainted "ghost" of the previous
+              // frame behind.
+              const Positioned.fill(
+                child: ColoredBox(color: Color(0xFF0E1F13)),
+              ),
+              TweenAnimationBuilder<double>(
+                tween: Tween(begin: 0, end: visible ? 1.0 : 0.0),
+                duration: _popDuration,
+                curve: visible ? _popInCurve : _popOutCurve,
+                builder: (context, t, child) {
+                  final scale = 0.05 + (t * 0.95);
+                  return Transform.scale(
+                    scale: scale,
+                    alignment: Alignment.bottomRight,
+                    child: child,
+                  );
+                },
+                child: child,
+              ),
+            ],
           ),
         );
       },
-      child: widget.child,
+      child: child,
     );
   }
 }
