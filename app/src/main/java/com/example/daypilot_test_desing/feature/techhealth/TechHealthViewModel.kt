@@ -57,6 +57,10 @@ class TechHealthViewModel(application: Application) : AndroidViewModel(applicati
                 if (used != r.usedMinutesToday) repository.updateUsage(r.id, used)
             }
             repository.getGroupRestrictions().forEach { g ->
+                g.apps.forEach { app ->
+                    val appUsed = usageMap[app.packageName] ?: 0
+                    if (appUsed != app.usedMinutesToday) repository.updateGroupAppUsage(g.id, app.packageName, appUsed)
+                }
                 val used = g.apps.sumOf { usageMap[it.packageName] ?: 0 }
                 if (used != g.usedMinutesToday) repository.updateGroupUsage(g.id, used)
             }

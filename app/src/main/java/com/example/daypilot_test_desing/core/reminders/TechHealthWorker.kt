@@ -49,6 +49,10 @@ class TechHealthWorker(
         }
 
         repository.getGroupRestrictions().filter { it.isEnabled }.forEach { g ->
+            g.apps.forEach { app ->
+                val appUsed = usageMap[app.packageName] ?: 0
+                if (appUsed != app.usedMinutesToday) repository.updateGroupAppUsage(g.id, app.packageName, appUsed)
+            }
             val used = g.apps.sumOf { usageMap[it.packageName] ?: 0 }
             if (used != g.usedMinutesToday) repository.updateGroupUsage(g.id, used)
             if (used >= g.dailyLimitMinutes && g.dailyLimitMinutes > 0 && !g.isViolatedToday) {

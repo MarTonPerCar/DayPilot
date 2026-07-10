@@ -14,6 +14,7 @@ interface TechHealthRepository {
     fun deleteGroup(id: String)
     fun updateUsage(id: String, usedMinutes: Int)
     fun updateGroupUsage(id: String, usedMinutes: Int)
+    fun updateGroupAppUsage(groupId: String, packageName: String, usedMinutes: Int)
     fun markViolated(id: String)
     fun markGroupViolated(id: String)
     // Swaps a client-generated placeholder group id for the real Supabase row id.

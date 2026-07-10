@@ -105,6 +105,19 @@ class SharedPrefsTechHealthRepository(context: Context) : TechHealthRepository {
         if (idx >= 0) { groups[idx] = groups[idx].copy(usedMinutesToday = usedMinutes); saveGroups(groups) }
     }
 
+    override fun updateGroupAppUsage(groupId: String, packageName: String, usedMinutes: Int) {
+        val groups   = loadGroups()
+        val groupIdx = groups.indexOfFirst { it.id == groupId }
+        if (groupIdx < 0) return
+        val group  = groups[groupIdx]
+        val appIdx = group.apps.indexOfFirst { it.packageName == packageName }
+        if (appIdx < 0) return
+        val updatedApps = group.apps.toMutableList()
+        updatedApps[appIdx] = updatedApps[appIdx].copy(usedMinutesToday = usedMinutes)
+        groups[groupIdx] = group.copy(apps = updatedApps)
+        saveGroups(groups)
+    }
+
     override fun markViolated(id: String) {
         val apps = loadApps()
         val idx  = apps.indexOfFirst { it.id == id }
@@ -152,7 +165,8 @@ class SharedPrefsTechHealthRepository(context: Context) : TechHealthRepository {
                 dailyLimitMinutes   = it.pendingLimitMinutes ?: it.dailyLimitMinutes,
                 pendingLimitMinutes = null,
                 isViolatedToday     = false,
-                usedMinutesToday    = 0
+                usedMinutesToday    = 0,
+                apps                = it.apps.map { app -> app.copy(usedMinutesToday = 0) }
             )
         })
         prefs.edit().putString("last_reset_date", today).apply()
