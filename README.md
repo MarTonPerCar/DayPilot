@@ -251,6 +251,21 @@ Los `user_daily_log` generados con `random()` usan solo valores que la app realm
 
 ---
 
+## Plantillas de email (`emails/`)
+
+Supabase Auth envía sus propios emails (confirmación de registro, restablecer contraseña, etc.) con una plantilla genérica por defecto. `emails/` contiene versiones con la identidad visual de DayPilot (verde salvia, a juego con `docs/confirm.html` en `master`) para pegar directamente en el dashboard.
+
+| Fichero | Sustituye a la plantilla de Supabase |
+|---|---|
+| `emails/confirm_signup.html` | Authentication → Email Templates → **Confirm signup** |
+| `emails/reset_password.html` | Authentication → Email Templates → **Reset Password** |
+
+No hay forma de subir esto por SQL ni por la CLI de este repo — hay que copiar el contenido del fichero y pegarlo en el editor HTML de cada plantilla, en el dashboard del proyecto. Ambas usan `{{ .ConfirmationURL }}`, la variable que ya inyecta Supabase con el enlace real (funciona igual que en la plantilla por defecto, solo cambia el diseño).
+
+Si el proyecto llegase a necesitar un remitente propio (en vez del genérico de Supabase), eso es aparte: se configura en Project Settings → Auth → SMTP Settings con un proveedor real (Resend, SendGrid, Postmark...); las plantillas no lo cambian por sí solas.
+
+---
+
 ## Inspección completa (`04_show_everything.sql`)
 
 Consulta de solo lectura pensada para depurar sin tener que revisar tabla por tabla. Devuelve **una fila por usuario**, ordenada por `username`, con:
