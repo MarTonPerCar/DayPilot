@@ -26,7 +26,10 @@ Future<void> _logWindowState(String label) async {
     final size = await windowManager.getSize();
     final position = await windowManager.getPosition();
     final visible = await windowManager.isVisible();
-    AppLogger.log('[$label] size=$size position=$position visible=$visible');
+    AppLogger.log(
+      '[$label] size=${size.width}x${size.height} '
+      'position=(${position.dx}, ${position.dy}) visible=$visible',
+    );
   } catch (e, st) {
     AppLogger.logError('_logWindowState($label)', e, st);
   }
@@ -43,6 +46,16 @@ Future<void> initDesktopWindow() async {
 
   await windowManager.ensureInitialized();
   AppLogger.log('windowManager.ensureInitialized() done');
+  await _logWindowState('right after ensureInitialized');
+
+  // The native Windows runner shows its window immediately on creation
+  // (standard win32_window.cpp behavior) — independent of window_manager's
+  // waitUntilReadyToShow, which assumes the window starts hidden. Force it
+  // hidden explicitly so the raw/unpositioned window never flashes visible
+  // before we've had a chance to size, position, and style it.
+  await windowManager.hide();
+  AppLogger.log('windowManager.hide() called explicitly');
+  await _logWindowState('after explicit hide()');
 
   await windowManager.waitUntilReadyToShow(
     WindowOptions(
