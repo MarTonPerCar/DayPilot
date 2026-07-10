@@ -858,3 +858,9 @@ CREATE POLICY "notifications_own"         ON notifications FOR SELECT USING (aut
 CREATE POLICY "notifications_insert_auth" ON notifications FOR INSERT WITH CHECK (auth.role() = 'authenticated');
 CREATE POLICY "notifications_update_own"  ON notifications FOR UPDATE USING (auth.uid() = user_id);
 CREATE POLICY "notifications_delete_own"  ON notifications FOR DELETE USING (auth.uid() = user_id);
+
+-- Realtime (Database → Replication): the client subscribes to live row
+-- changes on these tables via Supabase Realtime's postgres_changes, each
+-- filtered to auth.uid() so a user only ever receives their own rows.
+ALTER PUBLICATION supabase_realtime ADD TABLE public.notifications;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.daily_progress;

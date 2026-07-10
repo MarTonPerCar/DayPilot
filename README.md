@@ -191,6 +191,19 @@ Tareas con sus fechas de calendario (JOIN de `tasks` + `task_days`). Expone `occ
 
 ---
 
+## Realtime
+
+Dos tablas están añadidas a la publicación `supabase_realtime` (Database → Replication), para que el cliente reciba cambios en vivo por WebSocket en vez de tener que hacer polling:
+
+| Tabla | Quién la escucha | Para qué |
+|---|---|---|
+| `notifications` | `NotificationsNotifier` (Flutter) | Nuevas notificaciones (solicitud de amistad, amistad aceptada, subida de nivel...) aparecen al instante en la campana, sin refrescar |
+| `daily_progress` | `ProgressNotifier` (Flutter) | Los puntos/progreso de hoy se actualizan al instante en cualquier dispositivo donde la sesión esté abierta, en vez de esperar al polling de refresco (que sigue existiendo como red de seguridad) |
+
+Ambas están filtradas por `user_id = auth.uid()` en el cliente, así que cada usuario solo recibe eventos de sus propias filas.
+
+---
+
 ## Funciones y triggers
 
 | Trigger | Sobre | Cuándo | Efecto |
