@@ -1,10 +1,13 @@
+import 'dart:ffi' hide Size;
 import 'dart:io';
 
+import 'package:ffi/ffi.dart' as ffi;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:launch_at_startup/launch_at_startup.dart';
 import 'package:screen_retriever/screen_retriever.dart';
 import 'package:tray_manager/tray_manager.dart';
+import 'package:win32/win32.dart' as win32;
 import 'package:window_manager/window_manager.dart';
 
 import '../data/notification_l10n.dart';
@@ -17,15 +20,21 @@ const Duration _popDuration = Duration(milliseconds: 260);
 const Curve _popInCurve = Curves.easeOutCubic;
 const Curve _popOutCurve = Curves.easeInCubic;
 
+// Matches app_theme.dart's darkest surface tone — the native window's
+// fallback color during animation, so any sliver exposed while the
+// content shrinks/grows blends in instead of looking like stray UI.
+const _windowBackgroundColor = Color(0x00000000);
+
+const int _vkEscape = 0x1B;
+const int _keyeventfKeyup = 0x0002;
+
 bool get isDesktopPlatform =>
     !kIsWeb && (Platform.isLinux || Platform.isWindows || Platform.isMacOS);
 
 /// Kept for compatibility with edit_profile_screen.dart's file-picker guard.
 final isPickingFileNotifier = ValueNotifier<bool>(false);
 
-/// Drives the pop-in/pop-out animation in [DesktopFlyoutAnimator]. Toggled
-/// from here (not from a widget's setState) because the tray/window-close
-/// handlers below are the ones that know when a hide/show is happening.
+/// Drives the pop-in/pop-out animation in [DesktopFlyoutAnimator].
 final flyoutVisibleNotifier = ValueNotifier<bool>(true);
 
 DateTime? _lastShowAt;
@@ -58,9 +67,26 @@ Future<void> _alignToPrimaryTaskbarCorner() async {
   await windowManager.setPosition(Offset(x, y));
 }
 
-/// Plays the pop-out animation, THEN hides the native window — the window
-/// has to still be on screen while the animation runs, or there'd be
-/// nothing visible to animate.
+/// Closes Windows' native "show hidden icons" tray flyout if it happened to
+/// be open when our tray icon was clicked (our icon can live inside that
+/// overflow panel) — otherwise it lingers on screen, overlapping our own
+/// window with stray system UI. Escape reliably dismisses that panel, same
+/// as it would if the user pressed it themselves.
+void _dismissWindowsTrayFlyout() {
+  if (!Platform.isWindows) return;
+  final inputs = ffi.calloc<win32.INPUT>(2);
+  try {
+    inputs[0].type = win32.INPUT_KEYBOARD;
+    inputs[0].ki.wVk = win32.VIRTUAL_KEY.VK_ESCAPE;
+    inputs[1].type = win32.INPUT_KEYBOARD;
+    inputs[1].ki.wVk = win32.VIRTUAL_KEY.VK_ESCAPE;
+    inputs[1].ki.dwFlags = win32.KEYBD_EVENT_FLAGS.KEYEVENTF_KEYUP;
+    win32.SendInput(2, inputs, sizeOf<win32.INPUT>());
+  } finally {
+    ffi.calloc.free(inputs);
+  }
+}
+
 Future<void> _hideWithAnimation(String reason) async {
   if (_isHiding) {
     AppLogger.log('_hideWithAnimation($reason) ignored — already hiding');
@@ -73,9 +99,6 @@ Future<void> _hideWithAnimation(String reason) async {
   }
   _isHiding = true;
   AppLogger.log('_hideWithAnimation($reason)');
-  // Force topmost just for the closing animation, so whatever window just
-  // took focus (e.g. an app the user clicked) doesn't instantly cover ours
-  // and cut the animation off before it's even visible.
   await windowManager.setAlwaysOnTop(true);
   flyoutVisibleNotifier.value = false;
   await Future.delayed(_popDuration);
@@ -85,22 +108,25 @@ Future<void> _hideWithAnimation(String reason) async {
   _isHiding = false;
 }
 
-/// Shows the native window first, THEN plays the pop-in animation.
 Future<void> _showWithAnimation(String reason) async {
   if (_isShowing) {
     AppLogger.log('_showWithAnimation($reason) ignored — already showing');
     return;
   }
   _isShowing = true;
-  // Set the grace-period timestamp BEFORE the native show()/focus() calls —
-  // a spurious blur can fire while they're still in flight, and if we only
-  // stamp the time afterward, that blur slips through uncovered.
   _lastShowAt = DateTime.now();
   AppLogger.log('_showWithAnimation($reason)');
+  _dismissWindowsTrayFlyout();
   await _alignToPrimaryTaskbarCorner();
   await windowManager.show();
   flyoutVisibleNotifier.value = true;
+  // Some window managers (Linux especially) ignore a focus request right
+  // after the window is mapped. Forcing always-on-top briefly raises it
+  // regardless of whether the WM grants keyboard focus.
+  await windowManager.setAlwaysOnTop(true);
+  await Future.delayed(const Duration(milliseconds: 60));
   await windowManager.focus();
+  await windowManager.setAlwaysOnTop(false);
   await _logWindowState('after $reason -> show()');
   _isShowing = false;
 }
@@ -111,9 +137,6 @@ Future<void> _configureLaunchAtStartup() async {
 
   final prefs = await AppPrefs.load();
   if (!prefs.launchAtStartupConfigured) {
-    // First run ever: default to enabled, like most tray apps do. On every
-    // later run we leave it alone and respect whatever the user chose via
-    // the Settings toggle, instead of silently re-enabling it each launch.
     await launchAtStartup.enable();
     await prefs.setLaunchAtStartupConfigured(true);
     AppLogger.log('launchAtStartup: first run, enabled by default');
@@ -140,7 +163,7 @@ Future<void> initDesktopWindow() async {
       minimumSize: mobileWindowSize,
       maximumSize: mobileWindowSize,
       skipTaskbar: true,
-      backgroundColor: const Color(0x00000000),
+      backgroundColor: _windowBackgroundColor,
       title: 'DayPilot',
     ),
     () async {
@@ -231,10 +254,6 @@ class TrayIconClickHandler with TrayListener {
   }
 }
 
-/// Intercepts the native close (X button / Alt+F4) and hides the window
-/// instead of letting the app exit. Also hides on blur (click outside),
-/// unless a native file picker is currently open. Both use the animated
-/// hide so the pop-out plays before the window actually disappears.
 class WindowCloseHandler with WindowListener {
   WindowCloseHandler._();
 
@@ -249,9 +268,7 @@ class WindowCloseHandler with WindowListener {
 
   @override
   void onWindowBlur() async {
-    AppLogger.log(
-      'onWindowBlur, isPickingFile=${isPickingFileNotifier.value}',
-    );
+    AppLogger.log('onWindowBlur, isPickingFile=${isPickingFileNotifier.value}');
     if (isPickingFileNotifier.value) return;
     await _hideWithAnimation('onWindowBlur');
   }
@@ -262,7 +279,12 @@ class WindowCloseHandler with WindowListener {
   }
 }
 
-/// Wraps the app in the pop-in/pop-out grow-from-corner animation.
+/// Wraps the app in the pop-in/pop-out grow-from-corner animation. No
+/// separate backdrop layer anymore — the native window's own
+/// [_windowBackgroundColor] handles the "don't show stray pixels while
+/// content is smaller than the window" job now, so the whole thing (app +
+/// border) shrinks/grows as one unified block instead of a static panel
+/// sitting behind a shrinking card.
 class DesktopFlyoutAnimator extends StatelessWidget {
   const DesktopFlyoutAnimator({super.key, required this.child});
 
@@ -276,29 +298,19 @@ class DesktopFlyoutAnimator extends StatelessWidget {
       builder: (context, visible, child) {
         return Directionality(
           textDirection: TextDirection.ltr,
-          child: Stack(
-            children: [
-              // Paints the full window every frame so shrinking/growing
-              // never leaves a stale, unrepainted "ghost" of the previous
-              // frame behind.
-              const Positioned.fill(
-                child: ColoredBox(color: Color(0xFF0E1F13)),
-              ),
-              TweenAnimationBuilder<double>(
-                tween: Tween(begin: 0, end: visible ? 1.0 : 0.0),
-                duration: _popDuration,
-                curve: visible ? _popInCurve : _popOutCurve,
-                builder: (context, t, child) {
-                  final scale = 0.05 + (t * 0.95);
-                  return Transform.scale(
-                    scale: scale,
-                    alignment: Alignment.bottomRight,
-                    child: child,
-                  );
-                },
+          child: TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0, end: visible ? 1.0 : 0.0),
+            duration: _popDuration,
+            curve: visible ? _popInCurve : _popOutCurve,
+            builder: (context, t, child) {
+              final scale = 0.05 + (t * 0.95);
+              return Transform.scale(
+                scale: scale,
+                alignment: Alignment.bottomRight,
                 child: child,
-              ),
-            ],
+              );
+            },
+            child: child,
           ),
         );
       },

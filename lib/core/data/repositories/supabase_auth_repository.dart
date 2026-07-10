@@ -91,6 +91,13 @@ class SupabaseAuthRepository implements AuthRepository {
   @override
   Future<void> logout() => _client.auth.signOut();
 
+  @override
+  Future<void> sendPasswordResetEmail(String email) =>
+      _client.auth.resetPasswordForEmail(
+        email,
+        redirectTo: 'https://martonpercar.github.io/DayPilot/reset-password.html',
+      );
+
   Future<void> _ensureProfileExists(User user) async {
     final existing = await _client.from('users').select('id').eq('id', user.id).limit(1);
     if (existing.isNotEmpty) return;
