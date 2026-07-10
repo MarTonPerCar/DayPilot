@@ -38,10 +38,10 @@ Users track daily tasks, steps, and app usage limits, and compete with friends o
 
 **Android:**
 - [⬇️ Descargar DayPilot (Version-Original)](https://github.com/MarTonPerCar/DayPilot/releases/download/v0.1.1/DayPilot.apk)
-- [⬇️ Descargar DayPilot (Incremento-Android)](https://github.com/MarTonPerCar/DayPilot/releases/download/incremento-android-v1.0.0/DayPilot-Incremento-Android.apk)
+- [⬇️ Descargar DayPilot (Incremento-Android)](https://github.com/MarTonPerCar/DayPilot/releases/download/incremento-android-latest/DayPilot-Incremento-Android.apk)
 
 **Flutter (Windows/Linux):**
-- [⬇️ Download DayPilot for Windows](https://github.com/MarTonPerCar/DayPilot/releases/download/incremento-flutter-v1.0.0/DayPilot-Windows.zip)
-- [⬇️ Download DayPilot for Linux](https://github.com/MarTonPerCar/DayPilot/releases/download/incremento-flutter-v1.0.0/DayPilot-Linux.zip)
+- [⬇️ Download DayPilot for Windows](https://github.com/MarTonPerCar/DayPilot/releases/download/incremento-flutter-latest/DayPilot-Windows.zip)
+- [⬇️ Download DayPilot for Linux](https://github.com/MarTonPerCar/DayPilot/releases/download/incremento-flutter-latest/DayPilot-Linux.zip)
 
 **iOS / macOS:** not available yet — future development. Distributing an unsigned build isn't practical on either platform: macOS Gatekeeper blocks unsigned apps for normal users, and iOS can't install an unsigned `.ipa` outside Xcode's own device deployment. Both need an Apple Developer account to sign and notarize/distribute properly.
