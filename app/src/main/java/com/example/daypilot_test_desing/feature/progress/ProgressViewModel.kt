@@ -84,6 +84,17 @@ class ProgressViewModel(
                 load()
             }.launchIn(viewModelScope)
 
+            // user_daily_log has a 1h TTL in SessionCache — force a real refetch
+            // instead of serving the stale 30-day history/streak chart.
+            channel.postgresChangeFlow<PostgresAction>(schema = "public") {
+                table = "user_daily_log"
+                filter("user_id", FilterOperator.EQ, userId)
+            }.onEach {
+                SessionCache.weeklyHistory.value    = null
+                SessionCache.weeklyHistoryFetchedAt = 0L
+                load()
+            }.launchIn(viewModelScope)
+
             // supabase-kt gives up and settles at UNSUBSCRIBED for good after enough
             // failed rejoin attempts (e.g. a stale JWT) — rebuild instead of leaving
             // progress sync dead for the rest of the session.
