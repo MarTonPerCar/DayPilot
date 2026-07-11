@@ -397,9 +397,6 @@ CREATE TRIGGER trg_limit_daily_log
 AFTER INSERT ON user_daily_log
 FOR EACH ROW EXECUTE FUNCTION fn_limit_daily_log();
 
--- Creates the public.users profile row the moment an auth.users row is
--- created (signup), instead of relying on the client to do it later —
--- works regardless of email confirmation timing.
 CREATE OR REPLACE FUNCTION fn_create_user_profile()
 RETURNS TRIGGER
 SECURITY DEFINER SET search_path = public
@@ -420,8 +417,6 @@ BEGIN
             NEW.raw_user_meta_data->>'region'
         );
     EXCEPTION WHEN unique_violation THEN
-        -- Username taken — fall back to a suffixed one rather than failing
-        -- the whole signup transaction.
         INSERT INTO users (id, email, name, username, username_lower, region)
         VALUES (
             NEW.id,
@@ -859,10 +854,63 @@ CREATE POLICY "notifications_insert_auth" ON notifications FOR INSERT WITH CHECK
 CREATE POLICY "notifications_update_own"  ON notifications FOR UPDATE USING (auth.uid() = user_id);
 CREATE POLICY "notifications_delete_own"  ON notifications FOR DELETE USING (auth.uid() = user_id);
 
--- Realtime (Database → Replication): the client subscribes to live row
--- changes on these tables via Supabase Realtime's postgres_changes, each
--- filtered to auth.uid() so a user only ever receives their own rows.
 ALTER PUBLICATION supabase_realtime ADD TABLE public.notifications;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.daily_progress;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.tasks;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.task_days;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.habits_daily;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.user_daily_log;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.friends;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.friend_requests;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.reactions;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.user_streaks;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.user_weekly_summary;
+
+CREATE POLICY "Users can only receive their own friend-stats broadcasts"
+ON "realtime"."messages"
+FOR SELECT
+TO authenticated
+USING (
+    realtime.topic() = 'friend-stats:' || (auth.uid())::text
+);
+
+CREATE OR REPLACE FUNCTION broadcast_stat_change_to_friends()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+    friend_uid UUID;
+    changed_uid UUID := COALESCE(NEW.user_id, OLD.user_id);
+BEGIN
+    FOR friend_uid IN
+        SELECT CASE WHEN requester_id = changed_uid THEN receiver_id ELSE requester_id END
+        FROM friends
+        WHERE requester_id = changed_uid OR receiver_id = changed_uid
+    LOOP
+        PERFORM realtime.broadcast_changes(
+            'friend-stats:' || friend_uid::text,
+            TG_OP,
+            TG_OP,
+            TG_TABLE_NAME,
+            TG_TABLE_SCHEMA,
+            NEW,
+            OLD
+        );
+    END LOOP;
+    RETURN NULL;
+END;
+$$;
+
+CREATE TRIGGER on_user_streaks_change
+AFTER INSERT OR UPDATE OR DELETE ON public.user_streaks
+FOR EACH ROW EXECUTE FUNCTION broadcast_stat_change_to_friends();
+
+CREATE TRIGGER on_user_weekly_summary_change
+AFTER INSERT OR UPDATE OR DELETE ON public.user_weekly_summary
+FOR EACH ROW EXECUTE FUNCTION broadcast_stat_change_to_friends();
+
+CREATE TRIGGER on_points_log_change
+AFTER INSERT ON public.points_log
+FOR EACH ROW EXECUTE FUNCTION broadcast_stat_change_to_friends();
