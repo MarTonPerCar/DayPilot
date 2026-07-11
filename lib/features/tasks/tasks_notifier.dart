@@ -12,10 +12,7 @@ import 'tasks_state.dart';
 
 class TasksNotifier extends Notifier<TasksState> {
   RealtimeChannel? _channel;
-<<<<<<< HEAD
   bool _refreshing = false;
-=======
->>>>>>> 5f3dd585ae241828e6b33e0afe8ad2d1d2dc9a8a
 
   @override
   TasksState build() {
@@ -31,8 +28,6 @@ class TasksNotifier extends Notifier<TasksState> {
       _subscribeToRealtimeOnce();
     } catch (_) {
       state = state.copyWith(isLoading: false);
-    } finally {
-      _subscribeToRealtimeOnce();
     }
   }
 
@@ -77,40 +72,6 @@ class TasksNotifier extends Notifier<TasksState> {
   }
 
   Future<void> refresh() => _load();
-
-  // getTasks() reads from calendar_tasks (a view over tasks + task_days), and
-  // Realtime can only subscribe to base tables — so both are watched here,
-  // filtered to the current user, and any change forces a fresh fetch since
-  // tasksCacheProvider has no TTL of its own (write-through only).
-  void _subscribeToRealtimeOnce() {
-    if (_channel != null) return;
-    final uid = ref.read(supabaseClientProvider).auth.currentUser?.id;
-    if (uid == null) return;
-
-    void onRemoteChange(_) {
-      ref.invalidate(tasksCacheProvider);
-      _load();
-    }
-
-    _channel = ref
-        .read(supabaseClientProvider)
-        .channel('tasks-$uid')
-        .onPostgresChanges(
-          event: PostgresChangeEvent.all,
-          schema: 'public',
-          table: 'tasks',
-          filter: PostgresChangeFilter(type: PostgresChangeFilterType.eq, column: 'user_id', value: uid),
-          callback: onRemoteChange,
-        )
-        .onPostgresChanges(
-          event: PostgresChangeEvent.all,
-          schema: 'public',
-          table: 'task_days',
-          filter: PostgresChangeFilter(type: PostgresChangeFilterType.eq, column: 'user_id', value: uid),
-          callback: onRemoteChange,
-        )
-        .subscribe();
-  }
 
   Future<void> addTask(NewTaskData data) async {
     final placeholderId = 'pending_${DateTime.now().microsecondsSinceEpoch}';

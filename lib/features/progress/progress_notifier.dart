@@ -15,8 +15,6 @@ class ProgressNotifier extends Notifier<AppProgress?> {
   RealtimeChannel? _channel;
   bool _refreshing = false;
 
-  RealtimeChannel? _channel;
-
   @override
   AppProgress? build() {
     Future.microtask(refresh);
@@ -40,17 +38,12 @@ class ProgressNotifier extends Notifier<AppProgress?> {
 
     _channel = ref
         .read(supabaseClientProvider)
-<<<<<<< HEAD
-        .channel('progress-$uid')
-=======
         .channel('daily-progress-$uid')
->>>>>>> 5f3dd585ae241828e6b33e0afe8ad2d1d2dc9a8a
         .onPostgresChanges(
           event: PostgresChangeEvent.all,
           schema: 'public',
           table: 'daily_progress',
           filter: PostgresChangeFilter(type: PostgresChangeFilterType.eq, column: 'user_id', value: uid),
-<<<<<<< HEAD
           callback: (payload) => _refreshFromRealtime(),
         )
         .onPostgresChanges(
@@ -71,11 +64,6 @@ class ProgressNotifier extends Notifier<AppProgress?> {
     } finally {
       _refreshing = false;
     }
-=======
-          callback: (_) => refresh(),
-        )
-        .subscribe();
->>>>>>> 5f3dd585ae241828e6b33e0afe8ad2d1d2dc9a8a
   }
 
   Future<void> completeTimerSession() async {
