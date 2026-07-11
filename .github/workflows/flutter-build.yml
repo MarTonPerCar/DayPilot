@@ -131,7 +131,7 @@ jobs:
             printf '%s\n' " features in a single desktop app."
           } > "$PKGROOT/DEBIAN/control"
 
-          dpkg-deb --build --root-owner-group "$PKGROOT" "$GITHUB_WORKSPACE/DayPilot-Setup.deb"
+          dpkg-deb -Zgzip --build --root-owner-group "$PKGROOT" "$GITHUB_WORKSPACE/DayPilot-Setup.deb"
 
       - name: Upload .deb artifact
         uses: actions/upload-artifact@v4
