@@ -1,3 +1,8 @@
+#define MyAppName "DayPilot"
+#define MyAppVersion "1.0.0"
+#define MyAppPublisher "Mario (ULPGC TFG)"
+#define MyAppExeName "daypilot.exe"
+
 [Setup]
 AppId={{A1B2C3D4-E5F6-4A5B-9C8D-DAYPILOT0001}}
 AppName={#MyAppName}
@@ -10,6 +15,8 @@ Compression=lzma2
 SolidCompression=yes
 WizardStyle=modern
 DisableProgramGroupPage=yes
+CloseApplications=yes
+RestartApplications=yes
 
 [Languages]
 Name: "spanish"; MessagesFile: "compiler:Languages\Spanish.isl"
