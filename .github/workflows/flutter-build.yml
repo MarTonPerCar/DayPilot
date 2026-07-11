@@ -40,24 +40,23 @@ jobs:
       - name: Build Windows release
         run: flutter build windows --release
 
-      - name: Zip build output
-        shell: bash
-        run: |
-          cd build/windows/x64/runner/Release
-          7z a -tzip DayPilot-Windows.zip *
-          mv DayPilot-Windows.zip "$GITHUB_WORKSPACE/"
+      - name: Install Inno Setup
+        run: choco install innosetup -y
 
-      - name: Upload artifact
+      - name: Compile installer
+        run: iscc installer\daypilot_installer.iss
+
+      - name: Upload installer artifact
         uses: actions/upload-artifact@v4
         with:
-          name: DayPilot-Windows
-          path: DayPilot-Windows.zip
+          name: DayPilot-Setup
+          path: installer\Output\DayPilot-Setup.exe
 
       - name: Create GitHub Release (tags only)
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          files: DayPilot-Windows.zip
+          files: installer/Output/DayPilot-Setup.exe
 
   build-linux:
     runs-on: ubuntu-latest
@@ -93,27 +92,23 @@ jobs:
       - name: Build Linux release
         run: flutter build linux --release
 
-      - name: Zip build output
-        run: |
-          cd build/linux/x64/release/bundle
-          zip -r "$GITHUB_WORKSPACE/DayPilot-Linux.zip" .
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: DayPilot-Linux
-          path: DayPilot-Linux.zip
-
-      - name: Build AppImage
+      - name: Build .deb package
         run: |
           set -e
-          APPDIR="$GITHUB_WORKSPACE/DayPilot.AppDir"
-          mkdir -p "$APPDIR/usr/bin"
-          cp -r build/linux/x64/release/bundle/* "$APPDIR/usr/bin/"
+          VERSION="${GITHUB_REF_NAME#v}"
 
-          cp assets/icon/icon.png "$APPDIR/daypilot.png"
+          PKGROOT="$GITHUB_WORKSPACE/debroot"
+          mkdir -p "$PKGROOT/DEBIAN"
+          mkdir -p "$PKGROOT/opt/daypilot"
+          mkdir -p "$PKGROOT/usr/bin"
+          mkdir -p "$PKGROOT/usr/share/applications"
+          mkdir -p "$PKGROOT/usr/share/icons/hicolor/256x256/apps"
 
-          cat > "$APPDIR/daypilot.desktop" <<EOF
+          cp -r build/linux/x64/release/bundle/* "$PKGROOT/opt/daypilot/"
+          cp assets/icon/icon.png "$PKGROOT/usr/share/icons/hicolor/256x256/apps/daypilot.png"
+          ln -s /opt/daypilot/daypilot "$PKGROOT/usr/bin/daypilot"
+
+          cat > "$PKGROOT/usr/share/applications/daypilot.desktop" <<EOF
           [Desktop Entry]
           Type=Application
           Name=DayPilot
@@ -123,27 +118,29 @@ jobs:
           Terminal=false
           EOF
 
-          cat > "$APPDIR/AppRun" <<'EOF'
-          #!/bin/bash
-          HERE="$(dirname "$(readlink -f "${0}")")"
-          exec "${HERE}/usr/bin/daypilot" "$@"
+          cat > "$PKGROOT/DEBIAN/control" <<EOF
+          Package: daypilot
+          Version: $VERSION
+          Section: utils
+          Priority: optional
+          Architecture: amd64
+          Maintainer: Mario Perez Carmona <mario2002pc@hotmail.com>
+          Depends: libgtk-3-0, libayatana-appindicator3-1
+          Description: DayPilot - personal organization and habit tracking app
+           Task management, calendar, health habits, and social rivalry
+           features in a single desktop app.
           EOF
-          chmod +x "$APPDIR/AppRun"
 
-          wget -q "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage" -O appimagetool
-          chmod +x appimagetool
-          ./appimagetool --appimage-extract-and-run "$APPDIR" "$GITHUB_WORKSPACE/DayPilot-x86_64.AppImage"
+          dpkg-deb --build --root-owner-group "$PKGROOT" "$GITHUB_WORKSPACE/DayPilot-Setup.deb"
 
-      - name: Upload AppImage artifact
+      - name: Upload .deb artifact
         uses: actions/upload-artifact@v4
         with:
-          name: DayPilot-AppImage
-          path: DayPilot-x86_64.AppImage
+          name: DayPilot-Setup-deb
+          path: DayPilot-Setup.deb
 
       - name: Create GitHub Release (tags only)
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            DayPilot-Linux.zip
-            DayPilot-x86_64.AppImage
+          files: DayPilot-Setup.deb
