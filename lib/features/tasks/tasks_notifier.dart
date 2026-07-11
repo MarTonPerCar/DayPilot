@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/cache/session_cache.dart';
 import '../../core/data/models/app_task.dart';
@@ -10,9 +11,13 @@ import 'task_error.dart';
 import 'tasks_state.dart';
 
 class TasksNotifier extends Notifier<TasksState> {
+  RealtimeChannel? _channel;
+  bool _refreshing = false;
+
   @override
   TasksState build() {
     Future.microtask(_load);
+    ref.onDispose(() => _channel?.unsubscribe());
     return const TasksState(isLoading: true);
   }
 
@@ -22,6 +27,48 @@ class TasksNotifier extends Notifier<TasksState> {
       state = state.copyWith(tasks: tasks, isLoading: false);
     } catch (_) {
       state = state.copyWith(isLoading: false);
+    } finally {
+      _subscribeToRealtimeOnce();
+    }
+  }
+
+  // calendar_tasks is a VIEW (joins tasks + task_days), so it never emits
+  // its own Realtime events — Postgres only publishes changes on real
+  // tables. Listen on both underlying tables instead, and re-read
+  // calendar_tasks (a normal, allowed SELECT) whenever either fires.
+  void _subscribeToRealtimeOnce() {
+    if (_channel != null) return;
+    final uid = ref.read(supabaseClientProvider).auth.currentUser?.id;
+    if (uid == null) return;
+
+    _channel = ref
+        .read(supabaseClientProvider)
+        .channel('tasks-$uid')
+        .onPostgresChanges(
+          event: PostgresChangeEvent.all,
+          schema: 'public',
+          table: 'tasks',
+          filter: PostgresChangeFilter(type: PostgresChangeFilterType.eq, column: 'user_id', value: uid),
+          callback: (payload) => _refreshFromRealtime(),
+        )
+        .onPostgresChanges(
+          event: PostgresChangeEvent.all,
+          schema: 'public',
+          table: 'task_days',
+          filter: PostgresChangeFilter(type: PostgresChangeFilterType.eq, column: 'user_id', value: uid),
+          callback: (payload) => _refreshFromRealtime(),
+        )
+        .subscribe();
+  }
+
+  Future<void> _refreshFromRealtime() async {
+    if (_refreshing) return; // a burst of changes shouldn't queue up overlapping fetches
+    _refreshing = true;
+    try {
+      ref.invalidate(tasksCacheProvider); // getTasks() short-circuits on cache otherwise
+      await _load();
+    } finally {
+      _refreshing = false;
     }
   }
 
