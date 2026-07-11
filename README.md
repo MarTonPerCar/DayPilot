@@ -47,7 +47,6 @@ This is the active working branch for the final increment: real UI, real Riverpo
 
 ## Downloads
 
-- [⬇️ Download DayPilot for Windows](https://github.com/MarTonPerCar/DayPilot/releases/latest/download/DayPilot-Windows.zip)
-- [⬇️ Download DayPilot for Linux](https://github.com/MarTonPerCar/DayPilot/releases/latest/download/DayPilot-Linux.zip)
+- [⬇️ Download DayPilot for Windows](https://github.com/MarTonPerCar/DayPilot/releases/latest/download/DayPilot-Setup.exe)
 
 > **Note:** this is the active working branch — builds here may contain bugs still being worked out, or may be identical to the latest `Incremento-Flutter` release if nothing has changed yet. For the stable version, use the downloads on `Incremento-Flutter` instead.
