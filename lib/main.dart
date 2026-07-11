@@ -28,21 +28,15 @@ void main() async {
       return true;
     };
 
-    AppLogger.log('Starting initDesktopWindow()');
     await initDesktopWindow();
-    AppLogger.log('initDesktopWindow() done');
 
-    AppLogger.log('Loading env.json');
     final env = jsonDecode(await rootBundle.loadString('env.json')) as Map<String, dynamic>;
-    AppLogger.log('Initializing Supabase');
     await Supabase.initialize(
       url: env['SUPABASE_URL'] as String,
       publishableKey: env['SUPABASE_KEY'] as String,
     );
-    AppLogger.log('Supabase initialized');
 
     await _restorePersistedPreferences();
-    AppLogger.log('Preferences restored, calling runApp()');
 
     runApp(
       const ProviderScope(
