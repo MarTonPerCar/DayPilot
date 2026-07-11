@@ -137,7 +137,3 @@ Tres funcionalidades que quedaron sin implementar en la UI y que se resolverán 
 ## Cómo se verá esta rama al terminar
 
 Cuando `desarrollo` esté completa, DayPilot será una aplicación Android con arquitectura MVVM lista para producción, completamente navegable y funcional durante una sesión, donde todas las interacciones (crear tarea, activar recordatorio, cambiar límite de app) tienen efecto real en la UI aunque los datos no persistan entre arranques. El siguiente paso será sustituir los repositorios falsos por Supabase.
-
----
-
-*Este README se actualizará al finalizar la rama con una sección de retrospectiva: decisiones que cambiaron, problemas encontrados y cómo se resolvieron.*
