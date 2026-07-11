@@ -25,13 +25,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
   project.set_dart_entrypoint_arguments(std::move(command_line_arguments));
 
   FlutterWindow window(project);
-  // Match lib/core/window/desktop_window.dart's mobileWindowSize — this is
-  // the real initial OS window size/position (window_manager only resizes
-  // and repositions it afterward from Dart, which left the rendering
-  // surface inconsistent instead of fixing the visible layout).
-  Win32Window::Point origin(0, 0);
-  Win32Window::Size size(390, 844);
-  if (!window.Create(L"DayPilot", origin, size)) {
+  Win32Window::Point origin(10, 10);
+  Win32Window::Size size(1280, 720);
+  if (!window.Create(L"test_diseno_flutter", origin, size)) {
     return EXIT_FAILURE;
   }
   window.SetQuitOnClose(true);

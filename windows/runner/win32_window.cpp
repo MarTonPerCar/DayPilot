@@ -144,19 +144,6 @@ bool Win32Window::Create(const std::wstring& title,
     return false;
   }
 
-  // Windows 11 rounds window corners at the compositor level, independent
-  // of window style — this happens even for popup/frameless windows and
-  // can leave a thin anti-aliased sliver exposing whatever's behind.
-  const DWORD kWindowCornerPreferenceAttr = 33;  // DWMWA_WINDOW_CORNER_PREFERENCE
-  const DWORD kCornerDoNotRound = 1;             // DWMWCP_DONOTROUND
-  DwmSetWindowAttribute(window, kWindowCornerPreferenceAttr,
-                        &kCornerDoNotRound, sizeof(kCornerDoNotRound));
-
-  const DWORD kBorderColorAttr = 34;             // DWMWA_BORDER_COLOR
-  const DWORD kBorderColorNone = 0xFFFFFFFE;     // DWMWA_COLOR_NONE
-  DwmSetWindowAttribute(window, kBorderColorAttr,
-                        &kBorderColorNone, sizeof(kBorderColorNone));
-
   UpdateTheme(window);
 
   return OnCreate();

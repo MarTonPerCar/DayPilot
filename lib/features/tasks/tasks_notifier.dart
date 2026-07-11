@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/cache/session_cache.dart';
 import '../../core/data/models/app_task.dart';
@@ -11,12 +10,9 @@ import 'task_error.dart';
 import 'tasks_state.dart';
 
 class TasksNotifier extends Notifier<TasksState> {
-  RealtimeChannel? _channel;
-
   @override
   TasksState build() {
     Future.microtask(_load);
-    ref.onDispose(() => _channel?.unsubscribe());
     return const TasksState(isLoading: true);
   }
 
@@ -24,47 +20,12 @@ class TasksNotifier extends Notifier<TasksState> {
     try {
       final tasks = await ref.read(taskRepositoryProvider).getTasks();
       state = state.copyWith(tasks: tasks, isLoading: false);
-      _subscribeToRealtimeOnce();
     } catch (_) {
       state = state.copyWith(isLoading: false);
     }
   }
 
   Future<void> refresh() => _load();
-
-  // getTasks() reads from calendar_tasks (a view over tasks + task_days), and
-  // Realtime can only subscribe to base tables — so both are watched here,
-  // filtered to the current user, and any change forces a fresh fetch since
-  // tasksCacheProvider has no TTL of its own (write-through only).
-  void _subscribeToRealtimeOnce() {
-    if (_channel != null) return;
-    final uid = ref.read(supabaseClientProvider).auth.currentUser?.id;
-    if (uid == null) return;
-
-    void onRemoteChange(_) {
-      ref.invalidate(tasksCacheProvider);
-      _load();
-    }
-
-    _channel = ref
-        .read(supabaseClientProvider)
-        .channel('tasks-$uid')
-        .onPostgresChanges(
-          event: PostgresChangeEvent.all,
-          schema: 'public',
-          table: 'tasks',
-          filter: PostgresChangeFilter(type: PostgresChangeFilterType.eq, column: 'user_id', value: uid),
-          callback: onRemoteChange,
-        )
-        .onPostgresChanges(
-          event: PostgresChangeEvent.all,
-          schema: 'public',
-          table: 'task_days',
-          filter: PostgresChangeFilter(type: PostgresChangeFilterType.eq, column: 'user_id', value: uid),
-          callback: onRemoteChange,
-        )
-        .subscribe();
-  }
 
   Future<void> addTask(NewTaskData data) async {
     final placeholderId = 'pending_${DateTime.now().microsecondsSinceEpoch}';

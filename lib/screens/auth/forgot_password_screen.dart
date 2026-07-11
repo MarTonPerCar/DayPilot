@@ -1,62 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import '../../components/basic/button.dart';
 import '../../components/basic/text_field.dart';
 import '../../components/basic/top_bar.dart';
-import '../../core/data/repositories/providers.dart';
 import '../../l10n/app_localizations.dart';
 
-class ForgotPasswordScreen extends ConsumerStatefulWidget {
+class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
 
   @override
-  ConsumerState<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
+  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
 }
 
-class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
-  final _emailController = TextEditingController();
+class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   bool _loading = false;
   bool _sent = false;
-  String? _error;
 
-  @override
-  void dispose() {
-    _emailController.dispose();
-    super.dispose();
-  }
-
-  bool _isValidEmail(String value) => RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(value);
-
-  Future<void> _send() async {
-    final l10n = AppLocalizations.of(context);
-    final email = _emailController.text.trim();
-
-    if (!_isValidEmail(email)) {
-      setState(() => _error = l10n.authErrorInvalidEmail);
-      return;
-    }
-
+  void _send() async {
+    setState(() => _loading = true);
+    await Future.delayed(const Duration(milliseconds: 800));
+    if (!mounted) return;
     setState(() {
-      _loading = true;
-      _error = null;
+      _loading = false;
+      _sent = true;
     });
-    try {
-      await ref.read(authRepositoryProvider).sendPasswordResetEmail(email);
-      if (!mounted) return;
-      setState(() {
-        _loading = false;
-        _sent = true;
-      });
-    } catch (e, st) {
-      // ignore: avoid_print
-      print('sendPasswordResetEmail failed: $e\n$st');
-      if (!mounted) return;
-      setState(() {
-        _loading = false;
-        _error = l10n.authErrorUnknown;
-      });
-    }
   }
 
   @override
@@ -96,9 +62,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                   if (!_sent) ...[
                     DayPilotTextField(
                       label: l10n.profileInfoEmail,
-                      controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
-                      errorText: _error,
                     ),
                     const SizedBox(height: 20),
                     DayPilotButton(label: l10n.forgotPasswordSendButton, isLoading: _loading, onPressed: _send),

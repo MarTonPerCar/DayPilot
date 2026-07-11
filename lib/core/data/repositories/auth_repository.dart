@@ -5,6 +5,7 @@ abstract class AuthRepository {
 
   Future<AppUser> login({required String email, required String password});
 
+  /// Returns null if email confirmation is required (no session yet).
   Future<AppUser?> signUp({
     required String name,
     required String username,
@@ -14,6 +15,4 @@ abstract class AuthRepository {
   });
 
   Future<void> logout();
-
-  Future<void> sendPasswordResetEmail(String email);
 }
