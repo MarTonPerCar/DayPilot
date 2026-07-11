@@ -108,28 +108,28 @@ jobs:
           cp assets/icon/icon.png "$PKGROOT/usr/share/icons/hicolor/256x256/apps/daypilot.png"
           ln -s /opt/daypilot/daypilot "$PKGROOT/usr/bin/daypilot"
 
-          cat > "$PKGROOT/usr/share/applications/daypilot.desktop" <<EOF
-          [Desktop Entry]
-          Type=Application
-          Name=DayPilot
-          Exec=daypilot
-          Icon=daypilot
-          Categories=Utility;
-          Terminal=false
-          EOF
+          {
+            printf '%s\n' "[Desktop Entry]"
+            printf '%s\n' "Type=Application"
+            printf '%s\n' "Name=DayPilot"
+            printf '%s\n' "Exec=daypilot"
+            printf '%s\n' "Icon=daypilot"
+            printf '%s\n' "Categories=Utility;"
+            printf '%s\n' "Terminal=false"
+          } > "$PKGROOT/usr/share/applications/daypilot.desktop"
 
-          cat > "$PKGROOT/DEBIAN/control" <<EOF
-          Package: daypilot
-          Version: $VERSION
-          Section: utils
-          Priority: optional
-          Architecture: amd64
-          Maintainer: Mario Perez Carmona <mario2002pc@hotmail.com>
-          Depends: libgtk-3-0, libayatana-appindicator3-1
-          Description: DayPilot - personal organization and habit tracking app
-           Task management, calendar, health habits, and social rivalry
-           features in a single desktop app.
-          EOF
+          {
+            printf '%s\n' "Package: daypilot"
+            printf '%s\n' "Version: $VERSION"
+            printf '%s\n' "Section: utils"
+            printf '%s\n' "Priority: optional"
+            printf '%s\n' "Architecture: amd64"
+            printf '%s\n' "Maintainer: Mario Perez Carmona <mario2002pc@hotmail.com>"
+            printf '%s\n' "Depends: libgtk-3-0, libayatana-appindicator3-1"
+            printf '%s\n' "Description: DayPilot - personal organization and habit tracking app"
+            printf '%s\n' " Task management, calendar, health habits, and social rivalry"
+            printf '%s\n' " features in a single desktop app."
+          } > "$PKGROOT/DEBIAN/control"
 
           dpkg-deb --build --root-owner-group "$PKGROOT" "$GITHUB_WORKSPACE/DayPilot-Setup.deb"
 
