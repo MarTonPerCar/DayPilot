@@ -864,3 +864,5 @@ CREATE POLICY "notifications_delete_own"  ON notifications FOR DELETE USING (aut
 -- filtered to auth.uid() so a user only ever receives their own rows.
 ALTER PUBLICATION supabase_realtime ADD TABLE public.notifications;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.daily_progress;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.tasks;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.task_days;
