@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/data/models/app_notification_item.dart';
 import '../../core/data/repositories/providers.dart';
+import '../friends/friends_notifier.dart';
 
 class NotificationsNotifier extends Notifier<List<AppNotificationItem>> {
   RealtimeChannel? _channel;
@@ -41,10 +42,11 @@ class NotificationsNotifier extends Notifier<List<AppNotificationItem>> {
   void _handleInsert(Map<String, dynamic> row) {
     final id = row['id'] as String?;
     if (id == null || state.any((n) => n.id == id)) return; // already have it from a refresh()
+    final type = AppNotificationTypeDb.fromDb(row['type'] as String);
     state = [
       AppNotificationItem(
         id: id,
-        type: AppNotificationTypeDb.fromDb(row['type'] as String),
+        type: type,
         title: row['title'] as String,
         body: row['body'] as String,
         isRead: row['is_read'] as bool? ?? false,
@@ -52,6 +54,13 @@ class NotificationsNotifier extends Notifier<List<AppNotificationItem>> {
       ),
       ...state,
     ];
+
+    // Friend requests/accepts don't have their own realtime channel, so ride
+    // in on this one — the Friends screen would otherwise stay stale until
+    // the next login or manual pull-to-refresh.
+    if (type == AppNotificationType.friendRequest || type == AppNotificationType.friendAccepted) {
+      ref.read(friendsNotifierProvider.notifier).refresh();
+    }
   }
 
   Future<void> markAsRead(String id) async {
