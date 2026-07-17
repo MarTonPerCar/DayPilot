@@ -4,7 +4,6 @@ import 'components/basic/button.dart';
 import 'components/basic/divider.dart';
 import 'components/basic/empty_state.dart';
 import 'components/basic/filter_selector.dart';
-import 'components/basic/reactions.dart';
 import 'components/basic/dropdown_pill.dart';
 import 'components/basic/section_indicator.dart';
 import 'components/basic/task_category.dart';
@@ -54,7 +53,6 @@ class ComponentCatalog extends StatefulWidget {
 
 class _ComponentCatalogState extends State<ComponentCatalog> {
   String _filter = 'Todos';
-  String? _reaction;
   int _activeSection = 0;
 
   bool _task1Done = false;
@@ -225,17 +223,6 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             selected: _filter,
             label: (s) => s,
             onSelected: (s) => setState(() => _filter = s),
-          ),
-
-          _SectionHeader('Reacciones'),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: DayPilotReactions(
-              selected: _reaction,
-              onReact: (e) => setState(
-                () => _reaction = _reaction == e ? null : e,
-              ),
-            ),
           ),
 
           _SectionHeader('Punto de dificultad'),

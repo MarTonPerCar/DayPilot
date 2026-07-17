@@ -12,9 +12,10 @@ class RankingNotifier extends Notifier<List<AppRankingEntry>> {
   @override
   List<AppRankingEntry> build() {
     Future.microtask(refresh);
+    final broadcast = ref.read(friendStatsBroadcastProvider);
     ref.onDispose(() {
       _channel?.unsubscribe();
-      ref.read(friendStatsBroadcastProvider).removeListener(_refreshFromRealtime);
+      broadcast.removeListener(_refreshFromRealtime);
     });
     return const [];
   }

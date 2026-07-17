@@ -32,16 +32,21 @@ class DayPilotRadioGroup<T> extends StatelessWidget {
               style: text.bodySmall?.copyWith(color: colors.onSurfaceVariant),
             ),
           ),
-        ...options.map((opt) {
-          return RadioListTile<T>(
-            title: Text(display(opt)),
-            value: opt,
-            groupValue: value,
-            onChanged: (v) { if (v != null) onChanged(v); },
-            contentPadding: const EdgeInsets.symmetric(horizontal: 4),
-            dense: true,
-          );
-        }),
+        RadioGroup<T>(
+          groupValue: value,
+          onChanged: (v) { if (v != null) onChanged(v); },
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: options.map((opt) {
+              return RadioListTile<T>(
+                title: Text(display(opt)),
+                value: opt,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 4),
+                dense: true,
+              );
+            }).toList(),
+          ),
+        ),
       ],
     );
   }

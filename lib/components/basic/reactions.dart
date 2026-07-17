@@ -1,44 +1,5 @@
 import 'package:flutter/material.dart';
 
-class DayPilotReactions extends StatelessWidget {
-  final String? selected;
-  final void Function(String) onReact;
-
-  static const _emojis = ['👍', '❤️', '🔥', '⭐', '😮', '😢'];
-
-  const DayPilotReactions({
-    super.key,
-    this.selected,
-    required this.onReact,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: _emojis.map((emoji) {
-        final isSelected = emoji == selected;
-        return GestureDetector(
-          onTap: () => onReact(emoji),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 150),
-            margin: const EdgeInsets.only(right: 8),
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: isSelected
-                  ? colors.primaryContainer
-                  : colors.surfaceContainerHighest,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Text(emoji, style: const TextStyle(fontSize: 20)),
-          ),
-        );
-      }).toList(),
-    );
-  }
-}
-
 class DayPilotReactionPicker extends StatefulWidget {
   final String? selected;
   final void Function(String) onReact;
@@ -58,7 +19,8 @@ class DayPilotReactionPicker extends StatefulWidget {
 class _DayPilotReactionPickerState extends State<DayPilotReactionPicker>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
-  bool _open = false;
+  final LayerLink _layerLink = LayerLink();
+  OverlayEntry? _overlayEntry;
 
   @override
   void initState() {
@@ -71,23 +33,95 @@ class _DayPilotReactionPickerState extends State<DayPilotReactionPicker>
 
   @override
   void dispose() {
+    _removeOverlay();
     _controller.dispose();
     super.dispose();
   }
 
   void _toggle() {
-    setState(() => _open = !_open);
-    if (_open) {
-      _controller.forward(from: 0);
+    if (_overlayEntry != null) {
+      _closeOverlay();
     } else {
-      _controller.reverse();
+      _openOverlay();
     }
+  }
+
+  void _openOverlay() {
+    final overlay = Overlay.of(context);
+    _overlayEntry = OverlayEntry(builder: _buildOverlayMenu);
+    overlay.insert(_overlayEntry!);
+    _controller.forward(from: 0);
+    setState(() {});
+  }
+
+  void _closeOverlay() {
+    _controller.reverse().whenComplete(() {
+      _removeOverlay();
+      if (mounted) setState(() {});
+    });
+    setState(() {});
+  }
+
+  void _removeOverlay() {
+    _overlayEntry?.remove();
+    _overlayEntry = null;
   }
 
   void _select(String emoji) {
     widget.onReact(emoji);
-    _controller.reverse();
-    setState(() => _open = false);
+    _closeOverlay();
+  }
+
+  Widget _buildOverlayMenu(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return Positioned(
+      left: 0,
+      top: 0,
+      child: CompositedTransformFollower(
+        link: _layerLink,
+        showWhenUnlinked: false,
+        targetAnchor: Alignment.topRight,
+        followerAnchor: Alignment.bottomRight,
+        offset: const Offset(0, -8),
+        child: ScaleTransition(
+          scale: CurvedAnimation(parent: _controller, curve: Curves.easeOutBack),
+          alignment: Alignment.bottomRight,
+          child: FadeTransition(
+            opacity: _controller,
+            child: Material(
+              color: Colors.transparent,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                decoration: BoxDecoration(
+                  color: colors.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: colors.outlineVariant),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withAlpha(40),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: DayPilotReactionPicker._emojis.map((emoji) {
+                    return GestureDetector(
+                      onTap: () => _select(emoji),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: Text(emoji, style: const TextStyle(fontSize: 20)),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -103,58 +137,14 @@ class _DayPilotReactionPickerState extends State<DayPilotReactionPicker>
       );
     }
 
-    return Stack(
-      clipBehavior: Clip.none,
-      alignment: Alignment.bottomCenter,
-      children: [
-        Positioned(
-          bottom: 44,
-          right: -8,
-          child: IgnorePointer(
-            ignoring: !_open,
-            child: ScaleTransition(
-              scale: CurvedAnimation(parent: _controller, curve: Curves.easeOutBack),
-              alignment: Alignment.bottomRight,
-              child: FadeTransition(
-                opacity: _controller,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: colors.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: colors.outlineVariant),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withAlpha(40),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: DayPilotReactionPicker._emojis.map((emoji) {
-                      return GestureDetector(
-                        onTap: () => _select(emoji),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 4),
-                          child: Text(emoji, style: const TextStyle(fontSize: 20)),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-        _TriggerButton(
-          icon: _open ? Icons.close_rounded : Icons.add_reaction_outlined,
-          background: colors.surfaceContainerHighest,
-          iconColor: colors.onSurfaceVariant,
-          onTap: _toggle,
-        ),
-      ],
+    return CompositedTransformTarget(
+      link: _layerLink,
+      child: _TriggerButton(
+        icon: _overlayEntry != null ? Icons.close_rounded : Icons.add_reaction_outlined,
+        background: colors.surfaceContainerHighest,
+        iconColor: colors.onSurfaceVariant,
+        onTap: _toggle,
+      ),
     );
   }
 }

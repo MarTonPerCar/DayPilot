@@ -244,6 +244,13 @@
   "notifTaskCompletedTitle": "Aufgabe erledigt! ✅",
   "notifTaskCompletedBody": "Du hast \"{title}\" erledigt und 20 Punkte verdient.",
   "@notifTaskCompletedBody": {"placeholders": {"title": {"type": "String"}}},
+  "notifTaskReminderTitle": "Heutige Aufgaben",
+  "notifTaskReminderCount": "Du hast {count} Aufgaben für heute",
+  "@notifTaskReminderCount": {"placeholders": {"count": {"type": "int"}}},
+  "notifTaskReminderNone": "Keine Aufgaben für heute ✓",
+  "notifTaskReminderGeneric": "Überprüfe deine heutigen Aufgaben",
+  "notifStreakDangerTitle": "Serie in Gefahr! 🔥",
+  "notifStreakDangerBody": "Öffne die App vor Mitternacht, um deine Serie zu halten",
 
   "timerPause": "Pausieren",
 

@@ -64,8 +64,8 @@ class _PhotoCropScreenState extends State<PhotoCropScreen> {
     final dx = (_viewportW - scaledW) / 2;
     final dy = (_viewportH - scaledH) / 2;
     _transformController.value = Matrix4.identity()
-      ..translate(dx, dy)
-      ..scale(scale);
+      ..translateByDouble(dx, dy, 0.0, 1.0)
+      ..scaleByDouble(scale, scale, scale, 1.0);
   }
 
   Future<void> _confirm() async {

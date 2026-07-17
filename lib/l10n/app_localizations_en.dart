@@ -646,6 +646,27 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get notifTaskReminderTitle => 'Today\'s Tasks';
+
+  @override
+  String notifTaskReminderCount(int count) {
+    return 'You have $count tasks due today';
+  }
+
+  @override
+  String get notifTaskReminderNone => 'No tasks for today ✓';
+
+  @override
+  String get notifTaskReminderGeneric => 'Check your tasks for today';
+
+  @override
+  String get notifStreakDangerTitle => 'Streak in Danger! 🔥';
+
+  @override
+  String get notifStreakDangerBody =>
+      'Open the app before midnight to keep your streak';
+
+  @override
   String get timerPause => 'Pause';
 
   @override

@@ -48,7 +48,7 @@ class DayPilotColorPicker extends StatelessWidget {
             spacing: 10,
             runSpacing: 10,
             children: colors.map((c) {
-              final isSelected = c.value == value.value;
+              final isSelected = c == value;
               return GestureDetector(
                 onTap: () => onChanged(c),
                 child: AnimatedContainer(

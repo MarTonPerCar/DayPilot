@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../core/window/desktop_notifications.dart';
 import '../features/notifications/notifications_notifier.dart';
 import '../l10n/app_localizations.dart';
 import 'home/home_screen.dart';
@@ -23,6 +24,21 @@ class _MainShellState extends ConsumerState<MainShell> {
     NotificationsScreen(),
     ProfileScreen(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    // Supabase auth is only guaranteed ready once AuthGate has routed here,
+    // so the desktop task-reminder/streak-danger checker starts here rather
+    // than from initDesktopWindow() (which runs before Supabase.initialize).
+    startDesktopDailyNotifications();
+  }
+
+  @override
+  void dispose() {
+    stopDesktopDailyNotifications();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

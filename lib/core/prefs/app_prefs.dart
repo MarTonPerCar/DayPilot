@@ -14,6 +14,9 @@ class AppPrefs {
   static const _taskRemindersKey = 'task_reminders_enabled';
   static const _streakAlertsKey = 'streak_alerts_enabled';
   static const _launchAtStartupConfiguredKey = 'launch_at_startup_configured';
+  static const _lastOpenDateKey = 'last_open_date';
+  static const _taskReminderFiredDateKey = 'task_reminder_fired_date';
+  static const _streakAlertFiredDateKey = 'streak_alert_fired_date';
 
   String? get theme => _prefs.getString(_themeKey);
   Future<void> setTheme(String value) => _prefs.setString(_themeKey, value);
@@ -36,4 +39,19 @@ class AppPrefs {
   bool get launchAtStartupConfigured => _prefs.getBool(_launchAtStartupConfiguredKey) ?? false;
   Future<void> setLaunchAtStartupConfigured(bool value) =>
       _prefs.setBool(_launchAtStartupConfiguredKey, value);
+
+  /// yyyy-MM-dd of the last time the app window was shown/focused — mirrors
+  /// Android's lastOpenDate, used as the "user was active today" signal.
+  String get lastOpenDate => _prefs.getString(_lastOpenDateKey) ?? '';
+  Future<void> setLastOpenDate(String value) => _prefs.setString(_lastOpenDateKey, value);
+
+  /// yyyy-MM-dd the desktop task-reminder notification last fired.
+  String get taskReminderFiredDate => _prefs.getString(_taskReminderFiredDateKey) ?? '';
+  Future<void> setTaskReminderFiredDate(String value) =>
+      _prefs.setString(_taskReminderFiredDateKey, value);
+
+  /// yyyy-MM-dd the desktop streak-danger notification last fired.
+  String get streakAlertFiredDate => _prefs.getString(_streakAlertFiredDateKey) ?? '';
+  Future<void> setStreakAlertFiredDate(String value) =>
+      _prefs.setString(_streakAlertFiredDateKey, value);
 }

@@ -648,6 +648,27 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get notifTaskReminderTitle => 'Tareas de hoy';
+
+  @override
+  String notifTaskReminderCount(int count) {
+    return 'Tienes $count tareas pendientes hoy';
+  }
+
+  @override
+  String get notifTaskReminderNone => 'No tienes tareas para hoy ✓';
+
+  @override
+  String get notifTaskReminderGeneric => 'Revisa tus tareas para hoy';
+
+  @override
+  String get notifStreakDangerTitle => '¡Racha en peligro! 🔥';
+
+  @override
+  String get notifStreakDangerBody =>
+      'Abre la app antes de medianoche para mantener tu racha';
+
+  @override
   String get timerPause => 'Pausar';
 
   @override

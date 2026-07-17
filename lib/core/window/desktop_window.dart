@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ffi' hide Size;
 import 'dart:io';
 
@@ -12,6 +13,7 @@ import 'package:window_manager/window_manager.dart';
 
 import '../data/notification_l10n.dart';
 import '../prefs/app_prefs.dart';
+import '../utils/iso_date.dart';
 import '../../l10n/locale_notifier.dart';
 
 const Size mobileWindowSize = Size(390, 844);
@@ -23,9 +25,6 @@ const Curve _popOutCurve = Curves.easeInCubic;
 // fallback color during animation, so any sliver exposed while the
 // content shrinks/grows blends in instead of looking like stray UI.
 const _windowBackgroundColor = Color(0x00000000);
-
-const int _vkEscape = 0x1B;
-const int _keyeventfKeyup = 0x0002;
 
 bool get isDesktopPlatform =>
     !kIsWeb && (Platform.isLinux || Platform.isWindows || Platform.isMacOS);
@@ -62,10 +61,10 @@ void _dismissWindowsTrayFlyout() {
   final inputs = ffi.calloc<win32.INPUT>(2);
   try {
     inputs[0].type = win32.INPUT_KEYBOARD;
-    inputs[0].ki.wVk = win32.VIRTUAL_KEY.VK_ESCAPE;
+    inputs[0].ki.wVk = win32.VK_ESCAPE;
     inputs[1].type = win32.INPUT_KEYBOARD;
-    inputs[1].ki.wVk = win32.VIRTUAL_KEY.VK_ESCAPE;
-    inputs[1].ki.dwFlags = win32.KEYBD_EVENT_FLAGS.KEYEVENTF_KEYUP;
+    inputs[1].ki.wVk = win32.VK_ESCAPE;
+    inputs[1].ki.dwFlags = win32.KEYEVENTF_KEYUP;
     win32.SendInput(2, inputs, sizeOf<win32.INPUT>());
   } finally {
     ffi.calloc.free(inputs);
@@ -98,6 +97,7 @@ Future<void> _showWithAnimation(String reason) async {
   _dismissWindowsTrayFlyout();
   await _alignToPrimaryTaskbarCorner();
   await windowManager.show();
+  unawaited(_markAppOpenedNow());
   flyoutVisibleNotifier.value = true;
   // Some window managers (Linux especially) ignore a focus request right
   // after the window is mapped. Forcing always-on-top briefly raises it
@@ -107,6 +107,14 @@ Future<void> _showWithAnimation(String reason) async {
   await windowManager.focus();
   await windowManager.setAlwaysOnTop(false);
   _isShowing = false;
+}
+
+/// Tracks that the window was shown/focused today — the desktop analogue of
+/// Android's ON_RESUME hook, used by desktop_notifications.dart as the
+/// "user was active today" signal for the streak-danger alert.
+Future<void> _markAppOpenedNow() async {
+  final prefs = await AppPrefs.load();
+  await prefs.setLastOpenDate(isoDate(DateTime.now()));
 }
 
 Future<void> _configureLaunchAtStartup() async {
@@ -143,6 +151,7 @@ Future<void> initDesktopWindow() async {
       await _alignToPrimaryTaskbarCorner();
       await windowManager.show();
       await windowManager.focus();
+      unawaited(_markAppOpenedNow());
       flyoutVisibleNotifier.value = true;
     },
   );

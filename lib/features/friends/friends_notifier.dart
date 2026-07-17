@@ -20,9 +20,10 @@ class FriendsNotifier extends Notifier<FriendsState> {
   @override
   FriendsState build() {
     Future.microtask(refresh);
+    final broadcast = ref.read(friendStatsBroadcastProvider);
     ref.onDispose(() {
       _channel?.unsubscribe();
-      ref.read(friendStatsBroadcastProvider).removeListener(_refreshFromRealtime);
+      broadcast.removeListener(_refreshFromRealtime);
     });
     return const FriendsState();
   }

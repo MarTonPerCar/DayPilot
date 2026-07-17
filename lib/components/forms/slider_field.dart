@@ -63,8 +63,8 @@ class DayPilotSliderField extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('${min.toStringAsFixed(0)}', style: text.labelSmall?.copyWith(color: colors.onSurfaceVariant)),
-              Text('${max.toStringAsFixed(0)}', style: text.labelSmall?.copyWith(color: colors.onSurfaceVariant)),
+              Text(min.toStringAsFixed(0), style: text.labelSmall?.copyWith(color: colors.onSurfaceVariant)),
+              Text(max.toStringAsFixed(0), style: text.labelSmall?.copyWith(color: colors.onSurfaceVariant)),
             ],
           ),
         ],
