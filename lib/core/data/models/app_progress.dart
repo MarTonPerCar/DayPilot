@@ -20,7 +20,5 @@ class AppProgress {
   final List<double> stepsHistory;
   final List<double> tasksHistory;
 
-  /// Calendar day-of-month for each entry in the history lists above (same
-  /// length, same order) — lets the chart label the x-axis with real dates.
   final List<int> dayLabels;
 }

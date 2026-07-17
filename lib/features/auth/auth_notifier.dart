@@ -29,7 +29,7 @@ class AuthNotifier extends Notifier<AuthSession> {
     ref.invalidate(rankingNotifierProvider);
     ref.invalidate(notificationsNotifierProvider);
     ref.invalidate(techHealthNotifierProvider);
-    // getTasks() short-circuits through this cache before hitting Supabase.
+
     ref.invalidate(tasksCacheProvider);
   }
 

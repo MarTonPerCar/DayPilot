@@ -49,7 +49,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
         _sent = true;
       });
     } catch (e, st) {
-      // ignore: avoid_print
+
       print('sendPasswordResetEmail failed: $e\n$st');
       if (!mounted) return;
       setState(() {

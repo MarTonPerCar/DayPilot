@@ -52,8 +52,7 @@ class SupabaseTechHealthRepository implements TechHealthRepository {
       },
       onConflict: 'user_id, app_package',
     );
-    // Upsert skips false-default columns, so a restriction re-created after a
-    // soft delete needs pending_delete cleared explicitly.
+
     await _client
         .from('tech_health_config')
         .update({'pending_delete': false})
@@ -88,7 +87,6 @@ class SupabaseTechHealthRepository implements TechHealthRepository {
     final uid = _userId;
     if (uid == null) return false;
 
-    // Mirrors fn_close_daily_progress's payout gate: >=3 active restrictions, none violated.
     final rows = await _client
         .from('tech_health_config')
         .select('is_violated_today')

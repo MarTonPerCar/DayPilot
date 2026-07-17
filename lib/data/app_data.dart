@@ -9,9 +9,9 @@ class TimerPreset {
   final IconData icon;
   final Color color;
   final TimerMode mode;
-  final int minutes; // fixed/custom: duración; pomodoro: minutos de trabajo
-  final int restMinutes; // solo pomodoro
-  final int sessions; // solo pomodoro
+  final int minutes;
+  final int restMinutes;
+  final int sessions;
 
   const TimerPreset({
     required this.id,
@@ -30,7 +30,7 @@ class AppReminder {
   final String id;
   final String title;
   final DateTime dateTime;
-  final String frequency; // 'Una vez' | 'Diario' | 'Semanal'
+  final String frequency;
   final bool notifyBefore;
   bool enabled;
 

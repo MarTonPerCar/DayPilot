@@ -21,18 +21,13 @@ const Duration _popDuration = Duration(milliseconds: 260);
 const Curve _popInCurve = Curves.easeOutCubic;
 const Curve _popOutCurve = Curves.easeInCubic;
 
-// Matches app_theme.dart's darkest surface tone — the native window's
-// fallback color during animation, so any sliver exposed while the
-// content shrinks/grows blends in instead of looking like stray UI.
 const _windowBackgroundColor = Color(0x00000000);
 
 bool get isDesktopPlatform =>
     !kIsWeb && (Platform.isLinux || Platform.isWindows || Platform.isMacOS);
 
-/// Kept for compatibility with edit_profile_screen.dart's file-picker guard.
 final isPickingFileNotifier = ValueNotifier<bool>(false);
 
-/// Drives the pop-in/pop-out animation in [DesktopFlyoutAnimator].
 final flyoutVisibleNotifier = ValueNotifier<bool>(true);
 
 DateTime? _lastShowAt;
@@ -51,11 +46,6 @@ Future<void> _alignToPrimaryTaskbarCorner() async {
   await windowManager.setPosition(Offset(x, y));
 }
 
-/// Closes Windows' native "show hidden icons" tray flyout if it happened to
-/// be open when our tray icon was clicked (our icon can live inside that
-/// overflow panel) — otherwise it lingers on screen, overlapping our own
-/// window with stray system UI. Escape reliably dismisses that panel, same
-/// as it would if the user pressed it themselves.
 void _dismissWindowsTrayFlyout() {
   if (!Platform.isWindows) return;
   final inputs = ffi.calloc<win32.INPUT>(2);
@@ -99,9 +89,7 @@ Future<void> _showWithAnimation(String reason) async {
   await windowManager.show();
   unawaited(_markAppOpenedNow());
   flyoutVisibleNotifier.value = true;
-  // Some window managers (Linux especially) ignore a focus request right
-  // after the window is mapped. Forcing always-on-top briefly raises it
-  // regardless of whether the WM grants keyboard focus.
+
   await windowManager.setAlwaysOnTop(true);
   await Future.delayed(const Duration(milliseconds: 60));
   await windowManager.focus();
@@ -109,9 +97,6 @@ Future<void> _showWithAnimation(String reason) async {
   _isShowing = false;
 }
 
-/// Tracks that the window was shown/focused today — the desktop analogue of
-/// Android's ON_RESUME hook, used by desktop_notifications.dart as the
-/// "user was active today" signal for the streak-danger alert.
 Future<void> _markAppOpenedNow() async {
   final prefs = await AppPrefs.load();
   await prefs.setLastOpenDate(isoDate(DateTime.now()));
@@ -244,12 +229,6 @@ class WindowCloseHandler with WindowListener {
   }
 }
 
-/// Wraps the app in the pop-in/pop-out grow-from-corner animation. No
-/// separate backdrop layer anymore — the native window's own
-/// [_windowBackgroundColor] handles the "don't show stray pixels while
-/// content is smaller than the window" job now, so the whole thing (app +
-/// border) shrinks/grows as one unified block instead of a static panel
-/// sitting behind a shrinking card.
 class DesktopFlyoutAnimator extends StatelessWidget {
   const DesktopFlyoutAnimator({super.key, required this.child});
 

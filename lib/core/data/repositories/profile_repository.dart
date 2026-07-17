@@ -12,6 +12,5 @@ abstract class ProfileRepository {
 
   Future<void> changePassword(String newPassword);
 
-  /// Returns the new public URL, already written to users.photo_url.
   Future<String> uploadAvatar({required Uint8List bytes, required String fileExtension});
 }

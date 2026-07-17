@@ -8,7 +8,6 @@ class AuthSession {
   final AuthStatus status;
   final AppUser? user;
 
-  /// Un-localized — widgets format it via `friendlyAuthError`.
   final Object? error;
 
   static const initial = AuthSession(status: AuthStatus.idle);

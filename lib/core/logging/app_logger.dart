@@ -2,12 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 
-/// Writes a plain-text log file next to the running executable — easy to
-/// find and send along when reporting a bug. Starts fresh every launch.
-///
-/// Uses synchronous file writes deliberately: this exists specifically to
-/// capture what happened right before a crash, so a write that's still
-/// in flight when the process dies is useless.
 class AppLogger {
   AppLogger._();
 
@@ -32,7 +26,7 @@ class AppLogger {
     try {
       _file?.writeAsStringSync('$line\n', mode: FileMode.append);
     } catch (_) {
-      // Nothing sensible to do if the log file itself can't be written.
+
     }
   }
 

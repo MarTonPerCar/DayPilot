@@ -4,95 +4,101 @@ import 'package:local_notifier/local_notifier.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../data/models/app_notification_item.dart';
-import '../data/notification_l10n.dart';
-import '../data/notification_writer.dart';
 import '../prefs/app_prefs.dart';
 import '../utils/iso_date.dart';
 import 'desktop_window.dart' show isDesktopPlatform;
 
-// Mirrors Android's DailyNotificationScheduler/DailyNotificationsReceiver
-// (AlarmManager + BroadcastReceiver), but desktop has no equivalent
-// wake-from-fully-closed mechanism. These only fire while the app is
-// actually running, via a periodic check against the wall clock instead of
-// a scheduled OS alarm — acceptable given DayPilot stays tray-resident
-// (launch_at_startup) most of the day.
-const _taskReminderHour = 9;
-const _streakDangerHour = 22;
-const _checkInterval = Duration(minutes: 1);
+const _dailyNotificationTypes = {'TASK_REMINDER', 'STREAK_RISK'};
 
-Timer? _dailyNotificationsTimer;
+RealtimeChannel? _channel;
 bool _localNotifierReady = false;
 
-/// Starts the periodic 09:00/22:00 check. Also runs one check immediately,
-/// so logging in after either time has already passed today still fires
-/// that day's notification instead of waiting for tomorrow.
 void startDesktopDailyNotifications() {
   if (!isDesktopPlatform) return;
-  unawaited(_checkDailyNotifications());
-  _dailyNotificationsTimer ??= Timer.periodic(_checkInterval, (_) => _checkDailyNotifications());
+  unawaited(_checkForUnseenNotificationsToday());
+  _subscribeToNewNotifications();
 }
 
 void stopDesktopDailyNotifications() {
-  _dailyNotificationsTimer?.cancel();
-  _dailyNotificationsTimer = null;
+  _channel?.unsubscribe();
+  _channel = null;
 }
 
-Future<void> _checkDailyNotifications() async {
+Future<void> _checkForUnseenNotificationsToday() async {
   final client = Supabase.instance.client;
   final uid = client.auth.currentUser?.id;
   if (uid == null) return;
 
+  final today = isoDate(DateTime.now());
+  final startOfDay = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+
+  final rows = await client
+      .from('notifications')
+      .select()
+      .eq('user_id', uid)
+      .inFilter('type', _dailyNotificationTypes.toList())
+      .gte('created_at', startOfDay.toUtc().toIso8601String());
+
+  for (final row in rows) {
+    final item = AppNotificationItem.fromRow(row);
+    await _maybeShowNative(
+      type: row['type'] as String,
+      title: item.title,
+      body: item.body,
+      today: today,
+    );
+  }
+}
+
+void _subscribeToNewNotifications() {
+  if (_channel != null) return;
+  final client = Supabase.instance.client;
+  final uid = client.auth.currentUser?.id;
+  if (uid == null) return;
+
+  _channel = client
+      .channel('desktop-notifications-$uid')
+      .onPostgresChanges(
+        event: PostgresChangeEvent.insert,
+        schema: 'public',
+        table: 'notifications',
+        filter: PostgresChangeFilter(type: PostgresChangeFilterType.eq, column: 'user_id', value: uid),
+        callback: (payload) {
+          final row = payload.newRecord;
+          final type = row['type'] as String?;
+          if (type == null || !_dailyNotificationTypes.contains(type)) return;
+          final item = AppNotificationItem.fromRow(row);
+          unawaited(_maybeShowNative(
+            type: type,
+            title: item.title,
+            body: item.body,
+            today: isoDate(DateTime.now()),
+          ));
+        },
+      )
+      .subscribe();
+}
+
+Future<void> _maybeShowNative({
+  required String type,
+  required String title,
+  required String body,
+  required String today,
+}) async {
   final prefs = await AppPrefs.load();
   if (!prefs.notificationsEnabled) return;
 
-  final now = DateTime.now();
-  final today = isoDate(now);
-
-  if (prefs.taskRemindersEnabled &&
-      now.hour >= _taskReminderHour &&
-      prefs.taskReminderFiredDate != today) {
-    await _fireTaskReminder(client, uid, prefs, today);
+  if (type == 'TASK_REMINDER') {
+    if (!prefs.taskRemindersEnabled) return;
+    if (prefs.taskReminderFiredDate == today) return;
+    await prefs.setTaskReminderFiredDate(today);
+  } else if (type == 'STREAK_RISK') {
+    if (!prefs.streakAlertsEnabled) return;
+    if (prefs.streakAlertFiredDate == today) return;
+    await prefs.setStreakAlertFiredDate(today);
   }
-
-  if (prefs.streakAlertsEnabled &&
-      now.hour >= _streakDangerHour &&
-      prefs.streakAlertFiredDate != today &&
-      prefs.lastOpenDate != today) {
-    await _fireStreakDanger(client, uid, prefs, today);
-  }
-}
-
-Future<void> _fireTaskReminder(SupabaseClient client, String uid, AppPrefs prefs, String today) async {
-  final l10n = currentL10n();
-
-  int? pendingCount;
-  try {
-    final rows = await client.from('calendar_tasks').select('is_completed').eq('user_id', uid).eq('date', today);
-    pendingCount = rows.where((r) => r['is_completed'] != true).length;
-  } catch (_) {
-    pendingCount = null;
-  }
-
-  final body = switch (pendingCount) {
-    null => l10n.notifTaskReminderGeneric,
-    0 => l10n.notifTaskReminderNone,
-    final n => l10n.notifTaskReminderCount(n),
-  };
-  final title = l10n.notifTaskReminderTitle;
 
   await _showSystemNotification(title, body);
-  await writeNotification(client, userId: uid, type: AppNotificationType.taskReminder, title: title, body: body);
-  await prefs.setTaskReminderFiredDate(today);
-}
-
-Future<void> _fireStreakDanger(SupabaseClient client, String uid, AppPrefs prefs, String today) async {
-  final l10n = currentL10n();
-  final title = l10n.notifStreakDangerTitle;
-  final body = l10n.notifStreakDangerBody;
-
-  await _showSystemNotification(title, body);
-  await writeNotification(client, userId: uid, type: AppNotificationType.streakRisk, title: title, body: body);
-  await prefs.setStreakAlertFiredDate(today);
 }
 
 Future<void> _showSystemNotification(String title, String body) async {

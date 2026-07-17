@@ -28,9 +28,7 @@ class _MainShellState extends ConsumerState<MainShell> {
   @override
   void initState() {
     super.initState();
-    // Supabase auth is only guaranteed ready once AuthGate has routed here,
-    // so the desktop task-reminder/streak-danger checker starts here rather
-    // than from initDesktopWindow() (which runs before Supabase.initialize).
+
     startDesktopDailyNotifications();
   }
 

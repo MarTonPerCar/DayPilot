@@ -31,8 +31,6 @@ class RankingNotifier extends Notifier<List<AppRankingEntry>> {
     final uid = client.auth.currentUser?.id;
     if (uid == null) return;
 
-    // Quién forma parte del ranking (yo + mis amigos): Postgres Changes,
-    // filtrado por usuario, igual que en todo lo demás.
     _channel = client
         .channel('ranking-$uid')
         .onPostgresChanges(
@@ -51,9 +49,6 @@ class RankingNotifier extends Notifier<List<AppRankingEntry>> {
         )
         .subscribe();
 
-    // Puntos de un amigo cambiando (points_log): llega por el mismo canal
-    // privado compartido "friend-stats:<uid>" que usa Amigos — no crear
-    // aquí un segundo canal con el mismo nombre.
     ref.read(friendStatsBroadcastProvider).addListener(_refreshFromRealtime);
   }
 

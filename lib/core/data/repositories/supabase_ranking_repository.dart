@@ -3,8 +3,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/app_ranking_entry.dart';
 import 'ranking_repository.dart';
 
-// SUM(...) in the view's points_last_30_days comes back as Postgres bigint,
-// which PostgREST may serialize as a JSON string rather than a number.
 int _asInt(dynamic value) => value is num ? value.toInt() : int.parse(value.toString());
 
 class SupabaseRankingRepository implements RankingRepository {

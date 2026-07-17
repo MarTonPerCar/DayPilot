@@ -23,8 +23,6 @@ class _PhotoCropScreenState extends State<PhotoCropScreen> {
   bool _saving = false;
   bool _didInitTransform = false;
 
-  // Captured on every build from the LayoutBuilder below, so the AppBar's
-  // confirm button (outside that scope) can still reach the current layout.
   double _holeSize = 0;
   double _viewportW = 0;
   double _viewportH = 0;
@@ -49,10 +47,6 @@ class _PhotoCropScreenState extends State<PhotoCropScreen> {
     super.dispose();
   }
 
-  /// Centers the image and scales it so its shortest side exactly covers
-  /// the crop square — the framing users expect on first opening the
-  /// cropper, instead of the image dumped at raw pixel size unrelated to
-  /// the crop hole.
   void _resetTransform() {
     final image = _decodedImage;
     if (image == null) return;
@@ -73,10 +67,7 @@ class _PhotoCropScreenState extends State<PhotoCropScreen> {
     try {
       final boundary =
           _boundaryKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
-      // Capture the whole (unmasked) interactive viewport at high density,
-      // then crop just the hole's rect out of it in-memory. The dark mask
-      // overlay is a sibling widget, not a child of this boundary, so it
-      // never ends up baked into the captured image.
+
       const pixelRatio = 3.0;
       final full = await boundary.toImage(pixelRatio: pixelRatio);
 
@@ -167,8 +158,7 @@ class _PhotoCropScreenState extends State<PhotoCropScreen> {
                         ),
                       ),
                     ),
-                    // Purely visual — IgnorePointer keeps pan/zoom gestures
-                    // reaching the InteractiveViewer underneath.
+
                     IgnorePointer(
                       child: CustomPaint(
                         size: Size(_viewportW, _viewportH),

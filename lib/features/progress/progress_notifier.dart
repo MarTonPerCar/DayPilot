@@ -8,9 +8,7 @@ import '../../core/data/repositories/providers.dart';
 import '../notifications/notifications_notifier.dart';
 
 class ProgressNotifier extends Notifier<AppProgress?> {
-  // Realtime (below) keeps this fresh instantly; this poll is only a safety
-  // net in case a realtime event is ever missed, e.g. after a dropped
-  // websocket reconnects silently.
+
   static const _refreshInterval = Duration(minutes: 5);
   RealtimeChannel? _channel;
   bool _refreshing = false;

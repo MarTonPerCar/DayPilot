@@ -5,7 +5,6 @@ import '../basic/quick_pick_chip.dart';
 import '../basic/sheet_handle.dart';
 import 'dotted_slider.dart';
 
-/// No group support yet — nothing writes to tech_health_group_config.
 Future<void> showAddRestrictionSheet(
   BuildContext context, {
   required Future<void> Function({

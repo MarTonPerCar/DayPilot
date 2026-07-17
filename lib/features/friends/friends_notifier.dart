@@ -41,7 +41,7 @@ class FriendsNotifier extends Notifier<FriendsState> {
     final client = ref.read(supabaseClientProvider);
     final uid = client.auth.currentUser?.id;
     if (uid == null) return;
-    
+
     _channel = client
         .channel('friends-$uid')
         .onPostgresChanges(

@@ -27,10 +27,7 @@ class SupabaseAuthRepository implements AuthRepository {
     if (user == null) {
       throw const AuthException('No se pudo iniciar sesión.');
     }
-    // This project requires email confirmation, so signUp() never has a
-    // session to insert the profile row with — this is the first point
-    // a confirmed user actually has one, so it's done here instead, from
-    // the name/username/region stashed in user_metadata at signup time.
+
     await _ensureProfileExists(user);
     return _fetchProfile(user.id);
   }
@@ -50,15 +47,12 @@ class SupabaseAuthRepository implements AuthRepository {
         data: {'name': name, 'username': username, 'region': region},
       );
     } on AuthException catch (e) {
-      // Could be a real existing account, or an orphan from a previous
-      // failed signup — sign in to tell the two apart.
+
       if (e.message.toLowerCase().contains('user already registered')) {
         try {
           await _client.auth.signInWithPassword(email: email, password: password);
         } on AuthException {
-          // Wrong password for an existing account — surface the clear
-          // "already registered" message instead of a confusing one about
-          // invalid credentials for what looked like a sign-up attempt.
+
           throw const AuthException('User already registered');
         }
       } else {

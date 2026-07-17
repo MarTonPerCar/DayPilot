@@ -1,3 +1,5 @@
+import '../notification_l10n.dart';
+
 enum AppNotificationType {
   friendRequest,
   friendAccepted,
@@ -49,10 +51,44 @@ class AppNotificationItem {
     required this.createdAt,
   });
 
+  factory AppNotificationItem.fromRow(Map<String, dynamic> row) {
+    final type = AppNotificationTypeDb.fromDb(row['type'] as String);
+    final rawTitle = row['title'] as String;
+    final rawBody = row['body'] as String;
+    final (title, body) = _localizedText(type, rawTitle, rawBody);
+
+    return AppNotificationItem(
+      id: row['id'] as String,
+      type: type,
+      title: title,
+      body: body,
+      isRead: row['is_read'] as bool? ?? false,
+      createdAt: DateTime.parse(row['created_at'] as String),
+    );
+  }
+
   final String id;
   final AppNotificationType type;
   final String title;
   final String body;
   final bool isRead;
   final DateTime createdAt;
+}
+
+(String title, String body) _localizedText(AppNotificationType type, String rawTitle, String rawBody) {
+  final l10n = currentL10n();
+  switch (type) {
+    case AppNotificationType.taskReminder:
+      final body = switch (rawBody) {
+        'TASK_REMINDER_NONE' => l10n.notifTaskReminderNone,
+        final s when s.startsWith('TASK_REMINDER_COUNT:') =>
+          l10n.notifTaskReminderCount(int.parse(s.split(':')[1])),
+        _ => l10n.notifTaskReminderGeneric,
+      };
+      return (l10n.notifTaskReminderTitle, body);
+    case AppNotificationType.streakRisk:
+      return (l10n.notifStreakDangerTitle, l10n.notifStreakDangerBody);
+    default:
+      return (rawTitle, rawBody);
+  }
 }

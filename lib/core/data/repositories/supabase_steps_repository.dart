@@ -1,22 +1,8 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../utils/iso_date.dart';
-import '../models/app_notification_item.dart';
 import '../models/app_steps.dart';
-import '../notification_l10n.dart';
-import '../notification_writer.dart';
-import '../points_writer.dart';
 import 'steps_repository.dart';
-
-typedef _Milestone = ({double threshold, int points, int cumulative});
-
-// Gated by the accumulated steps_points column (server-authoritative), not
-// an in-memory flag, so it survives restarts and multiple devices.
-const _stepMilestones = <_Milestone>[
-  (threshold: 0.5, points: 10, cumulative: 10),
-  (threshold: 0.75, points: 20, cumulative: 30),
-  (threshold: 1.0, points: 30, cumulative: 60),
-];
 
 class SupabaseStepsRepository implements StepsRepository {
   SupabaseStepsRepository(this._client);
@@ -25,13 +11,12 @@ class SupabaseStepsRepository implements StepsRepository {
 
   String? get _userId => _client.auth.currentUser?.id;
 
+  static const _pointsByMilestoneLevel = [0, 10, 30, 60];
+
   @override
   Future<AppSteps> getSteps() async {
     final uid = _userId;
     if (uid == null) return const AppSteps(steps: 0, goal: 2000, pointsEarnedToday: 0);
-
-    // pending_steps_goal/_date on `users` is just staging — nothing
-    // server-side copies it into habits_daily, so this call is what applies it.
     final today = isoDate(DateTime.now());
 
     final userRow = await _client
@@ -43,9 +28,15 @@ class SupabaseStepsRepository implements StepsRepository {
     final pendingDate = userRow['pending_steps_goal_date'] as String?;
     final pendingIsDue = pendingGoal != null && pendingDate != null && pendingDate.compareTo(today) <= 0;
 
-    final habitsRows =
-        await _client.from('habits_daily').select('steps_goal').eq('user_id', uid).eq('date', today);
-    var goal = habitsRows.isEmpty ? 2000 : habitsRows.first['steps_goal'] as int;
+    final habitsRows = await _client
+        .from('habits_daily')
+        .select('steps, steps_goal, steps_milestone_level')
+        .eq('user_id', uid)
+        .eq('date', today);
+    final habitsRow = habitsRows.isEmpty ? null : habitsRows.first;
+    var goal = habitsRow == null ? 2000 : habitsRow['steps_goal'] as int;
+    final steps = habitsRow?['steps'] as int? ?? 0;
+    final milestoneLevel = habitsRow?['steps_milestone_level'] as int? ?? 0;
 
     if (pendingIsDue) {
       goal = pendingGoal;
@@ -55,34 +46,10 @@ class SupabaseStepsRepository implements StepsRepository {
       );
     }
 
-    final progressRows =
-        await _client.from('daily_progress').select('steps, steps_points').eq('user_id', uid);
-    final progress = progressRows.isEmpty ? null : progressRows.first;
-    final steps = progress?['steps'] as int? ?? 0;
-    var pointsEarnedToday = progress?['steps_points'] as int? ?? 0;
-
-    if (goal > 0) {
-      for (final m in _stepMilestones) {
-        if (steps < goal * m.threshold || pointsEarnedToday >= m.cumulative) continue;
-        await logPointsAndCheckLevelUp(_client, userId: uid, points: m.points, source: 'STEPS');
-        pointsEarnedToday += m.points;
-        if (m.cumulative == 60) {
-          final l10n = currentL10n();
-          await writeNotification(
-            _client,
-            userId: uid,
-            type: AppNotificationType.stepsGoal,
-            title: l10n.notifStepsGoalTitle,
-            body: l10n.notifStepsGoalBody,
-          );
-        }
-      }
-    }
-
     return AppSteps(
       steps: steps,
       goal: goal,
-      pointsEarnedToday: pointsEarnedToday,
+      pointsEarnedToday: _pointsByMilestoneLevel[milestoneLevel],
       pendingGoal: pendingIsDue ? null : pendingGoal,
     );
   }

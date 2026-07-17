@@ -40,17 +40,13 @@ class AppPrefs {
   Future<void> setLaunchAtStartupConfigured(bool value) =>
       _prefs.setBool(_launchAtStartupConfiguredKey, value);
 
-  /// yyyy-MM-dd of the last time the app window was shown/focused — mirrors
-  /// Android's lastOpenDate, used as the "user was active today" signal.
   String get lastOpenDate => _prefs.getString(_lastOpenDateKey) ?? '';
   Future<void> setLastOpenDate(String value) => _prefs.setString(_lastOpenDateKey, value);
 
-  /// yyyy-MM-dd the desktop task-reminder notification last fired.
   String get taskReminderFiredDate => _prefs.getString(_taskReminderFiredDateKey) ?? '';
   Future<void> setTaskReminderFiredDate(String value) =>
       _prefs.setString(_taskReminderFiredDateKey, value);
 
-  /// yyyy-MM-dd the desktop streak-danger notification last fired.
   String get streakAlertFiredDate => _prefs.getString(_streakAlertFiredDateKey) ?? '';
   Future<void> setStreakAlertFiredDate(String value) =>
       _prefs.setString(_streakAlertFiredDateKey, value);

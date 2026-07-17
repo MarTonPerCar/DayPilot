@@ -55,7 +55,6 @@ class SupabaseTaskRepository implements TaskRepository {
       'date': isoDate(data.date),
     });
 
-    // One row per occurrence, capped 90 days out.
     if (data.recurring && data.recurrenceDays >= 1) {
       final limit = data.date.add(const Duration(days: 90));
       var next = data.date.add(Duration(days: data.recurrenceDays));
@@ -100,9 +99,8 @@ class SupabaseTaskRepository implements TaskRepository {
       'completed_at': isDone ? DateTime.now().toUtc().toIso8601String() : null,
     }).eq('id', occurrenceId).eq('user_id', uid);
 
-    if (!isDone) return; // un-checking never revokes points
+    if (!isDone) return;
 
-    // is_earned gates it so toggling off and back on doesn't double-pay.
     final rows = await _client
         .from('calendar_tasks')
         .select('is_earned')

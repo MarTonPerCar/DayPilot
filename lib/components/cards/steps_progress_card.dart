@@ -179,8 +179,8 @@ class _GaugePainter extends CustomPainter {
     required this.progressColor,
   });
 
-  static const _startAngle = 3 * pi / 4; // 135°
-  static const _sweepAngle = 3 * pi / 2; // 270°
+  static const _startAngle = 3 * pi / 4;
+  static const _sweepAngle = 3 * pi / 2;
 
   @override
   void paint(Canvas canvas, Size size) {

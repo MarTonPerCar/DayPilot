@@ -21,7 +21,6 @@ class NotificationsNotifier extends Notifier<List<AppNotificationItem>> {
     _subscribeToRealtimeOnce();
   }
 
-  // These notifications never produce an OS banner, so the in-app list must update live.
   void _subscribeToRealtimeOnce() {
     if (_channel != null) return;
     final uid = ref.read(supabaseClientProvider).auth.currentUser?.id;
@@ -42,27 +41,13 @@ class NotificationsNotifier extends Notifier<List<AppNotificationItem>> {
 
   void _handleInsert(Map<String, dynamic> row) {
     final id = row['id'] as String?;
-    if (id == null || state.any((n) => n.id == id)) return; // already have it from a refresh()
-    final type = AppNotificationTypeDb.fromDb(row['type'] as String);
-    state = [
-      AppNotificationItem(
-        id: id,
-        type: type,
-        title: row['title'] as String,
-        body: row['body'] as String,
-        isRead: row['is_read'] as bool? ?? false,
-        createdAt: DateTime.parse(row['created_at'] as String),
-      ),
-      ...state,
-    ];
+    if (id == null || state.any((n) => n.id == id)) return;
+    final item = AppNotificationItem.fromRow(row);
+    state = [item, ...state];
 
-    // Friend requests/accepts and reactions don't have their own realtime
-    // subscription wired to their respective screens, so ride in on this
-    // one — otherwise Friends/Profile would stay stale until the next
-    // login, manual refresh, or (for the weekly summary) up to 5 minutes.
-    if (type == AppNotificationType.friendRequest || type == AppNotificationType.friendAccepted) {
+    if (item.type == AppNotificationType.friendRequest || item.type == AppNotificationType.friendAccepted) {
       ref.read(friendsNotifierProvider.notifier).refresh();
-    } else if (type == AppNotificationType.reaction) {
+    } else if (item.type == AppNotificationType.reaction) {
       ref.read(weeklySummaryNotifierProvider.notifier).refresh();
     }
   }

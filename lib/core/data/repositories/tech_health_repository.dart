@@ -11,7 +11,6 @@ abstract class TechHealthRepository {
 
   Future<void> toggleRestriction(String appPackage, bool isActive);
 
-  /// Soft delete — the nightly cron does the actual DELETE the next day.
   Future<void> deleteRestriction(String appPackage);
 
   Future<bool> getPointEarnedToday();

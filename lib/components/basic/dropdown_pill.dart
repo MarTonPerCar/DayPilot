@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class DropdownPillItem<T> {
-  /// `null` representa la opción "Todas" (sin filtro).
+
   final T? value;
   final String label;
   final IconData icon;

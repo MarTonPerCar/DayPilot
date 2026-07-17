@@ -50,6 +50,13 @@ static void my_application_activate(GApplication* application) {
     gtk_window_set_title(window, "DayPilot");
   }
 
+  GdkScreen* rgba_screen = gtk_widget_get_screen(GTK_WIDGET(window));
+  GdkVisual* rgba_visual = gdk_screen_get_rgba_visual(rgba_screen);
+  if (rgba_visual != nullptr && gdk_screen_is_composited(rgba_screen)) {
+    gtk_widget_set_visual(GTK_WIDGET(window), rgba_visual);
+  }
+  gtk_widget_set_app_paintable(GTK_WIDGET(window), TRUE);
+
   // Must match mobileWindowSize in desktop_window.dart.
   gtk_window_set_default_size(window, 390, 844);
   gtk_widget_realize(GTK_WIDGET(window));

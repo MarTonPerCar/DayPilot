@@ -31,10 +31,6 @@ class TasksNotifier extends Notifier<TasksState> {
     }
   }
 
-  // calendar_tasks is a VIEW (joins tasks + task_days), so it never emits
-  // its own Realtime events — Postgres only publishes changes on real
-  // tables. Listen on both underlying tables instead, and re-read
-  // calendar_tasks (a normal, allowed SELECT) whenever either fires.
   void _subscribeToRealtimeOnce() {
     if (_channel != null) return;
     final uid = ref.read(supabaseClientProvider).auth.currentUser?.id;
@@ -61,10 +57,10 @@ class TasksNotifier extends Notifier<TasksState> {
   }
 
   Future<void> _refreshFromRealtime() async {
-    if (_refreshing) return; // a burst of changes shouldn't queue up overlapping fetches
+    if (_refreshing) return;
     _refreshing = true;
     try {
-      ref.invalidate(tasksCacheProvider); // getTasks() short-circuits on cache otherwise
+      ref.invalidate(tasksCacheProvider);
       await _load();
     } finally {
       _refreshing = false;

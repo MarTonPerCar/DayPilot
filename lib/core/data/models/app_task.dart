@@ -25,8 +25,6 @@ class NewTaskData {
   final int recurrenceDays;
 }
 
-/// [id] is the recurring series (`tasks.id`); [occurrenceId] is a single date
-/// (`task_days.id`), used to toggle done.
 class AppTask {
   const AppTask({
     required this.id,
