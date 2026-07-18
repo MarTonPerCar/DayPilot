@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/data/models/app_tech_restriction.dart';
 import '../../core/data/repositories/providers.dart';
+import '../../core/logging/app_logger.dart';
 
 class TechHealthState {
   const TechHealthState({this.restrictions = const [], this.pointEarnedToday = false});
@@ -18,10 +19,14 @@ class TechHealthNotifier extends Notifier<TechHealthState> {
   }
 
   Future<void> refresh() async {
-    final repo = ref.read(techHealthRepositoryProvider);
-    final restrictions = await repo.getRestrictions();
-    final pointEarnedToday = await repo.getPointEarnedToday();
-    state = TechHealthState(restrictions: restrictions, pointEarnedToday: pointEarnedToday);
+    try {
+      final repo = ref.read(techHealthRepositoryProvider);
+      final restrictions = await repo.getRestrictions();
+      final pointEarnedToday = await repo.getPointEarnedToday();
+      state = TechHealthState(restrictions: restrictions, pointEarnedToday: pointEarnedToday);
+    } catch (e, st) {
+      AppLogger.logError('TechHealthNotifier.refresh', e, st);
+    }
   }
 
   Future<void> saveRestriction({

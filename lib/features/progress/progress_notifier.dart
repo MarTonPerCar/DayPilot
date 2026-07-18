@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/data/models/app_progress.dart';
 import '../../core/data/repositories/providers.dart';
+import '../../core/logging/app_logger.dart';
 import '../notifications/notifications_notifier.dart';
 
 class ProgressNotifier extends Notifier<AppProgress?> {
@@ -25,8 +26,12 @@ class ProgressNotifier extends Notifier<AppProgress?> {
   }
 
   Future<void> refresh() async {
-    state = await ref.read(progressRepositoryProvider).getProgress();
-    _subscribeToRealtimeOnce();
+    try {
+      state = await ref.read(progressRepositoryProvider).getProgress();
+      _subscribeToRealtimeOnce();
+    } catch (e, st) {
+      AppLogger.logError('ProgressNotifier.refresh', e, st);
+    }
   }
 
   void _subscribeToRealtimeOnce() {
@@ -65,10 +70,14 @@ class ProgressNotifier extends Notifier<AppProgress?> {
   }
 
   Future<void> completeTimerSession() async {
-    final awarded = await ref.read(progressRepositoryProvider).completeTimerSession();
-    if (!awarded) return;
-    await refresh();
-    await ref.read(notificationsNotifierProvider.notifier).refresh();
+    try {
+      final awarded = await ref.read(progressRepositoryProvider).completeTimerSession();
+      if (!awarded) return;
+      await refresh();
+      await ref.read(notificationsNotifierProvider.notifier).refresh();
+    } catch (e, st) {
+      AppLogger.logError('ProgressNotifier.completeTimerSession', e, st);
+    }
   }
 }
 

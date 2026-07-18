@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../core/data/friend_stats_broadcast.dart';
 import '../../core/data/models/app_friend.dart';
 import '../../core/data/repositories/providers.dart';
+import '../../core/logging/app_logger.dart';
 import '../rivalry/ranking_notifier.dart';
 
 class FriendsState {
@@ -29,11 +30,15 @@ class FriendsNotifier extends Notifier<FriendsState> {
   }
 
   Future<void> refresh() async {
-    final repo = ref.read(friendsRepositoryProvider);
-    final friends = await repo.getFriends();
-    final requests = await repo.getIncomingRequests();
-    state = FriendsState(friends: friends, requests: requests);
-    _subscribeToRealtimeOnce();
+    try {
+      final repo = ref.read(friendsRepositoryProvider);
+      final friends = await repo.getFriends();
+      final requests = await repo.getIncomingRequests();
+      state = FriendsState(friends: friends, requests: requests);
+      _subscribeToRealtimeOnce();
+    } catch (e, st) {
+      AppLogger.logError('FriendsNotifier.refresh', e, st);
+    }
   }
 
   void _subscribeToRealtimeOnce() {

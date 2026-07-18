@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../core/data/friend_stats_broadcast.dart';
 import '../../core/data/models/app_ranking_entry.dart';
 import '../../core/data/repositories/providers.dart';
+import '../../core/logging/app_logger.dart';
 
 class RankingNotifier extends Notifier<List<AppRankingEntry>> {
   RealtimeChannel? _channel;
@@ -21,8 +22,12 @@ class RankingNotifier extends Notifier<List<AppRankingEntry>> {
   }
 
   Future<void> refresh() async {
-    state = await ref.read(rankingRepositoryProvider).getRanking();
-    _subscribeToRealtimeOnce();
+    try {
+      state = await ref.read(rankingRepositoryProvider).getRanking();
+      _subscribeToRealtimeOnce();
+    } catch (e, st) {
+      AppLogger.logError('RankingNotifier.refresh', e, st);
+    }
   }
 
   void _subscribeToRealtimeOnce() {

@@ -25,8 +25,8 @@ class AppLogger {
     debugPrint(line);
     try {
       _file?.writeAsStringSync('$line\n', mode: FileMode.append);
-    } catch (_) {
-
+    } catch (e) {
+      debugPrint('AppLogger write failed: $e');
     }
   }
 

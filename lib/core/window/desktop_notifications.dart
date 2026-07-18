@@ -4,6 +4,7 @@ import 'package:local_notifier/local_notifier.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../data/models/app_notification_item.dart';
+import '../logging/app_logger.dart';
 import '../prefs/app_prefs.dart';
 import '../utils/iso_date.dart';
 import 'desktop_window.dart' show isDesktopPlatform;
@@ -29,24 +30,28 @@ Future<void> _checkForUnseenNotificationsToday() async {
   final uid = client.auth.currentUser?.id;
   if (uid == null) return;
 
-  final today = isoDate(DateTime.now());
-  final startOfDay = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+  try {
+    final today = isoDate(DateTime.now());
+    final startOfDay = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
 
-  final rows = await client
-      .from('notifications')
-      .select()
-      .eq('user_id', uid)
-      .inFilter('type', _dailyNotificationTypes.toList())
-      .gte('created_at', startOfDay.toUtc().toIso8601String());
+    final rows = await client
+        .from('notifications')
+        .select()
+        .eq('user_id', uid)
+        .inFilter('type', _dailyNotificationTypes.toList())
+        .gte('created_at', startOfDay.toUtc().toIso8601String());
 
-  for (final row in rows) {
-    final item = AppNotificationItem.fromRow(row);
-    await _maybeShowNative(
-      type: row['type'] as String,
-      title: item.title,
-      body: item.body,
-      today: today,
-    );
+    for (final row in rows) {
+      final item = AppNotificationItem.fromRow(row);
+      await _maybeShowNative(
+        type: row['type'] as String,
+        title: item.title,
+        body: item.body,
+        today: today,
+      );
+    }
+  } catch (e, st) {
+    AppLogger.logError('checkForUnseenNotificationsToday', e, st);
   }
 }
 

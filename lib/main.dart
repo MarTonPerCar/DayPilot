@@ -28,7 +28,11 @@ void main() async {
       return true;
     };
 
-    await initDesktopWindow();
+    try {
+      await initDesktopWindow();
+    } catch (e, st) {
+      AppLogger.logError('initDesktopWindow', e, st);
+    }
 
     final env = jsonDecode(await rootBundle.loadString('env.json')) as Map<String, dynamic>;
     await Supabase.initialize(

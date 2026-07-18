@@ -13,6 +13,7 @@ import '../../components/basic/top_bar.dart';
 import '../../components/forms/select_field.dart';
 import '../../core/data/models/app_profile_stats.dart';
 import '../../core/data/repositories/providers.dart';
+import '../../core/logging/app_logger.dart';
 import '../../core/window/desktop_window.dart';
 import '../../data/app_data.dart';
 import '../../features/profile/profile_notifier.dart';
@@ -111,7 +112,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         _avatarUrl = url;
         _uploadingAvatar = false;
       });
-    } catch (_) {
+    } catch (e, st) {
+      AppLogger.logError('EditProfileScreen._pickAndUploadAvatar', e, st);
       if (!mounted) return;
       setState(() => _uploadingAvatar = false);
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.settingsAvatarUploadError)));
@@ -119,19 +121,27 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   }
 
   Future<void> _save() async {
+    final l10n = AppLocalizations.of(context);
     final name = _nameController.text.trim();
     final username = _usernameController.text.trim();
     if (name.isEmpty || username.isEmpty) return;
 
     setState(() => _saving = true);
-    await ref.read(profileRepositoryProvider).updateProfile(
-          name: name,
-          username: username,
-          region: _region,
-        );
-    await ref.read(profileStatsNotifierProvider.notifier).refresh();
-    if (!mounted) return;
-    Navigator.pop(context);
+    try {
+      await ref.read(profileRepositoryProvider).updateProfile(
+            name: name,
+            username: username,
+            region: _region,
+          );
+      await ref.read(profileStatsNotifierProvider.notifier).refresh();
+      if (!mounted) return;
+      Navigator.pop(context);
+    } catch (e, st) {
+      AppLogger.logError('EditProfileScreen._save', e, st);
+      if (!mounted) return;
+      setState(() => _saving = false);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.authErrorUnknown)));
+    }
   }
 
   void _openChangePassword() {
@@ -279,7 +289,8 @@ class _ChangePasswordSheetState extends ConsumerState<_ChangePasswordSheet> {
       if (!mounted) return;
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.settingsPasswordChanged)));
-    } catch (_) {
+    } catch (e, st) {
+      AppLogger.logError('EditProfileScreen._ChangePasswordSheet._submit', e, st);
       if (!mounted) return;
       setState(() {
         _saving = false;

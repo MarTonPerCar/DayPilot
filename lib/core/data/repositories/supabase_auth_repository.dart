@@ -1,5 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../logging/app_logger.dart';
 import '../models/app_user.dart';
 import '../models/auth_exceptions.dart';
 import 'auth_repository.dart';
@@ -46,16 +47,16 @@ class SupabaseAuthRepository implements AuthRepository {
         password: password,
         data: {'name': name, 'username': username, 'region': region},
       );
-    } on AuthException catch (e) {
-
+    } on AuthException catch (e, st) {
       if (e.message.toLowerCase().contains('user already registered')) {
         try {
           await _client.auth.signInWithPassword(email: email, password: password);
-        } on AuthException {
-
+        } on AuthException catch (e2, st2) {
+          AppLogger.logError('SupabaseAuthRepository.signUp retry-login', e2, st2);
           throw const AuthException('User already registered');
         }
       } else {
+        AppLogger.logError('SupabaseAuthRepository.signUp', e, st);
         rethrow;
       }
     }

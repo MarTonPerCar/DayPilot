@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/logging/app_logger.dart';
 import '../../data/app_data.dart';
 import '../../l10n/app_localizations.dart';
 import '../basic/quick_pick_chip.dart';
@@ -96,13 +97,19 @@ class _RestrictionFormSheetState extends State<_RestrictionFormSheet> {
     final apps = AppData.mockInstallableApps;
     final (name, _, _) = apps[_selectedAppIndex!];
     setState(() => _saving = true);
-    await widget.onCreate(
-      appPackage: 'com.demo.${name.toLowerCase().replaceAll(' ', '')}',
-      appName: name,
-      limitMinutes: _limitMinutes,
-    );
-    if (!mounted) return;
-    Navigator.pop(context);
+    try {
+      await widget.onCreate(
+        appPackage: 'com.demo.${name.toLowerCase().replaceAll(' ', '')}',
+        appName: name,
+        limitMinutes: _limitMinutes,
+      );
+      if (!mounted) return;
+      Navigator.pop(context);
+    } catch (e, st) {
+      AppLogger.logError('RestrictionFormSheet._submit', e, st);
+      if (!mounted) return;
+      setState(() => _saving = false);
+    }
   }
 
   @override

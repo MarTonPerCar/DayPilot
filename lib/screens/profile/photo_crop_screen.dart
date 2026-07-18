@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
+import '../../core/logging/app_logger.dart';
 import '../../l10n/app_localizations.dart';
 
 class PhotoCropScreen extends StatefulWidget {
@@ -34,10 +35,16 @@ class _PhotoCropScreenState extends State<PhotoCropScreen> {
   }
 
   Future<void> _decodeImage() async {
-    final codec = await ui.instantiateImageCodec(widget.imageBytes);
-    final frame = await codec.getNextFrame();
-    if (!mounted) return;
-    setState(() => _decodedImage = frame.image);
+    try {
+      final codec = await ui.instantiateImageCodec(widget.imageBytes);
+      final frame = await codec.getNextFrame();
+      if (!mounted) return;
+      setState(() => _decodedImage = frame.image);
+    } catch (e, st) {
+      AppLogger.logError('PhotoCropScreen._decodeImage', e, st);
+      if (!mounted) return;
+      Navigator.pop(context);
+    }
   }
 
   @override

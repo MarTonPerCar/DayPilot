@@ -6,6 +6,7 @@ import '../../core/data/models/app_task.dart';
 import '../../core/data/models/task_category.dart';
 import '../../core/data/models/task_difficulty.dart';
 import '../../core/data/repositories/providers.dart';
+import '../../core/logging/app_logger.dart';
 import '../progress/progress_notifier.dart';
 import 'task_error.dart';
 import 'tasks_state.dart';
@@ -26,7 +27,8 @@ class TasksNotifier extends Notifier<TasksState> {
       final tasks = await ref.read(taskRepositoryProvider).getTasks();
       state = state.copyWith(tasks: tasks, isLoading: false);
       _subscribeToRealtimeOnce();
-    } catch (_) {
+    } catch (e, st) {
+      AppLogger.logError('TasksNotifier._load', e, st);
       state = state.copyWith(isLoading: false);
     }
   }
@@ -88,7 +90,8 @@ class TasksNotifier extends Notifier<TasksState> {
       await ref.read(taskRepositoryProvider).addTask(data);
       ref.invalidate(tasksCacheProvider);
       await _load();
-    } catch (_) {
+    } catch (e, st) {
+      AppLogger.logError('TasksNotifier.addTask', e, st);
       state = state.copyWith(
         tasks: state.tasks.where((t) => t.id != placeholderId).toList(),
         errorType: TaskErrorType.create,
@@ -130,7 +133,8 @@ class TasksNotifier extends Notifier<TasksState> {
             durationMinutes: durationMinutes,
           );
       ref.read(tasksCacheProvider.notifier).state = state.tasks;
-    } catch (_) {
+    } catch (e, st) {
+      AppLogger.logError('TasksNotifier.updateTask', e, st);
       state = state.copyWith(tasks: previous, errorType: TaskErrorType.update);
     }
   }
@@ -147,7 +151,8 @@ class TasksNotifier extends Notifier<TasksState> {
       await ref.read(taskRepositoryProvider).toggleTask(occurrenceId: occurrenceId, isDone: isDone);
       ref.read(tasksCacheProvider.notifier).state = state.tasks;
       if (isDone) await ref.read(progressNotifierProvider.notifier).refresh();
-    } catch (_) {
+    } catch (e, st) {
+      AppLogger.logError('TasksNotifier.toggleTask', e, st);
       state = state.copyWith(tasks: previous, errorType: TaskErrorType.toggle);
     }
   }
@@ -158,7 +163,8 @@ class TasksNotifier extends Notifier<TasksState> {
     try {
       await ref.read(taskRepositoryProvider).deleteTask(id);
       ref.read(tasksCacheProvider.notifier).state = state.tasks;
-    } catch (_) {
+    } catch (e, st) {
+      AppLogger.logError('TasksNotifier.deleteTask', e, st);
       state = state.copyWith(tasks: previous, errorType: TaskErrorType.delete);
     }
   }

@@ -5,6 +5,7 @@ import '../../components/basic/button.dart';
 import '../../components/basic/text_field.dart';
 import '../../components/basic/top_bar.dart';
 import '../../core/data/repositories/providers.dart';
+import '../../core/logging/app_logger.dart';
 import '../../l10n/app_localizations.dart';
 
 class ForgotPasswordScreen extends ConsumerStatefulWidget {
@@ -49,8 +50,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
         _sent = true;
       });
     } catch (e, st) {
-
-      print('sendPasswordResetEmail failed: $e\n$st');
+      AppLogger.logError('ForgotPasswordScreen.send', e, st);
       if (!mounted) return;
       setState(() {
         _loading = false;

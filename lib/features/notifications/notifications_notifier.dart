@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/data/models/app_notification_item.dart';
 import '../../core/data/repositories/providers.dart';
+import '../../core/logging/app_logger.dart';
 import '../friends/friends_notifier.dart';
 import '../profile/weekly_summary_notifier.dart';
 
@@ -17,8 +18,12 @@ class NotificationsNotifier extends Notifier<List<AppNotificationItem>> {
   }
 
   Future<void> refresh() async {
-    state = await ref.read(notificationsRepositoryProvider).getNotifications();
-    _subscribeToRealtimeOnce();
+    try {
+      state = await ref.read(notificationsRepositoryProvider).getNotifications();
+      _subscribeToRealtimeOnce();
+    } catch (e, st) {
+      AppLogger.logError('NotificationsNotifier.refresh', e, st);
+    }
   }
 
   void _subscribeToRealtimeOnce() {

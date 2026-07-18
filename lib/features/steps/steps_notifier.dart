@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/data/models/app_steps.dart';
 import '../../core/data/repositories/providers.dart';
+import '../../core/logging/app_logger.dart';
 
 class StepsNotifier extends Notifier<AppSteps?> {
   static const _refreshInterval = Duration(minutes: 5);
@@ -17,7 +18,11 @@ class StepsNotifier extends Notifier<AppSteps?> {
   }
 
   Future<void> refresh() async {
-    state = await ref.read(stepsRepositoryProvider).getSteps();
+    try {
+      state = await ref.read(stepsRepositoryProvider).getSteps();
+    } catch (e, st) {
+      AppLogger.logError('StepsNotifier.refresh', e, st);
+    }
   }
 
   Future<void> setGoal(int newGoal) async {
