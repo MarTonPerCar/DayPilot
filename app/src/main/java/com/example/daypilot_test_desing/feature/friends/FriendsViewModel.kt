@@ -25,6 +25,8 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
 
@@ -35,7 +37,15 @@ class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
     private var refreshing = false
     private val onFriendStatsChanged: () -> Unit = { refreshFromRealtime() }
 
+    // init{}'s startup load(), DayPilotNavGraph's awaitLoad(), and every realtime trigger
+    // below can all call load() around the same time — without this, whichever call
+    // *finishes* last wins and overwrites _uiState, even if it's the one that hit a
+    // transient failure. The mutex serializes them so a stale/failed result can never
+    // clobber a more recent good one.
+    private val loadMutex = Mutex()
+
     init {
+        Log.d(TAG, "init: starting first load()")
         viewModelScope.launch { load() }
         // Fires when a FRIEND_REQUEST/FRIEND_ACCEPTED notification arrives via the
         // always-on notifications realtime channel (see NotificationsViewModel) —
@@ -50,18 +60,18 @@ class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
      *  startup join in DayPilotNavGraph, which needs real success/failure, not just "finished". */
     suspend fun awaitLoad(): Boolean = load()
 
-    private suspend fun load(): Boolean {
-        return try {
-            _uiState.update { current ->
-                current.copy(
-                    friends        = repo.getFriends(),         // cache-first with 5min TTL
-                    friendRequests = repo.getFriendRequests()   // always fresh
-                )
-            }
+    private suspend fun load(): Boolean = loadMutex.withLock {
+        try {
+            val fetchedFriends  = repo.getFriends()         // cache-first with 5min TTL
+            val fetchedRequests = repo.getFriendRequests()  // always fresh
+            _uiState.update { it.copy(friends = fetchedFriends, friendRequests = fetchedRequests) }
+            Log.d(TAG, "load(): ${fetchedFriends.size} friend(s), ${fetchedRequests.size} request(s)")
             subscribeToRealtimeOnce()
             true
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to load friends data", e)
+            // Deliberately not touching _uiState here — the previous (correct) friends
+            // list stays on screen instead of being wiped by a transient failure.
+            Log.e(TAG, "Failed to load friends data — keeping previously shown state", e)
             false
         }
     }
@@ -106,7 +116,11 @@ class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
     }
 
     private fun refreshFromRealtime() {
-        if (refreshing) return // a burst of changes shouldn't queue up overlapping fetches
+        if (refreshing) {
+            Log.d(TAG, "refreshFromRealtime(): already refreshing, skipping duplicate trigger")
+            return // a burst of changes shouldn't queue up overlapping fetches
+        }
+        Log.d(TAG, "refreshFromRealtime(): triggered")
         refreshing = true
         // getFriends() is cache-first with a 5min TTL — drop it so this actually
         // fetches fresh data instead of serving the stale cached list.
