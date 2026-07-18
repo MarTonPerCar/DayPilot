@@ -16,9 +16,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 /**
  * These two alarms only wake the app and ask Supabase what (if anything) it already
@@ -69,7 +66,6 @@ class DailyNotificationsReceiver : BroadcastReceiver() {
 
     private suspend fun handleStreakDanger(context: Context, prefs: AppPreferences) {
         if (!prefs.notificationsEnabled || !prefs.streakAlertsEnabled) return
-        if (prefs.lastOpenDate == today()) return  // User opened the app today
 
         val uid = awaitCurrentUserId() ?: return
         val row = SupabaseNotificationRepository.getLatestOfTypeToday(uid, "STREAK_RISK") ?: return
@@ -105,8 +101,6 @@ class DailyNotificationsReceiver : BroadcastReceiver() {
             .build()
         context.getSystemService(NotificationManager::class.java)?.notify(id, notification)
     }
-
-    private fun today() = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
 
     companion object {
         private const val TAG = "DailyNotifReceiver"
