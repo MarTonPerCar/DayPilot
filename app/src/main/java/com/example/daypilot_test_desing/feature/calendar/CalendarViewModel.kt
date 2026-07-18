@@ -12,10 +12,19 @@ import com.example.daypilot_test_desing.core.data.model.TaskCategory
 import com.example.daypilot_test_desing.core.data.model.TaskDifficulty
 import com.example.daypilot_test_desing.core.data.repository.ProgressRepository
 import com.example.daypilot_test_desing.core.data.repository.TaskRepository
+import com.example.daypilot_test_desing.data.supabase.supabase
+import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.postgrest.query.filter.FilterOperator
+import io.github.jan.supabase.realtime.PostgresAction
+import io.github.jan.supabase.realtime.RealtimeChannel
+import io.github.jan.supabase.realtime.channel
+import io.github.jan.supabase.realtime.postgresChangeFlow
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -26,6 +35,9 @@ class CalendarViewModel(
 
     private val _uiState = MutableStateFlow(CalendarUiState(isLoading = true))
     val uiState: StateFlow<CalendarUiState> = _uiState.asStateFlow()
+
+    private var realtimeChannel: RealtimeChannel? = null
+    private var refreshing = false
 
     init { refresh() }
 
@@ -38,12 +50,56 @@ class CalendarViewModel(
         return try {
             val tasks = taskRepo.getTasks()  // cache-first
             _uiState.update { it.copy(tasks = tasks, isLoading = false) }
+            subscribeToRealtimeOnce()
             true
         } catch (e: Exception) {
             Log.e(TAG, "Failed to load calendar tasks", e)
             _uiState.update { it.copy(isLoading = false) }
             false
         }
+    }
+
+    // getTasks() reads from a joined tasks+task_days view, and Realtime can
+    // only subscribe to base tables — so both are watched here, filtered to
+    // the current user.
+    private fun subscribeToRealtimeOnce() {
+        if (realtimeChannel != null) return
+        val uid = supabase.auth.currentUserOrNull()?.id ?: return
+
+        viewModelScope.launch {
+            val channel = supabase.channel("tasks-$uid")
+
+            channel.postgresChangeFlow<PostgresAction>(schema = "public") {
+                table = "tasks"
+                filter("user_id", FilterOperator.EQ, uid)
+            }.onEach { refreshFromRealtime() }.launchIn(viewModelScope)
+
+            channel.postgresChangeFlow<PostgresAction>(schema = "public") {
+                table = "task_days"
+                filter("user_id", FilterOperator.EQ, uid)
+            }.onEach { refreshFromRealtime() }.launchIn(viewModelScope)
+
+            channel.subscribe()
+            realtimeChannel = channel
+        }
+    }
+
+    private fun refreshFromRealtime() {
+        if (refreshing) return // a burst of changes shouldn't queue up overlapping fetches
+        refreshing = true
+        SessionCache.tasks.value = null // getTasks() short-circuits on cache otherwise
+        viewModelScope.launch {
+            try {
+                load()
+            } finally {
+                refreshing = false
+            }
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        viewModelScope.launch { runCatching { realtimeChannel?.unsubscribe() } }
     }
 
     fun refresh(): Job = viewModelScope.launch { load() }

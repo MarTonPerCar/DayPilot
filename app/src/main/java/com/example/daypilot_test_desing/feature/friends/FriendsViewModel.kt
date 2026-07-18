@@ -6,12 +6,23 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.core.cache.SessionCache
+import com.example.daypilot_test_desing.core.data.local.FriendStatsBroadcast
+import com.example.daypilot_test_desing.core.data.local.NotificationHub
 import com.example.daypilot_test_desing.core.data.model.ReactionType
 import com.example.daypilot_test_desing.core.data.repository.FriendRepository
+import com.example.daypilot_test_desing.data.supabase.supabase
+import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.postgrest.query.filter.FilterOperator
+import io.github.jan.supabase.realtime.PostgresAction
+import io.github.jan.supabase.realtime.RealtimeChannel
+import io.github.jan.supabase.realtime.channel
+import io.github.jan.supabase.realtime.postgresChangeFlow
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -20,7 +31,18 @@ class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
     private val _uiState = MutableStateFlow(FriendsUiState())
     val uiState: StateFlow<FriendsUiState> = _uiState.asStateFlow()
 
-    init { viewModelScope.launch { load() } }
+    private var realtimeChannel: RealtimeChannel? = null
+    private var refreshing = false
+    private val onFriendStatsChanged: () -> Unit = { refreshFromRealtime() }
+
+    init {
+        viewModelScope.launch { load() }
+        // Fires when a FRIEND_REQUEST/FRIEND_ACCEPTED notification arrives via the
+        // always-on notifications realtime channel (see NotificationsViewModel) —
+        // kept alongside the direct subscriptions below as a second, overlapping
+        // signal source; refreshFromRealtime()'s guard makes that harmless.
+        NotificationHub.friendsShouldRefresh.onEach { refreshFromRealtime() }.launchIn(viewModelScope)
+    }
 
     fun refresh(): Job = viewModelScope.launch { load() }
 
@@ -36,11 +58,73 @@ class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
                     friendRequests = repo.getFriendRequests()   // always fresh
                 )
             }
+            subscribeToRealtimeOnce()
             true
         } catch (e: Exception) {
             Log.e(TAG, "Failed to load friends data", e)
             false
         }
+    }
+
+    // friends/friend_requests/reactions have no OR-filter support in Postgres
+    // Changes, so "requester or receiver" needs two separate subscriptions —
+    // plus the shared friend-stats broadcast channel for a friend's own
+    // streak/weekly-summary/points changes, which can't be filtered by my
+    // own user_id since the changed row belongs to someone else.
+    private fun subscribeToRealtimeOnce() {
+        if (realtimeChannel != null) return
+        val uid = supabase.auth.currentUserOrNull()?.id ?: return
+
+        viewModelScope.launch {
+            val channel = supabase.channel("friends-$uid")
+
+            channel.postgresChangeFlow<PostgresAction>(schema = "public") {
+                table = "friends"
+                filter("requester_id", FilterOperator.EQ, uid)
+            }.onEach { refreshFromRealtime() }.launchIn(viewModelScope)
+
+            channel.postgresChangeFlow<PostgresAction>(schema = "public") {
+                table = "friends"
+                filter("receiver_id", FilterOperator.EQ, uid)
+            }.onEach { refreshFromRealtime() }.launchIn(viewModelScope)
+
+            channel.postgresChangeFlow<PostgresAction>(schema = "public") {
+                table = "friend_requests"
+                filter("to_user_id", FilterOperator.EQ, uid)
+            }.onEach { refreshFromRealtime() }.launchIn(viewModelScope)
+
+            channel.postgresChangeFlow<PostgresAction>(schema = "public") {
+                table = "reactions"
+                filter("from_user_id", FilterOperator.EQ, uid)
+            }.onEach { refreshFromRealtime() }.launchIn(viewModelScope)
+
+            channel.subscribe()
+            realtimeChannel = channel
+        }
+
+        FriendStatsBroadcast.addListener(onFriendStatsChanged)
+    }
+
+    private fun refreshFromRealtime() {
+        if (refreshing) return // a burst of changes shouldn't queue up overlapping fetches
+        refreshing = true
+        // getFriends() is cache-first with a 5min TTL — drop it so this actually
+        // fetches fresh data instead of serving the stale cached list.
+        SessionCache.friends.value    = null
+        SessionCache.friendsFetchedAt = 0L
+        viewModelScope.launch {
+            try {
+                load()
+            } finally {
+                refreshing = false
+            }
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        viewModelScope.launch { runCatching { realtimeChannel?.unsubscribe() } }
+        FriendStatsBroadcast.removeListener(onFriendStatsChanged)
     }
 
     fun acceptRequest(userId: String) {

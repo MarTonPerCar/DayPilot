@@ -3,6 +3,9 @@ package com.example.daypilot_test_desing.core.data.local
 import android.content.Context
 import com.example.daypilot_test_desing.core.data.model.NotificationData
 import com.example.daypilot_test_desing.core.data.model.NotificationType
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import java.util.UUID
 
 object NotificationHub {
@@ -30,5 +33,15 @@ object NotificationHub {
 
     fun clear() {
         repo.clear()
+    }
+
+    // Friends data has no realtime channel of its own — a friend request/accept
+    // arriving via the notifications realtime channel signals here so
+    // FriendsViewModel (wherever it's currently alive) can refresh itself.
+    private val _friendsShouldRefresh = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    val friendsShouldRefresh: SharedFlow<Unit> = _friendsShouldRefresh.asSharedFlow()
+
+    fun notifyFriendsChanged() {
+        _friendsShouldRefresh.tryEmit(Unit)
     }
 }
