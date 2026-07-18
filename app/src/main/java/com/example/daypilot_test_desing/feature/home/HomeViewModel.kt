@@ -1,5 +1,6 @@
 package com.example.daypilot_test_desing.feature.home
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -33,8 +34,12 @@ class HomeViewModel(
 
     fun invalidate() { /* cache freshness is managed at the repo/SessionCache layer */ }
 
-    private suspend fun load() {
-        try {
+    /** Suspends until this ViewModel's data has actually loaded (or failed) — used by the
+     *  startup join in DayPilotNavGraph, which needs real success/failure, not just "finished". */
+    suspend fun awaitLoad(): Boolean = load()
+
+    private suspend fun load(): Boolean {
+        return try {
             coroutineScope {
                 val userD    = async { userRepo.getCurrentUser() }
                 val tasksD   = async { taskRepo.getTasks() }
@@ -66,10 +71,15 @@ class HomeViewModel(
                     timerCompletedToday = today.timerPoints > 0
                 )
             }
-        } catch (_: Exception) { }
+            true
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to load home data", e)
+            false
+        }
     }
 
     companion object {
+        private const val TAG = "HomeViewModel"
         fun factory(
             stepsRepo: StepsRepository,
             progressRepo: ProgressRepository,

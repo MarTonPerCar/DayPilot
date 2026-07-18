@@ -18,6 +18,7 @@ import com.example.daypilot_test_desing.core.ui.components.basic.*
 import com.example.daypilot_test_desing.core.ui.components.cards.*
 import com.example.daypilot_test_desing.core.data.model.NotificationData
 import com.example.daypilot_test_desing.core.data.model.NotificationType
+import com.example.daypilot_test_desing.core.reminders.NotificationBodyCodec
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -127,8 +128,8 @@ fun NotificationsScreen(
                 ) {
                     items(filtered) { notification ->
                         NotificationCard(
-                            title   = notification.title,
-                            message = notification.message,
+                            title   = decodedTitle(notification),
+                            message = decodedMessage(notification),
                             timeAgo = notification.timeAgo,
                             type    = notification.type,
                             isRead  = notification.isRead,
@@ -139,5 +140,21 @@ fun NotificationsScreen(
             }
         }
     }
+}
+
+// TASK_REMINDER / STREAK_RISK rows arrive from Supabase with encoded placeholder
+// title/body ("TASK_REMINDER_TITLE", "TASK_REMINDER_COUNT:3", ...) — decode them into
+// real text here; every other notification type already carries its final text.
+@Composable
+private fun decodedTitle(notification: NotificationData): String =
+    NotificationBodyCodec.titleForPlaceholder(notification.title)
+        ?.let { stringResource(it) }
+        ?: notification.title
+
+@Composable
+private fun decodedMessage(notification: NotificationData): String {
+    val decoded = NotificationBodyCodec.decodeBody(notification.message) ?: return notification.message
+    val (resId, arg) = decoded
+    return if (arg != null) stringResource(resId, arg) else stringResource(resId)
 }
 

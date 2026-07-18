@@ -89,20 +89,7 @@ class SupabaseProgressRepository : ProgressRepository {
                 level             = newLevel,
                 pointsToNextLevel = pointsToNextLevel(newLevel)
             )
-            // Checked here (the single place total_points_historical changes) rather than
-            // wherever the UI happens to next observe the level, so it fires right when the
-            // threshold from pointsToNextLevel's formula is actually crossed, from any source.
-            if (newLevel > profile.level) {
-                try {
-                    // Persisted to the DB — the always-on realtime subscription delivers it to
-                    // NotificationHub, so adding it locally too would double it up.
-                    SupabaseNotificationRepository.insertForCurrentUser(
-                        type  = "LEVEL_UP",
-                        title = "¡Subiste de nivel! 🏆",
-                        body  = "Ahora eres nivel $newLevel. ¡Sigue así!"
-                    )
-                } catch (_: Exception) { }
-            }
+            // LEVEL_UP notification is now inserted by a Supabase DB trigger.
         }
     }
 

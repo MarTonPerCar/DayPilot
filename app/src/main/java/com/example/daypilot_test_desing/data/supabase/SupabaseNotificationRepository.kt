@@ -1,7 +1,9 @@
 package com.example.daypilot_test_desing.data.supabase
 
+import android.util.Log
 import com.example.daypilot_test_desing.core.data.model.NotificationData
 import com.example.daypilot_test_desing.core.data.model.NotificationType
+import com.example.daypilot_test_desing.core.data.model.RawTodayNotification
 import com.example.daypilot_test_desing.core.data.repository.NotificationRepository
 import com.example.daypilot_test_desing.data.supabase.dto.InsertNotificationDto
 import com.example.daypilot_test_desing.data.supabase.dto.NotificationDto
@@ -10,11 +12,14 @@ import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Order
 import java.time.Duration
 import java.time.Instant
+import java.time.LocalDate
 import java.time.OffsetDateTime
+import java.time.ZoneId
 import java.util.UUID
 
 object SupabaseNotificationRepository : NotificationRepository {
 
+    private const val TAG = "SupabaseNotificationRepo"
     private const val DISPLAY_LIMIT = 30
     private const val RETAIN_LIMIT  = 50
 
@@ -73,6 +78,29 @@ object SupabaseNotificationRepository : NotificationRepository {
             )
             pruneOldest(userId)
         } catch (_: Exception) { }
+    }
+
+    override suspend fun getLatestOfTypeToday(userId: String, type: String): RawTodayNotification? {
+        return try {
+            val startOfToday = LocalDate.now(ZoneId.systemDefault())
+                .atStartOfDay(ZoneId.systemDefault())
+                .toInstant()
+                .toString()
+            supabase.from("notifications").select {
+                filter {
+                    eq("user_id", userId)
+                    eq("type", type)
+                    gte("created_at", startOfToday)
+                }
+                order("created_at", Order.DESCENDING)
+                limit(1)
+            }.decodeList<NotificationDto>().firstOrNull()?.let {
+                RawTodayNotification(type = it.type, rawTitle = it.title, rawBody = it.body)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to fetch today's $type notification for user $userId", e)
+            null
+        }
     }
 
     suspend fun insertForCurrentUser(type: String, title: String, body: String) {

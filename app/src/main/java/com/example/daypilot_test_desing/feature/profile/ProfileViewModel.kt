@@ -2,6 +2,7 @@ package com.example.daypilot_test_desing.feature.profile
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -30,8 +31,12 @@ class ProfileViewModel(
 
     fun invalidate() { /* cache freshness is managed at the repo/SessionCache layer */ }
 
-    private suspend fun load() {
-        try {
+    /** Suspends until this ViewModel's data has actually loaded (or failed) — used by the
+     *  startup join in DayPilotNavGraph, which needs real success/failure, not just "finished". */
+    suspend fun awaitLoad(): Boolean = load()
+
+    private suspend fun load(): Boolean {
+        return try {
             val user    = userRepo.getCurrentUser()    // cache-first
             val summary = userRepo.getWeeklySummary()
             val today   = progressRepo.getTodayProgress()  // cache-first
@@ -57,7 +62,11 @@ class ProfileViewModel(
                 avatarUrl            = user.avatarUrl,
                 weeklySummary        = summary
             )
-        } catch (_: Exception) { }
+            true
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to load profile data", e)
+            false
+        }
     }
 
     fun updateProfile(name: String, username: String, region: TimeZoneRegion) {
@@ -106,6 +115,8 @@ class ProfileViewModel(
     }
 
     companion object {
+        private const val TAG = "ProfileViewModel"
+
         fun factory(userRepo: UserRepository, progressRepo: ProgressRepository): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")

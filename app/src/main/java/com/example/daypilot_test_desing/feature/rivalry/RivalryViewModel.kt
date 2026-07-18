@@ -1,5 +1,6 @@
 package com.example.daypilot_test_desing.feature.rivalry
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -25,8 +26,12 @@ class RivalryViewModel(private val repo: RankingRepository) : ViewModel() {
         SessionCache.rankingFetchedAt = 0L
     }
 
-    private suspend fun load() {
-        try {
+    /** Suspends until this ViewModel's data has actually loaded (or failed) — used by the
+     *  startup join in DayPilotNavGraph, which needs real success/failure, not just "finished". */
+    suspend fun awaitLoad(): Boolean = load()
+
+    private suspend fun load(): Boolean {
+        return try {
             val ranking  = repo.getRanking()  // cache-first with 5min TTL
             val uid      = repo.getCurrentUserId()
             val me       = ranking.firstOrNull { it.id == uid }
@@ -42,10 +47,16 @@ class RivalryViewModel(private val repo: RankingRepository) : ViewModel() {
                 currentUserLevel    = me?.level ?: 1,
                 ranking             = ranking
             )
-        } catch (_: Exception) { }
+            true
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to load rivalry data", e)
+            false
+        }
     }
 
     companion object {
+        private const val TAG = "RivalryViewModel"
+
         fun factory(repo: RankingRepository): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")

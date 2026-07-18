@@ -28,6 +28,7 @@ class AppSessionViewModel : ViewModel() {
     sealed class State {
         data object Loading : State()
         data object DataLoading : State()  // session confirmed, waiting for data fetch
+        data object DataLoadFailed : State()  // startup data fetch failed twice, waiting for manual retry
         data object Authenticated : State()
         data object Unauthenticated : State()
     }
@@ -59,6 +60,16 @@ class AppSessionViewModel : ViewModel() {
     /** Call after all ViewModel data has been loaded; triggers navigation to HOME. */
     fun markDataLoaded() {
         _state.value = State.Authenticated
+    }
+
+    /** Call when the startup data fetch failed even after an automatic retry. */
+    fun markDataLoadFailed() {
+        _state.value = State.DataLoadFailed
+    }
+
+    /** User tapped retry on the data-load-failed screen; re-enters DataLoading. */
+    fun retryDataLoad() {
+        _state.value = State.DataLoading
     }
 
     /** Signs the user out of Supabase and marks the session as gone. */

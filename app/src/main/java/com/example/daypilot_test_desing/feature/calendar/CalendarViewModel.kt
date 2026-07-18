@@ -12,7 +12,6 @@ import com.example.daypilot_test_desing.core.data.model.TaskCategory
 import com.example.daypilot_test_desing.core.data.model.TaskDifficulty
 import com.example.daypilot_test_desing.core.data.repository.ProgressRepository
 import com.example.daypilot_test_desing.core.data.repository.TaskRepository
-import com.example.daypilot_test_desing.data.supabase.SupabaseNotificationRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,13 +29,20 @@ class CalendarViewModel(
 
     init { refresh() }
 
-    private suspend fun load() {
+    /** Suspends until this ViewModel's data has actually loaded (or failed) — used by the
+     *  startup join in DayPilotNavGraph, which needs real success/failure, not just "finished". */
+    suspend fun awaitLoad(): Boolean = load()
+
+    private suspend fun load(): Boolean {
         _uiState.update { it.copy(isLoading = true) }
-        try {
+        return try {
             val tasks = taskRepo.getTasks()  // cache-first
             _uiState.update { it.copy(tasks = tasks, isLoading = false) }
+            true
         } catch (e: Exception) {
+            Log.e(TAG, "Failed to load calendar tasks", e)
             _uiState.update { it.copy(isLoading = false) }
+            false
         }
     }
 
@@ -127,13 +133,7 @@ class CalendarViewModel(
                 taskRepo.toggleTask(occurrenceId, isDone)
                 if (shouldAwardPoints) {
                     progressRepo.logPoints(20, "TASKS")
-                    // Persisted to the DB — the always-on realtime subscription delivers it to
-                    // NotificationHub, so adding it locally too would double it up.
-                    SupabaseNotificationRepository.insertForCurrentUser(
-                        type  = "TASK_COMPLETED",
-                        title = "✓ ${original.title}",
-                        body  = "+20 puntos ganados"
-                    )
+                    // TASK_COMPLETED notification is now inserted by a Supabase DB trigger.
                 }
                 SessionCache.tasks.value = _uiState.value.tasks
             } catch (e: Exception) {

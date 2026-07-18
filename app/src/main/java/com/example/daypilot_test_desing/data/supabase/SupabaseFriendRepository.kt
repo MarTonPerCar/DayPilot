@@ -12,7 +12,6 @@ import com.example.daypilot_test_desing.data.supabase.dto.InsertFriendDto
 import com.example.daypilot_test_desing.data.supabase.dto.InsertFriendRequestDto
 import com.example.daypilot_test_desing.data.supabase.dto.InsertReactionDto
 import com.example.daypilot_test_desing.data.supabase.dto.ReactionDto
-import com.example.daypilot_test_desing.data.supabase.SupabaseNotificationRepository
 import com.example.daypilot_test_desing.data.supabase.dto.SentRequestDto
 import com.example.daypilot_test_desing.data.supabase.dto.UserDto
 import com.example.daypilot_test_desing.data.supabase.dto.UserStreakDto
@@ -168,19 +167,7 @@ class SupabaseFriendRepository : FriendRepository {
         supabase.from("friends").insert(
             InsertFriendDto(requesterId = userId, receiverId = uid)
         )
-        try {
-            val myName = supabase.from("users").select {
-                filter { eq("id", uid) }
-                limit(1)
-            }.decodeList<UserDto>().firstOrNull()?.name ?: ""
-            SupabaseNotificationRepository.insert(
-                userId = userId,
-                type   = "FRIEND_ACCEPTED",
-                title  = "Solicitud aceptada",
-                body   = if (myName.isNotEmpty()) "$myName aceptó tu solicitud de amistad"
-                         else "Tu solicitud de amistad fue aceptada"
-            )
-        } catch (_: Exception) { }
+        // FRIEND_ACCEPTED notification is now inserted by a Supabase DB trigger.
     }
 
     override suspend fun rejectRequest(userId: String) {
@@ -209,36 +196,8 @@ class SupabaseFriendRepository : FriendRepository {
                 type            = reaction.toDbString()
             )
         ) { onConflict = "from_user_id,weekly_summary_id" }
-
-        try {
-            val users = getUsersForIds(listOf(uid, userId))
-            val myName     = users.firstOrNull { it.id == uid }?.name     ?: ""
-            val targetName = users.firstOrNull { it.id == userId }?.name  ?: ""
-
-            val emoji = when (reaction) {
-                ReactionType.FIRE   -> "🔥"
-                ReactionType.CLAP   -> "👏"
-                ReactionType.STRONG -> "💪"
-                ReactionType.STAR   -> "⭐"
-            }
-
-            if (targetName.isNotEmpty()) {
-                SupabaseNotificationRepository.insert(
-                    userId = userId,
-                    type   = "REACTION",
-                    title  = "Nueva reacción $emoji",
-                    body   = "${myName.ifEmpty { "Un amigo" }} reaccionó a tu semana con $emoji"
-                )
-            }
-
-            if (targetName.isNotEmpty()) {
-                SupabaseNotificationRepository.insertForCurrentUser(
-                    type  = "REACTION",
-                    title = "Reacción enviada $emoji",
-                    body  = "Reaccionaste a la semana de $targetName con $emoji"
-                )
-            }
-        } catch (_: Exception) { }
+        // REACTION notification (to the friend) is now inserted by a Supabase DB trigger.
+        // The "reaction sent" self-confirmation is a local-only toast now — see FriendsViewModel.
     }
 
     override suspend fun searchUsers(query: String): List<SearchUserData> {
@@ -274,19 +233,7 @@ class SupabaseFriendRepository : FriendRepository {
         supabase.from("friend_requests").insert(
             InsertFriendRequestDto(fromUserId = uid, toUserId = userId)
         )
-        try {
-            val myName = supabase.from("users").select {
-                filter { eq("id", uid) }
-                limit(1)
-            }.decodeList<UserDto>().firstOrNull()?.name ?: ""
-            SupabaseNotificationRepository.insert(
-                userId = userId,
-                type   = "FRIEND_REQUEST",
-                title  = "Nueva solicitud de amistad",
-                body   = if (myName.isNotEmpty()) "$myName quiere ser tu amigo"
-                         else "Tienes una nueva solicitud de amistad"
-            )
-        } catch (_: Exception) { }
+        // FRIEND_REQUEST notification is now inserted by a Supabase DB trigger.
     }
 
     override suspend fun removeFriend(userId: String) {

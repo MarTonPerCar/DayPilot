@@ -131,6 +131,7 @@
     <string name="friends_empty">Du hast noch keine Freunde.\nSuche und füge Freunde hinzu!</string>
     <string name="friends_requests_empty">Keine ausstehenden Anfragen</string>
     <string name="friends_remove">Freund entfernen</string>
+    <string name="friends_reaction_sent">Reaktion gesendet</string>
 
     <!-- Notifications -->
     <string name="notifications_title">Benachrichtigungen</string>
@@ -581,5 +582,6 @@
     <string name="error_remove_friend">Freund konnte nicht entfernt werden. Bitte erneut versuchen.</string>
     <string name="error_add_friend">Freundschaftsanfrage konnte nicht gesendet werden. Bitte erneut versuchen.</string>
     <string name="error_react_friend">Reaktion konnte nicht gesendet werden. Bitte erneut versuchen.</string>
+    <string name="error_startup_load">Deine Daten konnten nicht geladen werden. Verbindung prüfen und erneut versuchen.</string>
 
 </resources>

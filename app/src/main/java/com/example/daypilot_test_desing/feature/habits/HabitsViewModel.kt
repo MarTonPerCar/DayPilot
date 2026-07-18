@@ -2,33 +2,63 @@ package com.example.daypilot_test_desing.feature.habits
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.example.daypilot_test_desing.core.data.repository.StepsRepository
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 class HabitsViewModel(private val stepsRepo: StepsRepository) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(buildState())
+    private val _uiState = MutableStateFlow(localState())
     val uiState: StateFlow<HabitsUiState> = _uiState.asStateFlow()
 
-    private fun buildState(): HabitsUiState {
-        val earned = stepsRepo.getPointsEarned()
-        return HabitsUiState(
-            currentSteps     = stepsRepo.getCurrentSteps(),
-            goalSteps        = stepsRepo.getGoalSteps(),
-            pointsEarned     = earned,
-            pointsRemaining  = maxOf(0, 60 - earned),
-            goalChangedToday = !stepsRepo.canChangeGoal(),
-            pendingGoal      = stepsRepo.getPendingGoal()
-        )
+    init { refresh() }
+
+    /** Local-only fields the sensor/prefs already know synchronously — no network. Safe to
+     *  call on every sensor tick (see DayPilotNavGraph's stepsState-keyed LaunchedEffect). */
+    private fun localState() = HabitsUiState(
+        currentSteps     = stepsRepo.getCurrentSteps(),
+        goalSteps        = stepsRepo.getGoalSteps(),
+        pendingGoal      = stepsRepo.getPendingGoal(),
+        goalChangedToday = !stepsRepo.canChangeGoal()
+    )
+
+    /** Cheap, no network — keeps the step-count preview live as the sensor updates. */
+    fun refreshLocal() {
+        _uiState.update { current ->
+            current.copy(
+                currentSteps     = stepsRepo.getCurrentSteps(),
+                goalSteps        = stepsRepo.getGoalSteps(),
+                pendingGoal      = stepsRepo.getPendingGoal(),
+                goalChangedToday = !stepsRepo.canChangeGoal()
+            )
+        }
     }
 
-    fun refresh() { _uiState.value = buildState() }
+    /** Sync trigger #2: entering the Habits screen mid-session (also used at init, which
+     *  doubles as the app-cold-start case for this widget's own points preview). */
+    fun refresh(): Job = viewModelScope.launch {
+        stepsRepo.syncSteps(stepsRepo.getCurrentSteps(), stepsRepo.getGoalSteps())
+        val earned = stepsRepo.getPointsEarned()
+        _uiState.update { current ->
+            current.copy(
+                currentSteps     = stepsRepo.getCurrentSteps(),
+                goalSteps        = stepsRepo.getGoalSteps(),
+                pointsEarned     = earned,
+                pointsRemaining  = maxOf(0, 60 - earned),
+                pendingGoal      = stepsRepo.getPendingGoal(),
+                goalChangedToday = !stepsRepo.canChangeGoal()
+            )
+        }
+    }
 
     fun configureGoal(newGoal: Int) {
         stepsRepo.configureGoal(newGoal)
-        _uiState.value = buildState()
+        refreshLocal()
     }
 
     companion object {

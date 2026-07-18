@@ -1,5 +1,6 @@
 package com.example.daypilot_test_desing.feature.notifications
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -30,6 +31,12 @@ class NotificationsViewModel(private val repo: NotificationRepository) : ViewMod
 
     private var realtimeChannel: RealtimeChannel? = null
 
+    // Set synchronously the moment a subscribe is kicked off (subscribeToRealtime's own work
+    // is async) — guards against awaitLoad() being called more than once on the same instance
+    // (e.g. Block 4's startup retry-once) trying to register postgresChangeFlow on a channel
+    // that's already joined, which supabase-kt rejects with an unhandled IllegalStateException.
+    private var realtimeSubscriptionStarted = false
+
     private val json = Json { ignoreUnknownKeys = true; coerceInputValues = true }
 
     init {
@@ -43,11 +50,26 @@ class NotificationsViewModel(private val repo: NotificationRepository) : ViewMod
         }
     }
 
-    fun load(): Job = viewModelScope.launch {
-        val uid = repo.getCurrentUserId() ?: return@launch
-        val fromDb = repo.getAll(uid)
-        NotificationHub.repo.mergeServerNotifications(fromDb)
-        subscribeToRealtime(uid)
+    fun load(): Job = viewModelScope.launch { awaitLoad() }
+
+    /** Suspends until this ViewModel's data has actually loaded (or failed) — used by the
+     *  startup join in DayPilotNavGraph, which needs real success/failure, not just "finished".
+     *  Unlike the fire-and-forget load() above, this never lets an exception escape uncaught —
+     *  it used to (no try/catch at all), which could crash the app on a cold-start network hiccup. */
+    suspend fun awaitLoad(): Boolean {
+        return try {
+            val uid = repo.getCurrentUserId() ?: return false
+            val fromDb = repo.getAll(uid)
+            NotificationHub.repo.mergeServerNotifications(fromDb)
+            if (!realtimeSubscriptionStarted) {
+                realtimeSubscriptionStarted = true
+                subscribeToRealtime(uid)
+            }
+            true
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to load notifications", e)
+            false
+        }
     }
 
     private fun subscribeToRealtime(userId: String) {
@@ -99,6 +121,8 @@ class NotificationsViewModel(private val repo: NotificationRepository) : ViewMod
     }
 
     companion object {
+        private const val TAG = "NotificationsViewModel"
+
         fun factory(repo: NotificationRepository): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")

@@ -11,12 +11,13 @@ interface StepsRepository {
     fun getCurrentSteps(): Int
     fun getGoalSteps(): Int
     fun getPendingGoal(): Int?
-    fun getPointsEarned(): Int
     fun canChangeGoal(): Boolean
     fun configureGoal(newGoal: Int)
     fun setSteps(steps: Int)
-    fun resetMilestones()
 
+    /** Points earned today from steps, derived from habits_daily.steps_milestone_level —
+     *  the server (fn_award_steps_milestones trigger) computes the level, this only reads it. */
+    suspend fun getPointsEarned(): Int
     suspend fun syncSteps(steps: Int, goal: Int)
     suspend fun getWeeklyStats(): StepsWeeklyStats
     suspend fun hydrateGoalFromServer()

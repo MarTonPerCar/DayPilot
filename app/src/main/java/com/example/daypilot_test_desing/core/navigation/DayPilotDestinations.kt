@@ -22,7 +22,6 @@ object DayPilotDestinations {
     const val RIVALRY    = "rivalry"
 
     // Desde Hábitos
-    const val STEPS       = "steps"
     const val REMINDERS   = "reminders"
     const val TECH_HEALTH = "tech_health"
     const val TIMER_HUB = "timer_hub"

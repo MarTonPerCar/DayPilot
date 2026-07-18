@@ -1,5 +1,6 @@
 package com.example.daypilot_test_desing.feature.friends
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -7,7 +8,6 @@ import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.core.cache.SessionCache
 import com.example.daypilot_test_desing.core.data.model.ReactionType
 import com.example.daypilot_test_desing.core.data.repository.FriendRepository
-import com.example.daypilot_test_desing.data.supabase.SupabaseNotificationRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,15 +24,23 @@ class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
 
     fun refresh(): Job = viewModelScope.launch { load() }
 
-    private suspend fun load() {
-        try {
+    /** Suspends until this ViewModel's data has actually loaded (or failed) — used by the
+     *  startup join in DayPilotNavGraph, which needs real success/failure, not just "finished". */
+    suspend fun awaitLoad(): Boolean = load()
+
+    private suspend fun load(): Boolean {
+        return try {
             _uiState.update { current ->
                 current.copy(
                     friends        = repo.getFriends(),         // cache-first with 5min TTL
                     friendRequests = repo.getFriendRequests()   // always fresh
                 )
             }
-        } catch (_: Exception) { }
+            true
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to load friends data", e)
+            false
+        }
     }
 
     fun acceptRequest(userId: String) {
@@ -53,13 +61,8 @@ class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
                 SessionCache.friendsFetchedAt = System.currentTimeMillis()
                 SessionCache.ranking.value    = null
                 SessionCache.rankingFetchedAt = 0L
-                // Persisted to the DB — the always-on realtime subscription delivers it to
-                // NotificationHub, so adding it locally too would double it up.
-                SupabaseNotificationRepository.insertForCurrentUser(
-                    type  = "FRIEND_ACCEPTED",
-                    title = "Nueva amistad 🤝",
-                    body  = "${request.name} es ahora tu amigo"
-                )
+                // FRIEND_ACCEPTED notification is now inserted by a Supabase DB trigger;
+                // switching to the friends tab (justAcceptedRequest) is already the confirmation.
             } catch (e: Exception) {
                 _uiState.update { state ->
                     state.copy(
@@ -105,12 +108,12 @@ class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
         }
         viewModelScope.launch {
             try {
-                // repo.reactToFriend() already persists a "Reacción enviada" notification
-                // for the current user and the always-on realtime subscription delivers it
-                // to NotificationHub — adding it here too would double it up.
+                // REACTION notification to the friend is inserted by a Supabase DB trigger;
+                // the "reaction sent" confirmation below is local-only, never stored.
                 repo.reactToFriend(userId, reaction)
                 SessionCache.friends.value    = _uiState.value.friends
                 SessionCache.friendsFetchedAt = System.currentTimeMillis()
+                _uiState.update { it.copy(userMessage = R.string.friends_reaction_sent) }
             } catch (e: Exception) {
                 _uiState.update { state ->
                     state.copy(friends = originalFriends, userMessage = R.string.error_react_friend)
@@ -142,6 +145,8 @@ class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
     }
 
     companion object {
+        private const val TAG = "FriendsViewModel"
+
         fun factory(repo: FriendRepository): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")

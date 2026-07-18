@@ -2,10 +2,10 @@ package com.example.daypilot_test_desing.data.supabase
 
 import android.content.SharedPreferences
 import android.util.Log
-import com.example.daypilot_test_desing.data.supabase.SupabaseNotificationRepository
 import com.example.daypilot_test_desing.core.data.repository.StepsRepository
 import com.example.daypilot_test_desing.core.data.repository.StepsWeeklyStats
 import com.example.daypilot_test_desing.data.supabase.dto.DailyLogDto
+import com.example.daypilot_test_desing.data.supabase.dto.HabitsDailyMilestoneDto
 import com.example.daypilot_test_desing.data.supabase.dto.HabitsDailyUpsertDto
 import com.example.daypilot_test_desing.data.supabase.dto.UserPendingGoalDto
 import io.github.jan.supabase.auth.auth
@@ -32,9 +32,6 @@ class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepos
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     private var currentSteps = 0
-    private var milestone1Awarded = false
-    private var milestone2Awarded = false
-    private var milestone3Awarded = false
 
     private fun today() = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
 
@@ -71,10 +68,27 @@ class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepos
         return if (pg > 0) pg else null
     }
 
-    override fun getPointsEarned(): Int =
-        (if (milestone1Awarded) 10 else 0) +
-        (if (milestone2Awarded) 20 else 0) +
-        (if (milestone3Awarded) 30 else 0)
+    override suspend fun getPointsEarned(): Int {
+        val uid = supabase.auth.currentUserOrNull()?.id ?: return 0
+        return try {
+            val level = supabase.from("habits_daily").select {
+                filter { eq("user_id", uid); eq("date", today()) }
+                limit(1)
+            }.decodeList<HabitsDailyMilestoneDto>().firstOrNull()?.stepsMilestoneLevel ?: 0
+            pointsForMilestoneLevel(level)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to read steps milestone level", e)
+            0
+        }
+    }
+
+    // Cumulative — matches what fn_award_steps_milestones awards server-side per level.
+    private fun pointsForMilestoneLevel(level: Int): Int = when (level) {
+        1    -> 10
+        2    -> 30
+        3    -> 60
+        else -> 0
+    }
 
     override fun canChangeGoal(): Boolean = true
 
@@ -132,63 +146,11 @@ class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepos
         }
     }
 
+    // Milestone points and the STEPS_GOAL notification are computed and inserted
+    // server-side by the fn_award_steps_milestones trigger on habits_daily writes —
+    // this only ever stores the raw sensor-derived count for display/upload.
     override fun setSteps(steps: Int) {
         currentSteps = steps
-        checkMilestones()
-    }
-
-    override fun resetMilestones() {
-        milestone1Awarded = false
-        milestone2Awarded = false
-        milestone3Awarded = false
-    }
-
-    private fun checkMilestones() {
-        val goal = getGoalSteps()
-        if (!milestone1Awarded && currentSteps >= goal / 2) {
-            milestone1Awarded = true
-            scope.launch { logMilestone(10) }
-        }
-        if (!milestone2Awarded && currentSteps >= (goal * 3) / 4) {
-            milestone2Awarded = true
-            scope.launch { logMilestone(20) }
-        }
-        if (!milestone3Awarded && currentSteps >= goal) {
-            milestone3Awarded = true
-            scope.launch { logMilestone(30) }
-        }
-    }
-
-    private suspend fun logMilestone(points: Int) {
-        val uid = supabase.auth.currentUserOrNull()?.id ?: return
-        val todayStr = today()
-        try {
-            // Routes through the shared repo (not a raw points_log insert here) so
-            // SessionCache.userProfile/todayProgress stay in sync and the LEVEL_UP check
-            // in SupabaseProgressRepository.logPoints() also runs for steps-sourced points.
-            SupabaseProgressRepository().logPoints(points, "STEPS")
-            supabase.from("habits_daily").upsert(
-                HabitsDailyUpsertDto(
-                    userId    = uid,
-                    date      = todayStr,
-                    steps     = currentSteps,
-                    stepsGoal = getGoalSteps()
-                )
-            ) { onConflict = "user_id,date" }
-            Log.d(TAG, "Persisted milestone ($points pts) at $currentSteps steps")
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to persist milestone ($points pts)", e)
-        }
-        val (title, msg) = when (points) {
-            10   -> "A mitad de camino 🏃" to "Has completado el 50% de tu objetivo de pasos (+10 pts)"
-            20   -> "¡Ya casi! 💪" to "Has completado el 75% de tu objetivo de pasos (+20 pts)"
-            else -> "¡Objetivo completado! 🎉" to "Has alcanzado tu objetivo de pasos (+30 pts)"
-        }
-        SupabaseNotificationRepository.insertForCurrentUser(
-            type  = "STEPS_GOAL",
-            title = title,
-            body  = msg
-        )
     }
 
     override suspend fun syncSteps(steps: Int, goal: Int) {

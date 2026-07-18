@@ -53,7 +53,6 @@ private fun rootTabFor(route: String?): String? = when (route) {
     DayPilotDestinations.HOME,
     DayPilotDestinations.CALENDAR,
     DayPilotDestinations.HABITS,
-    DayPilotDestinations.STEPS,
     DayPilotDestinations.PROGRESS,
     DayPilotDestinations.RIVALRY,
     DayPilotDestinations.TIMER_HUB,

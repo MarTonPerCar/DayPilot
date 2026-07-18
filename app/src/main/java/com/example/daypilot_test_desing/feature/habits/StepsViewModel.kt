@@ -77,14 +77,16 @@ class StepsViewModel(
                         .putString("baseline_date", today)
                         .putInt("baseline_steps", totalSinceBoot)
                         .apply()
-                    stepsRepo.resetMilestones()
+                    // Milestone level/points for the new day are recomputed server-side
+                    // the moment this device's next sync writes today's row.
                     totalSinceBoot
                 }
             }
             val dailySteps = maxOf(0, totalSinceBoot - baseline)
             val prevSteps  = stepsRepo.getCurrentSteps()
             stepsRepo.setSteps(dailySteps)
-            if (dailySteps != prevSteps) updateLocalState()
+            // Local-only — keeps the visible counter live every tick without a network call.
+            if (dailySteps != prevSteps) updateStepsDisplay()
             if (lastSyncedSteps < 0 || dailySteps - lastSyncedSteps >= STEP_SYNC_THRESHOLD) {
                 triggerSync(dailySteps)
             }
@@ -96,10 +98,11 @@ class StepsViewModel(
         registerSensorIfPermitted()
         viewModelScope.launch {
             stepsRepo.hydrateGoalFromServer()
-            updateLocalState()
+            updateStepsDisplay()
+            refreshPoints()
         }
         viewModelScope.launch { loadWeeklyStats() }
-        updateLocalState()
+        updateStepsDisplay()
         _uiState.update { it.copy(sensorAvailable = stepSensor != null) }
 
         viewModelScope.launch {
@@ -110,12 +113,19 @@ class StepsViewModel(
             }
         }
 
+        // Sync trigger #1: app comes to the foreground (covers both cold start and
+        // resuming from background — no need to distinguish between them).
         ProcessLifecycleOwner.get().lifecycle.addObserver(object : DefaultLifecycleObserver {
             override fun onStop(owner: LifecycleOwner) {
                 triggerSync(stepsRepo.getCurrentSteps())
             }
             override fun onStart(owner: LifecycleOwner) {
                 registerSensorIfPermitted()
+                // If the sensor hasn't reported this session yet, currentSteps is still the
+                // 0 default — pushing that would clobber today's real server-side count.
+                // Just re-read points in that case; the sensor's first reading will trigger
+                // its own sync moments later (see the "lastSyncedSteps < 0" check above).
+                if (baseline >= 0) triggerSync() else viewModelScope.launch { refreshPoints() }
             }
         })
     }
@@ -140,9 +150,10 @@ class StepsViewModel(
         sensorManager?.unregisterListener(sensorListener)
     }
 
+    /** Sync trigger #2: entering the Steps screen mid-session. */
     fun refresh() {
         triggerSync()
-        updateLocalState()
+        updateStepsDisplay()
         viewModelScope.launch { loadWeeklyStats() }
     }
 
@@ -150,24 +161,38 @@ class StepsViewModel(
         lastSyncedSteps = steps
         val goal = stepsRepo.getGoalSteps()
         Log.d(TAG, "Triggering steps sync: $steps/$goal")
-        viewModelScope.launch { stepsRepo.syncSteps(steps, goal) }
+        viewModelScope.launch {
+            stepsRepo.syncSteps(steps, goal)
+            // Re-fetch afterwards so the displayed points reflect the server's freshly
+            // recomputed steps_milestone_level, not a locally-tracked value.
+            refreshPoints()
+        }
     }
 
     fun configureGoal(newGoal: Int) {
         stepsRepo.configureGoal(newGoal)
-        updateLocalState()
+        updateStepsDisplay()
     }
 
-    private fun updateLocalState() {
-        val earned = stepsRepo.getPointsEarned()
+    /** Local-only — steps/goal fields the sensor and prefs already know synchronously. */
+    private fun updateStepsDisplay() {
         _uiState.update { current ->
             current.copy(
                 currentSteps     = stepsRepo.getCurrentSteps(),
                 goalSteps        = stepsRepo.getGoalSteps(),
-                pointsEarned     = earned,
-                pointsRemaining  = maxOf(0, 60 - earned),
                 pendingGoal      = stepsRepo.getPendingGoal(),
                 goalChangedToday = !stepsRepo.canChangeGoal()
+            )
+        }
+    }
+
+    /** Server round-trip — only called after a sync, never on every sensor tick. */
+    private suspend fun refreshPoints() {
+        val earned = stepsRepo.getPointsEarned()
+        _uiState.update { current ->
+            current.copy(
+                pointsEarned    = earned,
+                pointsRemaining = maxOf(0, 60 - earned)
             )
         }
     }

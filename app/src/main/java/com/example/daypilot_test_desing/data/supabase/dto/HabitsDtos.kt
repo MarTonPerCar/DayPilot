@@ -27,6 +27,13 @@ data class HabitsDailyReadTimerDto(
     @SerialName("timer_point_earned") val timerPointEarned: Boolean = false
 )
 
+// fn_award_steps_milestones (DB trigger) computes this 0-3 level server-side whenever
+// steps/steps_goal change — Android only ever reads it back, never computes it locally.
+@Serializable
+data class HabitsDailyMilestoneDto(
+    @SerialName("steps_milestone_level") val stepsMilestoneLevel: Int = 0
+)
+
 @Serializable
 data class HabitsDailyTimerDto(
     @SerialName("user_id") val userId: String,
