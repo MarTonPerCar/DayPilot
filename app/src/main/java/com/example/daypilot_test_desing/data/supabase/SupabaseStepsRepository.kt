@@ -182,10 +182,12 @@ class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepos
                 order("date", Order.DESCENDING)
                 limit(1)
             }.decodeList<HabitsDailyUpsertDto>().firstOrNull()
-            if (row != null && row.stepsGoal > 0) {
-                prefs.edit().putInt("steps_goal", row.stepsGoal).apply()
-                Log.d(TAG, "Hydrated steps goal from DB: ${row.stepsGoal}")
-            }
+            // No row yet on a genuinely fresh account — write the same placeholder default
+            // so the guard above actually stops future reruns instead of re-querying on
+            // every app open until the first real sync eventually creates a row.
+            val goal = if (row != null && row.stepsGoal > 0) row.stepsGoal else 10_000
+            prefs.edit().putInt("steps_goal", goal).apply()
+            Log.d(TAG, "Hydrated steps goal from DB: $goal")
         } catch (e: Exception) {
             Log.e(TAG, "Failed to hydrate steps goal from server", e)
         }
