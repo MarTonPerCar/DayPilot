@@ -1,4 +1,4 @@
-# DayPilot — Rama `desarrollo`
+# DayPilot — Rama `Test-Funcional-Android`
 
 > **Estado:** En desarrollo activo  
 > **Base:** `Test-Diseno-Android` (fase de diseño UI completada)  
@@ -56,7 +56,7 @@ Migrar la gestión de estado del NavGraph a ViewModels, conectados a repositorio
 1. Añadir dependencias `lifecycle-viewmodel-compose` y `lifecycle-runtime-compose`
 2. Definir interfaces de repositorio por dominio
 3. Implementar `FakeRepository` por dominio con datos hardcodeados coherentes
-4. Crear un ViewModel por dominio con `StateFlow` y `UiState` sellado
+4. Crear un ViewModel por dominio con `StateFlow` y una `UiState` como `data class`
 5. Conectar cada pantalla mediante `collectAsStateWithLifecycle()`
 6. El NavGraph pasa a gestionar solo navegación, sin ningún `var x by remember`
 
@@ -68,19 +68,20 @@ data/
 │   ├── TaskRepository.kt           ← interfaz
 │   ├── ReminderRepository.kt       ← interfaz
 │   ├── TechHealthRepository.kt     ← interfaz
-│   ├── PointsRepository.kt         ← interfaz
+│   ├── ProgressRepository.kt       ← interfaz
 │   ├── FriendRepository.kt         ← interfaz
 │   └── fake/
 │       ├── FakeTaskRepository.kt
 │       ├── FakeReminderRepository.kt
 │       ├── FakeTechHealthRepository.kt
-│       ├── FakePointsRepository.kt
+│       ├── FakeProgressRepository.kt
 │       └── FakeFriendRepository.kt
-ui/
+... (StepsRepository, RankingRepository, SettingsRepository, UserRepository y
+     NotificationRepository, con sus respectivas Fake*, siguen el mismo patrón)
+viewmodel/
 ├── calendar/
 │   ├── CalendarViewModel.kt
-│   ├── CalendarUiState.kt
-│   └── CalendarScreen.kt           ← ya existe, solo cambia la firma
+│   └── CalendarUiState.kt
 ├── habits/
 │   ├── HabitsViewModel.kt
 │   └── HabitsUiState.kt
@@ -91,6 +92,10 @@ ui/
 │   ├── RivalryViewModel.kt
 │   └── RivalryUiState.kt
 ... (un ViewModel por pantalla o dominio funcional)
+presentation/
+├── calendar/CalendarScreen.kt      ← ya existe, solo cambia la firma
+├── habits/HabitsScreen.kt
+... (una carpeta por dominio, con las pantallas ya existentes)
 ```
 
 **Criterio de finalización:** ningún estado de negocio en el NavGraph. Toda la app navega, responde a interacciones y persiste cambios durante la sesión a través de ViewModels y repositorios falsos.
@@ -127,9 +132,9 @@ Tres funcionalidades que quedaron sin implementar en la UI y que se resolverán 
 ## Convenciones de esta rama
 
 - Un commit por feature completa, no por archivo
-- Mensajes de commit en español: `feat: CalendarViewModel con FakeTaskRepository`
+- Mensajes de commit en inglés, en una sola línea, sin cuerpo
 - Nunca romper la navegación existente — los cambios son aditivos
-- Cada ViewModel tiene su `UiState` sellado definido antes de conectarlo a la pantalla
+- Cada ViewModel tiene su `UiState` (`data class`) definida antes de conectarlo a la pantalla
 - Las pantallas no conocen los repositorios — solo hablan con el ViewModel
 
 ---
