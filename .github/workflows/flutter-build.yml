@@ -3,7 +3,8 @@ name: Flutter Build
 on:
   push:
     tags:
-      - 'v*'
+      # v{V}.{SV}.X.Y.Z — V=2 Flutter, SV=1 this branch (main)
+      - 'v2.1.*'
   workflow_dispatch:
 
 permissions:
@@ -95,7 +96,8 @@ jobs:
       - name: Build .deb package
         run: |
           set -e
-          VERSION="${GITHUB_REF_NAME#v}"
+          # Tag format: v{V}.{SV}.X.Y.Z — strip the "vV.SV." prefix, keep X.Y.Z
+          VERSION="$(echo "$GITHUB_REF_NAME" | cut -d. -f3-)"
 
           PKGROOT="$GITHUB_WORKSPACE/debroot"
           mkdir -p "$PKGROOT/DEBIAN"
@@ -144,3 +146,36 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: DayPilot-Setup.deb
+
+  update-latest:
+    needs: [build-windows, build-linux]
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Windows artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: DayPilot-Setup
+
+      - name: Download Linux artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: DayPilot-Setup-deb
+
+      - name: Move floating "latest" tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -f incremento-flutter-latest
+          git push origin -f incremento-flutter-latest
+
+      - name: Update "latest" release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: incremento-flutter-latest
+          name: "Latest build (Incremento-Flutter)"
+          files: |
+            DayPilot-Setup.exe
+            DayPilot-Setup.deb

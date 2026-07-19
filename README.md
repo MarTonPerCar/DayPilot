@@ -1,14 +1,10 @@
-# DayPilot (Flutter) — Windows debugging scratch branch
-
-Throwaway branch to iterate on a Windows-only layout bug without spamming releases on `Incremento-Flutter-TestFinal`. Not a real branch, don't build on it.
-
 # DayPilot (Flutter)
 
 Flutter port of DayPilot, a productivity app (tasks, steps, Pomodoro timers, app usage limits, social ranking) originally built for Android with Kotlin and Jetpack Compose, backed by Supabase.
 
 Users track daily tasks, steps, and app usage limits, and compete with friends on a 30-day points ranking. The app includes timers (Pomodoro and custom), reminders, a real-time notification system, and a weekly progress summary.
 
-This is the active working branch for the final increment: real UI, real Riverpod architecture, and a real Supabase backend, built on top of the design system from `Test-Diseño-Flutter`. It's merged into `Incremento-Flutter` periodically.
+This branch, `Incremento-Flutter`, is the **stable, permanent home** for the final increment: real UI, real Riverpod architecture, and a real Supabase backend, built on top of the design system from `Test-Diseño-Flutter`. Active work and testing happen on `Incremento-Flutter-TestFinal`, which is merged in here periodically once it's verified.
 
 ## Features
 
@@ -41,12 +37,13 @@ This is the active working branch for the final increment: real UI, real Riverpo
 
 | Branch | Purpose |
 |---|---|
-| `Incremento-Flutter` | Permanent branch this work is periodically merged into |
-| `Test-Diseño-Flutter` | Design-system-only base this branch builds on |
+| `Incremento-Flutter-TestFinal` | Active working branch, merged in here periodically once verified |
+| `Test-Diseño-Flutter` | Design-system-only base this work builds on |
 | `Test-Supabase-Flutter` | Standalone spike validating `supabase_flutter` against the real project database |
 
 ## Downloads
 
-- [⬇️ Download DayPilot for Windows](https://github.com/MarTonPerCar/DayPilot/releases/latest/download/DayPilot-Setup.exe)
+- [⬇️ Download DayPilot for Windows](https://github.com/MarTonPerCar/DayPilot/releases/download/incremento-flutter-latest/DayPilot-Setup.exe)
+- [⬇️ Download DayPilot for Linux (.deb)](https://github.com/MarTonPerCar/DayPilot/releases/download/incremento-flutter-latest/DayPilot-Setup.deb)
 
-> **Note:** this is the active working branch — builds here may contain bugs still being worked out, or may be identical to the latest `Incremento-Flutter` release if nothing has changed yet. For the stable version, use the downloads on `Incremento-Flutter` instead.
+> **Note:** these links always point at the latest release built from this branch (`Incremento-Flutter`), the stable version of the app.
