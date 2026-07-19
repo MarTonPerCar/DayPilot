@@ -44,7 +44,7 @@ Esta combinación fue la única que compiló correctamente. Cambiar cualquiera d
 |---|---|---|
 | Kotlin | **2.2.21** | supabase-kt 3.3.0 usa `kotlinx-serialization 1.9.0` compilado con Kotlin 2.2. Las versiones 2.0.x y 2.1.x no pueden leer esos binarios y el compilador K2 falla con un crash interno. |
 | supabase-kt | **3.3.0** | Versión estable con Auth y PostgREST. |
-| ktor-client-android | **3.3.0** | Debe coincidir con la versión de supabase-kt para evitar incompatibilidades binarias. |
+| ktor-client-android | **3.1.3** | Versión con la que se resolvió correctamente el engine HTTP para Android usado por supabase-kt. |
 | compileSdk / targetSdk | **36** | supabase-kt arrastra dependencias de AndroidX que lo requieren. |
 | Java target | **17** | Necesario con Kotlin 2.2.x y AndroidX moderno. |
 | minSdk | **26** | Requisito mínimo de supabase-kt. |
