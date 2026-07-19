@@ -3,7 +3,8 @@ name: Android Build
 on:
   push:
     tags:
-      - 'v*'
+      # v{V}.{SV}.X.Y.Z — V=1 Android, SV=1 this branch (main)
+      - 'v1.1.*'
   workflow_dispatch:
 
 permissions:
