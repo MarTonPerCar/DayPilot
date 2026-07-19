@@ -2,6 +2,7 @@ package com.example.daypilot_test_desing.core.data.local
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import com.example.daypilot_test_desing.core.data.model.AppRestriction
 import com.example.daypilot_test_desing.core.data.model.GroupRestriction
 import com.example.daypilot_test_desing.core.data.repository.TechHealthRepository
@@ -13,6 +14,10 @@ import java.util.Locale
 
 class SharedPrefsTechHealthRepository(context: Context) : TechHealthRepository {
 
+    companion object {
+        private const val TAG = "SharedPrefsTechHealthRepo"
+    }
+
     private val prefs: SharedPreferences =
         context.getSharedPreferences("daypilot_tech_health", Context.MODE_PRIVATE)
 
@@ -22,7 +27,10 @@ class SharedPrefsTechHealthRepository(context: Context) : TechHealthRepository {
         val raw = prefs.getString("apps", null) ?: return mutableListOf()
         return try {
             json.decodeFromString(ListSerializer(AppRestriction.serializer()), raw).toMutableList()
-        } catch (_: Exception) { mutableListOf() }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to decode stored app restrictions, discarding local cache", e)
+            mutableListOf()
+        }
     }
 
     private fun saveApps(list: List<AppRestriction>) {
@@ -35,7 +43,10 @@ class SharedPrefsTechHealthRepository(context: Context) : TechHealthRepository {
         val raw = prefs.getString("groups", null) ?: return mutableListOf()
         return try {
             json.decodeFromString(ListSerializer(GroupRestriction.serializer()), raw).toMutableList()
-        } catch (_: Exception) { mutableListOf() }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to decode stored group restrictions, discarding local cache", e)
+            mutableListOf()
+        }
     }
 
     private fun saveGroups(list: List<GroupRestriction>) {
@@ -105,6 +116,19 @@ class SharedPrefsTechHealthRepository(context: Context) : TechHealthRepository {
         if (idx >= 0) { groups[idx] = groups[idx].copy(usedMinutesToday = usedMinutes); saveGroups(groups) }
     }
 
+    override fun updateGroupAppUsage(groupId: String, packageName: String, usedMinutes: Int) {
+        val groups   = loadGroups()
+        val groupIdx = groups.indexOfFirst { it.id == groupId }
+        if (groupIdx < 0) return
+        val group  = groups[groupIdx]
+        val appIdx = group.apps.indexOfFirst { it.packageName == packageName }
+        if (appIdx < 0) return
+        val updatedApps = group.apps.toMutableList()
+        updatedApps[appIdx] = updatedApps[appIdx].copy(usedMinutesToday = usedMinutes)
+        groups[groupIdx] = group.copy(apps = updatedApps)
+        saveGroups(groups)
+    }
+
     override fun markViolated(id: String) {
         val apps = loadApps()
         val idx  = apps.indexOfFirst { it.id == id }
@@ -152,7 +176,8 @@ class SharedPrefsTechHealthRepository(context: Context) : TechHealthRepository {
                 dailyLimitMinutes   = it.pendingLimitMinutes ?: it.dailyLimitMinutes,
                 pendingLimitMinutes = null,
                 isViolatedToday     = false,
-                usedMinutesToday    = 0
+                usedMinutesToday    = 0,
+                apps                = it.apps.map { app -> app.copy(usedMinutesToday = 0) }
             )
         })
         prefs.edit().putString("last_reset_date", today).apply()

@@ -41,7 +41,6 @@ fun FriendCard(
             .clip(RoundedCornerShape(20.dp))
             .background(MaterialTheme.colorScheme.surface)
     ) {
-        // ── Cabecera ─────────────────────────────────────────
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -82,7 +81,6 @@ fun FriendCard(
             }
         }
 
-        // ── Resumen semanal ──────────────────────────────────
         DayPilotDivider()
         if (weeklySummary != null) {
             Column(

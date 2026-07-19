@@ -55,7 +55,6 @@ import com.example.daypilot_test_desing.core.data.model.TaskCategory
 import com.example.daypilot_test_desing.core.data.model.TaskDifficulty
 import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
 
-// ── 1. TaskCard ───────────────────────────────────────────────────
 @Composable
 fun TaskCard(
     title: String,
@@ -136,7 +135,6 @@ fun TaskCard(
     }
 }
 
-// ── 2. TaskMiniCard ───────────────────────────────────────────────
 @Composable
 fun TaskMiniCard(
     title: String,
@@ -196,7 +194,6 @@ fun TaskMiniCard(
     }
 }
 
-// ── 3. TaskDayCard ────────────────────────────────────────────────
 @Composable
 fun TaskDayCard(
     title: String,
@@ -215,7 +212,6 @@ fun TaskDayCard(
 ) {
     var showDeleteConfirm by remember { mutableStateOf(false) }
 
-    // ── Diálogo de confirmación ───────────────────────────────────
     if (showDeleteConfirm) {
         AlertDialog(
             onDismissRequest = { showDeleteConfirm = false },
@@ -263,7 +259,6 @@ fun TaskDayCard(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        // Barra de color por dificultad + categoría
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -339,7 +334,6 @@ fun TaskDayCard(
                 }
             }
 
-            // Botones editar / eliminar (spinner while pending)
             if (isPending) {
                 Box(modifier = Modifier.size(32.dp), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
@@ -374,7 +368,6 @@ fun TaskDayCard(
     }
 }
 
-// ── Preview ──────────────────────────────────────────────────────
 @Preview(showBackground = true)
 @Composable
 fun TaskCardsPreview() {

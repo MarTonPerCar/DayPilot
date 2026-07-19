@@ -1,13 +1,13 @@
 package com.example.daypilot_test_desing.feature.progress
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.daypilot_test_desing.core.cache.SessionCache
 import com.example.daypilot_test_desing.core.data.model.buildProgressWindow
-import com.example.daypilot_test_desing.data.supabase.SupabaseNotificationRepository
 import com.example.daypilot_test_desing.core.data.repository.ProgressRepository
 import com.example.daypilot_test_desing.data.supabase.supabase
 import io.github.jan.supabase.auth.auth
@@ -44,11 +44,15 @@ class ProgressViewModel(
 
     fun invalidate() { /* cache freshness is managed at the repo/SessionCache layer */ }
 
-    private suspend fun load() {
-        try {
-            val todayProgress = repo.getTodayProgress()   // cache-first
-            val history       = repo.getHistory(30)        // cache-first with 1h TTL
-            val ranking       = repo.getRankingPosition()  // uses cached ranking if available
+    /** Suspends until this ViewModel's data has actually loaded (or failed) — used by the
+     *  startup join in DayPilotNavGraph, which needs real success/failure, not just "finished". */
+    suspend fun awaitLoad(): Boolean = load()
+
+    private suspend fun load(): Boolean {
+        return try {
+            val todayProgress = repo.getTodayProgress()
+            val history       = repo.getHistory(30)
+            val ranking       = repo.getRankingPosition()
             val progressData  = buildProgressWindow(history, todayProgress)
             _uiState.value = ProgressUiState(
                 progressData        = progressData,
@@ -61,12 +65,15 @@ class ProgressViewModel(
                 timerCompletedToday = todayProgress.timerPoints > 0
             )
             subscribeToRealtimeOnce()
-        } catch (_: Exception) { }
+            true
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to load progress data", e)
+            false
+        }
     }
 
-    // daily_progress has no TTL in SessionCache (write-through only), so without this,
-    // a change made from another device/session would never be picked up here until the
-    // date rolls over or a local action happens to overwrite the cache.
+    // daily_progress is write-through with no TTL, so without realtime a change from
+    // another device wouldn't surface here until the date rolls over.
     private fun subscribeToRealtimeOnce() {
         if (realtimeChannel != null) return
         val uid = supabase.auth.currentUserOrNull()?.id ?: return
@@ -84,9 +91,18 @@ class ProgressViewModel(
                 load()
             }.launchIn(viewModelScope)
 
-            // supabase-kt gives up and settles at UNSUBSCRIBED for good after enough
-            // failed rejoin attempts (e.g. a stale JWT) — rebuild instead of leaving
-            // progress sync dead for the rest of the session.
+            // Force a real refetch instead of serving the 1h-TTL'd stale history chart.
+            channel.postgresChangeFlow<PostgresAction>(schema = "public") {
+                table = "user_daily_log"
+                filter("user_id", FilterOperator.EQ, userId)
+            }.onEach {
+                SessionCache.weeklyHistory.value    = null
+                SessionCache.weeklyHistoryFetchedAt = 0L
+                load()
+            }.launchIn(viewModelScope)
+
+            // supabase-kt settles at UNSUBSCRIBED for good after enough failed rejoin
+            // attempts (e.g. a stale JWT) — rebuild instead of leaving progress sync dead.
             channel.status.onEach { status ->
                 if (status == RealtimeChannel.Status.UNSUBSCRIBED && realtimeChannel === channel) {
                     delay(5_000)
@@ -112,21 +128,19 @@ class ProgressViewModel(
             try {
                 val awarded = repo.completeTimerSession()  // server-side gated via habits_daily
                 if (!awarded) return@launch
-                load()  // re-fetches fresh todayProgress, updates UiState
-                // TODO: move notification sending to NotificationRepository so ProgressViewModel
-                //       doesn't depend on a concrete Supabase class
-                SupabaseNotificationRepository.insertForCurrentUser(
-                    type  = "TIMER_DONE",
-                    title = "¡Temporizador completado! ⏱",
-                    body  = "Has completado una sesión de concentración y ganado 10 pts"
-                )
-            } catch (_: Exception) { }
+                load()
+                // TIMER_DONE notification is now inserted by a Supabase DB trigger.
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to record timer completion", e)
+            }
         }
     }
 
     private fun today() = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
 
     companion object {
+        private const val TAG = "ProgressViewModel"
+
         fun factory(application: Application, repo: ProgressRepository): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")

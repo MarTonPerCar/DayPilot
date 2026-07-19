@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.provider.Settings
 import android.text.TextUtils
+import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import com.example.daypilot_test_desing.core.data.local.SharedPrefsTechHealthRepository
 import com.example.daypilot_test_desing.data.supabase.supabase
@@ -22,6 +23,8 @@ import kotlinx.coroutines.launch
 class DayPilotAccessibilityService : AccessibilityService() {
 
     companion object {
+        private const val TAG = "DayPilotAccessibility"
+
         fun isEnabled(context: Context): Boolean {
             val expected = ComponentName(context, DayPilotAccessibilityService::class.java)
             val enabledServices = Settings.Secure.getString(
@@ -65,31 +68,36 @@ class DayPilotAccessibilityService : AccessibilityService() {
     }
 
     private fun checkAndBlock(pkg: String) {
-        val usageMap = AppUsageTracker.getTodayUsage(this)
+        try {
+            val usageMap = AppUsageTracker.getTodayUsage(this)
 
-        val appRestriction = repo.getAppRestrictions().find { it.packageName == pkg && it.isEnabled }
-        if (appRestriction != null) {
-            val usedMinutes = usageMap[pkg] ?: appRestriction.usedMinutesToday
-            if (usedMinutes >= appRestriction.dailyLimitMinutes) {
-                block(pkg, appRestriction.appName)
-                if (!appRestriction.isViolatedToday) {
-                    repo.markViolated(appRestriction.id)
-                    scope.launch { markAppViolatedInSupabase(pkg) }
+            val appRestriction = repo.getAppRestrictions().find { it.packageName == pkg && it.isEnabled }
+            if (appRestriction != null) {
+                val usedMinutes = usageMap[pkg] ?: appRestriction.usedMinutesToday
+                if (usedMinutes >= appRestriction.dailyLimitMinutes) {
+                    block(pkg, appRestriction.appName)
+                    if (!appRestriction.isViolatedToday) {
+                        repo.markViolated(appRestriction.id)
+                        scope.launch { markAppViolatedInSupabase(pkg) }
+                    }
+                }
+                return
+            }
+
+            val group = repo.getGroupRestrictions().find { g -> g.isEnabled && g.apps.any { it.packageName == pkg } }
+            if (group != null) {
+                val usedMinutes = group.apps.sumOf { usageMap[it.packageName] ?: 0 }
+                if (usedMinutes >= group.dailyLimitMinutes) {
+                    block(pkg, group.groupName)
+                    if (!group.isViolatedToday) {
+                        repo.markGroupViolated(group.id)
+                        scope.launch { markGroupViolatedInSupabase(group.groupName) }
+                    }
                 }
             }
-            return
-        }
-
-        val group = repo.getGroupRestrictions().find { g -> g.isEnabled && g.apps.any { it.packageName == pkg } }
-        if (group != null) {
-            val usedMinutes = group.apps.sumOf { usageMap[it.packageName] ?: 0 }
-            if (usedMinutes >= group.dailyLimitMinutes) {
-                block(pkg, group.groupName)
-                if (!group.isViolatedToday) {
-                    repo.markGroupViolated(group.id)
-                    scope.launch { markGroupViolatedInSupabase(group.groupName) }
-                }
-            }
+        } catch (e: Exception) {
+            // Must not crash — a crashed accessibility service silently disables all TechHealth blocking.
+            Log.e(TAG, "checkAndBlock failed for $pkg", e)
         }
     }
 
@@ -115,7 +123,9 @@ class DayPilotAccessibilityService : AccessibilityService() {
             supabase.from("tech_health_config").update({ set("is_violated_today", true) }) {
                 filter { eq("user_id", uid); eq("app_package", packageName) }
             }
-        } catch (_: Exception) { }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to mark app $packageName as violated", e)
+        }
     }
 
     private suspend fun markGroupViolatedInSupabase(groupName: String) {
@@ -124,7 +134,9 @@ class DayPilotAccessibilityService : AccessibilityService() {
             supabase.from("tech_health_group_config").update({ set("is_violated_today", true) }) {
                 filter { eq("user_id", uid); eq("group_name", groupName) }
             }
-        } catch (_: Exception) { }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to mark group $groupName as violated", e)
+        }
     }
 
     override fun onInterrupt() {}

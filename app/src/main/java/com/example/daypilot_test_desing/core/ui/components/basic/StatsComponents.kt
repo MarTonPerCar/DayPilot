@@ -61,7 +61,6 @@ fun StatsTopBlock(
     }
 }
 
-// ── Fila de desglose ─────────────────────────────────────────────
 @Composable
 fun StatsBreakdownRow(
     icon: ImageVector,

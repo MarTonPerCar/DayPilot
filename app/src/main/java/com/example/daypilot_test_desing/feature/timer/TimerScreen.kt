@@ -97,7 +97,6 @@ fun TimerScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(32.dp, Alignment.CenterVertically)
         ) {
-            // ── Círculo de progreso ──────────────────────────────
             Box(
                 modifier         = Modifier.size(260.dp),
                 contentAlignment = Alignment.Center
@@ -153,7 +152,6 @@ fun TimerScreen(
                 }
             }
 
-            // ── Punto ganado ─────────────────────────────────────
             if (pointEarnedToday || isFinished) {
                 Row(
                     modifier = Modifier
@@ -173,7 +171,6 @@ fun TimerScreen(
                 }
             }
 
-            // ── Controles ────────────────────────────────────────
             Row(
                 horizontalArrangement = Arrangement.spacedBy(20.dp),
                 verticalAlignment     = Alignment.CenterVertically

@@ -22,8 +22,7 @@ data class AppSettings(
     val notificationsEnabled: Boolean = true
 )
 
-// Both mirror fn_update_level() in the DB so the app can predict a level bump
-// locally right after awarding points, without waiting for a re-fetch.
+// Mirrors fn_update_level() in the DB — must stay in sync with it.
 fun calculateLevel(totalPointsHistorical: Int): Int {
     val level = kotlin.math.floor(
         (-1.0 + kotlin.math.sqrt(1.0 + 4.0 * (2.0 + totalPointsHistorical / 5.0))) / 2.0

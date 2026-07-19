@@ -61,7 +61,6 @@ fun PomodoroScreen(
 
     val surfaceVarColor = MaterialTheme.colorScheme.surfaceVariant
 
-    // Ticker
     LaunchedEffect(isRunning) {
         while (isRunning && !isFinished) {
             delay(1000)
@@ -92,7 +91,6 @@ fun PomodoroScreen(
         onCompleted()
     }
 
-    // Sonido al cambio de fase
     LaunchedEffect(phaseEndCount) {
         if (phaseEndCount == 0) return@LaunchedEffect
         val uri = if (isFinished)
@@ -125,7 +123,6 @@ fun PomodoroScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(24.dp, Alignment.CenterVertically)
         ) {
-            // ── Indicador de sesiones ────────────────────────────
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment     = Alignment.CenterVertically
@@ -150,7 +147,6 @@ fun PomodoroScreen(
                 }
             }
 
-            // ── Fase actual ───────────────────────────────────────
             Row(
                 modifier = Modifier
                     .clip(RoundedCornerShape(50))
@@ -173,7 +169,6 @@ fun PomodoroScreen(
                 )
             }
 
-            // ── Círculo de progreso ──────────────────────────────
             Box(
                 modifier         = Modifier.size(260.dp),
                 contentAlignment = Alignment.Center
@@ -219,12 +214,10 @@ fun PomodoroScreen(
                 }
             }
 
-            // ── Controles ────────────────────────────────────────
             Row(
                 horizontalArrangement = Arrangement.spacedBy(20.dp),
                 verticalAlignment     = Alignment.CenterVertically
             ) {
-                // Reset
                 Box(
                     modifier = Modifier
                         .size(56.dp)
@@ -248,7 +241,6 @@ fun PomodoroScreen(
                     }
                 }
 
-                // Play / Pause
                 Box(
                     modifier = Modifier
                         .size(72.dp)
@@ -275,7 +267,6 @@ fun PomodoroScreen(
                     }
                 }
 
-                // Skip fase
                 Box(
                     modifier = Modifier
                         .size(56.dp)
@@ -310,7 +301,6 @@ fun PomodoroScreen(
                 }
             }
 
-            // ── Punto ganado ─────────────────────────────────────
             if (isFinished) {
                 Row(
                     modifier = Modifier

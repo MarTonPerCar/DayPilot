@@ -25,14 +25,6 @@ class AppPreferences(context: Context) {
         get() = prefs.getString("last_open_date", "") ?: ""
         set(v) { prefs.edit().putString("last_open_date", v).apply() }
 
-    var pendingTaskCount: Int
-        get() = prefs.getInt("pending_task_count", 0)
-        set(v) { prefs.edit().putInt("pending_task_count", v).apply() }
-
-    var pendingTaskCountDate: String
-        get() = prefs.getString("pending_task_count_date", "") ?: ""
-        set(v) { prefs.edit().putString("pending_task_count_date", v).apply() }
-
     var taskRemindersEnabled: Boolean
         get() = prefs.getBoolean("task_reminders_enabled", true)
         set(v) { prefs.edit().putBoolean("task_reminders_enabled", v).apply() }

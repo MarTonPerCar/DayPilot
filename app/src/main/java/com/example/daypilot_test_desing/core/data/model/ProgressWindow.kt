@@ -8,11 +8,7 @@ import java.util.Locale
 
 private const val WINDOW_SIZE = 30
 
-// Always exactly 30 slots (position in the list = how far back the day is),
-// zero-filled for days with no user_daily_log row, but each slot now carries
-// its real calendar day-of-month for the chart's x-axis labels — labels can
-// therefore roll over a month boundary (e.g. ...25, 30, 5, 6) instead of
-// counting 1..30 regardless of what month it actually is.
+// x-axis labels use the real calendar day, so they can roll over a month boundary (...25, 30, 5, 6).
 fun buildProgressWindow(history: List<DailyLogDto>, today: DailyProgressDto): List<DayProgress> {
     val fmt = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT)
     val byDate = history.associateBy { it.date }

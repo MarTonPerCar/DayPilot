@@ -17,7 +17,6 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.daypilot_test_desing.core.navigation.DayPilotDestinations
 
-// ── Tabs de la barra ─────────────────────────────────────────────
 data class BottomBarTab(
     val route: String,
     val label: String,
@@ -48,12 +47,10 @@ val bottomBarTabs = listOf(
     )
 )
 
-// Maps any route to the tab that "owns" it
 private fun rootTabFor(route: String?): String? = when (route) {
     DayPilotDestinations.HOME,
     DayPilotDestinations.CALENDAR,
     DayPilotDestinations.HABITS,
-    DayPilotDestinations.STEPS,
     DayPilotDestinations.PROGRESS,
     DayPilotDestinations.RIVALRY,
     DayPilotDestinations.TIMER_HUB,
@@ -71,7 +68,6 @@ private fun rootTabFor(route: String?): String? = when (route) {
     else -> null
 }
 
-// ── Bottom Bar ───────────────────────────────────────────────────
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DayPilotBottomBar(navController: NavController, unreadNotifications: Int = 0) {

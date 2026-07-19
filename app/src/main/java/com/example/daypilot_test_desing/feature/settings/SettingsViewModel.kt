@@ -1,6 +1,7 @@
 package com.example.daypilot_test_desing.feature.settings
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -28,6 +29,10 @@ class SettingsViewModel(
 
     fun refresh(): Job = viewModelScope.launch { loadUserName() }
 
+    /** Suspends until this ViewModel's data has actually loaded (or failed) — used by the
+     *  startup join in DayPilotNavGraph, which needs real success/failure, not just "finished". */
+    suspend fun awaitLoad(): Boolean = loadUserName()
+
     private fun loadPrefsState() = SettingsUiState(
         isDarkMode           = prefs.isDarkMode,
         selectedThemeId      = prefs.themeId,
@@ -37,11 +42,15 @@ class SettingsViewModel(
         streakAlertsEnabled  = prefs.streakAlertsEnabled
     )
 
-    private suspend fun loadUserName() {
-        try {
+    private suspend fun loadUserName(): Boolean {
+        return try {
             val name = userRepo.getCurrentUser().name
             _uiState.value = _uiState.value.copy(name = name)
-        } catch (_: Exception) { }
+            true
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to load user name for settings", e)
+            false
+        }
     }
 
     fun toggleDarkMode(enabled: Boolean) {
@@ -90,6 +99,8 @@ class SettingsViewModel(
     }
 
     companion object {
+        private const val TAG = "SettingsViewModel"
+
         fun factory(application: Application, userRepo: UserRepository): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")

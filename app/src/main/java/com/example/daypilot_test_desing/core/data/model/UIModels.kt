@@ -10,8 +10,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.example.daypilot_test_desing.R
 
-// ── Podium ────────────────────────────────────────────────────────
-
 data class PodiumEntry(
     val name: String,
     val points: Int,
@@ -19,8 +17,6 @@ data class PodiumEntry(
     val avatarUrl: String? = null,
     val isCurrentUser: Boolean = false
 )
-
-// ── Weekly reactions ──────────────────────────────────────────────
 
 data class ReceivedReaction(
     val fromName: String,
@@ -35,8 +31,6 @@ data class WeeklySummaryData(
     val bestStreak: Int,
     val reactions: List<ReceivedReaction> = emptyList()
 )
-
-// ── Home sections ─────────────────────────────────────────────────
 
 enum class HomeSection(
     @StringRes val titleRes: Int,

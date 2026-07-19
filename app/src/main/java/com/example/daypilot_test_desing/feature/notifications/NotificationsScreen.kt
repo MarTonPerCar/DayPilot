@@ -18,6 +18,7 @@ import com.example.daypilot_test_desing.core.ui.components.basic.*
 import com.example.daypilot_test_desing.core.ui.components.cards.*
 import com.example.daypilot_test_desing.core.data.model.NotificationData
 import com.example.daypilot_test_desing.core.data.model.NotificationType
+import com.example.daypilot_test_desing.core.reminders.NotificationBodyCodec
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,7 +59,6 @@ fun NotificationsScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            // ── Subtítulo ────────────────────────────────────────
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -82,7 +82,6 @@ fun NotificationsScreen(
                 }
             }
 
-            // ── Filtros ──────────────────────────────────────────
             LazyRow(
                 contentPadding        = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -113,7 +112,6 @@ fun NotificationsScreen(
                 }
             }
 
-            // ── Lista ────────────────────────────────────────────
             if (filtered.isEmpty()) {
                 DayPilotEmptyState(
                     message = stringResource(R.string.notifications_empty),
@@ -127,8 +125,8 @@ fun NotificationsScreen(
                 ) {
                     items(filtered) { notification ->
                         NotificationCard(
-                            title   = notification.title,
-                            message = notification.message,
+                            title   = decodedTitle(notification),
+                            message = decodedMessage(notification),
                             timeAgo = notification.timeAgo,
                             type    = notification.type,
                             isRead  = notification.isRead,
@@ -139,5 +137,19 @@ fun NotificationsScreen(
             }
         }
     }
+}
+
+// Only TASK_REMINDER/STREAK_RISK carry encoded placeholders — every other type is already final text.
+@Composable
+private fun decodedTitle(notification: NotificationData): String =
+    NotificationBodyCodec.titleForPlaceholder(notification.title)
+        ?.let { stringResource(it) }
+        ?: notification.title
+
+@Composable
+private fun decodedMessage(notification: NotificationData): String {
+    val decoded = NotificationBodyCodec.decodeBody(notification.message) ?: return notification.message
+    val (resId, arg) = decoded
+    return if (arg != null) stringResource(resId, arg) else stringResource(resId)
 }
 

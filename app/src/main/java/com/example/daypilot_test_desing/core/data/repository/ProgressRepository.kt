@@ -9,9 +9,6 @@ interface ProgressRepository {
     suspend fun logPoints(points: Int, source: String)
     suspend fun getRankingPosition(): Int
 
-    /** Awards the once-per-day timer bonus if not already claimed today
-     *  (checked server-side via habits_daily.timer_point_earned, not a local
-     *  pref, so it's correct across devices/apps). Returns true if newly
-     *  awarded. */
+    // Gated via habits_daily.timer_point_earned server-side, not a local pref — correct across devices.
     suspend fun completeTimerSession(): Boolean
 }

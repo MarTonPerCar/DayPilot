@@ -29,3 +29,11 @@ data class NotificationData(
     val type: NotificationType,
     val isRead: Boolean
 )
+
+/** Raw row for a server-decided notification (TASK_REMINDER / STREAK_RISK), title/body
+ *  still encoded — decode via [com.example.daypilot_test_desing.core.reminders.NotificationBodyCodec]. */
+data class RawTodayNotification(
+    val type: String,
+    val rawTitle: String,
+    val rawBody: String
+)

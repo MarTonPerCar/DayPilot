@@ -46,7 +46,6 @@ fun HabitsScreen(
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // ── Pasos ────────────────────────────────────────────
             DayPilotSectionHeader(title = stringResource(R.string.steps_title))
 
             StepsCard(
@@ -59,7 +58,6 @@ fun HabitsScreen(
                 onConfigureGoal = onConfigureGoal
             )
 
-            // ── Secciones ─────────────────────────────────────────
             DayPilotSectionHeader(title = stringResource(R.string.habits_other))
 
             HabitCard(

@@ -73,7 +73,6 @@ fun TimerCard(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            // Icono
             Box(
                 modifier = Modifier
                     .size(44.dp)
@@ -89,7 +88,6 @@ fun TimerCard(
                 )
             }
 
-            // Info
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = stringResource(mode.labelRes),
@@ -104,7 +102,6 @@ fun TimerCard(
                 )
             }
 
-            // Punto ganado hoy
             if (pointEarnedToday) {
                 Icon(
                     imageVector = Icons.Default.CheckCircle,
@@ -114,7 +111,6 @@ fun TimerCard(
                 )
             }
 
-            // Botón iniciar
             Box(
                 modifier = Modifier
                     .size(40.dp)
@@ -135,7 +131,6 @@ fun TimerCard(
     }
 }
 
-// ── Preview ──────────────────────────────────────────────────────
 @Preview(showBackground = true)
 @Composable
 fun TimerCardPreview() {

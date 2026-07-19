@@ -58,7 +58,6 @@ fun SettingsScreen(
         ) {
             Spacer(Modifier.height(8.dp))
 
-            // ── Apariencia ───────────────────────────────────────
             DayPilotThemeSelector(
                 selectedThemeId = selectedThemeId,
                 onThemeSelect   = onThemeSelect
@@ -81,7 +80,6 @@ fun SettingsScreen(
                 )
             }
 
-            // ── Notificaciones ───────────────────────────────────
             Card(
                 modifier  = Modifier.fillMaxWidth(),
                 shape     = RoundedCornerShape(16.dp),
@@ -117,7 +115,6 @@ fun SettingsScreen(
                 )
             }
 
-            // ── Perfil ───────────────────────────────────────────
             Card(
                 modifier  = Modifier.fillMaxWidth(),
                 shape     = RoundedCornerShape(16.dp),
@@ -177,7 +174,6 @@ fun SettingsScreen(
                 }
             }
 
-            // ── Idioma ───────────────────────────────────────────
             val languageDisplay = when (selectedLanguage) {
                 "en" -> "English"
                 "de" -> "Deutsch"
@@ -207,7 +203,6 @@ fun SettingsScreen(
                 )
             }
 
-            // ── Cerrar sesión ────────────────────────────────────
             Spacer(Modifier.height(8.dp))
 
             DayPilotButtonError(

@@ -1,5 +1,6 @@
 package com.example.daypilot_test_desing.feature.friends
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -24,8 +25,14 @@ class SearchFriendsViewModel(private val repo: FriendRepository) : ViewModel() {
 
     init {
         viewModelScope.launch {
-            val sentIds = try { repo.getPendingSentRequestUserIds() } catch (_: Exception) { emptyList() }
-            val fIds    = try { repo.getFriendIds() }                 catch (_: Exception) { emptyList() }
+            val sentIds = try { repo.getPendingSentRequestUserIds() } catch (e: Exception) {
+                Log.e(TAG, "Failed to load pending sent request ids", e)
+                emptyList()
+            }
+            val fIds = try { repo.getFriendIds() } catch (e: Exception) {
+                Log.e(TAG, "Failed to load friend ids", e)
+                emptyList()
+            }
             friendIds = fIds.toSet()
             _uiState.update { it.copy(sentRequestUserIds = sentIds.toSet()) }
         }
@@ -34,7 +41,7 @@ class SearchFriendsViewModel(private val repo: FriendRepository) : ViewModel() {
     fun search(query: String) {
         searchJob?.cancel()
         searchJob = viewModelScope.launch {
-            delay(400) // debounce: only fire after the user stops typing
+            delay(400)
             _uiState.update { it.copy(isLoading = true) }
             try {
                 val results = repo.searchUsers(query)
@@ -47,7 +54,8 @@ class SearchFriendsViewModel(private val repo: FriendRepository) : ViewModel() {
                         isLoading = false
                     )
                 }
-            } catch (_: Exception) {
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to search users for '$query'", e)
                 _uiState.update { it.copy(isLoading = false) }
             }
         }
@@ -70,6 +78,7 @@ class SearchFriendsViewModel(private val repo: FriendRepository) : ViewModel() {
             try {
                 repo.addFriend(userId)
             } catch (e: Exception) {
+                Log.e(TAG, "Failed to send friend request to $userId", e)
                 _uiState.update { state ->
                     state.copy(
                         requestJustSent    = false,
@@ -91,6 +100,8 @@ class SearchFriendsViewModel(private val repo: FriendRepository) : ViewModel() {
     }
 
     companion object {
+        private const val TAG = "SearchFriendsViewModel"
+
         fun factory(repo: FriendRepository): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")

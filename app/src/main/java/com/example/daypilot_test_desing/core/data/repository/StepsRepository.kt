@@ -11,12 +11,12 @@ interface StepsRepository {
     fun getCurrentSteps(): Int
     fun getGoalSteps(): Int
     fun getPendingGoal(): Int?
-    fun getPointsEarned(): Int
     fun canChangeGoal(): Boolean
     fun configureGoal(newGoal: Int)
     fun setSteps(steps: Int)
-    fun resetMilestones()
 
+    // fn_award_steps_milestones computes the level server-side; this only reads it.
+    suspend fun getPointsEarned(): Int
     suspend fun syncSteps(steps: Int, goal: Int)
     suspend fun getWeeklyStats(): StepsWeeklyStats
     suspend fun hydrateGoalFromServer()

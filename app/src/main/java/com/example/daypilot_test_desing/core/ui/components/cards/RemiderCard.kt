@@ -67,7 +67,6 @@ fun ReminderCard(
     val displayTime = if (triggerAtMillis > 0L) formatTrigger(triggerAtMillis) else time
     var showDeleteConfirm by remember { mutableStateOf(false) }
 
-    // ── Diálogo de confirmación ───────────────────────────────────
     if (showDeleteConfirm) {
         AlertDialog(
             onDismissRequest = { showDeleteConfirm = false },
@@ -152,7 +151,6 @@ fun ReminderCard(
     }
 }
 
-// ── Preview ──────────────────────────────────────────────────────
 @Preview(showBackground = true)
 @Composable
 fun ReminderCardPreview() {

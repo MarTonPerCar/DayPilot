@@ -28,7 +28,6 @@ object AppUsageTracker {
         return mode == AppOpsManager.MODE_ALLOWED
     }
 
-    // Returns a map of packageName → minutes used today
     fun getTodayUsage(context: Context): Map<String, Int> {
         if (!hasPermission(context)) return emptyMap()
         val usm = context.getSystemService(Context.USAGE_STATS_SERVICE) as? UsageStatsManager

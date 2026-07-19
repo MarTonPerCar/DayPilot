@@ -1,6 +1,7 @@
 package com.example.daypilot_test_desing.core.data.repository
 
 import com.example.daypilot_test_desing.core.data.model.NotificationData
+import com.example.daypilot_test_desing.core.data.model.RawTodayNotification
 
 interface NotificationRepository {
     suspend fun getCurrentUserId(): String?
@@ -9,4 +10,5 @@ interface NotificationRepository {
     suspend fun markAsRead(notificationId: String)
     suspend fun markAllAsRead(userId: String)
     suspend fun insert(userId: String, type: String, title: String, body: String)
+    suspend fun getLatestOfTypeToday(userId: String, type: String): RawTodayNotification?
 }

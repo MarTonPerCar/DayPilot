@@ -1,5 +1,6 @@
 package com.example.daypilot_test_desing.feature.auth
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -28,6 +29,7 @@ class AuthViewModel(private val repo: AuthRepository) : ViewModel() {
                 _uiState.update { it.copy(loginLoading = false) }
                 onSuccess()
             } catch (e: Exception) {
+                Log.w(TAG, "Login failed for $email", e)
                 _uiState.update { it.copy(loginLoading = false, loginError = friendlyError(e)) }
             }
         }
@@ -71,6 +73,7 @@ class AuthViewModel(private val repo: AuthRepository) : ViewModel() {
                     }
                 }
             } catch (e: Exception) {
+                Log.w(TAG, "Registration failed for $email", e)
                 _uiState.update { it.copy(registerLoading = false, registerError = friendlyError(e)) }
             }
         }
@@ -83,6 +86,7 @@ class AuthViewModel(private val repo: AuthRepository) : ViewModel() {
                 repo.sendResetEmail(email)
                 _uiState.update { it.copy(resetLoading = false, resetSent = true) }
             } catch (e: Exception) {
+                Log.w(TAG, "Password reset email failed for $email", e)
                 _uiState.update { it.copy(resetLoading = false, resetError = friendlyError(e)) }
             }
         }
@@ -105,6 +109,8 @@ class AuthViewModel(private val repo: AuthRepository) : ViewModel() {
     }
 
     companion object {
+        private const val TAG = "AuthViewModel"
+
         fun factory(repo: AuthRepository): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")

@@ -64,7 +64,6 @@ fun RivalryScreen(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            // ── Tu posición ──────────────────────────────────────
             item {
                 CurrentUserRankingCard(
                     name     = currentUserName,
@@ -75,7 +74,6 @@ fun RivalryScreen(
                 )
             }
 
-            // ── Sección de ranking ────────────────────────────────
             if (!hasFriends) {
                 item {
                     Box(
@@ -111,7 +109,6 @@ fun RivalryScreen(
                 }
 
                 if (ranking.size >= 3) {
-                    // ── Podio ─────────────────────────────────────
                     item {
                         PodiumCard(
                             first = PodiumEntry(
@@ -137,7 +134,6 @@ fun RivalryScreen(
                             )
                         )
                     }
-                    // ── Posiciones 4+ ─────────────────────────────
                     if (ranking.size > 3) {
                         item { Spacer(Modifier.height(4.dp)) }
                         itemsIndexed(ranking.drop(3)) { index, entry ->
@@ -153,7 +149,6 @@ fun RivalryScreen(
                         }
                     }
                 } else {
-                    // ── < 3 participantes: lista completa sin podio ─
                     itemsIndexed(ranking) { index, entry ->
                         RankingCard(
                             name          = entry.name,

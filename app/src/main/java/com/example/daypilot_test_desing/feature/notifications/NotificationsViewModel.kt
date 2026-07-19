@@ -1,5 +1,6 @@
 package com.example.daypilot_test_desing.feature.notifications
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -31,6 +32,11 @@ class NotificationsViewModel(private val repo: NotificationRepository) : ViewMod
 
     private var realtimeChannel: RealtimeChannel? = null
 
+    // Set synchronously before the async subscribe work starts, so a second awaitLoad() call
+    // (e.g. the startup retry-once) can't register on an already-joined channel — supabase-kt
+    // throws an unhandled IllegalStateException if it does.
+    private var realtimeSubscriptionStarted = false
+
     private val json = Json { ignoreUnknownKeys = true; coerceInputValues = true }
 
     init {
@@ -44,11 +50,24 @@ class NotificationsViewModel(private val repo: NotificationRepository) : ViewMod
         }
     }
 
-    fun load(): Job = viewModelScope.launch {
-        val uid = repo.getCurrentUserId() ?: return@launch
-        val fromDb = repo.getAll(uid)
-        NotificationHub.repo.mergeServerNotifications(fromDb)
-        subscribeToRealtime(uid)
+    fun load(): Job = viewModelScope.launch { awaitLoad() }
+
+    /** Suspends until this ViewModel's data has actually loaded (or failed) — used by the
+     *  startup join in DayPilotNavGraph, which needs real success/failure, not just "finished". */
+    suspend fun awaitLoad(): Boolean {
+        return try {
+            val uid = repo.getCurrentUserId() ?: return false
+            val fromDb = repo.getAll(uid)
+            NotificationHub.repo.mergeServerNotifications(fromDb)
+            if (!realtimeSubscriptionStarted) {
+                realtimeSubscriptionStarted = true
+                subscribeToRealtime(uid)
+            }
+            true
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to load notifications", e)
+            false
+        }
     }
 
     private fun subscribeToRealtime(userId: String) {
@@ -64,8 +83,7 @@ class NotificationsViewModel(private val repo: NotificationRepository) : ViewMod
                     val dto = json.decodeFromJsonElement<NotificationDto>(change.record)
                     NotificationHub.repo.add(dto.toModel())
                     if (dto.type == "FRIEND_REQUEST" || dto.type == "FRIEND_ACCEPTED") {
-                        // getFriends() is cache-first with a 5min TTL (see SessionCache) —
-                        // drop it so the refresh this triggers actually fetches fresh data.
+                        // Drop the cache slot so the refresh this triggers fetches fresh data.
                         SessionCache.friends.value    = null
                         SessionCache.friendsFetchedAt = 0L
                         NotificationHub.notifyFriendsChanged()
@@ -73,9 +91,8 @@ class NotificationsViewModel(private val repo: NotificationRepository) : ViewMod
                 }
             }.launchIn(viewModelScope)
 
-            // supabase-kt gives up and settles at UNSUBSCRIBED for good after enough
-            // failed rejoin attempts (e.g. a stale JWT) — rebuild instead of leaving
-            // notifications dead for the rest of the session.
+            // supabase-kt settles at UNSUBSCRIBED for good after enough failed rejoin
+            // attempts (e.g. a stale JWT) — rebuild instead of leaving notifications dead.
             channel.status.onEach { status ->
                 if (status == RealtimeChannel.Status.UNSUBSCRIBED && realtimeChannel === channel) {
                     delay(5_000)
@@ -107,6 +124,8 @@ class NotificationsViewModel(private val repo: NotificationRepository) : ViewMod
     }
 
     companion object {
+        private const val TAG = "NotificationsViewModel"
+
         fun factory(repo: NotificationRepository): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")

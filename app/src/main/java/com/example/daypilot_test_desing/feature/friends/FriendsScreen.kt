@@ -74,7 +74,6 @@ fun FriendsScreen(
         stringResource(R.string.friends_tab_requests)
     )
 
-    // Switch to the friends tab as soon as a request is accepted.
     LaunchedEffect(justAcceptedRequest) {
         if (justAcceptedRequest) {
             selectedTab = 0
@@ -82,7 +81,6 @@ fun FriendsScreen(
         }
     }
 
-    // Remove-friend confirmation dialog
     friendToRemove?.let { friend ->
         AlertDialog(
             onDismissRequest = { friendToRemove = null },
@@ -149,7 +147,6 @@ fun FriendsScreen(
             }
 
             when (selectedTab) {
-                // ── Amigos ────────────────────────────────────────
                 0 -> {
                     if (friends.isEmpty()) {
                         DayPilotEmptyState(
@@ -180,7 +177,6 @@ fun FriendsScreen(
                     }
                 }
 
-                // ── Solicitudes ───────────────────────────────────
                 1 -> {
                     if (friendRequests.isEmpty()) {
                         DayPilotEmptyState(

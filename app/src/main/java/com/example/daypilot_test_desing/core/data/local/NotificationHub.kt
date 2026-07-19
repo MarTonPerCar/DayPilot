@@ -35,9 +35,7 @@ object NotificationHub {
         repo.clear()
     }
 
-    // Friends data has no realtime channel of its own — a friend request/accept
-    // arriving via the notifications realtime channel signals here so
-    // FriendsViewModel (wherever it's currently alive) can refresh itself.
+    // Friends has no realtime channel of its own; signaled here from the notifications channel instead.
     private val _friendsShouldRefresh = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     val friendsShouldRefresh: SharedFlow<Unit> = _friendsShouldRefresh.asSharedFlow()
 

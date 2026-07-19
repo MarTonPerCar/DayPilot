@@ -6,10 +6,7 @@ import android.content.Intent
 import com.example.daypilot_test_desing.core.data.local.SharedPrefsReminderRepository
 import com.example.daypilot_test_desing.core.data.preferences.AppPreferences
 
-/**
- * AlarmManager wipes all pending alarms on reboot. This re-arms reminders and daily
- * notifications so they don't silently stop firing until the user reopens the app.
- */
+// AlarmManager wipes all pending alarms on reboot — this re-arms them.
 class BootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action != Intent.ACTION_BOOT_COMPLETED) return

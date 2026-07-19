@@ -1,5 +1,6 @@
 package com.example.daypilot_test_desing.data.supabase
 
+import android.util.Log
 import com.example.daypilot_test_desing.core.data.repository.AuthRepository
 import com.example.daypilot_test_desing.core.data.repository.RegisterOutcome
 import com.example.daypilot_test_desing.data.supabase.dto.NewUserDto
@@ -15,16 +16,17 @@ import kotlinx.serialization.json.put
 
 class SupabaseAuthRepository : AuthRepository {
 
+    companion object {
+        private const val TAG = "SupabaseAuthRepository"
+    }
+
     override suspend fun login(email: String, password: String) {
         supabase.auth.signInWith(Email) {
             this.email = email
             this.password = password
         }
-        // This project requires email confirmation, so register() never has
-        // a session to insert the profile row with — this is the first
-        // point a confirmed user actually has one, so it's done here
-        // instead, from the name/username/region stashed in user_metadata
-        // at signup time.
+        // register() has no session to insert the profile row with (email confirmation
+        // required) — this is the first point a confirmed user actually has one.
         supabase.auth.currentUserOrNull()?.let { ensureProfileExists(it) }
     }
 
@@ -54,9 +56,9 @@ class SupabaseAuthRepository : AuthRepository {
                         this.password = password
                     }
                 } catch (signInException: Exception) {
-                    // Wrong password for an existing account — surface the clear
-                    // "already registered" outcome instead of a confusing error
-                    // about invalid credentials for what looked like sign-up.
+                    // Wrong password for an existing account — surface "already registered"
+                    // instead of a confusing invalid-credentials error for what looked like sign-up.
+                    Log.w(TAG, "register(): sign-in fallback failed for $email, treating as AlreadyExists", signInException)
                     return RegisterOutcome.AlreadyExists
                 }
             } else throw e

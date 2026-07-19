@@ -12,11 +12,19 @@ import com.example.daypilot_test_desing.core.data.model.TaskCategory
 import com.example.daypilot_test_desing.core.data.model.TaskDifficulty
 import com.example.daypilot_test_desing.core.data.repository.ProgressRepository
 import com.example.daypilot_test_desing.core.data.repository.TaskRepository
-import com.example.daypilot_test_desing.data.supabase.SupabaseNotificationRepository
+import com.example.daypilot_test_desing.data.supabase.supabase
+import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.postgrest.query.filter.FilterOperator
+import io.github.jan.supabase.realtime.PostgresAction
+import io.github.jan.supabase.realtime.RealtimeChannel
+import io.github.jan.supabase.realtime.channel
+import io.github.jan.supabase.realtime.postgresChangeFlow
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -28,16 +36,69 @@ class CalendarViewModel(
     private val _uiState = MutableStateFlow(CalendarUiState(isLoading = true))
     val uiState: StateFlow<CalendarUiState> = _uiState.asStateFlow()
 
+    private var realtimeChannel: RealtimeChannel? = null
+    private var refreshing = false
+
     init { refresh() }
 
-    private suspend fun load() {
+    /** Suspends until this ViewModel's data has actually loaded (or failed) — used by the
+     *  startup join in DayPilotNavGraph, which needs real success/failure, not just "finished". */
+    suspend fun awaitLoad(): Boolean = load()
+
+    private suspend fun load(): Boolean {
         _uiState.update { it.copy(isLoading = true) }
-        try {
-            val tasks = taskRepo.getTasks()  // cache-first
+        return try {
+            val tasks = taskRepo.getTasks()
             _uiState.update { it.copy(tasks = tasks, isLoading = false) }
+            subscribeToRealtimeOnce()
+            true
         } catch (e: Exception) {
+            Log.e(TAG, "Failed to load calendar tasks", e)
             _uiState.update { it.copy(isLoading = false) }
+            false
         }
+    }
+
+    // Realtime can only subscribe to base tables, but getTasks() reads a joined
+    // tasks+task_days view — so both base tables are watched here instead.
+    private fun subscribeToRealtimeOnce() {
+        if (realtimeChannel != null) return
+        val uid = supabase.auth.currentUserOrNull()?.id ?: return
+
+        viewModelScope.launch {
+            val channel = supabase.channel("tasks-$uid")
+
+            channel.postgresChangeFlow<PostgresAction>(schema = "public") {
+                table = "tasks"
+                filter("user_id", FilterOperator.EQ, uid)
+            }.onEach { refreshFromRealtime() }.launchIn(viewModelScope)
+
+            channel.postgresChangeFlow<PostgresAction>(schema = "public") {
+                table = "task_days"
+                filter("user_id", FilterOperator.EQ, uid)
+            }.onEach { refreshFromRealtime() }.launchIn(viewModelScope)
+
+            channel.subscribe()
+            realtimeChannel = channel
+        }
+    }
+
+    private fun refreshFromRealtime() {
+        if (refreshing) return // a burst of changes shouldn't queue up overlapping fetches
+        refreshing = true
+        SessionCache.tasks.value = null // getTasks() short-circuits on cache otherwise
+        viewModelScope.launch {
+            try {
+                load()
+            } finally {
+                refreshing = false
+            }
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        viewModelScope.launch { runCatching { realtimeChannel?.unsubscribe() } }
     }
 
     fun refresh(): Job = viewModelScope.launch { load() }
@@ -63,8 +124,8 @@ class CalendarViewModel(
 
         viewModelScope.launch {
             try {
-                taskRepo.addTask(data)          // invalidates SessionCache.tasks
-                load()                           // re-fetches from Supabase, repopulates cache
+                taskRepo.addTask(data)
+                load()
                 SessionCache.tasks.value = _uiState.value.tasks
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to create task '${data.title}' (recurring=${data.isRecurring})", e)
@@ -112,8 +173,7 @@ class CalendarViewModel(
 
     fun toggleTask(occurrenceId: String, isDone: Boolean) {
         val original = _uiState.value.tasks.firstOrNull { it.occurrenceId == occurrenceId } ?: return
-        // Points are only ever paid once per occurrence, tracked by isEarned (sticky,
-        // unlike isDone) — unchecking never takes points back, rechecking never re-pays.
+        // isEarned is sticky (unlike isDone) — points are paid at most once per occurrence.
         val shouldAwardPoints = isDone && !original.isEarned
         _uiState.update { state ->
             state.copy(tasks = state.tasks.map {
@@ -127,13 +187,7 @@ class CalendarViewModel(
                 taskRepo.toggleTask(occurrenceId, isDone)
                 if (shouldAwardPoints) {
                     progressRepo.logPoints(20, "TASKS")
-                    // Persisted to the DB — the always-on realtime subscription delivers it to
-                    // NotificationHub, so adding it locally too would double it up.
-                    SupabaseNotificationRepository.insertForCurrentUser(
-                        type  = "TASK_COMPLETED",
-                        title = "✓ ${original.title}",
-                        body  = "+20 puntos ganados"
-                    )
+                    // TASK_COMPLETED notification is now inserted by a Supabase DB trigger.
                 }
                 SessionCache.tasks.value = _uiState.value.tasks
             } catch (e: Exception) {
@@ -150,8 +204,7 @@ class CalendarViewModel(
 
     fun deleteTask(id: String) {
         val snapshot = _uiState.value.tasks
-        // Points already earned for completed occurrences stay earned — deleting a
-        // task never takes points back.
+        // isEarned stays sticky here too — deleting a task never claws back points.
         _uiState.update { state -> state.copy(tasks = state.tasks.filter { it.id != id }) }
         viewModelScope.launch {
             try {

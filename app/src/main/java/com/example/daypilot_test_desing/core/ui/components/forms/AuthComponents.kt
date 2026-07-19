@@ -38,7 +38,6 @@ import com.example.daypilot_test_desing.core.ui.components.basic.DayPilotTextFie
 import com.example.daypilot_test_desing.core.data.model.TimeZoneRegion
 import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
 
-// ── Toggle login / registro ───────────────────────────────────────
 @Composable
 fun AuthToggle(isLogin: Boolean, onToggle: (Boolean) -> Unit) {
     Row(
@@ -83,7 +82,6 @@ fun ToggleOption(text: String, selected: Boolean, onClick: () -> Unit) {
     }
 }
 
-// ── Login Card ────────────────────────────────────────────────────
 @Composable
 fun LoginCard(
     isLoading: Boolean = false,
@@ -134,7 +132,6 @@ fun LoginCard(
     }
 }
 
-// ── Register Card ─────────────────────────────────────────────────
 @Composable
 fun RegisterCard(
     isLoading: Boolean = false,
@@ -200,7 +197,6 @@ fun RegisterCard(
     }
 }
 
-// ── AuthCard base ─────────────────────────────────────────────────
 @Composable
 fun AuthCard(content: @Composable ColumnScope.() -> Unit) {
     Card(
@@ -220,7 +216,6 @@ fun AuthCard(content: @Composable ColumnScope.() -> Unit) {
     }
 }
 
-// ── Preview ──────────────────────────────────────────────────────
 @Preview(showBackground = true)
 @Composable
 fun AuthComponentsPreview() {

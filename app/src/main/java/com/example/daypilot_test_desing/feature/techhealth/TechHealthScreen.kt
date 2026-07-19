@@ -51,8 +51,6 @@ fun TechHealthScreen(
     onDeleteGroup: (String) -> Unit,
     onBack: () -> Unit
 ) {
-    // si faltan permisos mostramos solo la pantalla de configuración, nada más
-    // (el return en composables funciona bien, lo he probado)
     if (!hasUsagePermission || !hasAccessibilityPermission) {
         TechHealthPermissionGate(
             hasUsagePermission         = hasUsagePermission,
@@ -70,7 +68,6 @@ fun TechHealthScreen(
     val sheetState     = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val total          = appRestrictions.size + groupRestrictions.size
 
-    // Info popup: explains how to earn the daily bonus point
     if (showInfoDialog) {
         AlertDialog(
             onDismissRequest = { showInfoDialog = false },
@@ -149,7 +146,6 @@ fun TechHealthScreen(
             contentPadding      = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            // ── Daily point indicator (3 states) ──────────────────
             item {
                 val earned  = techHealthPointEarned && activeRestrictionCount >= 3
                 val warning = activeRestrictionCount < 3
@@ -254,7 +250,6 @@ fun TechHealthScreen(
     }
 }
 
-// ── Pantalla de permisos (sustituye el contenido entero hasta que ambos estén concedidos) ──
 
 @Composable
 private fun TechHealthPermissionGate(
@@ -374,7 +369,6 @@ private fun PermissionCard(
                 verticalAlignment     = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Badge: número o check
                 Box(
                     modifier = Modifier
                         .size(32.dp)

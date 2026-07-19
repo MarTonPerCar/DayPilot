@@ -2,7 +2,6 @@ package com.example.daypilot_test_desing.core.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// ─── VERDE SALVIA ───────────────────────────────────────────────
 val SageGreen_Primary       = Color(0xFF4A7C59)
 val SageGreen_PrimaryVar    = Color(0xFF2E5E40)
 val SageGreen_Secondary     = Color(0xFF81A88D)
@@ -23,7 +22,6 @@ val SageGreen_OnError       = Color(0xFFFFFFFF)
 val SageGreen_Outline       = Color(0xFF6B9474)
 val SageGreen_OutlineVar    = Color(0xFFB0CCB5)
 
-// Dark variant
 val SageGreenDark_Primary      = Color(0xFF7EBD8F)
 val SageGreenDark_PrimaryVar   = Color(0xFF4A7C59)
 val SageGreenDark_Secondary    = Color(0xFF9DBFA8)
@@ -44,7 +42,6 @@ val SageGreenDark_OnError      = Color(0xFF690005)
 val SageGreenDark_Outline      = Color(0xFF5C8A6A)
 val SageGreenDark_OutlineVar   = Color(0xFF2E5E40)
 
-// ─── AZUL OCÉANO ────────────────────────────────────────────────
 val Ocean_Primary       = Color(0xFF1A6B8A)
 val Ocean_PrimaryVar    = Color(0xFF0D4F6B)
 val Ocean_Secondary     = Color(0xFF4A9BB5)
@@ -65,7 +62,6 @@ val Ocean_OnError       = Color(0xFFFFFFFF)
 val Ocean_Outline       = Color(0xFF4A8BA0)
 val Ocean_OutlineVar    = Color(0xFFB0D8E8)
 
-// Dark variant
 val OceanDark_Primary      = Color(0xFF5BC8E8)
 val OceanDark_PrimaryVar   = Color(0xFF1A6B8A)
 val OceanDark_Secondary    = Color(0xFF80C4D8)
@@ -86,7 +82,6 @@ val OceanDark_OnError      = Color(0xFF690005)
 val OceanDark_Outline      = Color(0xFF2E7A96)
 val OceanDark_OutlineVar   = Color(0xFF0D4F6B)
 
-// ─── MORADO LAVANDA ─────────────────────────────────────────────
 val Lavender_Primary       = Color(0xFF6B4FA8)
 val Lavender_PrimaryVar    = Color(0xFF4D338A)
 val Lavender_Secondary     = Color(0xFF9B7FCC)
@@ -107,7 +102,6 @@ val Lavender_OnError       = Color(0xFFFFFFFF)
 val Lavender_Outline       = Color(0xFF7A5EAD)
 val Lavender_OutlineVar    = Color(0xFFCFC0F0)
 
-// Dark variant
 val LavenderDark_Primary      = Color(0xFFBCA0E8)
 val LavenderDark_PrimaryVar   = Color(0xFF6B4FA8)
 val LavenderDark_Secondary    = Color(0xFFCDB8F0)
@@ -128,7 +122,6 @@ val LavenderDark_OnError      = Color(0xFF690005)
 val LavenderDark_Outline      = Color(0xFF7A5EAD)
 val LavenderDark_OutlineVar   = Color(0xFF4D338A)
 
-// ─── NARANJA ÁMBAR ──────────────────────────────────────────────
 val Amber_Primary       = Color(0xFFB85C00)
 val Amber_PrimaryVar    = Color(0xFF8A4200)
 val Amber_Secondary     = Color(0xFFD4843A)
@@ -149,7 +142,6 @@ val Amber_OnError       = Color(0xFFFFFFFF)
 val Amber_Outline       = Color(0xFFAD6420)
 val Amber_OutlineVar    = Color(0xFFEFCFA0)
 
-// Dark variant
 val AmberDark_Primary      = Color(0xFFFFB366)
 val AmberDark_PrimaryVar   = Color(0xFFB85C00)
 val AmberDark_Secondary    = Color(0xFFEFCA90)
@@ -170,7 +162,6 @@ val AmberDark_OnError      = Color(0xFF690005)
 val AmberDark_Outline      = Color(0xFFAD6420)
 val AmberDark_OutlineVar   = Color(0xFF8A4200)
 
-// ─── OSCURO PURO ────────────────────────────────────────────────
 val Amoled_Primary       = Color(0xFFE0E0E0)
 val Amoled_PrimaryVar    = Color(0xFFBDBDBD)
 val Amoled_Secondary     = Color(0xFF9E9E9E)

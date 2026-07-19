@@ -3,6 +3,7 @@ package com.example.daypilot_test_desing.core.navigation
 import android.app.LocaleManager
 import android.os.Build
 import android.os.LocaleList
+import android.util.Log
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -26,7 +27,9 @@ import androidx.navigation.navArgument
 import android.app.Application
 import android.content.Context
 import androidx.compose.runtime.remember
-import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 
 import com.example.daypilot_test_desing.core.data.preferences.AppPreferences
 
@@ -73,12 +76,12 @@ import com.example.daypilot_test_desing.feature.auth.ResetPasswordScreen
 import com.example.daypilot_test_desing.feature.rivalry.RivalryScreen
 import com.example.daypilot_test_desing.feature.friends.SearchFriendsScreen
 import com.example.daypilot_test_desing.feature.settings.SettingsScreen
-import com.example.daypilot_test_desing.feature.habits.StepsScreen
 import com.example.daypilot_test_desing.feature.techhealth.TechHealthScreen
 import com.example.daypilot_test_desing.feature.timer.TimerHubScreen
 import com.example.daypilot_test_desing.feature.timer.TimerScreen
 import com.example.daypilot_test_desing.core.ui.components.DayPilotBottomBar
 
+private const val TAG = "DayPilotNavGraph"
 
 @Composable
 fun DayPilotNavGraph(
@@ -116,10 +119,10 @@ fun DayPilotNavGraph(
     val settingsVM: SettingsViewModel = viewModel(factory = SettingsViewModel.factory(application, userRepo))
     val calendarVM: CalendarViewModel = viewModel(factory = CalendarViewModel.factory(taskRepo, progressRepo))
 
-    // homeVM.refresh() makes 5+ DB calls, too costly to run on every sensor tick.
+    // habitsVM.refresh() now does a network sync — refreshLocal() is the cheap per-tick alternative.
     val stepsState by stepsVM.uiState.collectAsState()
     LaunchedEffect(stepsState.currentSteps) {
-        habitsVM.refresh()
+        habitsVM.refreshLocal()
     }
 
     LaunchedEffect(currentRoute) {
@@ -137,51 +140,41 @@ fun DayPilotNavGraph(
         onDispose { navLifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
-    // LEVEL_UP detection lives in SupabaseProgressRepository.logPoints() — the single place
-    // total_points_historical actually changes — instead of here, so it fires the moment the
-    // pointsToNextLevel threshold is crossed rather than whenever ProfileViewModel next reloads.
-
-    val calendarStateForCache by calendarVM.uiState.collectAsState()
-    LaunchedEffect(calendarStateForCache.tasks) {
-        val cal        = java.util.Calendar.getInstance()
-        val todayDay   = cal.get(java.util.Calendar.DAY_OF_MONTH)
-        val todayMonth = cal.get(java.util.Calendar.MONTH) + 1
-        val todayYear  = cal.get(java.util.Calendar.YEAR)
-        val today      = "%04d-%02d-%02d".format(todayYear, todayMonth, todayDay)
-        val pending    = calendarStateForCache.tasks.count { task ->
-            !task.isDone &&
-            task.day   == todayDay   &&
-            task.month == todayMonth &&
-            task.year  == todayYear
-        }
-        appPrefs.pendingTaskCount     = pending
-        appPrefs.pendingTaskCountDate = today
-    }
-
+    // LEVEL_UP detection lives in SupabaseProgressRepository.logPoints(), not here.
     val sessionState by sessionVM.state.collectAsState()
     LaunchedEffect(sessionState) {
         val current = navController.currentBackStackEntry?.destination?.route
         when (sessionState) {
             AppSessionViewModel.State.DataLoading -> {
-                listOf(
-                    homeVM.refresh(),
-                    calendarVM.refresh(),
-                    profileVM.refresh(),
-                    progressVM.refresh(),
-                    friendsVM.refresh(),
-                    rivalryVM.refresh(),
-                    settingsVM.refresh(),
-                    notificationsVM.load(),
-                ).joinAll()
-                val s = settingsVM.uiState.value
-                DailyNotificationScheduler.scheduleAll(
-                    context              = context,
-                    notificationsEnabled = s.notificationsEnabled,
-                    taskOn               = s.taskRemindersEnabled,
-                    streakOn             = s.streakAlertsEnabled
-                )
-                sessionVM.markDataLoaded()
+                // joinAll() can't see failure — awaitLoad() can, so a failed batch gets one retry.
+                suspend fun loadAll(): Boolean = coroutineScope {
+                    listOf(
+                        async { homeVM.awaitLoad() },
+                        async { calendarVM.awaitLoad() },
+                        async { profileVM.awaitLoad() },
+                        async { progressVM.awaitLoad() },
+                        async { friendsVM.awaitLoad() },
+                        async { rivalryVM.awaitLoad() },
+                        async { settingsVM.awaitLoad() },
+                        async { notificationsVM.awaitLoad() },
+                    ).awaitAll().all { it }
+                }
+
+                val succeeded = loadAll() || loadAll()
+                if (succeeded) {
+                    val s = settingsVM.uiState.value
+                    DailyNotificationScheduler.scheduleAll(
+                        context              = context,
+                        notificationsEnabled = s.notificationsEnabled,
+                        taskOn               = s.taskRemindersEnabled,
+                        streakOn             = s.streakAlertsEnabled
+                    )
+                    sessionVM.markDataLoaded()
+                } else {
+                    sessionVM.markDataLoadFailed()
+                }
             }
+            AppSessionViewModel.State.DataLoadFailed -> { /* show LoadingScreen with retry, wait */ }
             AppSessionViewModel.State.Authenticated -> {
                 if (current == DayPilotDestinations.LOADING ||
                     current == DayPilotDestinations.AUTH   ||
@@ -222,7 +215,10 @@ fun DayPilotNavGraph(
         ) {
 
             composable(DayPilotDestinations.LOADING) {
-                LoadingScreen()
+                LoadingScreen(
+                    isError = sessionState == AppSessionViewModel.State.DataLoadFailed,
+                    onRetry = { sessionVM.retryDataLoad() }
+                )
             }
 
             composable(DayPilotDestinations.AUTH) {
@@ -370,8 +366,12 @@ fun DayPilotNavGraph(
                     onLanguageSelect        = { code ->
                         settingsVM.selectLanguage(code)
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            context.getSystemService(LocaleManager::class.java)
-                                .applicationLocales = LocaleList.forLanguageTags(code)
+                            try {
+                                context.getSystemService(LocaleManager::class.java)
+                                    ?.applicationLocales = LocaleList.forLanguageTags(code)
+                            } catch (e: Exception) {
+                                Log.e(TAG, "Failed to set per-app locale to $code", e)
+                            }
                         }
                     },
                     onToggleNotifications   = settingsVM::toggleNotifications,
@@ -444,6 +444,7 @@ fun DayPilotNavGraph(
 
             composable(DayPilotDestinations.HABITS) {
                 val s by habitsVM.uiState.collectAsState()
+                LaunchedEffect(Unit) { habitsVM.refresh() }
                 HabitsScreen(
                     currentSteps          = s.currentSteps,
                     goalSteps             = s.goalSteps,
@@ -501,25 +502,6 @@ fun DayPilotNavGraph(
                     currentUserLevel    = s.currentUserLevel,
                     ranking             = s.ranking,
                     onBack              = { navController.popBackStack() }
-                )
-            }
-
-            composable(DayPilotDestinations.STEPS) {
-                val s by stepsVM.uiState.collectAsState()
-                StepsScreen(
-                    currentSteps     = s.currentSteps,
-                    goalSteps        = s.goalSteps,
-                    pointsEarned     = s.pointsEarned,
-                    pointsRemaining  = s.pointsRemaining,
-                    totalSteps7Days  = s.totalSteps7Days,
-                    bestDaySteps     = s.bestDaySteps,
-                    dailyAverage     = s.dailyAverage,
-                    goalStreak       = s.goalStreak,
-                    pendingGoal      = s.pendingGoal,
-                    goalChangedToday = s.goalChangedToday,
-                    sensorAvailable  = s.sensorAvailable,
-                    onBack           = { habitsVM.refresh(); navController.popBackStack() },
-                    onConfigureGoal  = stepsVM::configureGoal
                 )
             }
 

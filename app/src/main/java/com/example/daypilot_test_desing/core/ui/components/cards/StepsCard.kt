@@ -95,7 +95,6 @@ fun StepsCard(
     val primaryColor = MaterialTheme.colorScheme.primary
     val surfaceVarColor = MaterialTheme.colorScheme.surfaceVariant
 
-    // ── BottomSheet de configuración ─────────────────────────────
     if (showGoalSheet) {
         ModalBottomSheet(
             onDismissRequest = { showGoalSheet = false },
@@ -202,7 +201,6 @@ fun StepsCard(
         }
     }
 
-    // ── Card ──────────────────────────────────────────────────────
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
@@ -215,7 +213,6 @@ fun StepsCard(
                 .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // ── Cabecera ──────────────────────────────────────────
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -252,7 +249,6 @@ fun StepsCard(
                 }
             }
 
-            // ── Circular + stats ──────────────────────────────────
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(20.dp),
@@ -333,7 +329,6 @@ fun StepsCard(
                 }
             }
 
-            // ── Banner meta pendiente ─────────────────────────────
             if (pendingGoal != null) {
                 Row(
                     modifier = Modifier
@@ -354,7 +349,6 @@ fun StepsCard(
     }
 }
 
-// ── Preview ──────────────────────────────────────────────────────
 @Preview(showBackground = true)
 @Composable
 fun StepsCardPreview() {

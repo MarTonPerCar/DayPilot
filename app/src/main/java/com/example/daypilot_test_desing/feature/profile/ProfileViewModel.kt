@@ -2,6 +2,7 @@ package com.example.daypilot_test_desing.feature.profile
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -30,12 +31,16 @@ class ProfileViewModel(
 
     fun invalidate() { /* cache freshness is managed at the repo/SessionCache layer */ }
 
-    private suspend fun load() {
-        try {
-            val user    = userRepo.getCurrentUser()    // cache-first
+    /** Suspends until this ViewModel's data has actually loaded (or failed) — used by the
+     *  startup join in DayPilotNavGraph, which needs real success/failure, not just "finished". */
+    suspend fun awaitLoad(): Boolean = load()
+
+    private suspend fun load(): Boolean {
+        return try {
+            val user    = userRepo.getCurrentUser()
             val summary = userRepo.getWeeklySummary()
-            val today   = progressRepo.getTodayProgress()  // cache-first
-            val ranking = progressRepo.getRankingPosition()  // uses cached ranking if available
+            val today   = progressRepo.getTodayProgress()
+            val ranking = progressRepo.getRankingPosition()
             _uiState.value = ProfileUiState(
                 name                 = user.name,
                 username             = user.username,
@@ -57,17 +62,22 @@ class ProfileViewModel(
                 avatarUrl            = user.avatarUrl,
                 weeklySummary        = summary
             )
-        } catch (_: Exception) { }
+            true
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to load profile data", e)
+            false
+        }
     }
 
     fun updateProfile(name: String, username: String, region: TimeZoneRegion) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isSavingProfile = true, profileSaveError = false)
             try {
-                userRepo.updateProfile(name, username, region)  // updates SessionCache.userProfile
-                load()  // re-reads from cache (instant), refreshes UiState
+                userRepo.updateProfile(name, username, region)
+                load()
                 _uiState.value = _uiState.value.copy(isSavingProfile = false, profileSaveSuccess = true)
-            } catch (_: Exception) {
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to update profile (name=$name, username=$username)", e)
                 _uiState.value = _uiState.value.copy(isSavingProfile = false, profileSaveError = true)
             }
         }
@@ -90,11 +100,14 @@ class ProfileViewModel(
                 Pair(b, m)
             }
             if (bytes == null) false
-            else userRepo.uploadAvatar(bytes, mimeType) != null  // updates SessionCache.userProfile.avatarUrl
-        } catch (_: Exception) { false }
+            else userRepo.uploadAvatar(bytes, mimeType) != null
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to upload avatar", e)
+            false
+        }
 
         if (success) {
-            load()  // re-reads from cache, picks up new avatarUrl
+            load()
             _uiState.value = _uiState.value.copy(isUploadingAvatar = false)
         } else {
             _uiState.value = _uiState.value.copy(isUploadingAvatar = false, avatarUploadError = true)
@@ -106,6 +119,8 @@ class ProfileViewModel(
     }
 
     companion object {
+        private const val TAG = "ProfileViewModel"
+
         fun factory(userRepo: UserRepository, progressRepo: ProgressRepository): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")

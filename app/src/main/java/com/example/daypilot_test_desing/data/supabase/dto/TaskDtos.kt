@@ -3,10 +3,9 @@ package com.example.daypilot_test_desing.data.supabase.dto
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-// Row from `calendar_tasks`. occurrenceId (task_days.id) is a single date, taskId
-// (tasks.id) is the whole recurring series — editing/deleting uses taskId, completing
-// uses occurrenceId. category is a Spanish string ("Estudio", "Trabajo"...), difficulty
-// is uppercase ("EASY"/"MEDIUM"/"HARD").
+// occurrenceId (task_days.id) is one date; taskId (tasks.id) is the whole recurring
+// series — completing uses occurrenceId, editing/deleting uses taskId.
+// category is a Spanish label string, difficulty is uppercase ("EASY"/"MEDIUM"/"HARD").
 @Serializable
 data class CalendarTaskDto(
     @SerialName("occurrence_id") val occurrenceId: String,

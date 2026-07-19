@@ -197,9 +197,7 @@ fun AppLimitFormCard(
                 )
                 OutlinedButton(
                     onClick = { showAppPicker = true },
-                    // Which app a restriction targets can't be changed after creation —
-                    // re-picking here would desync the stable id from a new package
-                    // and orphan the original restriction's row in the database.
+                    // Changing the target app after creation would orphan the original row.
                     enabled = !isEditing,
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),

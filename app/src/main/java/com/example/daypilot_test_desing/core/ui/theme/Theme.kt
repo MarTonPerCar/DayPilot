@@ -5,7 +5,6 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 
-// ─── ENUM DE TEMAS ──────────────────────────────────────────────
 enum class DayPilotTheme {
     SAGE_GREEN,
     OCEAN,
@@ -14,7 +13,6 @@ enum class DayPilotTheme {
     AMOLED
 }
 
-// ─── PALETAS ────────────────────────────────────────────────────
 
 private val SageGreenLightScheme = lightColorScheme(
     primary           = SageGreen_Primary,
@@ -215,7 +213,6 @@ private val AmoledScheme = darkColorScheme(
     outlineVariant    = Amoled_OutlineVar,
 )
 
-// ─── COMPOSABLE PRINCIPAL ───────────────────────────────────────
 @Composable
 fun DayPilotTheme(
     theme: DayPilotTheme = DayPilotTheme.SAGE_GREEN,

@@ -1,5 +1,6 @@
 package com.example.daypilot_test_desing.data.supabase
 
+import android.util.Log
 import com.example.daypilot_test_desing.core.cache.SessionCache
 import com.example.daypilot_test_desing.core.data.model.FriendData
 import com.example.daypilot_test_desing.core.data.model.FriendWeeklySummary
@@ -12,7 +13,6 @@ import com.example.daypilot_test_desing.data.supabase.dto.InsertFriendDto
 import com.example.daypilot_test_desing.data.supabase.dto.InsertFriendRequestDto
 import com.example.daypilot_test_desing.data.supabase.dto.InsertReactionDto
 import com.example.daypilot_test_desing.data.supabase.dto.ReactionDto
-import com.example.daypilot_test_desing.data.supabase.SupabaseNotificationRepository
 import com.example.daypilot_test_desing.data.supabase.dto.SentRequestDto
 import com.example.daypilot_test_desing.data.supabase.dto.UserDto
 import com.example.daypilot_test_desing.data.supabase.dto.UserStreakDto
@@ -23,17 +23,25 @@ import io.github.jan.supabase.postgrest.query.Order
 
 class SupabaseFriendRepository : FriendRepository {
 
+    companion object {
+        private const val TAG = "SupabaseFriendRepo"
+    }
+
     private fun userId() = supabase.auth.currentUserOrNull()?.id
 
     private fun ReactionType.toDbString() = name.lowercase()
 
+    // Left to propagate, not swallowed — a failure here must not silently look like "no friends".
     private suspend fun getUsersForIds(ids: List<String>): List<UserDto> {
         if (ids.isEmpty()) return emptyList()
         return try {
             supabase.from("users").select {
                 filter { isIn("id", ids) }
             }.decodeList<UserDto>()
-        } catch (_: Exception) { emptyList() }
+        } catch (e: Exception) {
+            Log.e(TAG, "getUsersForIds: failed fetching ${ids.size} user(s)", e)
+            throw e
+        }
     }
 
     private suspend fun getStreaksForIds(ids: List<String>): Map<String, Int> {
@@ -43,22 +51,31 @@ class SupabaseFriendRepository : FriendRepository {
                 filter { isIn("user_id", ids) }
             }.decodeList<UserStreakDto>()
                 .associate { it.userId to it.currentStreak }
-        } catch (_: Exception) { emptyMap() }
+        } catch (e: Exception) {
+            Log.w(TAG, "getStreaksForIds: failed fetching ${ids.size} streak(s), showing without them", e)
+            emptyMap()
+        }
     }
 
-    // Two separate queries to avoid OR-filter PostgREST issues.
+    // Two separate queries to avoid OR-filter PostgREST issues; left to propagate like getUsersForIds.
     private suspend fun getFriendIds(uid: String): List<String> {
         val asRequester = try {
             supabase.from("friends").select {
                 filter { eq("requester_id", uid) }
             }.decodeList<FriendRowDto>().map { it.receiverId }
-        } catch (_: Exception) { emptyList() }
+        } catch (e: Exception) {
+            Log.e(TAG, "getFriendIds: failed fetching requester-side rows for $uid", e)
+            throw e
+        }
 
         val asReceiver = try {
             supabase.from("friends").select {
                 filter { eq("receiver_id", uid) }
             }.decodeList<FriendRowDto>().map { it.requesterId }
-        } catch (_: Exception) { emptyList() }
+        } catch (e: Exception) {
+            Log.e(TAG, "getFriendIds: failed fetching receiver-side rows for $uid", e)
+            throw e
+        }
 
         return (asRequester + asReceiver).distinct()
     }
@@ -68,67 +85,75 @@ class SupabaseFriendRepository : FriendRepository {
         return getFriendIds(uid)
     }
 
+    // Failures propagate instead of masquerading as "zero friends" — but the best-effort
+    // fetches below (streaks/weekly-summary/reactions) only degrade a card's details, not the list.
     override suspend fun getFriends(): List<FriendData> {
         val now = System.currentTimeMillis()
         SessionCache.friends.value?.let { cached ->
             if (now - SessionCache.friendsFetchedAt < SessionCache.SOCIAL_TTL_MS) return cached
         }
         val uid = userId() ?: return emptyList()
-        return try {
-            val friendIds = getFriendIds(uid)
-            if (friendIds.isEmpty()) return emptyList()
 
-            val users   = getUsersForIds(friendIds)
-            val streaks = getStreaksForIds(friendIds)
+        val friendIds = getFriendIds(uid)
+        if (friendIds.isEmpty()) return emptyList()
 
-            val allSummaries = try {
-                supabase.from("user_weekly_summary").select {
-                    filter { isIn("user_id", friendIds) }
-                    order("week_start", Order.DESCENDING)
-                }.decodeList<WeeklySummaryRowDto>()
-            } catch (_: Exception) { emptyList() }
-            val summaryByUser = allSummaries.groupBy { it.userId }.mapValues { it.value.first() }
+        val users   = getUsersForIds(friendIds)
+        val streaks = getStreaksForIds(friendIds)
 
-            val summaryIds = summaryByUser.values.map { it.id }
-            val myReactions = if (summaryIds.isNotEmpty()) {
-                try {
-                    supabase.from("reactions").select {
-                        filter {
-                            eq("from_user_id", uid)
-                            isIn("weekly_summary_id", summaryIds)
-                        }
-                    }.decodeList<ReactionDto>()
-                } catch (_: Exception) { emptyList() }
-            } else emptyList()
-            val reactionBySummaryId = myReactions.associate { it.weeklySummaryId to it.type }
+        val allSummaries = try {
+            supabase.from("user_weekly_summary").select {
+                filter { isIn("user_id", friendIds) }
+                order("week_start", Order.DESCENDING)
+            }.decodeList<WeeklySummaryRowDto>()
+        } catch (e: Exception) {
+            Log.e(TAG, "getFriends: failed fetching weekly summaries, showing friends without them", e)
+            emptyList()
+        }
+        val summaryByUser = allSummaries.groupBy { it.userId }.mapValues { it.value.first() }
 
-            users.map { user ->
-                val summary = summaryByUser[user.id]
-                val weeklySummary = summary?.let {
-                    FriendWeeklySummary(
-                        totalPoints    = it.totalPoints,
-                        tasksCompleted = it.totalTasksCompleted,
-                        totalSteps     = it.totalSteps,
-                        bestStreak     = it.bestStreak,
-                        myReaction     = reactionBySummaryId[it.id]?.let { typeName ->
-                            ReactionType.entries.firstOrNull { rt -> rt.name.lowercase() == typeName }
-                        }
-                    )
-                }
-                FriendData(
-                    id            = user.id,
-                    name          = user.name,
-                    email         = user.email,
-                    points        = user.totalPointsHistorical,
-                    streak        = streaks[user.id] ?: 0,
-                    avatarUrl     = user.photoUrl,
-                    weeklySummary = weeklySummary
-                )
-            }.also { result ->
-                SessionCache.friends.value    = result
-                SessionCache.friendsFetchedAt = now
+        val summaryIds = summaryByUser.values.map { it.id }
+        val myReactions = if (summaryIds.isNotEmpty()) {
+            try {
+                supabase.from("reactions").select {
+                    filter {
+                        eq("from_user_id", uid)
+                        isIn("weekly_summary_id", summaryIds)
+                    }
+                }.decodeList<ReactionDto>()
+            } catch (e: Exception) {
+                Log.e(TAG, "getFriends: failed fetching my reactions", e)
+                emptyList()
             }
-        } catch (_: Exception) { emptyList() }
+        } else emptyList()
+        val reactionBySummaryId = myReactions.associate { it.weeklySummaryId to it.type }
+
+        return users.map { user ->
+            val summary = summaryByUser[user.id]
+            val weeklySummary = summary?.let {
+                FriendWeeklySummary(
+                    totalPoints    = it.totalPoints,
+                    tasksCompleted = it.totalTasksCompleted,
+                    totalSteps     = it.totalSteps,
+                    bestStreak     = it.bestStreak,
+                    myReaction     = reactionBySummaryId[it.id]?.let { typeName ->
+                        ReactionType.entries.firstOrNull { rt -> rt.name.lowercase() == typeName }
+                    }
+                )
+            }
+            FriendData(
+                id            = user.id,
+                name          = user.name,
+                email         = user.email,
+                points        = user.totalPointsHistorical,
+                streak        = streaks[user.id] ?: 0,
+                avatarUrl     = user.photoUrl,
+                weeklySummary = weeklySummary
+            )
+        }.also { result ->
+            SessionCache.friends.value    = result
+            SessionCache.friendsFetchedAt = now
+            Log.d(TAG, "getFriends: fetched ${result.size} friend(s) for $uid")
+        }
     }
 
     override suspend fun getFriendRequests(): List<FriendData> {
@@ -154,7 +179,10 @@ class SupabaseFriendRepository : FriendRepository {
                     avatarUrl = user.photoUrl
                 )
             }
-        } catch (_: Exception) { emptyList() }
+        } catch (e: Exception) {
+            Log.e(TAG, "getFriendRequests: failed for $uid", e)
+            emptyList()
+        }
     }
 
     override suspend fun acceptRequest(userId: String) {
@@ -168,19 +196,7 @@ class SupabaseFriendRepository : FriendRepository {
         supabase.from("friends").insert(
             InsertFriendDto(requesterId = userId, receiverId = uid)
         )
-        try {
-            val myName = supabase.from("users").select {
-                filter { eq("id", uid) }
-                limit(1)
-            }.decodeList<UserDto>().firstOrNull()?.name ?: ""
-            SupabaseNotificationRepository.insert(
-                userId = userId,
-                type   = "FRIEND_ACCEPTED",
-                title  = "Solicitud aceptada",
-                body   = if (myName.isNotEmpty()) "$myName aceptó tu solicitud de amistad"
-                         else "Tu solicitud de amistad fue aceptada"
-            )
-        } catch (_: Exception) { }
+        // FRIEND_ACCEPTED notification is now inserted by a Supabase DB trigger.
     }
 
     override suspend fun rejectRequest(userId: String) {
@@ -209,36 +225,8 @@ class SupabaseFriendRepository : FriendRepository {
                 type            = reaction.toDbString()
             )
         ) { onConflict = "from_user_id,weekly_summary_id" }
-
-        try {
-            val users = getUsersForIds(listOf(uid, userId))
-            val myName     = users.firstOrNull { it.id == uid }?.name     ?: ""
-            val targetName = users.firstOrNull { it.id == userId }?.name  ?: ""
-
-            val emoji = when (reaction) {
-                ReactionType.FIRE   -> "🔥"
-                ReactionType.CLAP   -> "👏"
-                ReactionType.STRONG -> "💪"
-                ReactionType.STAR   -> "⭐"
-            }
-
-            if (targetName.isNotEmpty()) {
-                SupabaseNotificationRepository.insert(
-                    userId = userId,
-                    type   = "REACTION",
-                    title  = "Nueva reacción $emoji",
-                    body   = "${myName.ifEmpty { "Un amigo" }} reaccionó a tu semana con $emoji"
-                )
-            }
-
-            if (targetName.isNotEmpty()) {
-                SupabaseNotificationRepository.insertForCurrentUser(
-                    type  = "REACTION",
-                    title = "Reacción enviada $emoji",
-                    body  = "Reaccionaste a la semana de $targetName con $emoji"
-                )
-            }
-        } catch (_: Exception) { }
+        // REACTION notification is inserted by a DB trigger; the "sent" confirmation
+        // is a local-only toast (see FriendsViewModel).
     }
 
     override suspend fun searchUsers(query: String): List<SearchUserData> {
@@ -266,7 +254,10 @@ class SupabaseFriendRepository : FriendRepository {
                         avatarUrl = user.photoUrl
                     )
                 }
-        } catch (_: Exception) { emptyList() }
+        } catch (e: Exception) {
+            Log.e(TAG, "searchUsers: failed for query '$query'", e)
+            emptyList()
+        }
     }
 
     override suspend fun addFriend(userId: String) {
@@ -274,19 +265,7 @@ class SupabaseFriendRepository : FriendRepository {
         supabase.from("friend_requests").insert(
             InsertFriendRequestDto(fromUserId = uid, toUserId = userId)
         )
-        try {
-            val myName = supabase.from("users").select {
-                filter { eq("id", uid) }
-                limit(1)
-            }.decodeList<UserDto>().firstOrNull()?.name ?: ""
-            SupabaseNotificationRepository.insert(
-                userId = userId,
-                type   = "FRIEND_REQUEST",
-                title  = "Nueva solicitud de amistad",
-                body   = if (myName.isNotEmpty()) "$myName quiere ser tu amigo"
-                         else "Tienes una nueva solicitud de amistad"
-            )
-        } catch (_: Exception) { }
+        // FRIEND_REQUEST notification is now inserted by a Supabase DB trigger.
     }
 
     override suspend fun removeFriend(userId: String) {
@@ -306,6 +285,9 @@ class SupabaseFriendRepository : FriendRepository {
                 filter { eq("from_user_id", uid) }
             }.decodeList<SentRequestDto>()
                 .map { it.toUserId }
-        } catch (_: Exception) { emptyList() }
+        } catch (e: Exception) {
+            Log.e(TAG, "getPendingSentRequestUserIds: failed for $uid", e)
+            emptyList()
+        }
     }
 }

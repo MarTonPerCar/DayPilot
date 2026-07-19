@@ -81,8 +81,7 @@ object ReminderScheduler {
         return if (isEarly) base xor 0x8000_0000.toInt() else base
     }
 
-    // Returns the next future fire time for a reminder.
-    // ONCE reminders that have already passed return 0 (can't reschedule).
+    // A ONCE reminder that already passed returns 0 — it can't be rescheduled.
     fun nextFireMillis(triggerAtMillis: Long, frequencyType: FrequencyType): Long {
         if (triggerAtMillis <= 0L) return 0L
         val now = System.currentTimeMillis()

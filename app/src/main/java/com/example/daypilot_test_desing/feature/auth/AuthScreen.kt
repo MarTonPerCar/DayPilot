@@ -66,7 +66,6 @@ fun AuthScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 24.dp, vertical = 48.dp)
         ) {
-            // ── Logo ─────────────────────────────────────────────
             Image(
                 painter = painterResource(
                     id = if (isDark) R.drawable.mi_logo_blanco
@@ -76,10 +75,8 @@ fun AuthScreen(
                 modifier = Modifier.height(60.dp)
             )
 
-            // ── Toggle ───────────────────────────────────────────
             AuthToggle(isLogin = isLogin, onToggle = { isLogin = it })
 
-            // ── Cards ────────────────────────────────────────────
             Box(
                 modifier = Modifier
                     .fillMaxWidth()

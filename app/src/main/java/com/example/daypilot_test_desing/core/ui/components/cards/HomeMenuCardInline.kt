@@ -31,7 +31,6 @@ fun HomeMenuCardInline(
             .background(MaterialTheme.colorScheme.surface)
             .clickable { onClick() }
     ) {
-        // Gradiente
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -45,7 +44,6 @@ fun HomeMenuCardInline(
                 )
         )
 
-        // Icono decorativo fondo
         Icon(
             imageVector = section.icon,
             contentDescription = null,
@@ -57,7 +55,6 @@ fun HomeMenuCardInline(
                 .rotate(-15f)
         )
 
-        // Contenido
         Column(
             modifier = Modifier
                 .fillMaxSize()
