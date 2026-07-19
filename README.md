@@ -1,14 +1,14 @@
-# DayPilot — Rama `Incremento-Android-TestFinal`
+# DayPilot — Rama `Incremento-Android`
 
 > **Estado:** Incremento completado  
-> **Base:** `Incremento-Android` (arquitectura MVVM + Supabase integrado)  
-> **Propósito:** Testing intensivo del primer incremento funcional completo
+> **Origen:** Consolidada desde `Incremento-Android-TestFinal` (arquitectura MVVM + Supabase integrado)  
+> **Propósito:** Versión de producción del primer incremento funcional completo
 
 ---
 
 ## ¿Qué es esta rama?
 
-Esta es la rama de trabajo del primer incremento funcional de DayPilot. Parte de la arquitectura MVVM con repositorios conectados a Supabase y añade las funcionalidades que faltaban para que la aplicación sea completa: sistema de puntos real, salud tecnológica con bloqueo de apps, social con reacciones, notificaciones centralizadas y cronómetros. Es también donde se realizó el testing exhaustivo, la revisión de código y la corrección de errores antes de consolidar en `Incremento-Android`.
+Esta es la rama de producción del primer incremento funcional de DayPilot. Parte de la arquitectura MVVM con repositorios conectados a Supabase y añade las funcionalidades que faltaban para que la aplicación sea completa: sistema de puntos real, salud tecnológica con bloqueo de apps, social con reacciones, notificaciones centralizadas y cronómetros. El testing exhaustivo, la revisión de código y la corrección de errores se realizaron en `Incremento-Android-TestFinal` antes de consolidarse aquí.
 
 ---
 
@@ -34,7 +34,7 @@ Sistema de restricciones de uso de apps basado en dos permisos del sistema: esta
 
 La pantalla de configuración muestra una pasarela de permisos a pantalla completa si alguno no está concedido, con instrucciones paso a paso para cada permiso, indicadores de estado y botones directos a los ajustes del sistema.
 
-Los datos de uso se actualizan mediante un `PeriodicWorkRequest` de WorkManager cada 15 minutos y también en tiempo real cada 60 segundos mientras la app está en primer plano. Si el usuario completa el día sin violar ningún límite (con al menos 3 restricciones activas), gana un punto de bonificación diario.
+Los datos de uso se actualizan mediante un `PeriodicWorkRequest` de WorkManager cada 15 minutos y también cada vez que la pantalla de salud tecnológica vuelve a primer plano (evento `ON_RESUME`). Si el usuario completa el día sin violar ningún límite (con al menos 3 restricciones activas), gana un punto de bonificación diario.
 
 ### Notificaciones
 
@@ -76,7 +76,7 @@ El patrón `if (!permiso) { MostrarGate(); return }` al inicio del composable fu
 
 ### WorkManager y límites del sistema
 
-WorkManager impone un intervalo mínimo de 15 minutos para trabajo periódico en Android. Para el polling más frecuente (actualización de uso de apps mientras la app está en primer plano) se usa un bucle de corrutinas en el ViewModel con `delay(60_000L)`, que el sistema puede cancelar libremente cuando la app pasa a segundo plano.
+WorkManager impone un intervalo mínimo de 15 minutos para trabajo periódico en Android. Para refrescar el uso de apps con más frecuencia que esos 15 minutos, la pantalla de salud tecnológica se suscribe al ciclo de vida y vuelve a pedir los datos cada vez que el usuario regresa a ella (evento `ON_RESUME`), en lugar de depender de un polling continuo en segundo plano.
 
 ### Resumen semanal
 
@@ -102,8 +102,8 @@ Durante la revisión de código se identificaron y corrigieron los siguientes pr
 
 | Rama | Propósito |
 |---|---|
-| `Incremento-Android` | Versión de producción del incremento, base para el siguiente |
-| `Incremento-Android-TestFinal` | Esta rama — trabajo y testing |
+| `Incremento-Android` | Esta rama — versión de producción del incremento, base para el siguiente |
+| `Incremento-Android-TestFinal` | Rama de trabajo y testing |
 | `Intensive-Android-Testing` | Misma app con timings acelerados para pruebas exhaustivas |
 
 ---
@@ -118,6 +118,6 @@ Durante la revisión de código se identificaron y corrigieron los siguientes pr
 
 ## Descargas
 
-- [⬇️ Descargar DayPilot (Incremento-Android-TestFinal)](https://github.com/MarTonPerCar/DayPilot/releases/download/incremento-android-testfinal-v1.0.0/DayPilot-Incremento-Android-TestFinal.apk)
+- [⬇️ Descargar DayPilot (Incremento-Android)](https://github.com/MarTonPerCar/DayPilot/releases/download/incremento-android-latest/DayPilot-Incremento-Android.apk)
 
-> **Nota:** esta es la rama de trabajo y testing — puede contener errores todavía sin corregir, o ser idéntica a la última versión de `Incremento-Android` si no ha habido cambios recientes. Para la versión estable, usa la descarga de `Incremento-Android`.
+> **Nota:** este enlace apunta siempre al último build publicado de `Incremento-Android`. Para la rama de trabajo y testing, usa la descarga de `Incremento-Android-TestFinal`.
