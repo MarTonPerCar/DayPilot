@@ -66,7 +66,7 @@ CREATE TABLE habits_daily (
     user_id                  UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     date                     DATE NOT NULL,
     steps                    INTEGER NOT NULL DEFAULT 0,
-    steps_goal               INTEGER NOT NULL DEFAULT 2000,
+    steps_goal               INTEGER NOT NULL DEFAULT 10000,
     timer_point_earned       BOOLEAN NOT NULL DEFAULT false,
     updated_at               TIMESTAMPTZ NOT NULL DEFAULT now(),
     UNIQUE(user_id, date)
@@ -550,7 +550,7 @@ BEGIN
         dp.user_id,
         dp.date,
         dp.steps,
-        COALESCE(hd.steps_goal, 2000),
+        COALESCE(hd.steps_goal, 10000),
         dp.tasks_completed,
         dp.tasks_points,
         dp.steps_points,

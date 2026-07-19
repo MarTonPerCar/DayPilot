@@ -91,7 +91,7 @@ Estado de los hábitos de un usuario para un día concreto. Una fila por (usuari
 | Columna | Descripción |
 |---|---|
 | `steps` | Pasos registrados ese día |
-| `steps_goal` | Meta de pasos de ese día |
+| `steps_goal` | Meta de pasos de ese día (por defecto `10000` si no se especifica) |
 | `timer_point_earned` | Si ya se otorgó el punto de temporizador ese día. `completeTimerSession()` lo consulta antes de conceder puntos (gate server-side, para que no se pueda ganar dos veces desde dos dispositivos el mismo día) y lo marca `true` justo después de otorgarlos |
 
 Cada INSERT/UPDATE en esta tabla dispara `fn_sync_habits_to_progress`, que actualiza los pasos en `daily_progress`.
@@ -224,7 +224,7 @@ Ambas están filtradas por `user_id = auth.uid()` en el cliente, así que cada u
 
 | Job | Schedule | Función |
 |---|---|---|
-| `close-daily-progress` | `0 0 * * *` (cada noche a medianoche UTC) | `fn_close_daily_progress()`: otorga el bonus de +10 TECH_HEALTH del día que cierra (apps y grupos combinados, ≥3 restricciones y ninguna violada), purga `tech_health_config`/`tech_health_group_config` marcados `pending_delete`, aplica cambios diferidos, resetea `is_violated_today`, archiva `daily_progress` en `user_daily_log` y resetea el progreso del día |
+| `close-daily-progress` | `0 0 * * *` (cada noche a medianoche UTC) | `fn_close_daily_progress()`: otorga el bonus de +10 TECH_HEALTH del día que cierra (apps y grupos combinados, ≥3 restricciones y ninguna violada), purga `tech_health_config`/`tech_health_group_config` marcados `pending_delete`, aplica cambios diferidos, resetea `is_violated_today`, archiva `daily_progress` en `user_daily_log` (usando `10000` como `steps_goal` de respaldo si ese día no tiene fila en `habits_daily`) y resetea el progreso del día |
 | `generate-weekly-summary` | `5 0 * * 1` (cada lunes a las 00:05 UTC) | `fn_generate_weekly_summary()`: agrega los últimos 7 días en `user_weekly_summary` (una fila por usuario, sobreescrita) |
 | `cleanup-completed-tasks` | `15 0 * * *` (cada noche a las 00:15 UTC) | `fn_cleanup_completed_tasks()`: elimina ocurrencias completadas con más de 20 días y tareas sin ninguna ocurrencia |
 | `apply-pending-steps-goals` | `2 0 * * *` (cada noche a las 00:02 UTC) | `fn_apply_pending_steps_goals()`: limpia `pending_steps_goal`/`pending_steps_goal_date` una vez pasa la fecha efectiva |

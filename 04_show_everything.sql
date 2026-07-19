@@ -131,7 +131,10 @@ LEFT JOIN LATERAL (
             'group_name', g.group_name,
             'limit_hours', g.limit_hours,
             'is_active', g.is_active,
+            'pending_active', g.pending_active,
+            'pending_limit_hours', g.pending_limit_hours,
             'is_violated_today', g.is_violated_today,
+            'pending_delete', g.pending_delete,
             'apps', (
                 SELECT json_agg(jsonb_build_object('app_name', a.app_name, 'app_package', a.app_package))
                 FROM tech_health_group_apps a WHERE a.group_id = g.id
