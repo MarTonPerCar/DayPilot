@@ -29,7 +29,7 @@ Con los usuarios de la seed (`ana.garcia@daypilot.test` / `password123`):
 
 ## Cómo ejecutarlo
 
-Copia `env.json.example` a `env.json` (ignorado por git) y rellena tus credenciales reales de Supabase. Sin este paso la app arranca con `SUPABASE_URL`/`SUPABASE_KEY` vacíos y no conecta.
+Copia `env.json.example` a `env.json` (ignorado por git) y rellena tus credenciales reales de Supabase. Sin este paso `flutter run`/`flutter build` falla directamente (falta el asset `env.json` declarado en `pubspec.yaml`), ni siquiera arranca la app.
 
 ```bash
 cp env.json.example env.json   # solo la primera vez, luego edita env.json
