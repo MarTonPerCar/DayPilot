@@ -45,7 +45,10 @@ This is the active working branch for the final increment: real UI, real Riverpo
 
 Releases for this branch are tagged `v2.2.X.Y.Z` (the repo-wide scheme: `V`=platform — `1` Android, `2` Flutter — `SV`=branch — `1` main, `2` TestFinal — followed by the real semantic version). CI also maintains a floating `incremento-flutter-testfinal-latest` tag that always points at the newest build for this branch specifically — unlike the repo-wide "latest" release, which mixes in unrelated Android/Flutter branches and can resolve to the wrong build entirely.
 
-- [⬇️ Download DayPilot for Windows](https://github.com/MarTonPerCar/DayPilot/releases/download/incremento-flutter-testfinal-latest/DayPilot-Setup.exe)
-- [⬇️ Download DayPilot for Linux (.deb)](https://github.com/MarTonPerCar/DayPilot/releases/download/incremento-flutter-testfinal-latest/DayPilot-Setup.deb)
+- [⬇️ Download DayPilot for Windows](https://github.com/MarTonPerCar/DayPilot/releases/download/incremento-flutter-testfinal-latest/DayPilot-Setup.exe) — run the installer after downloading
+- Linux (.deb):
+  ```bash
+  wget -O DayPilot-Setup.deb https://github.com/MarTonPerCar/DayPilot/releases/download/incremento-flutter-testfinal-latest/DayPilot-Setup.deb && sudo apt install ./DayPilot-Setup.deb
+  ```
 
 > **Note:** the `incremento-flutter-testfinal-latest` tag/release is created by CI on the next tag push (`v2.2.X.Y.Z`) and doesn't exist yet — these links will 404 until then. This is the active working branch — builds here may contain bugs still being worked out, or may be identical to the latest `Incremento-Flutter` release if nothing has changed yet. For the stable version, use the downloads on `Incremento-Flutter` instead.
