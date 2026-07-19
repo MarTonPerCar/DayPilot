@@ -16,7 +16,7 @@ class SupabaseStepsRepository implements StepsRepository {
   @override
   Future<AppSteps> getSteps() async {
     final uid = _userId;
-    if (uid == null) return const AppSteps(steps: 0, goal: 2000, pointsEarnedToday: 0);
+    if (uid == null) return const AppSteps(steps: 0, goal: 10000, pointsEarnedToday: 0);
     final today = isoDate(DateTime.now());
 
     final userRow = await _client
@@ -34,7 +34,7 @@ class SupabaseStepsRepository implements StepsRepository {
         .eq('user_id', uid)
         .eq('date', today);
     final habitsRow = habitsRows.isEmpty ? null : habitsRows.first;
-    var goal = habitsRow == null ? 2000 : habitsRow['steps_goal'] as int;
+    var goal = habitsRow == null ? 10000 : habitsRow['steps_goal'] as int;
     final steps = habitsRow?['steps'] as int? ?? 0;
     final milestoneLevel = habitsRow?['steps_milestone_level'] as int? ?? 0;
 
