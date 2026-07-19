@@ -7,10 +7,10 @@ This branch is the **design-system-only starting point** for the Flutter port: a
 ## What's here
 
 - **5 Material 3 themes** (light/dark variants each), switchable at runtime.
-- **~60 reusable `DayPilot*` components** — cards, form fields, chips, buttons, dialogs — used consistently across every screen.
-- **One file per screen**, each wired to static/dummy data so the UI can be reviewed without a backend.
+- **~75 reusable components** (`lib/components/{basic,cards,forms,sheets}`) — cards, form fields, chips, buttons, dialogs — used consistently across every screen; many (not all) are prefixed `DayPilot*`.
+- **One file per screen**, each wired to static/dummy data so the UI can be reviewed without a backend. Create/edit/delete actions in forms and sheets are visual-only stubs (e.g. `onSave`/`onDelete` no-ops) — no data actually mutates on this branch.
 - **Localization** in Spanish, English, and German (`lib/l10n`).
-- A **component catalog** screen (`lib/component_catalog.dart`) previewing every reusable component and theme in one place.
+- A **component catalog** screen (`lib/component_catalog.dart`) previewing most reusable components in one place. Theme switching lives in the Settings screen, not the catalog.
 
 ## Related branches
 
