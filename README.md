@@ -26,9 +26,9 @@ Esta rama (`Test-Diseno-Android`) es el espacio de trabajo dedicado al diseño y
 | UI | Jetpack Compose + Material 3 |
 | Navegación | Navigation Compose |
 | Gestión de estado | `remember` / `mutableStateOf` (NavGraph) |
-| Temas | `StateFlow` reactivo, sin reinicio |
-| Min SDK | 26 |
-| Target SDK | 35 |
+| Temas | `remember` / `mutableStateOf`, parámetros de `DayPilotTheme` |
+| Min SDK | 24 |
+| Target SDK | 36 |
 
 ---
 
@@ -36,17 +36,17 @@ Esta rama (`Test-Diseno-Android`) es el espacio de trabajo dedicado al diseño y
 
 ### Temas de color
 
-La app cuenta con **5 temas predefinidos**, cada uno con versión clara y oscura, aplicables en caliente sin reiniciar la aplicación:
+La app cuenta con **5 temas predefinidos**, soportados por `DayPilotTheme` sin necesidad de reiniciar la aplicación para cambiarlos (recomposición). Cuatro de ellos tienen versión clara y oscura; el tema `amoled` solo define esquema oscuro:
 
 | ID | Nombre |
 |---|---|
 | `sage_green` | Verde Salvia *(default)* |
-| `ocean_blue` | Azul Océano |
-| `sunset_orange` | Naranja Atardecer |
-| `lavender_purple` | Lavanda |
-| `rose_gold` | Oro Rosa |
+| `ocean` | Azul Océano |
+| `lavender` | Morado Lavanda |
+| `amber` | Naranja Ámbar |
+| `amoled` | Oscuro Puro *(solo oscuro)* |
 
-El tema se gestiona mediante un `StateFlow` a nivel de aplicación y se aplica de forma reactiva a través de `DayPilotTheme`, que acepta los parámetros `theme: DayPilotTheme` y `darkMode: Boolean`.
+El tema se aplica a través del composable `DayPilotTheme`, que acepta los parámetros `theme: DayPilotTheme` y `darkMode: Boolean`. Actualmente `MainActivity` lo invoca con un tema fijo (`SAGE_GREEN`, oscuro); el selector de `SettingsScreen` gestiona su propio estado local (`remember`/`mutableStateOf`) sin estar aún conectado al tema raíz de la app — pendiente de la migración a ViewModel.
 
 ### Tipografía
 
@@ -74,7 +74,7 @@ app/
 │   │   ├── FriendModels.kt
 │   │   ├── NotificationModels.kt
 │   │   ├── SearchModels.kt
-│   │   ├── ReactionType.kt
+│   │   ├── Reactiontype.kt
 │   │   └── UIModels.kt
 │   ├── components/
 │   │   ├── basic/            ← componentes atómicos reutilizables
@@ -173,7 +173,7 @@ El estado mutable compartido (listas de tareas, recordatorios, restricciones) vi
 | `HabitsScreen` | `habits` | Hub de hábitos |
 | `StepsScreen` | `steps` | Progreso de pasos + resumen semanal |
 | `TimerHubScreen` | `timer_hub` | Selección de tipo de cronómetro |
-| `TimerScreen` | `timer/{mode}/{minutes}` | Cronómetro con círculo de progreso |
+| `TimerScreen` | `timer/{timerMode}/{minutes}` | Cronómetro con círculo de progreso |
 | `PomodoroScreen` | `pomodoro/{sessions}` | Pomodoro con fases trabajo/descanso |
 | `RemindersScreen` | `reminders` | Lista de recordatorios + formulario |
 | `TechHealthScreen` | `tech_health` | Restricciones de apps y grupos |
