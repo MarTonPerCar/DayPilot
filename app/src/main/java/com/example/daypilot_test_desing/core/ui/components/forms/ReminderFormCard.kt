@@ -86,7 +86,6 @@ fun ReminderFormCard(
                 .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // ── Título ────────────────────────────────────────────
             Text(
                 text = stringResource(R.string.reminder_form_title),
                 style = MaterialTheme.typography.titleMedium,
@@ -94,14 +93,12 @@ fun ReminderFormCard(
                 color = MaterialTheme.colorScheme.onSurface
             )
 
-            // ── Nombre ────────────────────────────────────────────
             DayPilotTextField(
                 value = title,
                 onValueChange = { title = it },
                 label = stringResource(R.string.reminder_form_name_label)
             )
 
-            // ── Accesos rápidos ───────────────────────────────────
             Text(
                 text = stringResource(R.string.reminder_form_quick_access),
                 style = MaterialTheme.typography.labelMedium,
@@ -144,7 +141,6 @@ fun ReminderFormCard(
                 }
             }
 
-            // ── Separador ─────────────────────────────────────────
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -159,7 +155,6 @@ fun ReminderFormCard(
                 HorizontalDivider(modifier = Modifier.weight(1f))
             }
 
-            // ── Selector fecha y hora ─────────────────────────────
             OutlinedButton(
                 onClick = {
                     val now = Calendar.getInstance()
@@ -206,7 +201,6 @@ fun ReminderFormCard(
                 )
             }
 
-            // ── Frecuencia ────────────────────────────────────────
             Text(
                 text = stringResource(R.string.reminder_form_frequency),
                 style = MaterialTheme.typography.labelMedium,
@@ -241,7 +235,6 @@ fun ReminderFormCard(
                 }
             }
 
-            // ── Aviso previo ──────────────────────────────────────
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(14.dp),
@@ -279,7 +272,6 @@ fun ReminderFormCard(
                 }
             }
 
-            // ── Botones ───────────────────────────────────────────
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -313,7 +305,6 @@ fun ReminderFormCard(
     }
 }
 
-// ── Preview ──────────────────────────────────────────────────────
 @Preview(showBackground = true)
 @Composable
 fun ReminderFormCardPreview() {

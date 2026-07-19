@@ -63,7 +63,6 @@ fun DailySummaryCard(
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
 
-                // ── Cabecera ──────────────────────────────────────
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -108,7 +107,6 @@ fun DailySummaryCard(
                     }
                 }
 
-                // ── Grid de stats ─────────────────────────────────
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -152,7 +150,6 @@ fun DailySummaryCard(
     }
 }
 
-// ── Preview ──────────────────────────────────────────────────────
 @Preview(showBackground = true)
 @Composable
 fun DailySummaryCardPreview() {

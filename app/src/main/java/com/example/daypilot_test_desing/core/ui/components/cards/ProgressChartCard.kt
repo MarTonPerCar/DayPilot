@@ -91,7 +91,6 @@ fun ProgressChartCard(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // ── Título ────────────────────────────────────────────
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleSmall,
@@ -99,7 +98,6 @@ fun ProgressChartCard(
                 color = MaterialTheme.colorScheme.onSurface
             )
 
-            // ── Canvas ────────────────────────────────────────────
             AnimatedContent(
                 targetState = values,
                 transitionSpec = { fadeIn(tween(300)) togetherWith fadeOut(tween(300)) },
@@ -118,7 +116,6 @@ fun ProgressChartCard(
                     val chartHeight = size.height - 16.dp.toPx()
                     val barWidth = chartWidth / animValues.size
 
-                    // ── Eje Y ─────────────────────────────────────
                     val ySteps = 4
                     repeat(ySteps + 1) { i ->
                         val yValue = chartMax * i / ySteps
@@ -148,7 +145,6 @@ fun ProgressChartCard(
                         )
                     }
 
-                    // ── Barras fondo ──────────────────────────────
                     animValues.forEachIndexed { index, value ->
                         val barHeight = if (chartMax > 0) (value / chartMax) * chartHeight else 0f
                         val x = yAxisWidth + index * barWidth
@@ -159,7 +155,6 @@ fun ProgressChartCard(
                         )
                     }
 
-                    // ── Marca vertical "hoy" (detrás de la curva) ─
                     if (todayIndex >= 0 && todayIndex < animValues.size) {
                         val todayX    = yAxisWidth + todayIndex * barWidth + barWidth / 2
                         val todayVal  = animValues[todayIndex]
@@ -174,7 +169,6 @@ fun ProgressChartCard(
                         )
                     }
 
-                    // ── Puntos de la línea ────────────────────────
                     val points = animValues.mapIndexed { index, value ->
                         Offset(
                             x = yAxisWidth + index * barWidth + barWidth / 2,
@@ -185,7 +179,6 @@ fun ProgressChartCard(
                     }
 
                     if (points.size >= 2) {
-                        // Área rellena
                         val fillPath = Path().apply {
                             moveTo(points.first().x, chartHeight)
                             lineTo(points.first().x, points.first().y)
@@ -208,7 +201,6 @@ fun ProgressChartCard(
                             )
                         )
 
-                        // Línea
                         val linePath = Path().apply {
                             moveTo(points.first().x, points.first().y)
                             points.zipWithNext().forEach { (p1, p2) ->
@@ -226,7 +218,6 @@ fun ProgressChartCard(
                             )
                         )
 
-                        // Puntos + valores cada 5
                         points.forEachIndexed { index, point ->
                             drawCircle(color = lineColor, radius = 3.dp.toPx(), center = point)
                             drawCircle(color = Color.White, radius = 1.5.dp.toPx(), center = point)
@@ -257,9 +248,7 @@ fun ProgressChartCard(
                         }
                     }
 
-                    // ── Eje X — etiquetas cada 5 posiciones + hoy ─
-                    // Position-based, not day-value-based: dayOfMonth rolls over
-                    // a month boundary so it's not evenly divisible by 5 anymore.
+                    // Position-based, not dayOfMonth-based — dayOfMonth rolls over a month boundary.
                     animValues.forEachIndexed { index, _ ->
                         val showLabel = index % 5 == 4 || index == todayIndex
                         if (showLabel) {
@@ -287,7 +276,6 @@ fun ProgressChartCard(
 
             HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant)
 
-            // ── Stats resumen ─────────────────────────────────────
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
@@ -309,7 +297,6 @@ fun ProgressChartCard(
     }
 }
 
-// ── Preview ──────────────────────────────────────────────────────
 @Preview(showBackground = true)
 @Composable
 fun ProgressChartCardPreview() {

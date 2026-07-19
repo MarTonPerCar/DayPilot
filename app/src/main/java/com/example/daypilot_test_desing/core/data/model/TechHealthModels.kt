@@ -2,8 +2,7 @@ package com.example.daypilot_test_desing.core.data.model
 
 import kotlinx.serialization.Serializable
 
-// pendingActive/pendingLimitMinutes only take effect the next day, so disabling
-// or loosening a restriction can't dodge an in-progress violation.
+// pendingActive/pendingLimitMinutes apply next day only, so they can't dodge an in-progress violation.
 @Serializable
 data class AppRestriction(
     val id: String,

@@ -20,9 +20,8 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
-// Shares the "daypilot_steps" SharedPreferences file with StepsViewModel — this
-// class owns steps_goal/pending_goal/goal_change_date, the ViewModel owns
-// baseline_date/baseline_steps. Don't reuse a key across the two.
+// Shares "daypilot_steps" prefs with StepsViewModel — this class owns steps_goal/pending_goal/
+// goal_change_date, the ViewModel owns baseline_date/baseline_steps; don't reuse a key across the two.
 class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepository {
 
     companion object {
@@ -41,9 +40,8 @@ class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepos
         return SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(cal.time)
     }
 
-    // "goal_change_date" stores the date the pending goal *takes effect* (not the
-    // date it was set) — same semantics as users.pending_steps_goal_date, so a
-    // value pulled from the server can be copied in as-is, no translation needed.
+    // "goal_change_date" is when the goal *takes effect*, matching users.pending_steps_goal_date
+    // exactly — a server value can be copied in as-is, no translation needed.
     private fun applyPendingGoalIfNewDay() {
         val pendingGoal = prefs.getInt("pending_goal", -1)
         val pendingDate = prefs.getString("goal_change_date", "") ?: ""
@@ -98,9 +96,7 @@ class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepos
             .putInt("pending_goal", newGoal)
             .putString("goal_change_date", applyDate)
             .apply()
-        // Mirrors it to users.pending_steps_goal/_date so any other device this
-        // account is signed into sees the same pending change, instead of the
-        // change silently only taking effect on the device it was set from.
+        // Mirrors to users.pending_steps_goal/_date so other devices see the same pending change.
         scope.launch { pushPendingGoalToServer(newGoal, applyDate) }
     }
 
@@ -119,8 +115,7 @@ class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepos
         }
     }
 
-    // Adopts a pending goal queued from another device into the local prefs
-    // mirror, so this device's own applyPendingGoalIfNewDay() picks it up too.
+    // Adopts a pending goal queued from another device so applyPendingGoalIfNewDay() picks it up too.
     private suspend fun pullPendingGoalFromServer() {
         val uid = supabase.auth.currentUserOrNull()?.id ?: return
         try {
@@ -146,9 +141,8 @@ class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepos
         }
     }
 
-    // Milestone points and the STEPS_GOAL notification are computed and inserted
-    // server-side by the fn_award_steps_milestones trigger on habits_daily writes —
-    // this only ever stores the raw sensor-derived count for display/upload.
+    // Milestone points/STEPS_GOAL notification come from the fn_award_steps_milestones
+    // trigger server-side — this only stores the raw sensor count for display/upload.
     override fun setSteps(steps: Int) {
         currentSteps = steps
     }
@@ -170,9 +164,8 @@ class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepos
         pullPendingGoalFromServer()
     }
 
-    // Guarded so it only runs once per device — otherwise a fresh install would
-    // default to 10_000 and syncSteps() would push that straight back to the DB,
-    // clobbering the real goal.
+    // Guarded to run once per device — otherwise syncSteps() would push the 10_000
+    // placeholder default straight back to the DB, clobbering the real goal.
     private suspend fun hydrateActiveGoalIfFirstRun() {
         if (prefs.contains("steps_goal")) return
         val uid = supabase.auth.currentUserOrNull()?.id ?: return
@@ -182,9 +175,7 @@ class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepos
                 order("date", Order.DESCENDING)
                 limit(1)
             }.decodeList<HabitsDailyUpsertDto>().firstOrNull()
-            // No row yet on a genuinely fresh account — write the same placeholder default
-            // so the guard above actually stops future reruns instead of re-querying on
-            // every app open until the first real sync eventually creates a row.
+            // Write the placeholder even with no row found, so the guard above stops re-querying forever.
             val goal = if (row != null && row.stepsGoal > 0) row.stepsGoal else 10_000
             prefs.edit().putInt("steps_goal", goal).apply()
             Log.d(TAG, "Hydrated steps goal from DB: $goal")

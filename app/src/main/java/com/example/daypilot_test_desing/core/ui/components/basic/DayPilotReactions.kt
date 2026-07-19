@@ -56,7 +56,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
-// ── Barra de reacciones ──────────────────────────────────────────
 @Composable
 fun DayPilotReactionBar(
     modifier: Modifier = Modifier,
@@ -81,7 +80,6 @@ fun DayPilotReactionBar(
     }
 }
 
-// ── Botón individual de reacción ─────────────────────────────────
 @Composable
 fun ReactionButton(
     reaction: ReactionType,
@@ -164,7 +162,6 @@ fun ReactionButton(
     }
 }
 
-// ── Contador de reacciones ───────────────────────────────────────
 @Composable
 fun DayPilotReactionSummary(
     reactions: Map<ReactionType, Int>,
@@ -196,7 +193,6 @@ fun DayPilotReactionSummary(
     }
 }
 
-// ── Botón de reacción flotante ───────────────────────────────────
 @Composable
 fun DayPilotReactionButton(
     selectedReaction: ReactionType? = null,
@@ -213,7 +209,6 @@ fun DayPilotReactionButton(
     )
 
     Box(modifier = modifier) {
-        // ── Botón principal ───────────────────────────────────
         Box(
             modifier = Modifier
                 .size(28.dp)
@@ -222,7 +217,6 @@ fun DayPilotReactionButton(
                 .clickable(enabled = !alreadyReacted) { expanded = !expanded },
             contentAlignment = Alignment.Center
         ) {
-            // Animates from "+" to checkmark once a reaction is sent
             AnimatedContent(
                 targetState = alreadyReacted,
                 transitionSpec = {
@@ -252,7 +246,6 @@ fun DayPilotReactionButton(
             }
         }
 
-        // ── Panel flotante (only when not yet reacted) ────────
         if (expanded && !alreadyReacted) {
             Popup(
                 alignment = Alignment.TopEnd,
@@ -320,7 +313,6 @@ fun DayPilotReactionButton(
     }
 }
 
-// ── Preview ──────────────────────────────────────────────────────
 @Preview(showBackground = true)
 @Composable
 fun DayPilotReactionsPreview() {

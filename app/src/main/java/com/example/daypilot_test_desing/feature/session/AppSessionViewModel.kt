@@ -1,5 +1,6 @@
 package com.example.daypilot_test_desing.feature.session
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.daypilot_test_desing.core.cache.SessionCache
@@ -25,6 +26,10 @@ import kotlinx.coroutines.launch
  */
 class AppSessionViewModel : ViewModel() {
 
+    companion object {
+        private const val TAG = "AppSessionViewModel"
+    }
+
     sealed class State {
         data object Loading : State()
         data object DataLoading : State()  // session confirmed, waiting for data fetch
@@ -39,14 +44,13 @@ class AppSessionViewModel : ViewModel() {
     init {
         viewModelScope.launch {
             _state.value = try {
-                // Wait until the Auth plugin has finished loading the persisted session
-                // from SharedPreferences (via supabase-kt's SettingsSessionManager).
                 // Without this, currentUserOrNull() always returns null on a cold start
-                // because the async storage load hasn't completed yet.
+                // because the async SharedPreferences session load hasn't completed yet.
                 supabase.auth.awaitInitialization()
                 if (supabase.auth.currentUserOrNull() != null) State.DataLoading
                 else State.Unauthenticated
-            } catch (_: Exception) {
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to restore session on startup", e)
                 State.Unauthenticated
             }
         }
@@ -75,7 +79,7 @@ class AppSessionViewModel : ViewModel() {
     /** Signs the user out of Supabase and marks the session as gone. */
     fun signOut() {
         viewModelScope.launch {
-            try { supabase.auth.signOut() } catch (_: Exception) {}
+            try { supabase.auth.signOut() } catch (e: Exception) { Log.w(TAG, "Server-side signOut failed, clearing local session anyway", e) }
             SessionCache.clear()
             NotificationHub.clear()
             _state.value = State.Unauthenticated

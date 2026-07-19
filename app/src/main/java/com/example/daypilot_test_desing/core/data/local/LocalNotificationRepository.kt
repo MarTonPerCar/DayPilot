@@ -2,6 +2,7 @@ package com.example.daypilot_test_desing.core.data.local
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import com.example.daypilot_test_desing.core.data.model.NotificationData
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -10,6 +11,10 @@ import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 
 class LocalNotificationRepository(context: Context) {
+
+    companion object {
+        private const val TAG = "LocalNotificationRepo"
+    }
 
     private val prefs: SharedPreferences =
         context.getSharedPreferences("daypilot_notifications", Context.MODE_PRIVATE)
@@ -20,7 +25,10 @@ class LocalNotificationRepository(context: Context) {
         val raw = prefs.getString("notifications", null) ?: return emptyList()
         return try {
             json.decodeFromString(ListSerializer(NotificationData.serializer()), raw)
-        } catch (_: Exception) { emptyList() }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to decode stored notifications, discarding local cache", e)
+            emptyList()
+        }
     }
 
     private fun save(list: List<NotificationData>) {
@@ -49,11 +57,7 @@ class LocalNotificationRepository(context: Context) {
         save(_notifications.value)
     }
 
-    // The server is fully authoritative — every notification is created by inserting
-    // into Supabase first (never locally), so anything here that isn't in fromServer
-    // is stale, not "pending sync": a leftover from before every notification path
-    // went through the DB, or a deleted/expired row. Replacing outright (instead of
-    // keeping unmatched local entries around) is what actually clears those out.
+    // Replacing outright (not merging with existing local entries) is what clears stale/deleted rows.
     fun mergeServerNotifications(fromServer: List<NotificationData>) {
         _notifications.value = fromServer.take(50)
         save(_notifications.value)

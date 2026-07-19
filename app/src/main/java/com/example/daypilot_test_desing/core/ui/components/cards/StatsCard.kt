@@ -63,7 +63,6 @@ fun StatsCard(
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
 
-                // ── Cabecera ──────────────────────────────────────
                 Text(
                     text = stringResource(R.string.stats_daily_summary),
                     style = MaterialTheme.typography.titleMedium,
@@ -71,7 +70,6 @@ fun StatsCard(
                     color = MaterialTheme.colorScheme.onSurface
                 )
 
-                // ── Ranking + Total ───────────────────────────────
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -92,7 +90,6 @@ fun StatsCard(
 
                 DayPilotDivider()
 
-                // ── Desglose de puntos ────────────────────────────
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     StatsBreakdownRow(
                         icon = Icons.Default.CheckCircle,
@@ -120,7 +117,6 @@ fun StatsCard(
     }
 }
 
-// ── Preview ──────────────────────────────────────────────────────
 @Preview(showBackground = true)
 @Composable
 fun StatsCardPreview() {

@@ -33,7 +33,10 @@ object SupabaseNotificationRepository : NotificationRepository {
                     eq("is_read", false)
                 }
             }.decodeList<NotificationDto>().size
-        } catch (_: Exception) { 0 }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to fetch unread count for user $userId", e)
+            0
+        }
     }
 
     override suspend fun getAll(userId: String): List<NotificationData> {
@@ -43,7 +46,10 @@ object SupabaseNotificationRepository : NotificationRepository {
                 order("created_at", Order.DESCENDING)
                 limit(DISPLAY_LIMIT.toLong())
             }.decodeList<NotificationDto>().map { it.toModel() }
-        } catch (_: Exception) { emptyList() }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to fetch notifications for user $userId", e)
+            emptyList()
+        }
     }
 
     override suspend fun markAsRead(notificationId: String) {
@@ -51,7 +57,9 @@ object SupabaseNotificationRepository : NotificationRepository {
             supabase.from("notifications").update({ set("is_read", true) }) {
                 filter { eq("id", notificationId) }
             }
-        } catch (_: Exception) { }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to mark notification $notificationId as read", e)
+        }
     }
 
     override suspend fun markAllAsRead(userId: String) {
@@ -62,7 +70,9 @@ object SupabaseNotificationRepository : NotificationRepository {
                     eq("is_read", false)
                 }
             }
-        } catch (_: Exception) { }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to mark all notifications as read for user $userId", e)
+        }
     }
 
     override suspend fun insert(userId: String, type: String, title: String, body: String) {
@@ -77,7 +87,9 @@ object SupabaseNotificationRepository : NotificationRepository {
                 )
             )
             pruneOldest(userId)
-        } catch (_: Exception) { }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to insert $type notification for user $userId", e)
+        }
     }
 
     override suspend fun getLatestOfTypeToday(userId: String, type: String): RawTodayNotification? {
@@ -104,8 +116,7 @@ object SupabaseNotificationRepository : NotificationRepository {
     }
 
     suspend fun insertForCurrentUser(type: String, title: String, body: String) {
-        // Needed when called from a BroadcastReceiver, where Auth may still be
-        // restoring the session from SharedPreferences; a no-op otherwise.
+        // Auth may still be restoring the session when called from a BroadcastReceiver.
         supabase.auth.awaitInitialization()
         val uid = supabase.auth.currentUserOrNull()?.id ?: return
         insert(uid, type, title, body)
@@ -124,7 +135,9 @@ object SupabaseNotificationRepository : NotificationRepository {
                     filter { isIn("id", ids) }
                 }
             }
-        } catch (_: Exception) { }
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed to prune old notifications for user $userId", e)
+        }
     }
 
     fun NotificationDto.toModel(): NotificationData {
@@ -161,6 +174,9 @@ object SupabaseNotificationRepository : NotificationRepository {
                 diff.toDays()    < 7  -> "${diff.toDays()}d"
                 else                  -> "${diff.toDays() / 7}sem"
             }
-        } catch (_: Exception) { "" }
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed to parse notification timestamp: $isoTimestamp", e)
+            ""
+        }
     }
 }

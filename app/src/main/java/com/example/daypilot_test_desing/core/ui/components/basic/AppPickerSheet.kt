@@ -68,7 +68,6 @@ fun loadInstalledApps(context: Context): List<AppInfo> {
 
 
 
-// ── Picker app única ─────────────────────────────────────────────
 @Composable
 fun AppPickerSheet(
     onSelect: (AppInfo) -> Unit,
@@ -161,7 +160,6 @@ fun AppPickerSheet(
     }
 }
 
-// ── Picker multi-selección (grupos) ──────────────────────────────
 @Composable
 fun AppMultiPickerSheet(
     initialSelected: List<AppInfo> = emptyList(),
@@ -274,7 +272,6 @@ fun AppMultiPickerSheet(
     }
 }
 
-// ── Fila de app ──────────────────────────────────────────────────
 @Composable
 fun AppPickerRow(
     app: AppInfo,

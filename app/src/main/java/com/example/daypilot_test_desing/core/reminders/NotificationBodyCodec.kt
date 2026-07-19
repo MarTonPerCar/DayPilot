@@ -3,14 +3,8 @@ package com.example.daypilot_test_desing.core.reminders
 import androidx.annotation.StringRes
 import com.example.daypilot_test_desing.R
 
-/**
- * TASK_REMINDER / STREAK_RISK notifications now arrive from Supabase cron jobs with
- * encoded title/body placeholders ("TASK_REMINDER_COUNT:3", "STREAK_RISK_BODY", ...)
- * instead of final display text. Decoding lives here so both the OS notification
- * (DailyNotificationsReceiver, which knows the type it queried for) and the in-app
- * notifications list (NotificationsScreen, which only has the raw title/body left
- * over from the DB row) resolve to the same localized strings.
- */
+// Shared by DailyNotificationsReceiver and NotificationsScreen so both decode encoded
+// placeholders ("TASK_REMINDER_COUNT:3", ...) to the same localized strings.
 object NotificationBodyCodec {
 
     @StringRes

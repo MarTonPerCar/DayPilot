@@ -15,8 +15,7 @@ interface StepsRepository {
     fun configureGoal(newGoal: Int)
     fun setSteps(steps: Int)
 
-    /** Points earned today from steps, derived from habits_daily.steps_milestone_level —
-     *  the server (fn_award_steps_milestones trigger) computes the level, this only reads it. */
+    // fn_award_steps_milestones computes the level server-side; this only reads it.
     suspend fun getPointsEarned(): Int
     suspend fun syncSteps(steps: Int, goal: Int)
     suspend fun getWeeklyStats(): StepsWeeklyStats

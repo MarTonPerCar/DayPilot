@@ -103,7 +103,6 @@ fun CalendarScreen(
 
     val detailTask = detailTaskId?.let { id -> tasks.find { it.occurrenceId == id } }
 
-    // ── Task detail bottom sheet ──────────────────────────────────
     detailTask?.let { task ->
         ModalBottomSheet(
             onDismissRequest = { detailTaskId = null },
@@ -118,7 +117,6 @@ fun CalendarScreen(
                     .padding(bottom = 32.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Title + done badge
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -141,7 +139,6 @@ fun CalendarScreen(
                     }
                 }
 
-                // Description
                 if (!task.description.isNullOrBlank()) {
                     Text(
                         text = task.description,
@@ -151,7 +148,6 @@ fun CalendarScreen(
                     HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant)
                 }
 
-                // Chips
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically
@@ -161,7 +157,6 @@ fun CalendarScreen(
                     DurationChip(minutes = task.duration)
                 }
 
-                // Badges: recurring + reminder
                 if (task.isRecurring || task.hasReminder) {
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         if (task.isRecurring) {
@@ -181,7 +176,6 @@ fun CalendarScreen(
                     }
                 }
 
-                // Action buttons
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -218,7 +212,6 @@ fun CalendarScreen(
         }
     }
 
-    // ── Add / Edit bottom sheet ───────────────────────────────────
     if (showAddSheet || editingTaskId != null) {
         ModalBottomSheet(
             onDismissRequest = {
@@ -313,7 +306,6 @@ fun CalendarScreen(
             )
 
             selectedDay?.let {
-                // ── Filters ──────────────────────────────────────
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -464,7 +456,6 @@ fun CalendarScreen(
                     }
                 }
 
-                // ── Day tasks ─────────────────────────────────────
                 DayPilotSectionHeader(
                     title = stringResource(R.string.calendar_day_tasks_title, selectedDay ?: 0),
                     actionText = stringResource(R.string.calendar_add_task_action),

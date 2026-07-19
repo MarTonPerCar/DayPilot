@@ -44,7 +44,6 @@ import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
 
-// ── Datos de cada tema ───────────────────────────────────────────
 data class ThemeOption(
     val id: String,
     val nameRes: Int,
@@ -109,7 +108,6 @@ val dayPilotThemes = listOf(
     )
 )
 
-// ── Selector de tema ─────────────────────────────────────────────
 @Composable
 fun DayPilotThemeSelector(
     selectedThemeId: String,
@@ -137,7 +135,6 @@ fun DayPilotThemeSelector(
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
         ) {
             Column {
-                // Franjas de colores
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -165,7 +162,6 @@ fun DayPilotThemeSelector(
                     }
                 }
 
-                // Mini paleta del tema seleccionado
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -181,7 +177,6 @@ fun DayPilotThemeSelector(
                     }
                 }
 
-                // Nombre del tema activo
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -207,7 +202,6 @@ fun DayPilotThemeSelector(
     }
 }
 
-// ── Selector modo oscuro ─────────────────────────────────────────
 @Composable
 fun DayPilotDarkModeSelector(
     isDarkMode: Boolean,
@@ -275,7 +269,6 @@ fun DayPilotDarkModeSelector(
     }
 }
 
-// ── Selector de opción (idioma, región, etc.) ────────────────────
 @Composable
 fun DayPilotOptionSelector(
     title: String,
@@ -390,7 +383,6 @@ fun DayPilotOptionSelector(
     }
 }
 
-// ── Preview ──────────────────────────────────────────────────────
 @Preview(showBackground = true)
 @Composable
 fun DayPilotSelectorsPreview() {

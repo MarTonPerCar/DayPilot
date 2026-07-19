@@ -61,9 +61,8 @@ class SupabaseTaskRepository : TaskRepository {
         val date = "%04d-%02d-%02d".format(data.year, data.month, data.day)
 
         try {
-            // Read back the id Postgrest actually stored rather than trusting the
-            // client-generated one — they can diverge (server-side default/trigger),
-            // and task_days' FK insert must reference the real stored id or it 23503s.
+            // Read back the id Postgrest actually stored — it can diverge from the
+            // client-generated one, and task_days' FK insert needs the real id or it 23503s.
             val realTaskId = supabase.from("tasks").insert(buildJsonObject {
                 put("id",                taskId)
                 put("user_id",           uid)
@@ -150,8 +149,7 @@ class SupabaseTaskRepository : TaskRepository {
             supabase.from("task_days").update({
                 set("is_completed", isDone)
                 set("completed_at", completedAt)
-                // is_earned only ever goes false -> true; never reset on uncheck, so a
-                // task can't be paid out twice by unchecking and rechecking it.
+                // is_earned only ever goes false -> true, so it can't be paid out twice.
                 if (isDone) set("is_earned", true)
             }) {
                 filter {

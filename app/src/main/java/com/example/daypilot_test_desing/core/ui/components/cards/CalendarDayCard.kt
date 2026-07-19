@@ -78,7 +78,6 @@ fun CalendarDayCard(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        // Número del día
         Text(
             text = day.toString(),
             style = MaterialTheme.typography.labelMedium,
@@ -86,7 +85,6 @@ fun CalendarDayCard(
             color = textColor
         )
 
-        // Puntos de tareas
         Row(
             horizontalArrangement = Arrangement.spacedBy(2.dp),
             verticalAlignment = Alignment.CenterVertically
@@ -114,7 +112,6 @@ fun CalendarDayCardPreview() {
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            // Fila de ejemplo del calendario
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(4.dp)

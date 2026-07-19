@@ -27,7 +27,6 @@ import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.core.ui.components.basic.DayPilotAvatar
 import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
 
-// ── Medalla ──────────────────────────────────────────────────────
 private fun rankMedal(position: Int): String = when (position) {
     1 -> "🥇"
     2 -> "🥈"
@@ -35,7 +34,6 @@ private fun rankMedal(position: Int): String = when (position) {
     else -> "#$position"
 }
 
-// ── Base compartida ──────────────────────────────────────────────
 @Composable
 private fun RankingCardBase(
     name: String,
@@ -84,7 +82,6 @@ private fun RankingCardBase(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // ── Posición / medalla ────────────────────────────────
             Box(
                 modifier = Modifier.width(36.dp),
                 contentAlignment = Alignment.Center
@@ -104,10 +101,8 @@ private fun RankingCardBase(
                 }
             }
 
-            // ── Avatar ────────────────────────────────────────────
             DayPilotAvatar(name = name, avatarUrl = avatarUrl, size = 44)
 
-            // ── Nombre + nivel + racha ────────────────────────────
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = name,
@@ -127,7 +122,6 @@ private fun RankingCardBase(
                 )
             }
 
-            // ── Puntos ────────────────────────────────────────────
             Column(horizontalAlignment = Alignment.End) {
                 Text(
                     text = points.toString(),
@@ -145,7 +139,6 @@ private fun RankingCardBase(
     }
 }
 
-// ── RankingCard ───────────────────────────────────────────────────
 @Composable
 fun RankingCard(
     name: String,
@@ -169,7 +162,6 @@ fun RankingCard(
     )
 }
 
-// ── CurrentUserRankingCard ────────────────────────────────────────
 @Composable
 fun CurrentUserRankingCard(
     name: String,
@@ -192,7 +184,6 @@ fun CurrentUserRankingCard(
     )
 }
 
-// ── Preview ──────────────────────────────────────────────────────
 @Preview(showBackground = true)
 @Composable
 fun RankingCardsPreview() {

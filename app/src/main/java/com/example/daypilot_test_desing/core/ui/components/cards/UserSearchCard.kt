@@ -34,7 +34,6 @@ import com.example.daypilot_test_desing.core.ui.components.basic.DayPilotIconBut
 import com.example.daypilot_test_desing.core.ui.components.basic.DayPilotStatsRow
 import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
 
-// ── Base compartida ──────────────────────────────────────────────
 @Composable
 private fun UserCardBase(
     name: String,
@@ -87,7 +86,6 @@ private fun UserCardBase(
     }
 }
 
-// ── 1. UserSearchCard ─────────────────────────────────────────────
 @Composable
 fun UserSearchCard(
     name: String,
@@ -152,7 +150,6 @@ fun UserSearchCard(
     )
 }
 
-// ── 2. FriendRequestCard ──────────────────────────────────────────
 @Composable
 fun FriendRequestCard(
     name: String,
@@ -215,7 +212,6 @@ fun FriendRequestCard(
     )
 }
 
-// ── Preview ──────────────────────────────────────────────────────
 @Preview(showBackground = true)
 @Composable
 fun UserCardsPreview() {

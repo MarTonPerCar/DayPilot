@@ -8,6 +8,7 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Build
+import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
@@ -37,52 +38,52 @@ fun scheduleStepsWorker(context: Context) {
     )
 }
 
-/**
- * Background safety net for when the app isn't in active use: register the step-counter
- * sensor, capture the single next value it reports, unregister immediately — no continuous
- * listening, no foreground service, no persistent notification, same tech-health philosophy
- * that ruled those out for TechHealthWorker too. Milestone points/notifications are computed
- * server-side by the fn_award_steps_milestones trigger the moment this upload lands.
- */
+// One-shot sensor read, no continuous listening or foreground service — same tech-health
+// philosophy as TechHealthWorker. Milestone points are computed server-side on upload.
 class StepsWorker(
     context: Context,
     params: WorkerParameters
 ) : CoroutineWorker(context, params) {
 
+    companion object {
+        private const val TAG = "StepsWorker"
+    }
+
     override suspend fun doWork(): Result {
         if (supabase.auth.currentUserOrNull()?.id == null) return Result.success()
         if (!hasActivityRecognitionPermission()) return Result.success()
 
-        val sensorManager = applicationContext.getSystemService(Context.SENSOR_SERVICE) as? SensorManager
-        val stepSensor = sensorManager?.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
-        if (sensorManager == null || stepSensor == null) return Result.success()
+        return try {
+            val sensorManager = applicationContext.getSystemService(Context.SENSOR_SERVICE) as? SensorManager
+            val stepSensor = sensorManager?.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
+            if (sensorManager == null || stepSensor == null) return Result.success()
 
-        val totalSinceBoot = readOneShotSteps(sensorManager, stepSensor) ?: return Result.success()
+            val totalSinceBoot = readOneShotSteps(sensorManager, stepSensor) ?: return Result.success()
 
-        // Shares the "daypilot_steps" prefs file with StepsViewModel — same
-        // baseline_date/baseline_steps keys, so a device that's had the app open today
-        // already has a trustworthy baseline; this worker adopts it as-is.
-        val prefs = applicationContext.getSharedPreferences("daypilot_steps", Context.MODE_PRIVATE)
-        val today = today()
-        val savedDate = prefs.getString("baseline_date", "")
-        val baseline = if (savedDate == today) {
-            prefs.getInt("baseline_steps", totalSinceBoot)
-        } else {
-            // New day and the app hasn't been opened yet to establish today's baseline —
-            // start counting from whatever the sensor reports right now.
-            prefs.edit()
-                .putString("baseline_date", today)
-                .putInt("baseline_steps", totalSinceBoot)
-                .apply()
-            totalSinceBoot
+            // Shares "daypilot_steps" prefs with StepsViewModel's baseline_date/baseline_steps keys.
+            val prefs = applicationContext.getSharedPreferences("daypilot_steps", Context.MODE_PRIVATE)
+            val today = today()
+            val savedDate = prefs.getString("baseline_date", "")
+            val baseline = if (savedDate == today) {
+                prefs.getInt("baseline_steps", totalSinceBoot)
+            } else {
+                prefs.edit()
+                    .putString("baseline_date", today)
+                    .putInt("baseline_steps", totalSinceBoot)
+                    .apply()
+                totalSinceBoot
+            }
+            val dailySteps = maxOf(0, totalSinceBoot - baseline)
+
+            val repo = SupabaseStepsRepository(prefs)
+            repo.setSteps(dailySteps)
+            repo.syncSteps(dailySteps, repo.getGoalSteps())
+
+            Result.success()
+        } catch (e: Exception) {
+            Log.e(TAG, "Background steps sync failed", e)
+            Result.failure()
         }
-        val dailySteps = maxOf(0, totalSinceBoot - baseline)
-
-        val repo = SupabaseStepsRepository(prefs)
-        repo.setSteps(dailySteps)
-        repo.syncSteps(dailySteps, repo.getGoalSteps())
-
-        return Result.success()
     }
 
     private fun hasActivityRecognitionPermission(): Boolean {

@@ -1,5 +1,6 @@
 package com.example.daypilot_test_desing.data.supabase
 
+import android.util.Log
 import com.example.daypilot_test_desing.core.cache.SessionCache
 import com.example.daypilot_test_desing.core.data.model.RankingData
 import com.example.daypilot_test_desing.core.data.model.calculateLevel
@@ -21,6 +22,10 @@ import java.util.Locale
 
 class SupabaseProgressRepository : ProgressRepository {
 
+    companion object {
+        private const val TAG = "SupabaseProgressRepo"
+    }
+
     private fun today() = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
     private fun userId() = supabase.auth.currentUserOrNull()?.id
 
@@ -40,7 +45,8 @@ class SupabaseProgressRepository : ProgressRepository {
                 ?: DailyProgressDto(userId = uid, date = today())
             SessionCache.todayProgress.value = result
             result
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to load today's progress for $uid", e)
             DailyProgressDto(userId = "", date = today())
         }
     }
@@ -60,7 +66,8 @@ class SupabaseProgressRepository : ProgressRepository {
             SessionCache.weeklyHistory.value    = result
             SessionCache.weeklyHistoryFetchedAt = now
             result
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to load history for $uid", e)
             emptyList()
         }
     }
@@ -105,12 +112,18 @@ class SupabaseProgressRepository : ProgressRepository {
                 supabase.from("friends").select {
                     filter { eq("requester_id", uid) }
                 }.decodeList<FriendRowDto>().map { it.receiverId }
-            } catch (_: Exception) { emptyList() }
+            } catch (e: Exception) {
+                Log.w(TAG, "getRankingPosition: failed fetching requester-side rows for $uid", e)
+                emptyList()
+            }
             val asReceiver = try {
                 supabase.from("friends").select {
                     filter { eq("receiver_id", uid) }
                 }.decodeList<FriendRowDto>().map { it.requesterId }
-            } catch (_: Exception) { emptyList() }
+            } catch (e: Exception) {
+                Log.w(TAG, "getRankingPosition: failed fetching receiver-side rows for $uid", e)
+                emptyList()
+            }
             val friendIds = (asRequester + asReceiver).distinct()
             val allIds    = (friendIds + uid).distinct()
             val ranking = supabase.from("friends_ranking").select {
@@ -130,7 +143,10 @@ class SupabaseProgressRepository : ProgressRepository {
             SessionCache.rankingFetchedAt    = System.currentTimeMillis()
             val idx = ranking.indexOfFirst { it.id == uid }
             if (idx >= 0) idx + 1 else ranking.size + 1
-        } catch (_: Exception) { 0 }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to compute ranking position for $uid", e)
+            0
+        }
     }
 
     override suspend fun completeTimerSession(): Boolean {
@@ -141,7 +157,10 @@ class SupabaseProgressRepository : ProgressRepository {
                 limit(1)
             }.decodeList<HabitsDailyReadTimerDto>()
                 .firstOrNull()?.timerPointEarned ?: false
-        } catch (_: Exception) { false }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to check timer-point eligibility for $uid, treating as not yet earned", e)
+            false
+        }
         if (alreadyEarned) return false
 
         logPoints(10, "TIMER")

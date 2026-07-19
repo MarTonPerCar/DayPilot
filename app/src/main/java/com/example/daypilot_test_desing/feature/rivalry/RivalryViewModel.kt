@@ -44,11 +44,9 @@ class RivalryViewModel(private val repo: RankingRepository) : ViewModel() {
      *  startup join in DayPilotNavGraph, which needs real success/failure, not just "finished". */
     suspend fun awaitLoad(): Boolean = load()
 
-    // friends_ranking is a VIEW — it never emits its own Realtime events, so
-    // watch the base `friends` table instead (who's in the ranking group),
-    // plus the shared friend-stats broadcast channel for point changes on a
-    // friend's own row (same channel instance FriendsViewModel listens to —
-    // never create a second channel with the same name).
+    // friends_ranking is a VIEW and never emits its own Realtime events, so this
+    // watches the base `friends` table plus the shared friend-stats broadcast channel
+    // (same instance FriendsViewModel listens to — don't create a second one).
     private fun subscribeToRealtimeOnce() {
         if (realtimeChannel != null) return
         val uid = supabase.auth.currentUserOrNull()?.id ?: return
@@ -94,7 +92,7 @@ class RivalryViewModel(private val repo: RankingRepository) : ViewModel() {
 
     private suspend fun load(): Boolean {
         return try {
-            val ranking  = repo.getRanking()  // cache-first with 5min TTL
+            val ranking  = repo.getRanking()
             val uid      = repo.getCurrentUserId()
             val me       = ranking.firstOrNull { it.id == uid }
                            ?: repo.getCurrentUserData()

@@ -8,24 +8,16 @@ import com.example.daypilot_test_desing.data.supabase.dto.DailyLogDto
 import com.example.daypilot_test_desing.data.supabase.dto.DailyProgressDto
 import kotlinx.coroutines.flow.MutableStateFlow
 
-/**
- * Process-singleton in-memory cache shared across all ViewModels for the current session.
- * Repos read from here first; on miss they fetch from Supabase and populate the slot.
- * VMs update the relevant slots after optimistic writes so other screens see consistent data.
- * Call clear() on logout so the next user starts with a blank slate.
- */
+// Repos must invalidate their slot after any write, or other screens see stale data.
 object SessionCache {
 
-    // ── Owned data (write-through, no TTL) ─────────────────────────────
     val todayProgress = MutableStateFlow<DailyProgressDto?>(null)
     val tasks         = MutableStateFlow<List<CalendarTaskData>?>(null)
     val userProfile   = MutableStateFlow<UserProfile?>(null)
 
-    // ── History (1-hour TTL) ────────────────────────────────────────────
     val weeklyHistory           = MutableStateFlow<List<DailyLogDto>?>(null)
     @Volatile var weeklyHistoryFetchedAt = 0L
 
-    // ── Social data (5-minute TTL) ──────────────────────────────────────
     val friends                 = MutableStateFlow<List<FriendData>?>(null)
     @Volatile var friendsFetchedAt       = 0L
 

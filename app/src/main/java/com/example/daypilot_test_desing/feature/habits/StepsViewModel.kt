@@ -50,10 +50,8 @@ class StepsViewModel(
         override fun onSensorChanged(event: SensorEvent) {
             val totalSinceBoot = event.values[0].toInt()
 
-            // Reject physiologically impossible spikes: if more than 10 steps/sec
-            // arrived since the last event and the gap is under 30 s, it's sensor
-            // noise (emulator artifact or aggressive software step detection).
-            // Gaps > 30 s are ignored — the app may have been backgrounded.
+            // >10 steps/sec within a 30s gap is sensor noise (emulator artifact or
+            // over-eager step detection), not real steps; larger gaps mean backgrounded.
             if (prevTotalSinceBoot >= 0 && prevEventNs > 0) {
                 val stepDelta  = totalSinceBoot - prevTotalSinceBoot
                 val timeDeltaS = (event.timestamp - prevEventNs) / 1_000_000_000.0
@@ -77,8 +75,7 @@ class StepsViewModel(
                         .putString("baseline_date", today)
                         .putInt("baseline_steps", totalSinceBoot)
                         .apply()
-                    // Milestone level/points for the new day are recomputed server-side
-                    // the moment this device's next sync writes today's row.
+                    // Milestone level/points recompute server-side on this device's next sync.
                     totalSinceBoot
                 }
             }
@@ -113,18 +110,15 @@ class StepsViewModel(
             }
         }
 
-        // Sync trigger #1: app comes to the foreground (covers both cold start and
-        // resuming from background — no need to distinguish between them).
+        // Sync trigger #1: app comes to the foreground (cold start or resume, same handling).
         ProcessLifecycleOwner.get().lifecycle.addObserver(object : DefaultLifecycleObserver {
             override fun onStop(owner: LifecycleOwner) {
                 triggerSync(stepsRepo.getCurrentSteps())
             }
             override fun onStart(owner: LifecycleOwner) {
                 registerSensorIfPermitted()
-                // If the sensor hasn't reported this session yet, currentSteps is still the
-                // 0 default — pushing that would clobber today's real server-side count.
-                // Just re-read points in that case; the sensor's first reading will trigger
-                // its own sync moments later (see the "lastSyncedSteps < 0" check above).
+                // baseline < 0 means the sensor hasn't reported yet this session, so currentSteps
+                // is still 0 — syncing that would clobber today's real server-side count.
                 if (baseline >= 0) triggerSync() else viewModelScope.launch { refreshPoints() }
             }
         })
@@ -163,8 +157,7 @@ class StepsViewModel(
         Log.d(TAG, "Triggering steps sync: $steps/$goal")
         viewModelScope.launch {
             stepsRepo.syncSteps(steps, goal)
-            // Re-fetch afterwards so the displayed points reflect the server's freshly
-            // recomputed steps_milestone_level, not a locally-tracked value.
+            // Re-fetch so displayed points reflect the server's recomputed milestone level.
             refreshPoints()
         }
     }

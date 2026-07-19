@@ -17,12 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
-/**
- * These two alarms only wake the app and ask Supabase what (if anything) it already
- * decided for today — fn_check_task_reminders / fn_check_streak_danger (cron jobs) own
- * the actual decision now. No row for today means nothing to show; nothing is written
- * back to the notifications table here, the cron job already inserted it.
- */
+// fn_check_task_reminders / fn_check_streak_danger (cron) own the decision now — this only displays.
 class DailyNotificationsReceiver : BroadcastReceiver() {
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -31,8 +26,7 @@ class DailyNotificationsReceiver : BroadcastReceiver() {
         val prefs = AppPreferences(context)
         val type  = intent.getStringExtra(EXTRA_ALARM_TYPE) ?: return
 
-        // The Supabase fetch below is async I/O — goAsync() keeps the receiver (and process)
-        // alive long enough for it to complete instead of being torn down right after return.
+        // goAsync() keeps the process alive for the async Supabase fetch below.
         val pending = goAsync()
         scope.launch {
             try {

@@ -66,7 +66,6 @@ fun EditProfileScreen(
         }
     }
 
-    // Crop result → upload
     val cropLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         val croppedUri = UCrop.getOutput(result.data ?: return@rememberLauncherForActivityResult)
         croppedUri?.let { onPhotoSelected(it) }
@@ -82,7 +81,6 @@ fun EditProfileScreen(
             .also { cropLauncher.launch(it) }
     }
 
-    // Camera temp file
     var cameraUri by remember { mutableStateOf<Uri?>(null) }
 
     val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
@@ -137,7 +135,6 @@ fun EditProfileScreen(
         ) {
             Spacer(Modifier.height(8.dp))
 
-            // ── Avatar ───────────────────────────────────────────
             Box(contentAlignment = Alignment.BottomEnd) {
                 Box(contentAlignment = Alignment.Center) {
                     DayPilotAvatar(
@@ -185,7 +182,6 @@ fun EditProfileScreen(
                 )
             }
 
-            // ── Información personal ─────────────────────────────
             DayPilotSectionHeader(
                 title = stringResource(R.string.edit_profile_personal_info)
             )
@@ -210,7 +206,6 @@ fun EditProfileScreen(
                 displayText = { it.value }
             )
 
-            // ── Seguridad ────────────────────────────────────────
             DayPilotSectionHeader(
                 title = stringResource(R.string.edit_profile_security)
             )

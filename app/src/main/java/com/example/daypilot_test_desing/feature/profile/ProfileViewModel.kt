@@ -37,10 +37,10 @@ class ProfileViewModel(
 
     private suspend fun load(): Boolean {
         return try {
-            val user    = userRepo.getCurrentUser()    // cache-first
+            val user    = userRepo.getCurrentUser()
             val summary = userRepo.getWeeklySummary()
-            val today   = progressRepo.getTodayProgress()  // cache-first
-            val ranking = progressRepo.getRankingPosition()  // uses cached ranking if available
+            val today   = progressRepo.getTodayProgress()
+            val ranking = progressRepo.getRankingPosition()
             _uiState.value = ProfileUiState(
                 name                 = user.name,
                 username             = user.username,
@@ -73,10 +73,11 @@ class ProfileViewModel(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isSavingProfile = true, profileSaveError = false)
             try {
-                userRepo.updateProfile(name, username, region)  // updates SessionCache.userProfile
-                load()  // re-reads from cache (instant), refreshes UiState
+                userRepo.updateProfile(name, username, region)
+                load()
                 _uiState.value = _uiState.value.copy(isSavingProfile = false, profileSaveSuccess = true)
-            } catch (_: Exception) {
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to update profile (name=$name, username=$username)", e)
                 _uiState.value = _uiState.value.copy(isSavingProfile = false, profileSaveError = true)
             }
         }
@@ -99,11 +100,14 @@ class ProfileViewModel(
                 Pair(b, m)
             }
             if (bytes == null) false
-            else userRepo.uploadAvatar(bytes, mimeType) != null  // updates SessionCache.userProfile.avatarUrl
-        } catch (_: Exception) { false }
+            else userRepo.uploadAvatar(bytes, mimeType) != null
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to upload avatar", e)
+            false
+        }
 
         if (success) {
-            load()  // re-reads from cache, picks up new avatarUrl
+            load()
             _uiState.value = _uiState.value.copy(isUploadingAvatar = false)
         } else {
             _uiState.value = _uiState.value.copy(isUploadingAvatar = false, avatarUploadError = true)

@@ -43,7 +43,6 @@ fun SearchFriendsScreen(
         }
     }
 
-    // Confirmation dialog after sending a request.
     // onConfirmationDismissed handles both state reset and navigation — don't also call onBack().
     if (requestJustSent) {
         AlertDialog(

@@ -46,7 +46,6 @@ fun HomeScreen(
             Column(
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                // ── Resumen diario ───────────────────────────────
                 DailySummaryCard(
                     userName        = userName,
                     streak          = streak,
@@ -61,7 +60,6 @@ fun HomeScreen(
                         .height(summaryHeight)
                 )
 
-                // ── Grid 2x2 ─────────────────────────────────────
                 Column(
                     modifier            = Modifier
                         .fillMaxWidth()

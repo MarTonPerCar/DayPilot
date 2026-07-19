@@ -31,9 +31,7 @@ class SupabaseFriendRepository : FriendRepository {
 
     private fun ReactionType.toDbString() = name.lowercase()
 
-    // Left to propagate (not swallowed) — this directly determines who shows up in the
-    // friends list, so a transient failure here must not silently look like "no friends"
-    // (see getFriends()'s caller, which already leaves the previous state untouched on error).
+    // Left to propagate, not swallowed — a failure here must not silently look like "no friends".
     private suspend fun getUsersForIds(ids: List<String>): List<UserDto> {
         if (ids.isEmpty()) return emptyList()
         return try {
@@ -53,12 +51,13 @@ class SupabaseFriendRepository : FriendRepository {
                 filter { isIn("user_id", ids) }
             }.decodeList<UserStreakDto>()
                 .associate { it.userId to it.currentStreak }
-        } catch (_: Exception) { emptyMap() }
+        } catch (e: Exception) {
+            Log.w(TAG, "getStreaksForIds: failed fetching ${ids.size} streak(s), showing without them", e)
+            emptyMap()
+        }
     }
 
-    // Two separate queries to avoid OR-filter PostgREST issues. Left to propagate (not
-    // swallowed) — same reasoning as getUsersForIds: this decides who's a friend at all,
-    // so a transient failure here must not silently look like "no friends".
+    // Two separate queries to avoid OR-filter PostgREST issues; left to propagate like getUsersForIds.
     private suspend fun getFriendIds(uid: String): List<String> {
         val asRequester = try {
             supabase.from("friends").select {
@@ -86,11 +85,8 @@ class SupabaseFriendRepository : FriendRepository {
         return getFriendIds(uid)
     }
 
-    // No outer catch-to-empty here anymore — a genuine failure now propagates to the
-    // caller (FriendsViewModel.load()) instead of masquerading as "this user has zero
-    // friends", which used to silently blank out an already-correct, already-displayed
-    // list. getStreaksForIds/weekly-summary/reactions below stay best-effort on purpose:
-    // losing those only degrades a friend card's extra details, not the list itself.
+    // Failures propagate instead of masquerading as "zero friends" — but the best-effort
+    // fetches below (streaks/weekly-summary/reactions) only degrade a card's details, not the list.
     override suspend fun getFriends(): List<FriendData> {
         val now = System.currentTimeMillis()
         SessionCache.friends.value?.let { cached ->
@@ -183,7 +179,10 @@ class SupabaseFriendRepository : FriendRepository {
                     avatarUrl = user.photoUrl
                 )
             }
-        } catch (_: Exception) { emptyList() }
+        } catch (e: Exception) {
+            Log.e(TAG, "getFriendRequests: failed for $uid", e)
+            emptyList()
+        }
     }
 
     override suspend fun acceptRequest(userId: String) {
@@ -226,8 +225,8 @@ class SupabaseFriendRepository : FriendRepository {
                 type            = reaction.toDbString()
             )
         ) { onConflict = "from_user_id,weekly_summary_id" }
-        // REACTION notification (to the friend) is now inserted by a Supabase DB trigger.
-        // The "reaction sent" self-confirmation is a local-only toast now — see FriendsViewModel.
+        // REACTION notification is inserted by a DB trigger; the "sent" confirmation
+        // is a local-only toast (see FriendsViewModel).
     }
 
     override suspend fun searchUsers(query: String): List<SearchUserData> {
@@ -255,7 +254,10 @@ class SupabaseFriendRepository : FriendRepository {
                         avatarUrl = user.photoUrl
                     )
                 }
-        } catch (_: Exception) { emptyList() }
+        } catch (e: Exception) {
+            Log.e(TAG, "searchUsers: failed for query '$query'", e)
+            emptyList()
+        }
     }
 
     override suspend fun addFriend(userId: String) {
@@ -283,6 +285,9 @@ class SupabaseFriendRepository : FriendRepository {
                 filter { eq("from_user_id", uid) }
             }.decodeList<SentRequestDto>()
                 .map { it.toUserId }
-        } catch (_: Exception) { emptyList() }
+        } catch (e: Exception) {
+            Log.e(TAG, "getPendingSentRequestUserIds: failed for $uid", e)
+            emptyList()
+        }
     }
 }

@@ -1,6 +1,7 @@
 package com.example.daypilot_test_desing.core.reminders
 
 import android.content.Context
+import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
@@ -29,39 +30,48 @@ class TechHealthWorker(
     params: WorkerParameters
 ) : CoroutineWorker(context, params) {
 
+    companion object {
+        private const val TAG = "TechHealthWorker"
+    }
+
     override suspend fun doWork(): Result {
         if (supabase.auth.currentUserOrNull()?.id == null) return Result.success()
 
-        val repository = SharedPrefsTechHealthRepository(applicationContext)
-        repository.applyPendingChangesIfNewDay()
+        return try {
+            val repository = SharedPrefsTechHealthRepository(applicationContext)
+            repository.applyPendingChangesIfNewDay()
 
-        if (!AppUsageTracker.hasPermission(applicationContext)) return Result.success()
+            if (!AppUsageTracker.hasPermission(applicationContext)) return Result.success()
 
-        val usageMap = AppUsageTracker.getTodayUsage(applicationContext)
+            val usageMap = AppUsageTracker.getTodayUsage(applicationContext)
 
-        repository.getAppRestrictions().filter { it.isEnabled }.forEach { r ->
-            val used = usageMap[r.packageName] ?: 0
-            if (used != r.usedMinutesToday) repository.updateUsage(r.id, used)
-            if (used >= r.dailyLimitMinutes && r.dailyLimitMinutes > 0 && !r.isViolatedToday) {
-                repository.markViolated(r.id)
-                markAppViolatedInSupabase(r.packageName)
+            repository.getAppRestrictions().filter { it.isEnabled }.forEach { r ->
+                val used = usageMap[r.packageName] ?: 0
+                if (used != r.usedMinutesToday) repository.updateUsage(r.id, used)
+                if (used >= r.dailyLimitMinutes && r.dailyLimitMinutes > 0 && !r.isViolatedToday) {
+                    repository.markViolated(r.id)
+                    markAppViolatedInSupabase(r.packageName)
+                }
             }
+
+            repository.getGroupRestrictions().filter { it.isEnabled }.forEach { g ->
+                g.apps.forEach { app ->
+                    val appUsed = usageMap[app.packageName] ?: 0
+                    if (appUsed != app.usedMinutesToday) repository.updateGroupAppUsage(g.id, app.packageName, appUsed)
+                }
+                val used = g.apps.sumOf { usageMap[it.packageName] ?: 0 }
+                if (used != g.usedMinutesToday) repository.updateGroupUsage(g.id, used)
+                if (used >= g.dailyLimitMinutes && g.dailyLimitMinutes > 0 && !g.isViolatedToday) {
+                    repository.markGroupViolated(g.id)
+                    markGroupViolatedInSupabase(g.groupName)
+                }
+            }
+
+            Result.success()
+        } catch (e: Exception) {
+            Log.e(TAG, "Periodic usage check failed", e)
+            Result.failure()
         }
-
-        repository.getGroupRestrictions().filter { it.isEnabled }.forEach { g ->
-            g.apps.forEach { app ->
-                val appUsed = usageMap[app.packageName] ?: 0
-                if (appUsed != app.usedMinutesToday) repository.updateGroupAppUsage(g.id, app.packageName, appUsed)
-            }
-            val used = g.apps.sumOf { usageMap[it.packageName] ?: 0 }
-            if (used != g.usedMinutesToday) repository.updateGroupUsage(g.id, used)
-            if (used >= g.dailyLimitMinutes && g.dailyLimitMinutes > 0 && !g.isViolatedToday) {
-                repository.markGroupViolated(g.id)
-                markGroupViolatedInSupabase(g.groupName)
-            }
-        }
-
-        return Result.success()
     }
 
     private suspend fun markAppViolatedInSupabase(packageName: String) {
@@ -70,7 +80,9 @@ class TechHealthWorker(
             supabase.from("tech_health_config").update({ set("is_violated_today", true) }) {
                 filter { eq("user_id", uid); eq("app_package", packageName) }
             }
-        } catch (_: Exception) { }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to mark app $packageName as violated", e)
+        }
     }
 
     private suspend fun markGroupViolatedInSupabase(groupName: String) {
@@ -79,6 +91,8 @@ class TechHealthWorker(
             supabase.from("tech_health_group_config").update({ set("is_violated_today", true) }) {
                 filter { eq("user_id", uid); eq("group_name", groupName) }
             }
-        } catch (_: Exception) { }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to mark group $groupName as violated", e)
+        }
     }
 }

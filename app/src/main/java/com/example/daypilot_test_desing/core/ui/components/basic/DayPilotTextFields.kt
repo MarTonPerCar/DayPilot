@@ -47,7 +47,6 @@ import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
 
-// ── Colores compartidos ──────────────────────────────────────────
 @Composable
 fun dayPilotTextFieldColors() = OutlinedTextFieldDefaults.colors(
     focusedBorderColor      = MaterialTheme.colorScheme.primary,
@@ -61,7 +60,6 @@ fun dayPilotTextFieldColors() = OutlinedTextFieldDefaults.colors(
     cursorColor             = MaterialTheme.colorScheme.primary
 )
 
-// ── 1. TextField genérico ────────────────────────────────────────
 @Composable
 fun DayPilotTextField(
     value              : String,
@@ -136,9 +134,6 @@ fun DayPilotTextField(
     }
 }
 
-// ── 2. TextField contraseña ──────────────────────────────────────
-// El parámetro label no tiene valor por defecto — el caller debe
-// pasar stringResource(R.string.password) explícitamente.
 @Composable
 fun DayPilotPasswordField(
     value        : String,
@@ -198,7 +193,6 @@ fun DayPilotPasswordField(
     }
 }
 
-// ── 3. TextField readonly con dropdown ───────────────────────────
 @Composable
 fun <T> DayPilotDropdownField(
     value      : T,
@@ -302,7 +296,6 @@ fun <T> DayPilotDropdownField(
     }
 }
 
-// ── Preview ──────────────────────────────────────────────────────
 @Preview(showBackground = true)
 @Composable
 fun DayPilotTextFieldsPreview() {

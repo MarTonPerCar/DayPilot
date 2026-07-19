@@ -14,18 +14,8 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonObject
 
-/**
- * Single owner of the private "friend-stats:<uid>" realtime broadcast channel,
- * fed by a DB trigger (broadcast_stat_change_to_friends()) whenever a friend's
- * streak/weekly summary/points change — data that can't be filtered by "my own
- * user_id" since it belongs to someone else.
- *
- * Multiple ViewModels (Friends, Rivalry) join the SAME channel instance via
- * addListener/removeListener instead of each creating their own channel with
- * the same name — Supabase Realtime only delivers events to one subscriber
- * per topic name, so two separately-created channels named "friend-stats:$uid"
- * would silently starve each other.
- */
+// One shared channel via addListener/removeListener, not one per ViewModel — Realtime
+// delivers to only one subscriber per topic name, so duplicates would silently starve each other.
 object FriendStatsBroadcast {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private var channel: RealtimeChannel? = null

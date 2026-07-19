@@ -45,12 +45,8 @@ fun ProfileStatsCard(
     modifier: Modifier = Modifier,
     avatarUrl: String? = null
 ) {
-    // totalPoints/pointsToNextLevel are both cumulative-since-account-creation
-    // thresholds (see UserModels.kt's pointsToNextLevel(level)), so dividing them
-    // directly makes the bar look almost full right after a level-up — it still
-    // carries every point banked from previous levels. Normalize to progress
-    // within the *current* level's bracket instead: subtract the cumulative
-    // threshold that was needed to reach this level from both sides.
+    // Both values are cumulative-since-creation, not per-level — dividing them directly
+    // would make the bar look nearly full right after a level-up, so normalize first.
     val previousLevelThreshold = cumulativeThresholdFor(level - 1)
     val pointsIntoLevel = (totalPoints - previousLevelThreshold).coerceAtLeast(0)
     val pointsNeededForLevel = (pointsToNextLevel - previousLevelThreshold).coerceAtLeast(1)

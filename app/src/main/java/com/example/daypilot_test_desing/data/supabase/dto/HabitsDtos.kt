@@ -11,9 +11,8 @@ data class InsertPointsLogDto(
     @SerialName("day_key") val dayKey: String
 )
 
-// Upserts must target the UNIQUE(user_id, date) constraint (onConflict at the
-// call site) or repeated calls the same day insert duplicate rows instead of
-// updating one.
+// Upserts must target the UNIQUE(user_id, date) constraint or repeated same-day
+// calls insert duplicate rows instead of updating one.
 @Serializable
 data class HabitsDailyUpsertDto(
     @SerialName("user_id") val userId: String,
@@ -27,8 +26,7 @@ data class HabitsDailyReadTimerDto(
     @SerialName("timer_point_earned") val timerPointEarned: Boolean = false
 )
 
-// fn_award_steps_milestones (DB trigger) computes this 0-3 level server-side whenever
-// steps/steps_goal change — Android only ever reads it back, never computes it locally.
+// Computed server-side by the fn_award_steps_milestones trigger — Android only reads it.
 @Serializable
 data class HabitsDailyMilestoneDto(
     @SerialName("steps_milestone_level") val stepsMilestoneLevel: Int = 0
@@ -41,10 +39,7 @@ data class HabitsDailyTimerDto(
     @SerialName("timer_point_earned") val timerPointEarned: Boolean
 )
 
-// Mirrors users.pending_steps_goal / users.pending_steps_goal_date — the same
-// columns the pg_cron rollover job reads to promote a queued goal change. Lets
-// any device see a goal change queued from another device instead of only the
-// device that set it (SharedPreferences alone can't do that).
+// Mirrors users.pending_steps_goal(_date) so any device sees a goal change queued elsewhere.
 @Serializable
 data class UserPendingGoalDto(
     @SerialName("pending_steps_goal") val pendingStepsGoal: Int? = null,

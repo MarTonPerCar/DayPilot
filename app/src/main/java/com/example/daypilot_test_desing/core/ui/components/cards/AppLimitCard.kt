@@ -182,8 +182,7 @@ fun AppLimitCard(
                 )
             }
 
-            // Pending on/off and/or limit change — still fully editable/toggleable/
-            // deletable, unlike pendingDelete below which locks the card.
+            // Unlike pendingDelete below, a pending toggle/limit change doesn't lock the card.
             if (!restriction.pendingDelete) {
                 if (restriction.pendingActive != null) {
                     Text(

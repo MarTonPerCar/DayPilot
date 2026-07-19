@@ -59,7 +59,6 @@ fun NotificationsScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            // ── Subtítulo ────────────────────────────────────────
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -83,7 +82,6 @@ fun NotificationsScreen(
                 }
             }
 
-            // ── Filtros ──────────────────────────────────────────
             LazyRow(
                 contentPadding        = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -114,7 +112,6 @@ fun NotificationsScreen(
                 }
             }
 
-            // ── Lista ────────────────────────────────────────────
             if (filtered.isEmpty()) {
                 DayPilotEmptyState(
                     message = stringResource(R.string.notifications_empty),
@@ -142,9 +139,7 @@ fun NotificationsScreen(
     }
 }
 
-// TASK_REMINDER / STREAK_RISK rows arrive from Supabase with encoded placeholder
-// title/body ("TASK_REMINDER_TITLE", "TASK_REMINDER_COUNT:3", ...) — decode them into
-// real text here; every other notification type already carries its final text.
+// Only TASK_REMINDER/STREAK_RISK carry encoded placeholders — every other type is already final text.
 @Composable
 private fun decodedTitle(notification: NotificationData): String =
     NotificationBodyCodec.titleForPlaceholder(notification.title)

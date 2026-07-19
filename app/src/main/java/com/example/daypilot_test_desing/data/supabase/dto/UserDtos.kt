@@ -3,13 +3,7 @@ package com.example.daypilot_test_desing.data.supabase.dto
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-/**
- * Payload for INSERT into the public `users` table after sign-up.
- *
- * Confirmed columns: id, email, name, username, username_lower, region
- * created_at is set by the DB default — do not include it.
- * member_since does NOT exist — use created_at instead.
- */
+// created_at is DB-default (don't include it); there is no member_since column.
 @Serializable
 data class NewUserDto(
     val id: String,

@@ -35,7 +35,6 @@ import com.example.daypilot_test_desing.core.data.model.HomeSectionData
 import com.example.daypilot_test_desing.core.data.model.ProgressFilter
 import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
 
-// ── Indicador visual por sección ─────────────────────────────────
 @Composable
 fun HomeSectionIndicator(data: HomeSectionData, accentColor: Color) {
     when (data) {
@@ -99,7 +98,6 @@ fun HomeSectionIndicator(data: HomeSectionData, accentColor: Color) {
 
         is HomeSectionData.Habits -> {
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                // Pasos
                 Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
                     Text(
                         text = stringResource(
@@ -120,7 +118,6 @@ fun HomeSectionIndicator(data: HomeSectionData, accentColor: Color) {
                     )
                 }
 
-                // Estado del cronómetro
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
@@ -201,7 +198,6 @@ fun HomeSectionIndicator(data: HomeSectionData, accentColor: Color) {
     }
 }
 
-// ── Preview ──────────────────────────────────────────────────────
 @Preview(showBackground = true)
 @Composable
 fun HomeSectionIndicatorPreview() {

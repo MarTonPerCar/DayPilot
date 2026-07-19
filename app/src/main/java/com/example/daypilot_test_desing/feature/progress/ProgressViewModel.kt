@@ -50,9 +50,9 @@ class ProgressViewModel(
 
     private suspend fun load(): Boolean {
         return try {
-            val todayProgress = repo.getTodayProgress()   // cache-first
-            val history       = repo.getHistory(30)        // cache-first with 1h TTL
-            val ranking       = repo.getRankingPosition()  // uses cached ranking if available
+            val todayProgress = repo.getTodayProgress()
+            val history       = repo.getHistory(30)
+            val ranking       = repo.getRankingPosition()
             val progressData  = buildProgressWindow(history, todayProgress)
             _uiState.value = ProgressUiState(
                 progressData        = progressData,
@@ -72,9 +72,8 @@ class ProgressViewModel(
         }
     }
 
-    // daily_progress has no TTL in SessionCache (write-through only), so without this,
-    // a change made from another device/session would never be picked up here until the
-    // date rolls over or a local action happens to overwrite the cache.
+    // daily_progress is write-through with no TTL, so without realtime a change from
+    // another device wouldn't surface here until the date rolls over.
     private fun subscribeToRealtimeOnce() {
         if (realtimeChannel != null) return
         val uid = supabase.auth.currentUserOrNull()?.id ?: return
@@ -92,8 +91,7 @@ class ProgressViewModel(
                 load()
             }.launchIn(viewModelScope)
 
-            // user_daily_log has a 1h TTL in SessionCache — force a real refetch
-            // instead of serving the stale 30-day history/streak chart.
+            // Force a real refetch instead of serving the 1h-TTL'd stale history chart.
             channel.postgresChangeFlow<PostgresAction>(schema = "public") {
                 table = "user_daily_log"
                 filter("user_id", FilterOperator.EQ, userId)
@@ -103,9 +101,8 @@ class ProgressViewModel(
                 load()
             }.launchIn(viewModelScope)
 
-            // supabase-kt gives up and settles at UNSUBSCRIBED for good after enough
-            // failed rejoin attempts (e.g. a stale JWT) — rebuild instead of leaving
-            // progress sync dead for the rest of the session.
+            // supabase-kt settles at UNSUBSCRIBED for good after enough failed rejoin
+            // attempts (e.g. a stale JWT) — rebuild instead of leaving progress sync dead.
             channel.status.onEach { status ->
                 if (status == RealtimeChannel.Status.UNSUBSCRIBED && realtimeChannel === channel) {
                     delay(5_000)
@@ -131,9 +128,11 @@ class ProgressViewModel(
             try {
                 val awarded = repo.completeTimerSession()  // server-side gated via habits_daily
                 if (!awarded) return@launch
-                load()  // re-fetches fresh todayProgress, updates UiState
+                load()
                 // TIMER_DONE notification is now inserted by a Supabase DB trigger.
-            } catch (_: Exception) { }
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to record timer completion", e)
+            }
         }
     }
 

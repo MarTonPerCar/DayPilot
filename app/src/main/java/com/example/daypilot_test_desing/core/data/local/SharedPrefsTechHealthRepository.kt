@@ -2,6 +2,7 @@ package com.example.daypilot_test_desing.core.data.local
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import com.example.daypilot_test_desing.core.data.model.AppRestriction
 import com.example.daypilot_test_desing.core.data.model.GroupRestriction
 import com.example.daypilot_test_desing.core.data.repository.TechHealthRepository
@@ -13,6 +14,10 @@ import java.util.Locale
 
 class SharedPrefsTechHealthRepository(context: Context) : TechHealthRepository {
 
+    companion object {
+        private const val TAG = "SharedPrefsTechHealthRepo"
+    }
+
     private val prefs: SharedPreferences =
         context.getSharedPreferences("daypilot_tech_health", Context.MODE_PRIVATE)
 
@@ -22,7 +27,10 @@ class SharedPrefsTechHealthRepository(context: Context) : TechHealthRepository {
         val raw = prefs.getString("apps", null) ?: return mutableListOf()
         return try {
             json.decodeFromString(ListSerializer(AppRestriction.serializer()), raw).toMutableList()
-        } catch (_: Exception) { mutableListOf() }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to decode stored app restrictions, discarding local cache", e)
+            mutableListOf()
+        }
     }
 
     private fun saveApps(list: List<AppRestriction>) {
@@ -35,7 +43,10 @@ class SharedPrefsTechHealthRepository(context: Context) : TechHealthRepository {
         val raw = prefs.getString("groups", null) ?: return mutableListOf()
         return try {
             json.decodeFromString(ListSerializer(GroupRestriction.serializer()), raw).toMutableList()
-        } catch (_: Exception) { mutableListOf() }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to decode stored group restrictions, discarding local cache", e)
+            mutableListOf()
+        }
     }
 
     private fun saveGroups(list: List<GroupRestriction>) {

@@ -39,7 +39,6 @@ import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
 import kotlinx.coroutines.delay
 
-// ── Press scale compartido ───────────────────────────────────────
 @Composable
 private fun pressScale(pressed: Boolean): Float {
     val scale by animateFloatAsState(
@@ -50,7 +49,6 @@ private fun pressScale(pressed: Boolean): Float {
     return scale
 }
 
-// ── Shake compartido ─────────────────────────────────────────────
 @Composable
 private fun rememberShakeOffset(trigger: Boolean): Float {
     val offset = remember { Animatable(0f) }
@@ -66,7 +64,6 @@ private fun rememberShakeOffset(trigger: Boolean): Float {
     return offset.value
 }
 
-// ── 1. Botón primario ────────────────────────────────────────────
 @Composable
 fun DayPilotButtonPrimary(
     text: String,
@@ -117,7 +114,6 @@ fun DayPilotButtonPrimary(
     }
 }
 
-// ── 2. Botón de texto plano ──────────────────────────────────────
 @Composable
 fun DayPilotButtonText(
     text: String,
@@ -151,7 +147,6 @@ fun DayPilotButtonText(
     }
 }
 
-// ── 3. Botón outlined ────────────────────────────────────────────
 @Composable
 fun DayPilotButtonOutlined(
     text: String,
@@ -197,7 +192,6 @@ fun DayPilotButtonOutlined(
     }
 }
 
-// ── 4. Botón de error ────────────────────────────────────────────
 @Composable
 fun DayPilotButtonError(
     text: String,
@@ -245,7 +239,6 @@ fun DayPilotButtonError(
     }
 }
 
-// ── 5. FloatingActionButton ──────────────────────────────────────
 @Composable
 fun DayPilotFAB(
     icon: ImageVector,
@@ -276,7 +269,6 @@ fun DayPilotFAB(
     }
 }
 
-// ── 6. IconButton ────────────────────────────────────────────────
 @Composable
 fun DayPilotIconButton(
     icon: ImageVector,

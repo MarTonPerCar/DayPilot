@@ -2,6 +2,7 @@ package com.example.daypilot_test_desing.feature.techhealth
 
 import android.app.Application
 import android.content.pm.PackageManager
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.daypilot_test_desing.core.data.model.AppRestriction
@@ -24,6 +25,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class TechHealthViewModel(application: Application) : AndroidViewModel(application) {
+
+    companion object {
+        private const val TAG = "TechHealthViewModel"
+    }
 
     private val repository = SharedPrefsTechHealthRepository(application)
 
@@ -75,10 +80,9 @@ class TechHealthViewModel(application: Application) : AndroidViewModel(applicati
         )
     }
 
-    // Editing merges onto the existing stored restriction rather than the form's
-    // fresh defaults, so pendingActive/isViolatedToday/usage bookkeeping and the
-    // original packageName survive intact, and a limit increase is deferred to
-    // the next day like the on/off toggle already is.
+    // Merges onto the existing stored restriction (not the form's fresh defaults) so
+    // pendingActive/isViolatedToday/usage bookkeeping survives, and a limit increase
+    // is deferred to the next day like the on/off toggle already is.
     fun saveApp(restriction: AppRestriction) {
         val existing = repository.getAppRestrictions().find { it.id == restriction.id }
         val merged = if (existing != null) {
@@ -147,9 +151,8 @@ class TechHealthViewModel(application: Application) : AndroidViewModel(applicati
         _uiState.value = buildState()
     }
 
-    // A purely numeric id means a client-generated placeholder timestamp (not
-    // yet synced to Supabase, see saveGroup/replaceGroupId) — fall back to
-    // matching by name in that case.
+    // A purely numeric id is a client-generated placeholder not yet synced to Supabase
+    // (see saveGroup/replaceGroupId) — fall back to matching by name in that case.
     private fun looksLikeSyncedId(id: String): Boolean = id.toLongOrNull() == null
 
     private fun isInstalled(packageName: String): Boolean {
@@ -227,7 +230,9 @@ class TechHealthViewModel(application: Application) : AndroidViewModel(applicati
                     ))
                 }
             }
-        } catch (_: Exception) { }
+        } catch (e: Exception) {
+            Log.e(TAG, "loadFromSupabase: failed for $uid", e)
+        }
         _uiState.value = buildState()
     }
 
@@ -237,7 +242,9 @@ class TechHealthViewModel(application: Application) : AndroidViewModel(applicati
             supabase.from("tech_health_config").delete {
                 filter { eq("user_id", uid); eq("app_package", packageName) }
             }
-        } catch (_: Exception) { }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to delete uninstalled app config $packageName", e)
+        }
     }
 
     private suspend fun deleteUninstalledGroupFromSupabase(groupId: String) {
@@ -245,7 +252,9 @@ class TechHealthViewModel(application: Application) : AndroidViewModel(applicati
             supabase.from("tech_health_group_config").delete {
                 filter { eq("id", groupId) }
             }
-        } catch (_: Exception) { }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to delete uninstalled group config $groupId", e)
+        }
     }
 
     private suspend fun upsertAppToSupabase(restriction: AppRestriction) {
@@ -269,7 +278,9 @@ class TechHealthViewModel(application: Application) : AndroidViewModel(applicati
                     eq("app_package", restriction.packageName)
                 }
             }
-        } catch (_: Exception) { }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to upsert app config ${restriction.packageName}", e)
+        }
     }
 
     private suspend fun upsertGroupToSupabase(restriction: GroupRestriction): String? {
@@ -277,8 +288,7 @@ class TechHealthViewModel(application: Application) : AndroidViewModel(applicati
         return try {
             val groupId: String
             if (looksLikeSyncedId(restriction.id)) {
-                // Update by stable id, not name, so a rename updates in place
-                // instead of orphaning the old row under a new one.
+                // Update by stable id, not name, so a rename updates in place instead of orphaning the row.
                 supabase.from("tech_health_group_config").update({
                     set("group_name", restriction.groupName)
                     set("limit_hours", restriction.dailyLimitMinutes / 60.0)
@@ -308,7 +318,10 @@ class TechHealthViewModel(application: Application) : AndroidViewModel(applicati
                 restriction.apps.map { TechHealthGroupAppDto(appPackage = it.packageName, appName = it.appName) }
             )
             groupId
-        } catch (_: Exception) { null }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to upsert group config ${restriction.groupName}", e)
+            null
+        }
     }
 
     private suspend fun replaceGroupMembership(groupId: String, apps: List<TechHealthGroupAppDto>) {
@@ -321,7 +334,9 @@ class TechHealthViewModel(application: Application) : AndroidViewModel(applicati
                     apps.map { InsertTechHealthGroupAppDto(groupId = groupId, appPackage = it.appPackage, appName = it.appName) }
                 )
             }
-        } catch (_: Exception) { }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to replace group membership for $groupId", e)
+        }
     }
 
     // Soft delete — fn_close_daily_progress() removes it for real that night.
@@ -336,7 +351,9 @@ class TechHealthViewModel(application: Application) : AndroidViewModel(applicati
                     eq("app_package", packageName)
                 }
             }
-        } catch (_: Exception) { }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to mark app config $packageName as pending-delete", e)
+        }
     }
 
     private suspend fun markGroupPendingDeleteInSupabase(group: GroupRestriction) {
@@ -351,7 +368,9 @@ class TechHealthViewModel(application: Application) : AndroidViewModel(applicati
                     else eq("group_name", group.groupName)
                 }
             }
-        } catch (_: Exception) { }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to mark group config ${group.id} as pending-delete", e)
+        }
     }
 
     // Writes pending_active, not is_active — fn_close_daily_progress flips
@@ -367,7 +386,9 @@ class TechHealthViewModel(application: Application) : AndroidViewModel(applicati
                     eq("app_package", packageName)
                 }
             }
-        } catch (_: Exception) { }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to update pending_active for app $packageName", e)
+        }
     }
 
     private suspend fun updateGroupPendingActiveInSupabase(group: GroupRestriction, pendingActive: Boolean?) {
@@ -382,12 +403,13 @@ class TechHealthViewModel(application: Application) : AndroidViewModel(applicati
                     else eq("group_name", group.groupName)
                 }
             }
-        } catch (_: Exception) { }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to update pending_active for group ${group.id}", e)
+        }
     }
 
-    // Client-side mirror of fn_close_daily_progress's eligibility check, just for
-    // an immediate "are you on track" read in the UI — the real +10 is only ever
-    // awarded server-side at midnight.
+    // Client-side mirror of fn_close_daily_progress's eligibility check, just for an
+    // immediate "are you on track" read — the real +10 is only ever awarded server-side.
     private fun effectiveRestrictionCount(): Int {
         val apps   = repository.getAppRestrictions().count { it.isEnabled }
         val groups = repository.getGroupRestrictions().filter { it.isEnabled }.sumOf { it.apps.size }

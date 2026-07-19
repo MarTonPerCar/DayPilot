@@ -22,7 +22,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
 
-// ── 1. TopBar simple con título ──────────────────────────────────
 @Composable
 fun DayPilotTopBar(
     title: String,
@@ -54,7 +53,6 @@ fun DayPilotTopBar(
     )
 }
 
-// ── 2. TopBar con una acción ─────────────────────────────────────
 @Composable
 fun DayPilotTopBarWithAction(
     title: String,
@@ -98,7 +96,6 @@ fun DayPilotTopBarWithAction(
     )
 }
 
-// ── 3. TopBar con dos acciones ───────────────────────────────────
 @Composable
 fun DayPilotTopBarWithTwoActions(
     title: String,
@@ -152,7 +149,6 @@ fun DayPilotTopBarWithTwoActions(
     )
 }
 
-// ── 4. TopBar centrada ───────────────────────────────────────────
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DayPilotCenteredTopBar(
@@ -199,7 +195,6 @@ fun DayPilotCenteredTopBar(
     )
 }
 
-// ── Preview ──────────────────────────────────────────────────────
 @Preview(showBackground = true)
 @Composable
 fun DayPilotTopBarsPreview() {

@@ -48,7 +48,7 @@ class CalendarViewModel(
     private suspend fun load(): Boolean {
         _uiState.update { it.copy(isLoading = true) }
         return try {
-            val tasks = taskRepo.getTasks()  // cache-first
+            val tasks = taskRepo.getTasks()
             _uiState.update { it.copy(tasks = tasks, isLoading = false) }
             subscribeToRealtimeOnce()
             true
@@ -59,9 +59,8 @@ class CalendarViewModel(
         }
     }
 
-    // getTasks() reads from a joined tasks+task_days view, and Realtime can
-    // only subscribe to base tables — so both are watched here, filtered to
-    // the current user.
+    // Realtime can only subscribe to base tables, but getTasks() reads a joined
+    // tasks+task_days view — so both base tables are watched here instead.
     private fun subscribeToRealtimeOnce() {
         if (realtimeChannel != null) return
         val uid = supabase.auth.currentUserOrNull()?.id ?: return
@@ -125,8 +124,8 @@ class CalendarViewModel(
 
         viewModelScope.launch {
             try {
-                taskRepo.addTask(data)          // invalidates SessionCache.tasks
-                load()                           // re-fetches from Supabase, repopulates cache
+                taskRepo.addTask(data)
+                load()
                 SessionCache.tasks.value = _uiState.value.tasks
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to create task '${data.title}' (recurring=${data.isRecurring})", e)
@@ -174,8 +173,7 @@ class CalendarViewModel(
 
     fun toggleTask(occurrenceId: String, isDone: Boolean) {
         val original = _uiState.value.tasks.firstOrNull { it.occurrenceId == occurrenceId } ?: return
-        // Points are only ever paid once per occurrence, tracked by isEarned (sticky,
-        // unlike isDone) — unchecking never takes points back, rechecking never re-pays.
+        // isEarned is sticky (unlike isDone) — points are paid at most once per occurrence.
         val shouldAwardPoints = isDone && !original.isEarned
         _uiState.update { state ->
             state.copy(tasks = state.tasks.map {
@@ -206,8 +204,7 @@ class CalendarViewModel(
 
     fun deleteTask(id: String) {
         val snapshot = _uiState.value.tasks
-        // Points already earned for completed occurrences stay earned — deleting a
-        // task never takes points back.
+        // isEarned stays sticky here too — deleting a task never claws back points.
         _uiState.update { state -> state.copy(tasks = state.tasks.filter { it.id != id }) }
         viewModelScope.launch {
             try {

@@ -22,7 +22,6 @@ import com.example.daypilot_test_desing.core.data.model.HomeSection
 import com.example.daypilot_test_desing.core.data.model.HomeSectionData
 import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
 
-// ── HomeMenuCard ─────────────────────────────────────────────────
 @Composable
 fun HomeMenuCard(
     section: HomeSection,
@@ -42,7 +41,6 @@ fun HomeMenuCard(
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
 
-            // ── Gradiente de fondo ───────────────────────────────
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -56,7 +54,6 @@ fun HomeMenuCard(
                     )
             )
 
-            // ── Icono decorativo de fondo ────────────────────────
             Icon(
                 imageVector = section.icon,
                 contentDescription = null,
@@ -68,14 +65,12 @@ fun HomeMenuCard(
                     .rotate(-15f)
             )
 
-            // ── Contenido ────────────────────────────────────────
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(16.dp),
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
-                // Icono pequeño + título
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Box(
                         modifier = Modifier

@@ -37,20 +37,15 @@ class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
     private var refreshing = false
     private val onFriendStatsChanged: () -> Unit = { refreshFromRealtime() }
 
-    // init{}'s startup load(), DayPilotNavGraph's awaitLoad(), and every realtime trigger
-    // below can all call load() around the same time — without this, whichever call
-    // *finishes* last wins and overwrites _uiState, even if it's the one that hit a
-    // transient failure. The mutex serializes them so a stale/failed result can never
-    // clobber a more recent good one.
+    // Serializes concurrent load() calls (init, awaitLoad, realtime triggers) so a
+    // slower failed load can't overwrite a faster successful one.
     private val loadMutex = Mutex()
 
     init {
         Log.d(TAG, "init: starting first load()")
         viewModelScope.launch { load() }
-        // Fires when a FRIEND_REQUEST/FRIEND_ACCEPTED notification arrives via the
-        // always-on notifications realtime channel (see NotificationsViewModel) —
-        // kept alongside the direct subscriptions below as a second, overlapping
-        // signal source; refreshFromRealtime()'s guard makes that harmless.
+        // Second, overlapping refresh signal alongside the direct subscriptions below —
+        // refreshFromRealtime()'s guard makes the overlap harmless.
         NotificationHub.friendsShouldRefresh.onEach { refreshFromRealtime() }.launchIn(viewModelScope)
     }
 
@@ -69,18 +64,15 @@ class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
             subscribeToRealtimeOnce()
             true
         } catch (e: Exception) {
-            // Deliberately not touching _uiState here — the previous (correct) friends
-            // list stays on screen instead of being wiped by a transient failure.
+            // _uiState is left untouched so a transient failure doesn't wipe the last-good list.
             Log.e(TAG, "Failed to load friends data — keeping previously shown state", e)
             false
         }
     }
 
-    // friends/friend_requests/reactions have no OR-filter support in Postgres
-    // Changes, so "requester or receiver" needs two separate subscriptions —
-    // plus the shared friend-stats broadcast channel for a friend's own
-    // streak/weekly-summary/points changes, which can't be filtered by my
-    // own user_id since the changed row belongs to someone else.
+    // No OR-filter support in Postgres Changes, so "requester or receiver" needs two
+    // subscriptions; the broadcast channel covers a friend's own stat changes, which
+    // can't be filtered by my user_id since the row belongs to someone else.
     private fun subscribeToRealtimeOnce() {
         if (realtimeChannel != null) return
         val uid = supabase.auth.currentUserOrNull()?.id ?: return
@@ -122,8 +114,7 @@ class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
         }
         Log.d(TAG, "refreshFromRealtime(): triggered")
         refreshing = true
-        // getFriends() is cache-first with a 5min TTL — drop it so this actually
-        // fetches fresh data instead of serving the stale cached list.
+        // Drop the cache slot so getFriends() fetches fresh instead of serving the stale TTL'd list.
         SessionCache.friends.value    = null
         SessionCache.friendsFetchedAt = 0L
         viewModelScope.launch {
@@ -159,9 +150,9 @@ class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
                 SessionCache.friendsFetchedAt = System.currentTimeMillis()
                 SessionCache.ranking.value    = null
                 SessionCache.rankingFetchedAt = 0L
-                // FRIEND_ACCEPTED notification is now inserted by a Supabase DB trigger;
-                // switching to the friends tab (justAcceptedRequest) is already the confirmation.
+                // FRIEND_ACCEPTED notification is inserted by a Supabase DB trigger, not here.
             } catch (e: Exception) {
+                Log.e(TAG, "Failed to accept friend request from $userId", e)
                 _uiState.update { state ->
                     state.copy(
                         friendRequests      = originalRequests,
@@ -185,6 +176,7 @@ class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
             try {
                 repo.rejectRequest(userId)
             } catch (e: Exception) {
+                Log.e(TAG, "Failed to reject friend request from $userId", e)
                 _uiState.update { state ->
                     state.copy(friendRequests = originalRequests, userMessage = R.string.error_reject_request)
                 }
@@ -206,13 +198,14 @@ class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
         }
         viewModelScope.launch {
             try {
-                // REACTION notification to the friend is inserted by a Supabase DB trigger;
-                // the "reaction sent" confirmation below is local-only, never stored.
+                // REACTION notification is inserted by a Supabase DB trigger; the
+                // "reaction sent" confirmation below is local-only, never stored.
                 repo.reactToFriend(userId, reaction)
                 SessionCache.friends.value    = _uiState.value.friends
                 SessionCache.friendsFetchedAt = System.currentTimeMillis()
                 _uiState.update { it.copy(userMessage = R.string.friends_reaction_sent) }
             } catch (e: Exception) {
+                Log.e(TAG, "Failed to send reaction $reaction to $userId", e)
                 _uiState.update { state ->
                     state.copy(friends = originalFriends, userMessage = R.string.error_react_friend)
                 }
@@ -231,6 +224,7 @@ class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
                 SessionCache.ranking.value    = null
                 SessionCache.rankingFetchedAt = 0L
             } catch (e: Exception) {
+                Log.e(TAG, "Failed to remove friend $userId", e)
                 _uiState.update { state ->
                     state.copy(friends = originalFriends, userMessage = R.string.error_remove_friend)
                 }

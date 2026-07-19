@@ -3,6 +3,7 @@ package com.example.daypilot_test_desing.core.navigation
 import android.app.LocaleManager
 import android.os.Build
 import android.os.LocaleList
+import android.util.Log
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -82,6 +83,7 @@ import com.example.daypilot_test_desing.feature.timer.TimerHubScreen
 import com.example.daypilot_test_desing.feature.timer.TimerScreen
 import com.example.daypilot_test_desing.core.ui.components.DayPilotBottomBar
 
+private const val TAG = "DayPilotNavGraph"
 
 @Composable
 fun DayPilotNavGraph(
@@ -119,9 +121,7 @@ fun DayPilotNavGraph(
     val settingsVM: SettingsViewModel = viewModel(factory = SettingsViewModel.factory(application, userRepo))
     val calendarVM: CalendarViewModel = viewModel(factory = CalendarViewModel.factory(taskRepo, progressRepo))
 
-    // homeVM.refresh() makes 5+ DB calls, too costly to run on every sensor tick — same
-    // reasoning applies to habitsVM.refresh() now that it does a network sync+points read,
-    // so this keeps the Habits hub step-count preview live via the cheap local-only path.
+    // habitsVM.refresh() now does a network sync — refreshLocal() is the cheap per-tick alternative.
     val stepsState by stepsVM.uiState.collectAsState()
     LaunchedEffect(stepsState.currentSteps) {
         habitsVM.refreshLocal()
@@ -142,20 +142,13 @@ fun DayPilotNavGraph(
         onDispose { navLifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
-    // LEVEL_UP detection lives in SupabaseProgressRepository.logPoints() — the single place
-    // total_points_historical actually changes — instead of here, so it fires the moment the
-    // pointsToNextLevel threshold is crossed rather than whenever ProfileViewModel next reloads.
-
+    // LEVEL_UP detection lives in SupabaseProgressRepository.logPoints(), not here.
     val sessionState by sessionVM.state.collectAsState()
     LaunchedEffect(sessionState) {
         val current = navController.currentBackStackEntry?.destination?.route
         when (sessionState) {
             AppSessionViewModel.State.DataLoading -> {
-                // Job/joinAll() only tells us the 8 loads finished, not whether they actually
-                // succeeded — each ViewModel used to swallow its own exceptions, so a transient
-                // failure (e.g. a cold-start race with the auth token) would silently proceed to
-                // Home with some ViewModels left at their default/empty state. awaitLoad() makes
-                // success explicit; a failed batch gets one automatic retry before giving up.
+                // joinAll() can't see failure — awaitLoad() can, so a failed batch gets one retry.
                 suspend fun loadAll(): Boolean = coroutineScope {
                     listOf(
                         async { homeVM.awaitLoad() },
@@ -375,8 +368,12 @@ fun DayPilotNavGraph(
                     onLanguageSelect        = { code ->
                         settingsVM.selectLanguage(code)
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            context.getSystemService(LocaleManager::class.java)
-                                .applicationLocales = LocaleList.forLanguageTags(code)
+                            try {
+                                context.getSystemService(LocaleManager::class.java)
+                                    ?.applicationLocales = LocaleList.forLanguageTags(code)
+                            } catch (e: Exception) {
+                                Log.e(TAG, "Failed to set per-app locale to $code", e)
+                            }
                         }
                     },
                     onToggleNotifications   = settingsVM::toggleNotifications,

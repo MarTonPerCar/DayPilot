@@ -108,7 +108,6 @@ fun TimerHubScreen(
         )
     )
 
-    // ── Custom sheet ─────────────────────────────────────────────
     if (showCustomSheet) {
         ModalBottomSheet(
             onDismissRequest = { showCustomSheet = false },
@@ -163,7 +162,6 @@ fun TimerHubScreen(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-                // Presets rápidos
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -219,7 +217,6 @@ fun TimerHubScreen(
         }
     }
 
-    // ── Pomodoro sheet ────────────────────────────────────────────
     if (showPomodoroSheet) {
         ModalBottomSheet(
             onDismissRequest = { showPomodoroSheet = false },
@@ -240,7 +237,6 @@ fun TimerHubScreen(
                     color = MaterialTheme.colorScheme.onBackground
                 )
 
-                // Info sesión
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(14.dp),
@@ -300,7 +296,6 @@ fun TimerHubScreen(
                     }
                 }
 
-                // Sesiones
                 Text(
                     text = stringResource(R.string.timer_pomodoro_sessions_label),
                     style = MaterialTheme.typography.labelMedium,

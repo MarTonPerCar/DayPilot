@@ -1,5 +1,6 @@
 package com.example.daypilot_test_desing.data.supabase
 
+import android.util.Log
 import com.example.daypilot_test_desing.core.cache.SessionCache
 import com.example.daypilot_test_desing.core.data.model.ReactionType
 import com.example.daypilot_test_desing.core.data.model.ReceivedReaction
@@ -19,6 +20,10 @@ import io.github.jan.supabase.storage.storage
 import io.ktor.http.ContentType
 
 class SupabaseUserRepository : UserRepository {
+
+    companion object {
+        private const val TAG = "SupabaseUserRepository"
+    }
 
     private fun userId() = supabase.auth.currentUserOrNull()?.id
 
@@ -57,7 +62,8 @@ class SupabaseUserRepository : UserRepository {
             )
             SessionCache.userProfile.value = profile
             profile
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to load profile for $uid", e)
             UserProfile(id = uid, name = "", username = "", email = "")
         }
     }
@@ -76,7 +82,10 @@ class SupabaseUserRepository : UserRepository {
                 supabase.from("reactions").select {
                     filter { eq("weekly_summary_id", row.id) }
                 }.decodeList<ReactionDto>()
-            } catch (_: Exception) { emptyList() }
+            } catch (e: Exception) {
+                Log.w(TAG, "getWeeklySummary: failed fetching reactions for summary ${row.id}", e)
+                emptyList()
+            }
 
             val reactions = if (reactionRows.isNotEmpty()) {
                 val senderIds = reactionRows.map { it.fromUserId }
@@ -84,7 +93,10 @@ class SupabaseUserRepository : UserRepository {
                     supabase.from("users").select {
                         filter { isIn("id", senderIds) }
                     }.decodeList<UserDto>()
-                } catch (_: Exception) { emptyList() }
+                } catch (e: Exception) {
+                    Log.w(TAG, "getWeeklySummary: failed fetching ${senderIds.size} reaction sender(s)", e)
+                    emptyList()
+                }
                 val senderById = senders.associateBy { it.id }
                 reactionRows.mapNotNull { r ->
                     val name = senderById[r.fromUserId]?.name ?: return@mapNotNull null
@@ -101,7 +113,8 @@ class SupabaseUserRepository : UserRepository {
                 bestStreak     = row.bestStreak,
                 reactions      = reactions
             )
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to load weekly summary for $uid", e)
             WeeklySummaryData(0, 0, 0, 0)
         }
     }
@@ -141,7 +154,8 @@ class SupabaseUserRepository : UserRepository {
             }
             SessionCache.userProfile.value = SessionCache.userProfile.value?.copy(avatarUrl = url)
             url
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to upload avatar for $uid", e)
             null
         }
     }

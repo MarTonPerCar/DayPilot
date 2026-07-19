@@ -54,13 +54,11 @@ class TechHealthBlockActivity : ComponentActivity() {
 
     @Deprecated("Deprecated in Java") // hay que mantenerlo aunque esté deprecated, el nuevo predictive back no aplica aquí
     override fun onBackPressed() {
-        // bloqueamos el botón de atrás, el usuario tiene que usar el botón de la pantalla
     }
 
     override fun onUserLeaveHint() {
         super.onUserLeaveHint()
         if (!intentionalExit) {
-            // User pressed Home or Recents — reshow the block screen
             startActivity(
                 Intent(this, TechHealthBlockActivity::class.java).apply {
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
@@ -98,7 +96,6 @@ private fun BlockScreen(appName: String, onGoHome: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            // Block icon circle
             Box(
                 modifier         = Modifier
                     .size(96.dp)
@@ -116,7 +113,6 @@ private fun BlockScreen(appName: String, onGoHome: () -> Unit) {
                 )
             }
 
-            // Title
             Text(
                 text       = stringResource(R.string.block_limit_reached),
                 style      = MaterialTheme.typography.headlineSmall,
@@ -125,7 +121,6 @@ private fun BlockScreen(appName: String, onGoHome: () -> Unit) {
                 textAlign  = TextAlign.Center
             )
 
-            // App name chip
             if (appName.isNotBlank()) {
                 Surface(
                     shape = RoundedCornerShape(8.dp),
@@ -140,7 +135,6 @@ private fun BlockScreen(appName: String, onGoHome: () -> Unit) {
                 }
             }
 
-            // Motivational message
             Text(
                 text      = stringResource(R.string.block_motivational),
                 style     = MaterialTheme.typography.titleMedium,
@@ -149,7 +143,6 @@ private fun BlockScreen(appName: String, onGoHome: () -> Unit) {
                 textAlign = TextAlign.Center
             )
 
-            // Explanation card
             Card(
                 shape  = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(
@@ -167,7 +160,6 @@ private fun BlockScreen(appName: String, onGoHome: () -> Unit) {
 
             Spacer(Modifier.height(4.dp))
 
-            // Primary CTA
             Button(
                 onClick  = onGoHome,
                 modifier = Modifier

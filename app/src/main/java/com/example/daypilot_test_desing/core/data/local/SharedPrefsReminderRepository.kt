@@ -2,6 +2,7 @@ package com.example.daypilot_test_desing.core.data.local
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import com.example.daypilot_test_desing.core.data.model.ReminderData
 import com.example.daypilot_test_desing.core.data.model.ReminderFormDataInfo
 import com.example.daypilot_test_desing.core.data.repository.ReminderRepository
@@ -9,11 +10,12 @@ import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 import java.util.UUID
 
-/**
- * Persists reminders in SharedPreferences as JSON.
- * There is no server-side table for reminders; they are device-local alarms.
- */
+// Reminders are device-local only — no server-side table, unlike the rest of the app's data.
 class SharedPrefsReminderRepository(context: Context) : ReminderRepository {
+
+    companion object {
+        private const val TAG = "SharedPrefsReminderRepo"
+    }
 
     private val prefs: SharedPreferences =
         context.getSharedPreferences("daypilot_reminders", Context.MODE_PRIVATE)
@@ -24,7 +26,10 @@ class SharedPrefsReminderRepository(context: Context) : ReminderRepository {
         val raw = prefs.getString("reminders", null) ?: return mutableListOf()
         return try {
             json.decodeFromString(ListSerializer(ReminderData.serializer()), raw).toMutableList()
-        } catch (_: Exception) { mutableListOf() }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to decode stored reminders, discarding local cache", e)
+            mutableListOf()
+        }
     }
 
     private fun save(list: List<ReminderData>) {

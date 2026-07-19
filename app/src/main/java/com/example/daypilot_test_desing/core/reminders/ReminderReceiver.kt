@@ -4,6 +4,7 @@ import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.core.data.local.SharedPrefsReminderRepository
@@ -14,6 +15,10 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
 class ReminderReceiver : BroadcastReceiver() {
+
+    companion object {
+        private const val TAG = "ReminderReceiver"
+    }
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
@@ -42,12 +47,10 @@ class ReminderReceiver : BroadcastReceiver() {
             ?.notify(notifId, notification)
 
         if (!isEarly && reminderId != null) {
-            // Delete one-time reminders after firing.
             if (isOneTime) {
                 SharedPrefsReminderRepository(context).deleteReminder(reminderId)
             }
 
-            // Reschedule repeating reminders for the next occurrence.
             if (triggerAt > 0L) {
                 val nextMillis: Long = when (frequencyType) {
                     "DAILY"  -> triggerAt + 24 * 3600 * 1_000L
@@ -66,14 +69,17 @@ class ReminderReceiver : BroadcastReceiver() {
                 }
             }
 
-            // Insert into the in-app notification center (skip the early warning
-            // to avoid duplicate entries).
+            // Skips the early warning to avoid duplicate entries in the notification center.
             scope.launch {
-                SupabaseNotificationRepository.insertForCurrentUser(
-                    type  = "TASK_REMINDER",
-                    title = contentTitle,
-                    body  = contentText
-                )
+                try {
+                    SupabaseNotificationRepository.insertForCurrentUser(
+                        type  = "TASK_REMINDER",
+                        title = contentTitle,
+                        body  = contentText
+                    )
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to insert TASK_REMINDER notification for reminder $reminderId", e)
+                }
             }
         }
     }

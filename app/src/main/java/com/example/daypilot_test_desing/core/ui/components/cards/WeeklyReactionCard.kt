@@ -58,7 +58,6 @@ fun WeeklyReactionCard(
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
 
-                // ── Cabecera ─────────────────────────────────────
                 Text(
                     text = stringResource(R.string.weekly_summary_title),
                     style = MaterialTheme.typography.titleSmall,
@@ -66,7 +65,6 @@ fun WeeklyReactionCard(
                     color = MaterialTheme.colorScheme.onSurface
                 )
 
-                // ── Stats en una sola fila ────────────────────────
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly,
@@ -97,7 +95,6 @@ fun WeeklyReactionCard(
                     )
                 }
 
-                // ── Reacciones ───────────────────────────────────
                 if (summary.reactions.isNotEmpty()) {
                     DayPilotDivider()
 
@@ -116,7 +113,6 @@ fun WeeklyReactionCard(
 }
 
 
-// ── Preview ──────────────────────────────────────────────────────
 @Composable
 @Preview(showBackground = true)
 fun WeeklyReactionCardPreview() {

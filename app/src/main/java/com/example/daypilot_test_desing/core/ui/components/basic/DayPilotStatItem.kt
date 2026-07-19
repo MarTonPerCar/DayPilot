@@ -23,7 +23,6 @@ import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
 
-// ── Ítem de estadística individual ──────────────────────────────
 @Composable
 fun DayPilotStatItem(label: String, value: String) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -41,7 +40,6 @@ fun DayPilotStatItem(label: String, value: String) {
     }
 }
 
-// ── Fila de puntos y racha ───────────────────────────────────────
 @Composable
 fun DayPilotStatsRow(points: Int, streak: Int) {
     Row(
@@ -64,7 +62,6 @@ fun DayPilotStatsRow(points: Int, streak: Int) {
     }
 }
 
-// ── Divisor vertical ─────────────────────────────────────────────
 @Composable
 fun DayPilotStatVerticalDivider(height: androidx.compose.ui.unit.Dp = 28.dp) {
     Box(
@@ -75,7 +72,6 @@ fun DayPilotStatVerticalDivider(height: androidx.compose.ui.unit.Dp = 28.dp) {
     )
 }
 
-// ── Preview ──────────────────────────────────────────────────────
 @Preview(showBackground = true)
 @Composable
 fun DayPilotStatItemPreview() {

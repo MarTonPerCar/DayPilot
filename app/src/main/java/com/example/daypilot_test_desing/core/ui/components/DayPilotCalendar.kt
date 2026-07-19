@@ -88,7 +88,6 @@ fun DayPilotCalendar(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // ── Cabecera mes ─────────────────────────────────────
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -116,7 +115,6 @@ fun DayPilotCalendar(
                 }
             }
 
-            // ── Cabecera días semana ──────────────────────────────
             Row(modifier = Modifier.fillMaxWidth()) {
                 dayHeaders.forEach { header ->
                     Text(
@@ -130,7 +128,6 @@ fun DayPilotCalendar(
                 }
             }
 
-            // ── Grid de días ─────────────────────────────────────
             val totalCells = startOffset + daysInMonth
             val rows = (totalCells + 6) / 7
 
@@ -165,7 +162,6 @@ fun DayPilotCalendar(
     }
 }
 
-// ── Celda de día ─────────────────────────────────────────────────
 @Composable
 fun CalendarDayCell(
     day: Int,
@@ -203,7 +199,6 @@ fun CalendarDayCell(
             textAlign = TextAlign.Center
         )
 
-        // Puntos de tareas
         if (dots.isNotEmpty()) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(2.dp),

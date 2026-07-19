@@ -149,9 +149,8 @@ fun TaskFormCard(
             icon            = Icons.Default.Notifications,
             initiallyExpanded = false
         ) {
-            // Reminder, like recurrence below, can only be set at creation —
-            // updateTask() has no way to change it afterwards, so hide it during
-            // edit rather than show a toggle that silently does nothing on save.
+            // Reminder/recurrence can only be set at creation — updateTask() can't change
+            // them, so hide these rather than show a toggle that silently does nothing.
             if (!isEditing) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),

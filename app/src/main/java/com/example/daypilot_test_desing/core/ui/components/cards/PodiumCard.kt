@@ -64,7 +64,6 @@ fun PodiumCard(
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.Bottom
             ) {
-                // ── 2º puesto ────────────────────────────────────
                 PodiumSlot(
                     entry = second,
                     medal = "🥈",
@@ -74,7 +73,6 @@ fun PodiumCard(
                     modifier = Modifier.weight(1f)
                 )
 
-                // ── 1º puesto ────────────────────────────────────
                 PodiumSlot(
                     entry = first,
                     medal = "🥇",
@@ -84,7 +82,6 @@ fun PodiumCard(
                     modifier = Modifier.weight(1f)
                 )
 
-                // ── 3º puesto ────────────────────────────────────
                 PodiumSlot(
                     entry = third,
                     medal = "🥉",
@@ -112,7 +109,6 @@ private fun PodiumSlot(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Bottom
     ) {
-        // Nombre
         Text(
             text = entry.name.split(" ").first(),
             style = MaterialTheme.typography.labelSmall,
@@ -128,7 +124,6 @@ private fun PodiumSlot(
 
         Spacer(Modifier.height(2.dp))
 
-        // Medalla
         Text(
             text = medal,
             fontSize = 20.sp
@@ -136,7 +131,6 @@ private fun PodiumSlot(
 
         Spacer(Modifier.height(4.dp))
 
-        // Barra del podio
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -159,14 +153,12 @@ private fun PodiumSlot(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                // Avatar
                 DayPilotAvatar(
                     name = entry.name,
                     avatarUrl = entry.avatarUrl,
                     size = if (position == 1) 48 else 40
                 )
 
-                // Puntos
                 Text(
                     text = "${entry.points}",
                     style = MaterialTheme.typography.labelMedium,
@@ -174,7 +166,6 @@ private fun PodiumSlot(
                     color = Color.White
                 )
 
-                // Racha
                 Text(
                     text = "${entry.streak}🔥",
                     style = MaterialTheme.typography.labelSmall,
