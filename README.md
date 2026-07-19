@@ -118,6 +118,8 @@ Durante la revisión de código se identificaron y corrigieron los siguientes pr
 
 ## Descargas
 
-- [⬇️ Descargar DayPilot (Incremento-Android-TestFinal)](https://github.com/MarTonPerCar/DayPilot/releases/download/incremento-android-testfinal-v1.0.0/DayPilot-Incremento-Android-TestFinal.apk)
+Los releases de esta rama se etiquetan `v1.2.X.Y.Z` (esquema compartido del repo: `V`=plataforma — `1` Android, `2` Flutter — `SV`=rama — `1` principal, `2` TestFinal — seguido de la versión semántica real). CI también mantiene una etiqueta flotante `incremento-android-testfinal-latest` que siempre apunta al build más reciente de esta rama.
+
+- [⬇️ Descargar DayPilot (Incremento-Android-TestFinal)](https://github.com/MarTonPerCar/DayPilot/releases/download/incremento-android-testfinal-latest/DayPilot-Incremento-Android-TestFinal.apk)
 
 > **Nota:** esta es la rama de trabajo y testing — puede contener errores todavía sin corregir, o ser idéntica a la última versión de `Incremento-Android` si no ha habido cambios recientes. Para la versión estable, usa la descarga de `Incremento-Android`.
