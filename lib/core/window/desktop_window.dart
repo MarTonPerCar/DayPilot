@@ -1,50 +1,143 @@
+import 'dart:async';
+import 'dart:ffi' hide Size;
 import 'dart:io';
 
+import 'package:ffi/ffi.dart' as ffi;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:launch_at_startup/launch_at_startup.dart';
 import 'package:screen_retriever/screen_retriever.dart';
 import 'package:tray_manager/tray_manager.dart';
+import 'package:win32/win32.dart' as win32;
 import 'package:window_manager/window_manager.dart';
 
 import '../data/notification_l10n.dart';
+import '../prefs/app_prefs.dart';
+import '../utils/iso_date.dart';
 import '../../l10n/locale_notifier.dart';
 
 const Size mobileWindowSize = Size(390, 844);
-const double _screenEdgeMargin = 24;
-const Duration _popDuration = Duration(milliseconds: 220);
-const Curve _popInCurve = Curves.easeOutBack;
-const Curve _popOutCurve = Curves.easeIn;
+const Duration _popDuration = Duration(milliseconds: 260);
+const Curve _popInCurve = Curves.easeOutCubic;
+const Curve _popOutCurve = Curves.easeInCubic;
+
+const _windowBackgroundColor = Color(0x00000000);
 
 bool get isDesktopPlatform =>
     !kIsWeb && (Platform.isLinux || Platform.isWindows || Platform.isMacOS);
 
-/// True while a native OS dialog is open, so onWindowBlur doesn't close the flyout.
 final isPickingFileNotifier = ValueNotifier<bool>(false);
 
-Future<void> initDesktopWindow() async {
-  if (!isDesktopPlatform) return;
+final flyoutVisibleNotifier = ValueNotifier<bool>(true);
 
+DateTime? _lastShowAt;
+bool _isHiding = false;
+bool _isShowing = false;
+
+Future<void> _alignToPrimaryTaskbarCorner() async {
+  final primary = await screenRetriever.getPrimaryDisplay();
+  final workPos = primary.visiblePosition ?? const Offset(0, 0);
+  final workSize = primary.visibleSize ?? primary.size;
+  final windowSize = await windowManager.getSize();
+
+  final x = workPos.dx + workSize.width - windowSize.width;
+  final y = workPos.dy + workSize.height - windowSize.height;
+
+  await windowManager.setPosition(Offset(x, y));
+}
+
+void _dismissWindowsTrayFlyout() {
+  if (!Platform.isWindows) return;
+  final inputs = ffi.calloc<win32.INPUT>(2);
+  try {
+    inputs[0].type = win32.INPUT_KEYBOARD;
+    inputs[0].ki.wVk = win32.VK_ESCAPE;
+    inputs[1].type = win32.INPUT_KEYBOARD;
+    inputs[1].ki.wVk = win32.VK_ESCAPE;
+    inputs[1].ki.dwFlags = win32.KEYEVENTF_KEYUP;
+    win32.SendInput(2, inputs, sizeOf<win32.INPUT>());
+  } finally {
+    ffi.calloc.free(inputs);
+  }
+}
+
+Future<void> _hideWithAnimation(String reason) async {
+  if (_isHiding) {
+    return;
+  }
+  if (_lastShowAt != null &&
+      DateTime.now().difference(_lastShowAt!) < const Duration(milliseconds: 400)) {
+    return;
+  }
+  _isHiding = true;
+  await windowManager.setAlwaysOnTop(true);
+  flyoutVisibleNotifier.value = false;
+  await Future.delayed(_popDuration);
+  await windowManager.setAlwaysOnTop(false);
+  await windowManager.hide();
+  _isHiding = false;
+}
+
+Future<void> _showWithAnimation(String reason) async {
+  if (_isShowing) {
+    return;
+  }
+  _isShowing = true;
+  _lastShowAt = DateTime.now();
+  _dismissWindowsTrayFlyout();
+  await _alignToPrimaryTaskbarCorner();
+  await windowManager.show();
+  unawaited(_markAppOpenedNow());
+  flyoutVisibleNotifier.value = true;
+
+  await windowManager.setAlwaysOnTop(true);
+  await Future.delayed(const Duration(milliseconds: 60));
+  await windowManager.focus();
+  await windowManager.setAlwaysOnTop(false);
+  _isShowing = false;
+}
+
+Future<void> _markAppOpenedNow() async {
+  final prefs = await AppPrefs.load();
+  await prefs.setLastOpenDate(isoDate(DateTime.now()));
+}
+
+Future<void> _configureLaunchAtStartup() async {
   launchAtStartup.setup(appName: 'DayPilot', appPath: Platform.resolvedExecutable);
 
+  final prefs = await AppPrefs.load();
+  if (!prefs.launchAtStartupConfigured) {
+    await launchAtStartup.enable();
+    await prefs.setLaunchAtStartupConfigured(true);
+  }
+}
+
+Future<void> initDesktopWindow() async {
+  if (!isDesktopPlatform) {
+    return;
+  }
+
   await windowManager.ensureInitialized();
+
+  await windowManager.hide();
+
   await windowManager.waitUntilReadyToShow(
     WindowOptions(
       size: mobileWindowSize,
       minimumSize: mobileWindowSize,
       maximumSize: mobileWindowSize,
       skipTaskbar: true,
-      titleBarStyle: TitleBarStyle.hidden,
-      // True per-pixel transparency isn't reliably compositied on Windows —
-      // it can leave stale/garbled content from whatever's behind the
-      // window instead of blending properly. Linux/macOS handle it fine.
-      backgroundColor: Platform.isWindows ? const Color(0xFF4A7C59) : const Color(0x00000000),
+      backgroundColor: _windowBackgroundColor,
       title: 'DayPilot',
     ),
     () async {
       await windowManager.setAsFrameless();
       await windowManager.setResizable(false);
-      await windowManager.setAlwaysOnTop(true);
+      await _alignToPrimaryTaskbarCorner();
+      await windowManager.show();
+      await windowManager.focus();
+      unawaited(_markAppOpenedNow());
+      flyoutVisibleNotifier.value = true;
     },
   );
 
@@ -56,6 +149,13 @@ Future<void> initDesktopWindow() async {
 
   await _setTrayMenu();
   dayPilotLocaleNotifier.addListener(_setTrayMenu);
+
+  TrayIconClickHandler.register();
+
+  await windowManager.setPreventClose(true);
+  WindowCloseHandler.register();
+
+  await _configureLaunchAtStartup();
 }
 
 Future<void> _setTrayMenu() async {
@@ -71,88 +171,26 @@ Future<void> _setTrayMenu() async {
   );
 }
 
-/// Linux never reports the tray icon's position, so this opens bottom-right.
-Future<Offset> _cornerPosition() async {
-  final display = await screenRetriever.getPrimaryDisplay();
-  final areaOrigin = display.visiblePosition ?? Offset.zero;
-  final areaSize = display.visibleSize ?? display.size;
-  return Offset(
-    areaOrigin.dx + areaSize.width - mobileWindowSize.width - _screenEdgeMargin,
-    areaOrigin.dy + areaSize.height - mobileWindowSize.height - _screenEdgeMargin,
-  );
-}
+class TrayIconClickHandler with TrayListener {
+  TrayIconClickHandler._();
 
-class DesktopFlyoutScope extends StatefulWidget {
-  const DesktopFlyoutScope({super.key, required this.child});
-
-  final Widget child;
-
-  @override
-  State<DesktopFlyoutScope> createState() => _DesktopFlyoutScopeState();
-}
-
-class _DesktopFlyoutScopeState extends State<DesktopFlyoutScope>
-    with WindowListener, TrayListener {
-  bool _contentVisible = false;
-
-  @override
-  void initState() {
-    super.initState();
-    if (isDesktopPlatform) {
-      windowManager.addListener(this);
-      trayManager.addListener(this);
-    }
+  static void register() {
+    trayManager.addListener(TrayIconClickHandler._());
   }
 
-  @override
-  void dispose() {
-    if (isDesktopPlatform) {
-      windowManager.removeListener(this);
-      trayManager.removeListener(this);
-    }
-    super.dispose();
-  }
-
-  Future<void> _open() async {
-    await windowManager.setPosition(await _cornerPosition());
-    await windowManager.show();
-    await windowManager.focus();
-    if (Platform.isWindows) {
-      // The win32 Flutter embedder resizes its child view off a real WM_SIZE
-      // message, which setting the same size again doesn't reliably send.
-      // Nudging the size by a pixel and back forces a genuine one, so the
-      // child view actually gets resized to match the window.
-      await windowManager.setSize(
-        Size(mobileWindowSize.width + 1, mobileWindowSize.height),
-      );
-      await windowManager.setSize(mobileWindowSize);
-    }
-    setState(() => _contentVisible = true);
-  }
-
-  Future<void> _close() async {
-    setState(() => _contentVisible = false);
-    await Future.delayed(_popDuration);
-    await windowManager.hide();
-  }
-
-  Future<void> _toggle() async {
-    if (await windowManager.isVisible()) {
-      await _close();
+  Future<void> _showOrFocus() async {
+    final visible = await windowManager.isVisible();
+    if (!visible) {
+      await _showWithAnimation('_showOrFocus');
     } else {
-      await _open();
+      _lastShowAt = DateTime.now();
+      await windowManager.focus();
     }
-  }
-
-  @override
-  void onWindowBlur() {
-    if (isPickingFileNotifier.value) return;
-    if (_contentVisible) _close();
   }
 
   @override
   void onTrayIconMouseDown() {
-    _toggle();
+    _showOrFocus();
   }
 
   @override
@@ -164,30 +202,63 @@ class _DesktopFlyoutScopeState extends State<DesktopFlyoutScope>
   void onTrayMenuItemClick(MenuItem menuItem) {
     switch (menuItem.key) {
       case 'open_app':
-        _toggle();
+        _showOrFocus();
       case 'exit_app':
+        windowManager.setPreventClose(false);
         windowManager.close();
     }
   }
+}
+
+class WindowCloseHandler with WindowListener {
+  WindowCloseHandler._();
+
+  static void register() {
+    windowManager.addListener(WindowCloseHandler._());
+  }
+
+  @override
+  void onWindowClose() async {
+    await _hideWithAnimation('onWindowClose');
+  }
+
+  @override
+  void onWindowBlur() async {
+    if (isPickingFileNotifier.value) return;
+    await _hideWithAnimation('onWindowBlur');
+  }
+}
+
+class DesktopFlyoutAnimator extends StatelessWidget {
+  const DesktopFlyoutAnimator({super.key, required this.child});
+
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    if (!isDesktopPlatform) return widget.child;
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0, end: _contentVisible ? 1.0 : 0.0),
-      duration: _popDuration,
-      curve: _contentVisible ? _popInCurve : _popOutCurve,
-      builder: (context, t, child) {
-        return Opacity(
-          opacity: t.clamp(0.0, 1.0),
-          child: Transform.scale(
-            scale: 0.92 + (t * 0.08),
-            alignment: Alignment.bottomRight,
+    if (!isDesktopPlatform) return child;
+    return ValueListenableBuilder<bool>(
+      valueListenable: flyoutVisibleNotifier,
+      builder: (context, visible, child) {
+        return Directionality(
+          textDirection: TextDirection.ltr,
+          child: TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0, end: visible ? 1.0 : 0.0),
+            duration: _popDuration,
+            curve: visible ? _popInCurve : _popOutCurve,
+            builder: (context, t, child) {
+              final scale = 0.05 + (t * 0.95);
+              return Transform.scale(
+                scale: scale,
+                alignment: Alignment.bottomRight,
+                child: child,
+              );
+            },
             child: child,
           ),
         );
       },
-      child: widget.child,
+      child: child,
     );
   }
 }

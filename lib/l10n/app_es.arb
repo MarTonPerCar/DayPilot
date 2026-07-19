@@ -244,6 +244,13 @@
   "notifTaskCompletedTitle": "¡Tarea completada! ✅",
   "notifTaskCompletedBody": "Completaste \"{title}\" y ganaste 20 pts.",
   "@notifTaskCompletedBody": {"placeholders": {"title": {"type": "String"}}},
+  "notifTaskReminderTitle": "Tareas de hoy",
+  "notifTaskReminderCount": "Tienes {count} tareas pendientes hoy",
+  "@notifTaskReminderCount": {"placeholders": {"count": {"type": "int"}}},
+  "notifTaskReminderNone": "No tienes tareas para hoy ✓",
+  "notifTaskReminderGeneric": "Revisa tus tareas para hoy",
+  "notifStreakDangerTitle": "¡Racha en peligro! 🔥",
+  "notifStreakDangerBody": "Abre la app antes de medianoche para mantener tu racha",
 
   "timerPause": "Pausar",
 

@@ -342,7 +342,6 @@ class _LineChartPainter extends CustomPainter {
     return v.round().toString();
   }
 
-  /// Rounds up to a "nice" number (1/2/5 × power of 10) for readable Y-axis steps.
   double _niceCeil(double maxValue) {
     if (maxValue <= 0) return 4;
     final raw = maxValue / 4;

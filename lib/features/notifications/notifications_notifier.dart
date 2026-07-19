@@ -3,6 +3,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/data/models/app_notification_item.dart';
 import '../../core/data/repositories/providers.dart';
+import '../../core/logging/app_logger.dart';
+import '../friends/friends_notifier.dart';
+import '../profile/weekly_summary_notifier.dart';
 
 class NotificationsNotifier extends Notifier<List<AppNotificationItem>> {
   RealtimeChannel? _channel;
@@ -15,11 +18,14 @@ class NotificationsNotifier extends Notifier<List<AppNotificationItem>> {
   }
 
   Future<void> refresh() async {
-    state = await ref.read(notificationsRepositoryProvider).getNotifications();
-    _subscribeToRealtimeOnce();
+    try {
+      state = await ref.read(notificationsRepositoryProvider).getNotifications();
+      _subscribeToRealtimeOnce();
+    } catch (e, st) {
+      AppLogger.logError('NotificationsNotifier.refresh', e, st);
+    }
   }
 
-  // These notifications never produce an OS banner, so the in-app list must update live.
   void _subscribeToRealtimeOnce() {
     if (_channel != null) return;
     final uid = ref.read(supabaseClientProvider).auth.currentUser?.id;
@@ -40,18 +46,15 @@ class NotificationsNotifier extends Notifier<List<AppNotificationItem>> {
 
   void _handleInsert(Map<String, dynamic> row) {
     final id = row['id'] as String?;
-    if (id == null || state.any((n) => n.id == id)) return; // already have it from a refresh()
-    state = [
-      AppNotificationItem(
-        id: id,
-        type: AppNotificationTypeDb.fromDb(row['type'] as String),
-        title: row['title'] as String,
-        body: row['body'] as String,
-        isRead: row['is_read'] as bool? ?? false,
-        createdAt: DateTime.parse(row['created_at'] as String),
-      ),
-      ...state,
-    ];
+    if (id == null || state.any((n) => n.id == id)) return;
+    final item = AppNotificationItem.fromRow(row);
+    state = [item, ...state];
+
+    if (item.type == AppNotificationType.friendRequest || item.type == AppNotificationType.friendAccepted) {
+      ref.read(friendsNotifierProvider.notifier).refresh();
+    } else if (item.type == AppNotificationType.reaction) {
+      ref.read(weeklySummaryNotifierProvider.notifier).refresh();
+    }
   }
 
   Future<void> markAsRead(String id) async {

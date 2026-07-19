@@ -1,5 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../logging/app_logger.dart';
 import '../models/app_user.dart';
 import '../models/auth_exceptions.dart';
 import 'auth_repository.dart';
@@ -27,10 +28,7 @@ class SupabaseAuthRepository implements AuthRepository {
     if (user == null) {
       throw const AuthException('No se pudo iniciar sesión.');
     }
-    // This project requires email confirmation, so signUp() never has a
-    // session to insert the profile row with — this is the first point
-    // a confirmed user actually has one, so it's done here instead, from
-    // the name/username/region stashed in user_metadata at signup time.
+
     await _ensureProfileExists(user);
     return _fetchProfile(user.id);
   }
@@ -49,19 +47,16 @@ class SupabaseAuthRepository implements AuthRepository {
         password: password,
         data: {'name': name, 'username': username, 'region': region},
       );
-    } on AuthException catch (e) {
-      // Could be a real existing account, or an orphan from a previous
-      // failed signup — sign in to tell the two apart.
+    } on AuthException catch (e, st) {
       if (e.message.toLowerCase().contains('user already registered')) {
         try {
           await _client.auth.signInWithPassword(email: email, password: password);
-        } on AuthException {
-          // Wrong password for an existing account — surface the clear
-          // "already registered" message instead of a confusing one about
-          // invalid credentials for what looked like a sign-up attempt.
+        } on AuthException catch (e2, st2) {
+          AppLogger.logError('SupabaseAuthRepository.signUp retry-login', e2, st2);
           throw const AuthException('User already registered');
         }
       } else {
+        AppLogger.logError('SupabaseAuthRepository.signUp', e, st);
         rethrow;
       }
     }
@@ -90,6 +85,13 @@ class SupabaseAuthRepository implements AuthRepository {
 
   @override
   Future<void> logout() => _client.auth.signOut();
+
+  @override
+  Future<void> sendPasswordResetEmail(String email) =>
+      _client.auth.resetPasswordForEmail(
+        email,
+        redirectTo: 'https://martonpercar.github.io/DayPilot/reset-password.html',
+      );
 
   Future<void> _ensureProfileExists(User user) async {
     final existing = await _client.from('users').select('id').eq('id', user.id).limit(1);

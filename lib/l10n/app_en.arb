@@ -244,6 +244,13 @@
   "notifTaskCompletedTitle": "Task completed! ✅",
   "notifTaskCompletedBody": "You completed \"{title}\" and earned 20 pts.",
   "@notifTaskCompletedBody": {"placeholders": {"title": {"type": "String"}}},
+  "notifTaskReminderTitle": "Today's Tasks",
+  "notifTaskReminderCount": "You have {count} tasks due today",
+  "@notifTaskReminderCount": {"placeholders": {"count": {"type": "int"}}},
+  "notifTaskReminderNone": "No tasks for today ✓",
+  "notifTaskReminderGeneric": "Check your tasks for today",
+  "notifStreakDangerTitle": "Streak in Danger! 🔥",
+  "notifStreakDangerBody": "Open the app before midnight to keep your streak",
 
   "timerPause": "Pause",
 

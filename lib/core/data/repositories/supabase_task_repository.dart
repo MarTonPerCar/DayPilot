@@ -4,12 +4,9 @@ import 'package:uuid/uuid.dart';
 
 import '../../cache/session_cache.dart';
 import '../../utils/iso_date.dart';
-import '../models/app_notification_item.dart';
 import '../models/app_task.dart';
 import '../models/task_category.dart';
 import '../models/task_difficulty.dart';
-import '../notification_l10n.dart';
-import '../notification_writer.dart';
 import '../points_writer.dart';
 import 'task_repository.dart';
 
@@ -58,7 +55,6 @@ class SupabaseTaskRepository implements TaskRepository {
       'date': isoDate(data.date),
     });
 
-    // One row per occurrence, capped 90 days out.
     if (data.recurring && data.recurrenceDays >= 1) {
       final limit = data.date.add(const Duration(days: 90));
       var next = data.date.add(Duration(days: data.recurrenceDays));
@@ -103,28 +99,17 @@ class SupabaseTaskRepository implements TaskRepository {
       'completed_at': isDone ? DateTime.now().toUtc().toIso8601String() : null,
     }).eq('id', occurrenceId).eq('user_id', uid);
 
-    if (!isDone) return; // un-checking never revokes points
+    if (!isDone) return;
 
-    // is_earned gates it so toggling off and back on doesn't double-pay.
     final rows = await _client
         .from('calendar_tasks')
-        .select('title, is_earned')
+        .select('is_earned')
         .eq('occurrence_id', occurrenceId)
         .eq('user_id', uid);
     if (rows.isEmpty || rows.first['is_earned'] == true) return;
-    final title = rows.first['title'] as String;
 
     await logPointsAndCheckLevelUp(_client, userId: uid, points: 20, source: 'TASKS');
     await _client.from('task_days').update({'is_earned': true}).eq('id', occurrenceId).eq('user_id', uid);
-
-    final l10n = currentL10n();
-    await writeNotification(
-      _client,
-      userId: uid,
-      type: AppNotificationType.taskCompleted,
-      title: l10n.notifTaskCompletedTitle,
-      body: l10n.notifTaskCompletedBody(title),
-    );
   }
 
   @override

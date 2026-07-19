@@ -7,6 +7,7 @@ import '../../components/basic/text_field.dart';
 import '../../components/cards/friend_card.dart';
 import '../../core/data/models/app_friend.dart';
 import '../../core/data/repositories/providers.dart';
+import '../../core/logging/app_logger.dart';
 import '../../l10n/app_localizations.dart';
 
 class SearchFriendsScreen extends ConsumerStatefulWidget {
@@ -40,15 +41,22 @@ class _SearchFriendsScreenState extends ConsumerState<SearchFriendsScreen> {
       return;
     }
     setState(() => _searching = true);
-    final results = await ref.read(friendsRepositoryProvider).searchUsers(query);
-    if (!mounted) return;
-    setState(() {
-      _results = results;
-      _searching = false;
-    });
+    try {
+      final results = await ref.read(friendsRepositoryProvider).searchUsers(query);
+      if (!mounted) return;
+      setState(() {
+        _results = results;
+        _searching = false;
+      });
+    } catch (e, st) {
+      AppLogger.logError('SearchFriendsScreen._search', e, st);
+      if (!mounted) return;
+      setState(() => _searching = false);
+    }
   }
 
   Future<void> _addFriend(AppUserSearchResult result) async {
+    final previous = _results;
     setState(() {
       _results = [
         for (final r in _results)
@@ -65,7 +73,13 @@ class _SearchFriendsScreenState extends ConsumerState<SearchFriendsScreen> {
             r,
       ];
     });
-    await ref.read(friendsRepositoryProvider).sendFriendRequest(result.userId);
+    try {
+      await ref.read(friendsRepositoryProvider).sendFriendRequest(result.userId);
+    } catch (e, st) {
+      AppLogger.logError('SearchFriendsScreen._addFriend', e, st);
+      if (!mounted) return;
+      setState(() => _results = previous);
+    }
   }
 
   @override

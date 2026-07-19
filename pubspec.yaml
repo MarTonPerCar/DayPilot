@@ -45,6 +45,10 @@ dependencies:
   image_picker: ^1.2.3
   launch_at_startup: ^0.5.1
 
+  win32: ^5.15.0
+  ffi: ^2.2.0
+  local_notifier: ^0.1.6
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -60,6 +64,10 @@ dev_dependencies:
 flutter_launcher_icons:
   android: true
   ios: true
+  windows:
+    generate: true
+    image_path: "assets/icon/icon.png"
+    icon_size: 256 
   image_path: "assets/icon/icon.png"
   adaptive_icon_background: "#4A7C59"
   adaptive_icon_foreground: "assets/icon/icon_foreground.png"

@@ -1,9 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/app_friend.dart';
-import '../models/app_notification_item.dart';
-import '../notification_l10n.dart';
-import '../notification_writer.dart';
 import '../reaction_types.dart';
 import 'friends_repository.dart';
 
@@ -13,11 +10,6 @@ class SupabaseFriendsRepository implements FriendsRepository {
   final SupabaseClient _client;
 
   String? get _userId => _client.auth.currentUser?.id;
-
-  Future<String> _myUsername(String uid) async {
-    final row = await _client.from('users').select('username').eq('id', uid).single();
-    return row['username'] as String;
-  }
 
   @override
   Future<List<AppFriend>> getFriends() async {
@@ -162,16 +154,6 @@ class SupabaseFriendsRepository implements FriendsRepository {
     final uid = _userId;
     if (uid == null) return;
     await _client.from('friend_requests').insert({'from_user_id': uid, 'to_user_id': toUserId});
-
-    final myUsername = await _myUsername(uid);
-    final l10n = currentL10n();
-    await writeNotification(
-      _client,
-      userId: toUserId,
-      type: AppNotificationType.friendRequest,
-      title: l10n.notifFriendRequestTitle,
-      body: l10n.notifFriendRequestBody(myUsername),
-    );
   }
 
   @override
@@ -180,16 +162,6 @@ class SupabaseFriendsRepository implements FriendsRepository {
     if (uid == null) return;
     await _client.from('friends').insert({'requester_id': fromUserId, 'receiver_id': uid});
     await _client.from('friend_requests').delete().eq('id', requestId);
-
-    final myUsername = await _myUsername(uid);
-    final l10n = currentL10n();
-    await writeNotification(
-      _client,
-      userId: fromUserId,
-      type: AppNotificationType.friendAccepted,
-      title: l10n.notifFriendAcceptedTitle,
-      body: l10n.notifFriendAcceptedBody(myUsername),
-    );
   }
 
   @override
@@ -215,16 +187,6 @@ class SupabaseFriendsRepository implements FriendsRepository {
         'type': type,
       },
       onConflict: 'from_user_id, weekly_summary_id',
-    );
-
-    final myUsername = await _myUsername(uid);
-    final l10n = currentL10n();
-    await writeNotification(
-      _client,
-      userId: toUserId,
-      type: AppNotificationType.reaction,
-      title: l10n.notifReactionTitle,
-      body: l10n.notifReactionBody(myUsername, emoji),
     );
   }
 }

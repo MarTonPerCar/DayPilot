@@ -1,7 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../core/data/friend_stats_broadcast.dart';
 import '../../core/data/models/app_friend.dart';
 import '../../core/data/repositories/providers.dart';
+import '../../core/logging/app_logger.dart';
 import '../rivalry/ranking_notifier.dart';
 
 class FriendsState {
@@ -12,17 +15,81 @@ class FriendsState {
 }
 
 class FriendsNotifier extends Notifier<FriendsState> {
+  RealtimeChannel? _channel;
+  bool _refreshing = false;
+
   @override
   FriendsState build() {
     Future.microtask(refresh);
+    final broadcast = ref.read(friendStatsBroadcastProvider);
+    ref.onDispose(() {
+      _channel?.unsubscribe();
+      broadcast.removeListener(_refreshFromRealtime);
+    });
     return const FriendsState();
   }
 
   Future<void> refresh() async {
-    final repo = ref.read(friendsRepositoryProvider);
-    final friends = await repo.getFriends();
-    final requests = await repo.getIncomingRequests();
-    state = FriendsState(friends: friends, requests: requests);
+    try {
+      final repo = ref.read(friendsRepositoryProvider);
+      final friends = await repo.getFriends();
+      final requests = await repo.getIncomingRequests();
+      state = FriendsState(friends: friends, requests: requests);
+      _subscribeToRealtimeOnce();
+    } catch (e, st) {
+      AppLogger.logError('FriendsNotifier.refresh', e, st);
+    }
+  }
+
+  void _subscribeToRealtimeOnce() {
+    if (_channel != null) return;
+    final client = ref.read(supabaseClientProvider);
+    final uid = client.auth.currentUser?.id;
+    if (uid == null) return;
+
+    _channel = client
+        .channel('friends-$uid')
+        .onPostgresChanges(
+          event: PostgresChangeEvent.all,
+          schema: 'public',
+          table: 'friends',
+          filter: PostgresChangeFilter(type: PostgresChangeFilterType.eq, column: 'requester_id', value: uid),
+          callback: (payload) => _refreshFromRealtime(),
+        )
+        .onPostgresChanges(
+          event: PostgresChangeEvent.all,
+          schema: 'public',
+          table: 'friends',
+          filter: PostgresChangeFilter(type: PostgresChangeFilterType.eq, column: 'receiver_id', value: uid),
+          callback: (payload) => _refreshFromRealtime(),
+        )
+        .onPostgresChanges(
+          event: PostgresChangeEvent.all,
+          schema: 'public',
+          table: 'friend_requests',
+          filter: PostgresChangeFilter(type: PostgresChangeFilterType.eq, column: 'to_user_id', value: uid),
+          callback: (payload) => _refreshFromRealtime(),
+        )
+        .onPostgresChanges(
+          event: PostgresChangeEvent.all,
+          schema: 'public',
+          table: 'reactions',
+          filter: PostgresChangeFilter(type: PostgresChangeFilterType.eq, column: 'from_user_id', value: uid),
+          callback: (payload) => _refreshFromRealtime(),
+        )
+        .subscribe();
+
+    ref.read(friendStatsBroadcastProvider).addListener(_refreshFromRealtime);
+  }
+
+  Future<void> _refreshFromRealtime() async {
+    if (_refreshing) return;
+    _refreshing = true;
+    try {
+      await refresh();
+    } finally {
+      _refreshing = false;
+    }
   }
 
   Future<void> acceptRequest(AppFriendRequest request) async {
@@ -31,7 +98,6 @@ class FriendsNotifier extends Notifier<FriendsState> {
           fromUserId: request.fromUserId,
         );
     await refresh();
-    // Ranking is me + my friends — changing who's a friend makes it stale.
     await ref.read(rankingNotifierProvider.notifier).refresh();
   }
 

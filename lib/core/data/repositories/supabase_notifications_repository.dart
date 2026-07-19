@@ -21,17 +21,7 @@ class SupabaseNotificationsRepository implements NotificationsRepository {
         .eq('user_id', uid)
         .order('created_at', ascending: false);
 
-    return [
-      for (final r in rows)
-        AppNotificationItem(
-          id: r['id'] as String,
-          type: AppNotificationTypeDb.fromDb(r['type'] as String),
-          title: r['title'] as String,
-          body: r['body'] as String,
-          isRead: r['is_read'] as bool,
-          createdAt: DateTime.parse(r['created_at'] as String),
-        ),
-    ];
+    return [for (final r in rows) AppNotificationItem.fromRow(r)];
   }
 
   @override
