@@ -22,10 +22,8 @@ class AppProfileStats {
   final String? avatarUrl;
   final int level;
 
-  /// Points earned within the current level (not since level 1).
   final int currentXp;
 
-  /// Size of the current level's span (not the absolute next-level threshold).
   final int xpToNextLevel;
   final int totalPoints;
   final int streak;

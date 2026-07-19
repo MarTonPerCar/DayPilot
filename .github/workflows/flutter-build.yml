@@ -2,7 +2,9 @@ name: Flutter Build
 
 on:
   push:
-  pull_request:
+    tags:
+      - 'v*'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -38,18 +40,23 @@ jobs:
       - name: Build Windows release
         run: flutter build windows --release
 
-      - name: Zip build output
-        shell: bash
-        run: |
-          cd build/windows/x64/runner/Release
-          7z a -tzip DayPilot-Windows.zip *
-          mv DayPilot-Windows.zip "$GITHUB_WORKSPACE/"
+      - name: Install Inno Setup
+        run: choco install innosetup -y
 
-      - name: Upload artifact
+      - name: Compile installer
+        run: iscc installer\daypilot_installer.iss
+
+      - name: Upload installer artifact
         uses: actions/upload-artifact@v4
         with:
-          name: DayPilot-Windows
-          path: DayPilot-Windows.zip
+          name: DayPilot-Setup
+          path: installer\Output\DayPilot-Setup.exe
+
+      - name: Create GitHub Release (tags only)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: installer/Output/DayPilot-Setup.exe
 
   build-linux:
     runs-on: ubuntu-latest
@@ -59,7 +66,7 @@ jobs:
       - name: Install Linux build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev libstdc++-12-dev libayatana-appindicator3-dev
+          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev libstdc++-12-dev libayatana-appindicator3-dev libnotify-dev
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -85,53 +92,55 @@ jobs:
       - name: Build Linux release
         run: flutter build linux --release
 
-      - name: Zip build output
+      - name: Build .deb package
         run: |
-          cd build/linux/x64/release/bundle
-          zip -r "$GITHUB_WORKSPACE/DayPilot-Linux.zip" .
+          set -e
+          VERSION="${GITHUB_REF_NAME#v}"
 
-      - name: Upload artifact
+          PKGROOT="$GITHUB_WORKSPACE/debroot"
+          mkdir -p "$PKGROOT/DEBIAN"
+          mkdir -p "$PKGROOT/opt/daypilot"
+          mkdir -p "$PKGROOT/usr/bin"
+          mkdir -p "$PKGROOT/usr/share/applications"
+          mkdir -p "$PKGROOT/usr/share/icons/hicolor/256x256/apps"
+
+          cp -r build/linux/x64/release/bundle/* "$PKGROOT/opt/daypilot/"
+          cp assets/icon/icon.png "$PKGROOT/usr/share/icons/hicolor/256x256/apps/daypilot.png"
+          ln -s /opt/daypilot/daypilot "$PKGROOT/usr/bin/daypilot"
+
+          {
+            printf '%s\n' "[Desktop Entry]"
+            printf '%s\n' "Type=Application"
+            printf '%s\n' "Name=DayPilot"
+            printf '%s\n' "Exec=daypilot"
+            printf '%s\n' "Icon=daypilot"
+            printf '%s\n' "Categories=Utility;"
+            printf '%s\n' "Terminal=false"
+          } > "$PKGROOT/usr/share/applications/daypilot.desktop"
+
+          {
+            printf '%s\n' "Package: daypilot"
+            printf '%s\n' "Version: $VERSION"
+            printf '%s\n' "Section: utils"
+            printf '%s\n' "Priority: optional"
+            printf '%s\n' "Architecture: amd64"
+            printf '%s\n' "Maintainer: Mario Perez Carmona <mario2002pc@hotmail.com>"
+            printf '%s\n' "Depends: libgtk-3-0, libayatana-appindicator3-1, libnotify4"
+            printf '%s\n' "Description: DayPilot - personal organization and habit tracking app"
+            printf '%s\n' " Task management, calendar, health habits, and social rivalry"
+            printf '%s\n' " features in a single desktop app."
+          } > "$PKGROOT/DEBIAN/control"
+
+          dpkg-deb -Zgzip --build --root-owner-group "$PKGROOT" "$GITHUB_WORKSPACE/DayPilot-Setup.deb"
+
+      - name: Upload .deb artifact
         uses: actions/upload-artifact@v4
         with:
-          name: DayPilot-Linux
-          path: DayPilot-Linux.zip
+          name: DayPilot-Setup-deb
+          path: DayPilot-Setup.deb
 
-  release:
-    needs: [build-windows, build-linux]
-    if: startsWith(github.ref, 'refs/tags/')
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Download Windows artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: DayPilot-Windows
-
-      - name: Download Linux artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: DayPilot-Linux
-
-      - name: Create GitHub Release for this version
+      - name: Create GitHub Release (tags only)
+        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            DayPilot-Windows.zip
-            DayPilot-Linux.zip
-
-      - name: Move floating "latest" tag
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag -f incremento-flutter-latest
-          git push origin -f incremento-flutter-latest
-
-      - name: Update "latest" release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: incremento-flutter-latest
-          name: "Latest build (Incremento-Flutter)"
-          files: |
-            DayPilot-Windows.zip
-            DayPilot-Linux.zip
+          files: DayPilot-Setup.deb

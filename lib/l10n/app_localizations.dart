@@ -1246,6 +1246,42 @@ abstract class AppLocalizations {
   /// **'Completaste \"{title}\" y ganaste 20 pts.'**
   String notifTaskCompletedBody(String title);
 
+  /// No description provided for @notifTaskReminderTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Tareas de hoy'**
+  String get notifTaskReminderTitle;
+
+  /// No description provided for @notifTaskReminderCount.
+  ///
+  /// In es, this message translates to:
+  /// **'Tienes {count} tareas pendientes hoy'**
+  String notifTaskReminderCount(int count);
+
+  /// No description provided for @notifTaskReminderNone.
+  ///
+  /// In es, this message translates to:
+  /// **'No tienes tareas para hoy ✓'**
+  String get notifTaskReminderNone;
+
+  /// No description provided for @notifTaskReminderGeneric.
+  ///
+  /// In es, this message translates to:
+  /// **'Revisa tus tareas para hoy'**
+  String get notifTaskReminderGeneric;
+
+  /// No description provided for @notifStreakDangerTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¡Racha en peligro! 🔥'**
+  String get notifStreakDangerTitle;
+
+  /// No description provided for @notifStreakDangerBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Abre la app antes de medianoche para mantener tu racha'**
+  String get notifStreakDangerBody;
+
   /// No description provided for @timerPause.
   ///
   /// In es, this message translates to:

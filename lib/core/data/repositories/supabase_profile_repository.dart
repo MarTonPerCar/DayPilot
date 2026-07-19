@@ -14,7 +14,6 @@ class SupabaseProfileRepository implements ProfileRepository {
 
   String? get _userId => _client.auth.currentUser?.id;
 
-  // Same curve as the `fn_update_level` DB trigger.
   static int _levelThreshold(int level) => 5 * level * (level + 3);
 
   @override

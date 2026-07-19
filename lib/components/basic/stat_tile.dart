@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Ya incluye su propio [Expanded]; colocar directamente dentro de un [Row].
 class StatTile extends StatelessWidget {
   final IconData icon;
   final Color color;

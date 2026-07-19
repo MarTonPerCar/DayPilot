@@ -14,7 +14,6 @@ class TechHealthScreen extends ConsumerWidget {
 
   static const _genericIcon = Icons.apps_rounded;
 
-  /// Icon/color aren't persisted — looked up from the demo app-picker list.
   (IconData, Color) _lookAndFeelFor(String appName, ColorScheme colors) {
     for (final (name, icon, color) in AppData.mockInstallableApps) {
       if (name.toLowerCase() == appName.toLowerCase()) return (icon, color);

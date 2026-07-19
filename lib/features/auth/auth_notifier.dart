@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/cache/session_cache.dart';
 import '../../core/data/models/auth_exceptions.dart';
 import '../../core/data/repositories/providers.dart';
+import '../../core/logging/app_logger.dart';
 import '../friends/friends_notifier.dart';
 import '../notifications/notifications_notifier.dart';
 import '../profile/profile_notifier.dart';
@@ -29,7 +30,7 @@ class AuthNotifier extends Notifier<AuthSession> {
     ref.invalidate(rankingNotifierProvider);
     ref.invalidate(notificationsNotifierProvider);
     ref.invalidate(techHealthNotifierProvider);
-    // getTasks() short-circuits through this cache before hitting Supabase.
+
     ref.invalidate(tasksCacheProvider);
   }
 
@@ -46,7 +47,8 @@ class AuthNotifier extends Notifier<AuthSession> {
           );
       _invalidateUserScopedProviders();
       state = state.copyWith(status: AuthStatus.authenticated, user: user);
-    } catch (e) {
+    } catch (e, st) {
+      AppLogger.logError('AuthNotifier.login', e, st);
       state = AuthSession(status: AuthStatus.unauthenticated, error: e);
     }
   }
@@ -77,13 +79,18 @@ class AuthNotifier extends Notifier<AuthSession> {
       }
       _invalidateUserScopedProviders();
       state = state.copyWith(status: AuthStatus.authenticated, user: user);
-    } catch (e) {
+    } catch (e, st) {
+      AppLogger.logError('AuthNotifier.signUp', e, st);
       state = AuthSession(status: AuthStatus.unauthenticated, error: e);
     }
   }
 
   Future<void> logout() async {
-    await ref.read(authRepositoryProvider).logout();
+    try {
+      await ref.read(authRepositoryProvider).logout();
+    } catch (e, st) {
+      AppLogger.logError('AuthNotifier.logout', e, st);
+    }
     _invalidateUserScopedProviders();
     state = AuthSession.initial;
   }

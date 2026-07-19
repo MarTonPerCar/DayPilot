@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/data/models/app_profile_stats.dart';
 import '../../core/data/repositories/providers.dart';
+import '../../core/logging/app_logger.dart';
 
 class ProfileStatsNotifier extends Notifier<AppProfileStats?> {
   static const _refreshInterval = Duration(minutes: 5);
@@ -17,7 +18,11 @@ class ProfileStatsNotifier extends Notifier<AppProfileStats?> {
   }
 
   Future<void> refresh() async {
-    state = await ref.read(profileRepositoryProvider).getProfileStats();
+    try {
+      state = await ref.read(profileRepositoryProvider).getProfileStats();
+    } catch (e, st) {
+      AppLogger.logError('ProfileStatsNotifier.refresh', e, st);
+    }
   }
 }
 

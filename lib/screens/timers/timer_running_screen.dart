@@ -44,8 +44,6 @@ class _TimerRunningScreenState extends ConsumerState<TimerRunningScreen> with Wi
     WidgetsBinding.instance.addObserver(this);
   }
 
-  // A ticking Timer while the desktop flyout is hidden confuses
-  // window_manager's hide/refocus on Linux, leaving the window stuck open.
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state != AppLifecycleState.resumed && _running) {

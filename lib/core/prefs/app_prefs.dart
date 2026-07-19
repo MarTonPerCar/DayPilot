@@ -13,6 +13,10 @@ class AppPrefs {
   static const _notificationsKey = 'notifications_enabled';
   static const _taskRemindersKey = 'task_reminders_enabled';
   static const _streakAlertsKey = 'streak_alerts_enabled';
+  static const _launchAtStartupConfiguredKey = 'launch_at_startup_configured';
+  static const _lastOpenDateKey = 'last_open_date';
+  static const _taskReminderFiredDateKey = 'task_reminder_fired_date';
+  static const _streakAlertFiredDateKey = 'streak_alert_fired_date';
 
   String? get theme => _prefs.getString(_themeKey);
   Future<void> setTheme(String value) => _prefs.setString(_themeKey, value);
@@ -31,4 +35,19 @@ class AppPrefs {
 
   bool get streakAlertsEnabled => _prefs.getBool(_streakAlertsKey) ?? true;
   Future<void> setStreakAlertsEnabled(bool value) => _prefs.setBool(_streakAlertsKey, value);
+
+  bool get launchAtStartupConfigured => _prefs.getBool(_launchAtStartupConfiguredKey) ?? false;
+  Future<void> setLaunchAtStartupConfigured(bool value) =>
+      _prefs.setBool(_launchAtStartupConfiguredKey, value);
+
+  String get lastOpenDate => _prefs.getString(_lastOpenDateKey) ?? '';
+  Future<void> setLastOpenDate(String value) => _prefs.setString(_lastOpenDateKey, value);
+
+  String get taskReminderFiredDate => _prefs.getString(_taskReminderFiredDateKey) ?? '';
+  Future<void> setTaskReminderFiredDate(String value) =>
+      _prefs.setString(_taskReminderFiredDateKey, value);
+
+  String get streakAlertFiredDate => _prefs.getString(_streakAlertFiredDateKey) ?? '';
+  Future<void> setStreakAlertFiredDate(String value) =>
+      _prefs.setString(_streakAlertFiredDateKey, value);
 }

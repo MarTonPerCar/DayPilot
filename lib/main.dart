@@ -1,10 +1,13 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'core/auth/auth_gate.dart';
+import 'core/logging/app_logger.dart';
 import 'core/prefs/app_prefs.dart';
 import 'core/window/desktop_window.dart';
 import 'l10n/app_localizations.dart';
@@ -12,22 +15,42 @@ import 'l10n/locale_notifier.dart';
 import 'theme/app_theme.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await initDesktopWindow();
+  runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    await AppLogger.init();
 
-  final env = jsonDecode(await rootBundle.loadString('env.json')) as Map<String, dynamic>;
-  await Supabase.initialize(
-    url: env['SUPABASE_URL'] as String,
-    publishableKey: env['SUPABASE_KEY'] as String,
-  );
+    FlutterError.onError = (details) {
+      AppLogger.logError('FlutterError', details.exception, details.stack ?? StackTrace.current);
+      FlutterError.presentError(details);
+    };
+    PlatformDispatcher.instance.onError = (error, stack) {
+      AppLogger.logError('PlatformDispatcher', error, stack);
+      return true;
+    };
 
-  await _restorePersistedPreferences();
+    try {
+      await initDesktopWindow();
+    } catch (e, st) {
+      AppLogger.logError('initDesktopWindow', e, st);
+    }
 
-  runApp(
-    const ProviderScope(
-      child: DesktopFlyoutScope(child: DayPilotApp()),
-    ),
-  );
+    final env = jsonDecode(await rootBundle.loadString('env.json')) as Map<String, dynamic>;
+    await Supabase.initialize(
+      url: env['SUPABASE_URL'] as String,
+      publishableKey: env['SUPABASE_KEY'] as String,
+    );
+
+    await _restorePersistedPreferences();
+
+    runApp(
+      const ProviderScope(
+        child: DesktopFlyoutAnimator(child: DayPilotApp()),
+      ),
+    );
+
+  }, (error, stack) {
+    AppLogger.logError('runZonedGuarded', error, stack);
+  });
 }
 
 Future<void> _restorePersistedPreferences() async {
@@ -76,15 +99,10 @@ class DayPilotApp extends StatelessWidget {
                   supportedLocales: AppLocalizations.supportedLocales,
                   home: const AuthGate(),
                   builder: (context, child) {
-                    if (!isDesktopPlatform) return child!;
                     const borderWidth = 5.0;
                     return Container(
+                      color: Colors.black,
                       padding: const EdgeInsets.all(borderWidth),
-                      decoration: const BoxDecoration(
-                        border: Border.fromBorderSide(
-                          BorderSide(color: Colors.black, width: borderWidth),
-                        ),
-                      ),
                       child: child,
                     );
                   },
