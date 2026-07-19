@@ -43,7 +43,10 @@ This branch, `Incremento-Flutter`, is the **stable, permanent home** for the fin
 
 ## Downloads
 
-- [⬇️ Download DayPilot for Windows](https://github.com/MarTonPerCar/DayPilot/releases/download/incremento-flutter-latest/DayPilot-Setup.exe)
-- [⬇️ Download DayPilot for Linux (.deb)](https://github.com/MarTonPerCar/DayPilot/releases/download/incremento-flutter-latest/DayPilot-Setup.deb)
+- [⬇️ Download DayPilot for Windows](https://github.com/MarTonPerCar/DayPilot/releases/download/incremento-flutter-latest/DayPilot-Setup.exe) — run the installer after downloading
+- Linux (.deb):
+  ```bash
+  wget -O DayPilot-Setup.deb https://github.com/MarTonPerCar/DayPilot/releases/download/incremento-flutter-latest/DayPilot-Setup.deb && sudo apt install ./DayPilot-Setup.deb
+  ```
 
 > **Note:** these links always point at the latest release built from this branch (`Incremento-Flutter`), the stable version of the app.
