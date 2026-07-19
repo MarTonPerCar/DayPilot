@@ -34,11 +34,11 @@ Sistema de restricciones de uso de apps basado en dos permisos del sistema: esta
 
 La pantalla de configuración muestra una pasarela de permisos a pantalla completa si alguno no está concedido, con instrucciones paso a paso para cada permiso, indicadores de estado y botones directos a los ajustes del sistema.
 
-Los datos de uso se actualizan mediante un `PeriodicWorkRequest` de WorkManager cada 15 minutos y también en tiempo real cada 60 segundos mientras la app está en primer plano. Si el usuario completa el día sin violar ningún límite (con al menos 3 restricciones activas), gana un punto de bonificación diario.
+Los datos de uso se actualizan mediante un `PeriodicWorkRequest` de WorkManager cada 15 minutos y también al volver a primer plano la propia pantalla de TechHealth (evento `ON_RESUME` del ciclo de vida). Si el usuario completa el día sin violar ningún límite (con al menos 3 restricciones activas), gana un punto de bonificación diario.
 
 ### Notificaciones
 
-Sistema centralizado de notificaciones almacenadas en Supabase. Cada evento relevante (solicitud de amistad, reacción recibida, alerta de nivel, etc.) genera una fila en la tabla `notifications`. La pantalla de notificaciones las carga, agrupa por tipo y permite marcarlas como leídas. Se utiliza un `Hub` local para evitar duplicados y reducir llamadas a la red en cada apertura.
+Sistema centralizado de notificaciones almacenadas en Supabase. Cada evento relevante (solicitud de amistad, reacción recibida, alerta de nivel, etc.) genera una fila en la tabla `notifications`. La pantalla de notificaciones las carga, permite filtrarlas por tipo y marcarlas como leídas. Se utiliza un `Hub` local para evitar duplicados y reducir llamadas a la red en cada apertura.
 
 ### Social — Amigos y reacciones
 
@@ -76,7 +76,7 @@ El patrón `if (!permiso) { MostrarGate(); return }` al inicio del composable fu
 
 ### WorkManager y límites del sistema
 
-WorkManager impone un intervalo mínimo de 15 minutos para trabajo periódico en Android. Para el polling más frecuente (actualización de uso de apps mientras la app está en primer plano) se usa un bucle de corrutinas en el ViewModel con `delay(60_000L)`, que el sistema puede cancelar libremente cuando la app pasa a segundo plano.
+WorkManager impone un intervalo mínimo de 15 minutos para trabajo periódico en Android. Para una actualización más inmediata, `TechHealthViewModel.refreshUsage()` se dispara también cuando la pantalla de TechHealth vuelve a primer plano, mediante un observador de ciclo de vida (`ON_RESUME`) registrado en `DayPilotNavGraph`, en lugar de un polling continuo mientras la app está abierta.
 
 ### Resumen semanal
 
