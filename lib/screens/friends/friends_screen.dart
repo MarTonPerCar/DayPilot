@@ -110,11 +110,35 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> with SingleTicker
             onReact: f.weeklySummaryId == null
                 ? null
                 : (emoji) => ref.read(friendsNotifierProvider.notifier).react(f, emoji),
-            onRemove: () => ref.read(friendsNotifierProvider.notifier).removeFriend(f.friendRowId),
+            onRemove: () => _confirmRemove(f),
           );
         },
       ),
     );
+  }
+
+  Future<void> _confirmRemove(AppFriend friend) async {
+    final l10n = AppLocalizations.of(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.friendsRemoveConfirmTitle),
+        content: Text(l10n.friendsRemoveConfirmMessage(friend.name)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(l10n.commonCancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(l10n.commonDelete),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) {
+      await ref.read(friendsNotifierProvider.notifier).removeFriend(friend.friendRowId);
+    }
   }
 
   Widget _buildRequests(BuildContext context, List<AppFriendRequest> requests) {

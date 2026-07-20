@@ -1774,6 +1774,18 @@ abstract class AppLocalizations {
   /// **'Aún no tienes amigos'**
   String get friendsNoFriends;
 
+  /// No description provided for @friendsRemoveConfirmTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Eliminar amigo?'**
+  String get friendsRemoveConfirmTitle;
+
+  /// No description provided for @friendsRemoveConfirmMessage.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Seguro que quieres eliminar a {name} de tus amigos?'**
+  String friendsRemoveConfirmMessage(String name);
+
   /// No description provided for @remindersEmptyState.
   ///
   /// In es, this message translates to:

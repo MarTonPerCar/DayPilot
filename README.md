@@ -11,9 +11,9 @@ This branch, `Incremento-Flutter`, is the **stable, permanent home** for the fin
 - Tasks (create/edit/complete, recurrence, points on completion)
 - Steps tracking with daily goals and milestone bonuses
 - Pomodoro and custom timers, with a once-per-day point bonus
-- Tech Health: per-app usage restrictions (configuration only — enforcement/blocking isn't built yet on any platform but Android's native app)
+- Tech Health: per-app usage restrictions — Android-only for now (the configuration screen itself is gated to Android; other platforms show an "unavailable" screen, since real-time usage watching/blocking hasn't been wired up for them yet)
 - Friends, friend requests, and a 30-day points ranking
-- Real-time in-app notifications (friend activity, level-ups, goals, tasks)
+- Real-time in-app notifications (friend activity, reactions, level-ups, streak risk, goals, tasks, timers, reminders, daily summary)
 - Weekly progress summary with reactions
 - Spanish, English, and German localization
 - Desktop support (Windows/Linux): runs as a tray-icon flyout window sized like a phone
@@ -24,7 +24,7 @@ This branch, `Incremento-Flutter`, is the **stable, permanent home** for the fin
 - **Framework:** Flutter
 - **State management:** Riverpod (`Notifier`/`NotifierProvider`, no codegen)
 - **Backend:** Supabase (PostgreSQL, Auth, Storage, Realtime)
-- **Architecture:** one repository interface + one notifier per domain
+- **Architecture:** one repository interface per domain (with a Supabase-backed implementation), one or more Riverpod notifiers per domain
 - **Localization:** `flutter_localizations`, ARB files (es/en/de)
 
 ## Running locally
@@ -42,6 +42,8 @@ This branch, `Incremento-Flutter`, is the **stable, permanent home** for the fin
 | `Test-Supabase-Flutter` | Standalone spike validating `supabase_flutter` against the real project database |
 
 ## Downloads
+
+Releases for this branch are tagged `v2.1.X.Y.Z` (the repo-wide scheme: `V`=platform — `1` Android, `2` Flutter — `SV`=branch — `1` main, `2` TestFinal — followed by the real semantic version). CI also maintains a floating `incremento-flutter-latest` tag that always points at the newest build for this branch specifically.
 
 - [⬇️ Download DayPilot for Windows](https://github.com/MarTonPerCar/DayPilot/releases/download/incremento-flutter-latest/DayPilot-Setup.exe) — run the installer after downloading
 - Linux (.deb):

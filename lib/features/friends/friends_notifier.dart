@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -15,14 +17,21 @@ class FriendsState {
 }
 
 class FriendsNotifier extends Notifier<FriendsState> {
+  // Realtime is the primary update path, but its first subscribe() after app start isn't
+  // instant — anything that lands before the handshake completes is silently missed (Postgres
+  // changes aren't replayed). This periodic refresh self-heals a missed event within a few
+  // minutes instead of leaving it stuck until the user happens to reopen this screen.
+  static const _refreshInterval = Duration(minutes: 5);
   RealtimeChannel? _channel;
   bool _refreshing = false;
 
   @override
   FriendsState build() {
     Future.microtask(refresh);
+    final timer = Timer.periodic(_refreshInterval, (_) => refresh());
     final broadcast = ref.read(friendStatsBroadcastProvider);
     ref.onDispose(() {
+      timer.cancel();
       _channel?.unsubscribe();
       broadcast.removeListener(_refreshFromRealtime);
     });

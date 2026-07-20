@@ -949,6 +949,14 @@ class AppLocalizationsDe extends AppLocalizations {
   String get friendsNoFriends => 'Du hast noch keine Freunde';
 
   @override
+  String get friendsRemoveConfirmTitle => 'Freund entfernen?';
+
+  @override
+  String friendsRemoveConfirmMessage(String name) {
+    return 'Möchtest du $name wirklich aus deinen Freunden entfernen?';
+  }
+
+  @override
   String get remindersEmptyState =>
       'Du hast keine Erinnerungen.\nFüge eine hinzu!';
 

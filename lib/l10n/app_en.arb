@@ -355,6 +355,9 @@
   "@friendsRequestsTabCount": {"placeholders": {"n": {"type": "int"}}},
   "friendsNoRequests": "You have no pending requests",
   "friendsNoFriends": "You don't have any friends yet",
+  "friendsRemoveConfirmTitle": "Remove friend?",
+  "friendsRemoveConfirmMessage": "Are you sure you want to remove {name} from your friends?",
+  "@friendsRemoveConfirmMessage": {"placeholders": {"name": {"type": "String"}}},
 
   "remindersEmptyState": "You have no reminders.\nAdd one!",
 
