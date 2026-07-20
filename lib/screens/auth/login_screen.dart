@@ -94,27 +94,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Container(
-                    width: 80,
-                    height: 80,
-                    decoration: BoxDecoration(
-                      color: colors.primaryContainer,
-                      borderRadius: BorderRadius.circular(24),
-                    ),
-                    child: Icon(
-                      Icons.flight_takeoff_rounded,
-                      size: 44,
-                      color: colors.onPrimaryContainer,
-                    ),
+                  Image.asset(
+                    'assets/images/daypilot_logo.png',
+                    width: 260,
+                    color: colors.onSurface,
+                    colorBlendMode: BlendMode.srcIn,
                   ),
                   const SizedBox(height: 16),
-                  Text(
-                    'DayPilot',
-                    style: text.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: colors.onSurface,
-                    ),
-                  ),
                   Text(
                     l10n.loginTagline,
                     style: text.bodyMedium?.copyWith(color: colors.onSurfaceVariant),
