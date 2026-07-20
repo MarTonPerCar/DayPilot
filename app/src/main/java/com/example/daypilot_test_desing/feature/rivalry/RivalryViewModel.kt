@@ -21,6 +21,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 class RivalryViewModel(private val repo: RankingRepository) : ViewModel() {
 
@@ -30,6 +32,10 @@ class RivalryViewModel(private val repo: RankingRepository) : ViewModel() {
     private var realtimeChannel: RealtimeChannel? = null
     private var refreshing = false
     private val onFriendStatsChanged: () -> Unit = { refreshFromRealtime() }
+
+    // Serializes concurrent load() calls (init, awaitLoad, realtime triggers) so a
+    // slower failed load can't overwrite a faster successful one.
+    private val loadMutex = Mutex()
 
     init { viewModelScope.launch { load() } }
 
@@ -90,8 +96,8 @@ class RivalryViewModel(private val repo: RankingRepository) : ViewModel() {
         FriendStatsBroadcast.removeListener(onFriendStatsChanged)
     }
 
-    private suspend fun load(): Boolean {
-        return try {
+    private suspend fun load(): Boolean = loadMutex.withLock {
+        try {
             val ranking  = repo.getRanking()
             val uid      = repo.getCurrentUserId()
             val me       = ranking.firstOrNull { it.id == uid }

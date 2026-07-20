@@ -38,7 +38,7 @@ Los datos de uso se actualizan mediante un `PeriodicWorkRequest` de WorkManager 
 
 ### Notificaciones
 
-Sistema centralizado de notificaciones almacenadas en Supabase. Cada evento relevante (solicitud de amistad, reacción recibida, alerta de nivel, etc.) genera una fila en la tabla `notifications`. La pantalla de notificaciones las carga, agrupa por tipo y permite marcarlas como leídas. Se utiliza un `Hub` local para evitar duplicados y reducir llamadas a la red en cada apertura.
+Sistema centralizado de notificaciones almacenadas en Supabase. Cada evento relevante (solicitud de amistad, reacción recibida, alerta de nivel, etc.) genera una fila en la tabla `notifications`. La pantalla de notificaciones las carga, permite filtrarlas por tipo y marcarlas como leídas. Se utiliza un `Hub` local para evitar duplicados y reducir llamadas a la red en cada apertura.
 
 ### Social — Amigos y reacciones
 
@@ -117,6 +117,8 @@ Durante la revisión de código se identificaron y corrigieron los siguientes pr
 ---
 
 ## Descargas
+
+Los releases de esta rama se etiquetan `v1.1.X.Y.Z` (esquema compartido del repo: `V`=plataforma — `1` Android, `2` Flutter — `SV`=rama — `1` principal, `2` TestFinal — seguido de la versión semántica real). CI también mantiene una etiqueta flotante `incremento-android-latest` que siempre apunta al build más reciente de esta rama.
 
 - [⬇️ Descargar DayPilot (Incremento-Android)](https://github.com/MarTonPerCar/DayPilot/releases/download/incremento-android-latest/DayPilot-Incremento-Android.apk)
 
