@@ -23,7 +23,7 @@ class SupabaseRankingRepository : RankingRepository {
         private const val TAG = "SupabaseRankingRepo"
     }
 
-    private fun userId() = supabase.auth.currentUserOrNull()?.id ?: ""
+    private fun userId() = supabase.auth.currentUserOrNull()?.id
 
     private suspend fun getFriendIds(uid: String): List<String> {
         val asRequester = try {
@@ -64,7 +64,9 @@ class SupabaseRankingRepository : RankingRepository {
         SessionCache.ranking.value?.let { cached ->
             if (now - SessionCache.rankingFetchedAt < SessionCache.SOCIAL_TTL_MS) return cached
         }
-        val uid = userId()
+        // Don't cache a result built before auth is ready — an empty uid still "succeeds"
+        // with zero rows, which would otherwise poison the cache with a false empty ranking.
+        val uid = userId() ?: return emptyList()
         val result = buildRanking(uid).map { dto ->
             RankingData(
                 id        = dto.id,
@@ -80,12 +82,11 @@ class SupabaseRankingRepository : RankingRepository {
         return result
     }
 
-    override suspend fun getCurrentUserId(): String = userId()
+    override suspend fun getCurrentUserId(): String = userId() ?: ""
 
     // Bypasses the friends_ranking VIEW — its RLS on user_streaks blocks the current user's own streak.
     override suspend fun getCurrentUserData(): RankingData? {
-        val uid = userId()
-        if (uid.isEmpty()) return null
+        val uid = userId() ?: return null
         return try {
             val user = supabase.from("users").select {
                 filter { eq("id", uid) }
