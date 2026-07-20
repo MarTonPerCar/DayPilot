@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -8,12 +10,19 @@ import '../friends/friends_notifier.dart';
 import '../profile/weekly_summary_notifier.dart';
 
 class NotificationsNotifier extends Notifier<List<AppNotificationItem>> {
+  // See FriendsNotifier for why this fallback exists — Realtime's first subscribe() after app
+  // start isn't instant, and missed Postgres changes are never replayed.
+  static const _refreshInterval = Duration(minutes: 5);
   RealtimeChannel? _channel;
 
   @override
   List<AppNotificationItem> build() {
     Future.microtask(refresh);
-    ref.onDispose(() => _channel?.unsubscribe());
+    final timer = Timer.periodic(_refreshInterval, (_) => refresh());
+    ref.onDispose(() {
+      timer.cancel();
+      _channel?.unsubscribe();
+    });
     return const [];
   }
 

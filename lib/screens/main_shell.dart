@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/window/desktop_notifications.dart';
+import '../features/friends/friends_notifier.dart';
 import '../features/notifications/notifications_notifier.dart';
 import '../l10n/app_localizations.dart';
 import 'home/home_screen.dart';
@@ -42,6 +43,10 @@ class _MainShellState extends ConsumerState<MainShell> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final unreadCount = ref.watch(notificationsNotifierProvider).where((n) => !n.isRead).length;
+    // Eagerly create FriendsNotifier here (not just when the Friends tab is first opened) so its
+    // Realtime channel starts subscribing at app-open instead of leaving a window where an incoming
+    // friend request/acceptance can land before anything is listening for it.
+    ref.read(friendsNotifierProvider);
 
     return Scaffold(
       body: IndexedStack(
