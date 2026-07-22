@@ -2,6 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/cache/session_cache.dart';
+import '../../core/connectivity/connectivity_service.dart';
+import '../../core/connectivity/offline_notifier.dart';
 import '../../core/data/models/app_task.dart';
 import '../../core/data/models/task_category.dart';
 import '../../core/data/models/task_difficulty.dart';
@@ -23,12 +25,19 @@ class TasksNotifier extends Notifier<TasksState> {
   }
 
   Future<void> _load() async {
+    if (!await ensureOnline(ref)) {
+      state = state.copyWith(isLoading: false);
+      return;
+    }
     try {
       final tasks = await ref.read(taskRepositoryProvider).getTasks();
       state = state.copyWith(tasks: tasks, isLoading: false);
       _subscribeToRealtimeOnce();
     } catch (e, st) {
       AppLogger.logError('TasksNotifier._load', e, st);
+      if (isConnectivityError(e)) {
+        ref.read(isOfflineProvider.notifier).setOffline(true);
+      }
       state = state.copyWith(isLoading: false);
     }
   }
@@ -72,6 +81,7 @@ class TasksNotifier extends Notifier<TasksState> {
   Future<void> refresh() => _load();
 
   Future<void> addTask(NewTaskData data) async {
+    if (!await ensureOnline(ref)) return;
     final placeholderId = 'pending_${DateTime.now().microsecondsSinceEpoch}';
     final placeholder = AppTask(
       id: placeholderId,
@@ -92,6 +102,9 @@ class TasksNotifier extends Notifier<TasksState> {
       await _load();
     } catch (e, st) {
       AppLogger.logError('TasksNotifier.addTask', e, st);
+      if (isConnectivityError(e)) {
+        ref.read(isOfflineProvider.notifier).setOffline(true);
+      }
       state = state.copyWith(
         tasks: state.tasks.where((t) => t.id != placeholderId).toList(),
         errorType: TaskErrorType.create,
@@ -107,6 +120,7 @@ class TasksNotifier extends Notifier<TasksState> {
     required TaskDifficulty difficulty,
     required int durationMinutes,
   }) async {
+    if (!await ensureOnline(ref)) return;
     final previous = state.tasks;
     state = state.copyWith(
       tasks: [
@@ -135,11 +149,15 @@ class TasksNotifier extends Notifier<TasksState> {
       ref.read(tasksCacheProvider.notifier).state = state.tasks;
     } catch (e, st) {
       AppLogger.logError('TasksNotifier.updateTask', e, st);
+      if (isConnectivityError(e)) {
+        ref.read(isOfflineProvider.notifier).setOffline(true);
+      }
       state = state.copyWith(tasks: previous, errorType: TaskErrorType.update);
     }
   }
 
   Future<void> toggleTask({required String occurrenceId, required bool isDone}) async {
+    if (!await ensureOnline(ref)) return;
     final previous = state.tasks;
     state = state.copyWith(
       tasks: [
@@ -153,11 +171,15 @@ class TasksNotifier extends Notifier<TasksState> {
       if (isDone) await ref.read(progressNotifierProvider.notifier).refresh();
     } catch (e, st) {
       AppLogger.logError('TasksNotifier.toggleTask', e, st);
+      if (isConnectivityError(e)) {
+        ref.read(isOfflineProvider.notifier).setOffline(true);
+      }
       state = state.copyWith(tasks: previous, errorType: TaskErrorType.toggle);
     }
   }
 
   Future<void> deleteTask(String id) async {
+    if (!await ensureOnline(ref)) return;
     final previous = state.tasks;
     state = state.copyWith(tasks: state.tasks.where((t) => t.id != id).toList());
     try {
@@ -165,6 +187,9 @@ class TasksNotifier extends Notifier<TasksState> {
       ref.read(tasksCacheProvider.notifier).state = state.tasks;
     } catch (e, st) {
       AppLogger.logError('TasksNotifier.deleteTask', e, st);
+      if (isConnectivityError(e)) {
+        ref.read(isOfflineProvider.notifier).setOffline(true);
+      }
       state = state.copyWith(tasks: previous, errorType: TaskErrorType.delete);
     }
   }

@@ -69,6 +69,16 @@ class AppLocalizationsDe extends AppLocalizations {
   String get commonPassword => 'Passwort';
 
   @override
+  String get noInternetTitle => 'Keine Internetverbindung';
+
+  @override
+  String get noInternetSubtitle =>
+      'Überprüfe deine Verbindung und versuche es erneut.';
+
+  @override
+  String get noInternetRetry => 'Erneut versuchen';
+
+  @override
   String get commonSteps => 'Schritte';
 
   @override

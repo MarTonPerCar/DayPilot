@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../core/connectivity/connectivity_service.dart';
+import '../../core/connectivity/offline_notifier.dart';
 import '../../core/data/models/app_notification_item.dart';
 import '../../core/data/repositories/providers.dart';
 import '../../core/logging/app_logger.dart';
@@ -27,11 +29,15 @@ class NotificationsNotifier extends Notifier<List<AppNotificationItem>> {
   }
 
   Future<void> refresh() async {
+    if (!await ensureOnline(ref)) return;
     try {
       state = await ref.read(notificationsRepositoryProvider).getNotifications();
       _subscribeToRealtimeOnce();
     } catch (e, st) {
       AppLogger.logError('NotificationsNotifier.refresh', e, st);
+      if (isConnectivityError(e)) {
+        ref.read(isOfflineProvider.notifier).setOffline(true);
+      }
     }
   }
 
@@ -67,22 +73,38 @@ class NotificationsNotifier extends Notifier<List<AppNotificationItem>> {
   }
 
   Future<void> markAsRead(String id) async {
-    await ref.read(notificationsRepositoryProvider).markAsRead(id);
-    state = [
-      for (final n in state)
-        if (n.id == id)
-          AppNotificationItem(id: n.id, type: n.type, title: n.title, body: n.body, isRead: true, createdAt: n.createdAt)
-        else
-          n,
-    ];
+    if (!await ensureOnline(ref)) return;
+    try {
+      await ref.read(notificationsRepositoryProvider).markAsRead(id);
+      state = [
+        for (final n in state)
+          if (n.id == id)
+            AppNotificationItem(id: n.id, type: n.type, title: n.title, body: n.body, isRead: true, createdAt: n.createdAt)
+          else
+            n,
+      ];
+    } catch (e, st) {
+      AppLogger.logError('NotificationsNotifier.markAsRead', e, st);
+      if (isConnectivityError(e)) {
+        ref.read(isOfflineProvider.notifier).setOffline(true);
+      }
+    }
   }
 
   Future<void> markAllAsRead() async {
-    await ref.read(notificationsRepositoryProvider).markAllAsRead();
-    state = [
-      for (final n in state)
-        AppNotificationItem(id: n.id, type: n.type, title: n.title, body: n.body, isRead: true, createdAt: n.createdAt),
-    ];
+    if (!await ensureOnline(ref)) return;
+    try {
+      await ref.read(notificationsRepositoryProvider).markAllAsRead();
+      state = [
+        for (final n in state)
+          AppNotificationItem(id: n.id, type: n.type, title: n.title, body: n.body, isRead: true, createdAt: n.createdAt),
+      ];
+    } catch (e, st) {
+      AppLogger.logError('NotificationsNotifier.markAllAsRead', e, st);
+      if (isConnectivityError(e)) {
+        ref.read(isOfflineProvider.notifier).setOffline(true);
+      }
+    }
   }
 }
 

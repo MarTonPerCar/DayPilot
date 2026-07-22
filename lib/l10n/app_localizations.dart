@@ -220,6 +220,24 @@ abstract class AppLocalizations {
   /// **'Contraseña'**
   String get commonPassword;
 
+  /// No description provided for @noInternetTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin conexión a internet'**
+  String get noInternetTitle;
+
+  /// No description provided for @noInternetSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Comprueba tu conexión e inténtalo de nuevo.'**
+  String get noInternetSubtitle;
+
+  /// No description provided for @noInternetRetry.
+  ///
+  /// In es, this message translates to:
+  /// **'Reintentar'**
+  String get noInternetRetry;
+
   /// No description provided for @commonSteps.
   ///
   /// In es, this message translates to:

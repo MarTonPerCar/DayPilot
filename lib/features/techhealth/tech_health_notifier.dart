@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/connectivity/connectivity_service.dart';
+import '../../core/connectivity/offline_notifier.dart';
 import '../../core/data/models/app_tech_restriction.dart';
 import '../../core/data/repositories/providers.dart';
 import '../../core/logging/app_logger.dart';
@@ -19,6 +21,7 @@ class TechHealthNotifier extends Notifier<TechHealthState> {
   }
 
   Future<void> refresh() async {
+    if (!await ensureOnline(ref)) return;
     try {
       final repo = ref.read(techHealthRepositoryProvider);
       final restrictions = await repo.getRestrictions();
@@ -26,6 +29,9 @@ class TechHealthNotifier extends Notifier<TechHealthState> {
       state = TechHealthState(restrictions: restrictions, pointEarnedToday: pointEarnedToday);
     } catch (e, st) {
       AppLogger.logError('TechHealthNotifier.refresh', e, st);
+      if (isConnectivityError(e)) {
+        ref.read(isOfflineProvider.notifier).setOffline(true);
+      }
     }
   }
 
@@ -34,22 +40,46 @@ class TechHealthNotifier extends Notifier<TechHealthState> {
     required String appName,
     required int limitMinutes,
   }) async {
-    await ref.read(techHealthRepositoryProvider).saveRestriction(
-          appPackage: appPackage,
-          appName: appName,
-          limitMinutes: limitMinutes,
-        );
-    await refresh();
+    if (!await ensureOnline(ref)) return;
+    try {
+      await ref.read(techHealthRepositoryProvider).saveRestriction(
+            appPackage: appPackage,
+            appName: appName,
+            limitMinutes: limitMinutes,
+          );
+      await refresh();
+    } catch (e, st) {
+      AppLogger.logError('TechHealthNotifier.saveRestriction', e, st);
+      if (isConnectivityError(e)) {
+        ref.read(isOfflineProvider.notifier).setOffline(true);
+      }
+    }
   }
 
   Future<void> toggleRestriction(String appPackage, bool isActive) async {
-    await ref.read(techHealthRepositoryProvider).toggleRestriction(appPackage, isActive);
-    await refresh();
+    if (!await ensureOnline(ref)) return;
+    try {
+      await ref.read(techHealthRepositoryProvider).toggleRestriction(appPackage, isActive);
+      await refresh();
+    } catch (e, st) {
+      AppLogger.logError('TechHealthNotifier.toggleRestriction', e, st);
+      if (isConnectivityError(e)) {
+        ref.read(isOfflineProvider.notifier).setOffline(true);
+      }
+    }
   }
 
   Future<void> deleteRestriction(String appPackage) async {
-    await ref.read(techHealthRepositoryProvider).deleteRestriction(appPackage);
-    await refresh();
+    if (!await ensureOnline(ref)) return;
+    try {
+      await ref.read(techHealthRepositoryProvider).deleteRestriction(appPackage);
+      await refresh();
+    } catch (e, st) {
+      AppLogger.logError('TechHealthNotifier.deleteRestriction', e, st);
+      if (isConnectivityError(e)) {
+        ref.read(isOfflineProvider.notifier).setOffline(true);
+      }
+    }
   }
 }
 

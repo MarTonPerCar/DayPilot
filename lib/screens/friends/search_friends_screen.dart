@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../components/basic/top_bar.dart';
 import '../../components/basic/text_field.dart';
 import '../../components/cards/friend_card.dart';
+import '../../core/connectivity/connectivity_service.dart';
+import '../../core/connectivity/offline_notifier.dart';
 import '../../core/data/models/app_friend.dart';
 import '../../core/data/repositories/providers.dart';
 import '../../core/logging/app_logger.dart';
@@ -41,6 +43,10 @@ class _SearchFriendsScreenState extends ConsumerState<SearchFriendsScreen> {
       return;
     }
     setState(() => _searching = true);
+    if (!await ensureOnlineFromWidget(ref)) {
+      if (mounted) setState(() => _searching = false);
+      return;
+    }
     try {
       final results = await ref.read(friendsRepositoryProvider).searchUsers(query);
       if (!mounted) return;
@@ -50,6 +56,9 @@ class _SearchFriendsScreenState extends ConsumerState<SearchFriendsScreen> {
       });
     } catch (e, st) {
       AppLogger.logError('SearchFriendsScreen._search', e, st);
+      if (isConnectivityError(e)) {
+        ref.read(isOfflineProvider.notifier).setOffline(true);
+      }
       if (!mounted) return;
       setState(() => _searching = false);
     }
@@ -73,10 +82,17 @@ class _SearchFriendsScreenState extends ConsumerState<SearchFriendsScreen> {
             r,
       ];
     });
+    if (!await ensureOnlineFromWidget(ref)) {
+      if (mounted) setState(() => _results = previous);
+      return;
+    }
     try {
       await ref.read(friendsRepositoryProvider).sendFriendRequest(result.userId);
     } catch (e, st) {
       AppLogger.logError('SearchFriendsScreen._addFriend', e, st);
+      if (isConnectivityError(e)) {
+        ref.read(isOfflineProvider.notifier).setOffline(true);
+      }
       if (!mounted) return;
       setState(() => _results = previous);
     }

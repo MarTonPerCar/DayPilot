@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../core/connectivity/connectivity_service.dart';
+import '../../core/connectivity/offline_notifier.dart';
 import '../../core/data/models/app_progress.dart';
 import '../../core/data/repositories/providers.dart';
 import '../../core/logging/app_logger.dart';
@@ -26,11 +28,15 @@ class ProgressNotifier extends Notifier<AppProgress?> {
   }
 
   Future<void> refresh() async {
+    if (!await ensureOnline(ref)) return;
     try {
       state = await ref.read(progressRepositoryProvider).getProgress();
       _subscribeToRealtimeOnce();
     } catch (e, st) {
       AppLogger.logError('ProgressNotifier.refresh', e, st);
+      if (isConnectivityError(e)) {
+        ref.read(isOfflineProvider.notifier).setOffline(true);
+      }
     }
   }
 
@@ -70,6 +76,7 @@ class ProgressNotifier extends Notifier<AppProgress?> {
   }
 
   Future<void> completeTimerSession() async {
+    if (!await ensureOnline(ref)) return;
     try {
       final awarded = await ref.read(progressRepositoryProvider).completeTimerSession();
       if (!awarded) return;
@@ -77,6 +84,9 @@ class ProgressNotifier extends Notifier<AppProgress?> {
       await ref.read(notificationsNotifierProvider.notifier).refresh();
     } catch (e, st) {
       AppLogger.logError('ProgressNotifier.completeTimerSession', e, st);
+      if (isConnectivityError(e)) {
+        ref.read(isOfflineProvider.notifier).setOffline(true);
+      }
     }
   }
 }

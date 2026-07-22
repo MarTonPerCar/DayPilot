@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../core/connectivity/connectivity_service.dart';
+import '../../core/connectivity/offline_notifier.dart';
 import '../../core/data/friend_stats_broadcast.dart';
 import '../../core/data/models/app_friend.dart';
 import '../../core/data/repositories/providers.dart';
@@ -39,6 +41,7 @@ class FriendsNotifier extends Notifier<FriendsState> {
   }
 
   Future<void> refresh() async {
+    if (!await ensureOnline(ref)) return;
     try {
       final repo = ref.read(friendsRepositoryProvider);
       final friends = await repo.getFriends();
@@ -47,6 +50,9 @@ class FriendsNotifier extends Notifier<FriendsState> {
       _subscribeToRealtimeOnce();
     } catch (e, st) {
       AppLogger.logError('FriendsNotifier.refresh', e, st);
+      if (isConnectivityError(e)) {
+        ref.read(isOfflineProvider.notifier).setOffline(true);
+      }
     }
   }
 
@@ -102,34 +108,66 @@ class FriendsNotifier extends Notifier<FriendsState> {
   }
 
   Future<void> acceptRequest(AppFriendRequest request) async {
-    await ref.read(friendsRepositoryProvider).acceptRequest(
-          requestId: request.requestId,
-          fromUserId: request.fromUserId,
-        );
-    await refresh();
-    await ref.read(rankingNotifierProvider.notifier).refresh();
+    if (!await ensureOnline(ref)) return;
+    try {
+      await ref.read(friendsRepositoryProvider).acceptRequest(
+            requestId: request.requestId,
+            fromUserId: request.fromUserId,
+          );
+      await refresh();
+      await ref.read(rankingNotifierProvider.notifier).refresh();
+    } catch (e, st) {
+      AppLogger.logError('FriendsNotifier.acceptRequest', e, st);
+      if (isConnectivityError(e)) {
+        ref.read(isOfflineProvider.notifier).setOffline(true);
+      }
+    }
   }
 
   Future<void> declineRequest(String requestId) async {
-    await ref.read(friendsRepositoryProvider).declineRequest(requestId);
-    await refresh();
+    if (!await ensureOnline(ref)) return;
+    try {
+      await ref.read(friendsRepositoryProvider).declineRequest(requestId);
+      await refresh();
+    } catch (e, st) {
+      AppLogger.logError('FriendsNotifier.declineRequest', e, st);
+      if (isConnectivityError(e)) {
+        ref.read(isOfflineProvider.notifier).setOffline(true);
+      }
+    }
   }
 
   Future<void> removeFriend(String friendRowId) async {
-    await ref.read(friendsRepositoryProvider).removeFriend(friendRowId);
-    await refresh();
-    await ref.read(rankingNotifierProvider.notifier).refresh();
+    if (!await ensureOnline(ref)) return;
+    try {
+      await ref.read(friendsRepositoryProvider).removeFriend(friendRowId);
+      await refresh();
+      await ref.read(rankingNotifierProvider.notifier).refresh();
+    } catch (e, st) {
+      AppLogger.logError('FriendsNotifier.removeFriend', e, st);
+      if (isConnectivityError(e)) {
+        ref.read(isOfflineProvider.notifier).setOffline(true);
+      }
+    }
   }
 
   Future<void> react(AppFriend friend, String emoji) async {
     final summaryId = friend.weeklySummaryId;
     if (summaryId == null) return;
-    await ref.read(friendsRepositoryProvider).sendReaction(
-          toUserId: friend.userId,
-          weeklySummaryId: summaryId,
-          emoji: emoji,
-        );
-    await refresh();
+    if (!await ensureOnline(ref)) return;
+    try {
+      await ref.read(friendsRepositoryProvider).sendReaction(
+            toUserId: friend.userId,
+            weeklySummaryId: summaryId,
+            emoji: emoji,
+          );
+      await refresh();
+    } catch (e, st) {
+      AppLogger.logError('FriendsNotifier.react', e, st);
+      if (isConnectivityError(e)) {
+        ref.read(isOfflineProvider.notifier).setOffline(true);
+      }
+    }
   }
 }
 

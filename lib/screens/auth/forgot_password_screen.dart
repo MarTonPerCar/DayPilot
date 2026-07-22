@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../components/basic/button.dart';
 import '../../components/basic/text_field.dart';
 import '../../components/basic/top_bar.dart';
+import '../../core/connectivity/connectivity_service.dart';
+import '../../core/connectivity/offline_notifier.dart';
 import '../../core/data/repositories/providers.dart';
 import '../../core/logging/app_logger.dart';
 import '../../l10n/app_localizations.dart';
@@ -42,6 +44,10 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
       _loading = true;
       _error = null;
     });
+    if (!await ensureOnlineFromWidget(ref)) {
+      if (mounted) setState(() => _loading = false);
+      return;
+    }
     try {
       await ref.read(authRepositoryProvider).sendPasswordResetEmail(email);
       if (!mounted) return;
@@ -51,6 +57,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
       });
     } catch (e, st) {
       AppLogger.logError('ForgotPasswordScreen.send', e, st);
+      if (isConnectivityError(e)) {
+        ref.read(isOfflineProvider.notifier).setOffline(true);
+      }
       if (!mounted) return;
       setState(() {
         _loading = false;

@@ -11,6 +11,8 @@ import '../../components/basic/avatar.dart';
 import '../../components/basic/text_field.dart';
 import '../../components/basic/top_bar.dart';
 import '../../components/forms/select_field.dart';
+import '../../core/connectivity/connectivity_service.dart';
+import '../../core/connectivity/offline_notifier.dart';
 import '../../core/data/models/app_profile_stats.dart';
 import '../../core/data/repositories/providers.dart';
 import '../../core/logging/app_logger.dart';
@@ -102,6 +104,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     if (cropped == null || !mounted) return;
 
     setState(() => _uploadingAvatar = true);
+    if (!await ensureOnlineFromWidget(ref)) {
+      if (mounted) setState(() => _uploadingAvatar = false);
+      return;
+    }
     try {
       final url = await ref.read(profileRepositoryProvider).uploadAvatar(
             bytes: cropped,
@@ -114,6 +120,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       });
     } catch (e, st) {
       AppLogger.logError('EditProfileScreen._pickAndUploadAvatar', e, st);
+      if (isConnectivityError(e)) {
+        ref.read(isOfflineProvider.notifier).setOffline(true);
+      }
       if (!mounted) return;
       setState(() => _uploadingAvatar = false);
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.settingsAvatarUploadError)));
@@ -127,6 +136,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     if (name.isEmpty || username.isEmpty) return;
 
     setState(() => _saving = true);
+    if (!await ensureOnlineFromWidget(ref)) {
+      if (mounted) setState(() => _saving = false);
+      return;
+    }
     try {
       await ref.read(profileRepositoryProvider).updateProfile(
             name: name,
@@ -138,6 +151,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       Navigator.pop(context);
     } catch (e, st) {
       AppLogger.logError('EditProfileScreen._save', e, st);
+      if (isConnectivityError(e)) {
+        ref.read(isOfflineProvider.notifier).setOffline(true);
+      }
       if (!mounted) return;
       setState(() => _saving = false);
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.authErrorUnknown)));
@@ -284,6 +300,10 @@ class _ChangePasswordSheetState extends ConsumerState<_ChangePasswordSheet> {
       _saving = true;
       _error = null;
     });
+    if (!await ensureOnlineFromWidget(ref)) {
+      if (mounted) setState(() => _saving = false);
+      return;
+    }
     try {
       await ref.read(profileRepositoryProvider).changePassword(_newPasswordController.text);
       if (!mounted) return;
@@ -291,6 +311,9 @@ class _ChangePasswordSheetState extends ConsumerState<_ChangePasswordSheet> {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.settingsPasswordChanged)));
     } catch (e, st) {
       AppLogger.logError('EditProfileScreen._ChangePasswordSheet._submit', e, st);
+      if (isConnectivityError(e)) {
+        ref.read(isOfflineProvider.notifier).setOffline(true);
+      }
       if (!mounted) return;
       setState(() {
         _saving = false;

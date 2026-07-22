@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../core/connectivity/connectivity_service.dart';
+import '../../core/connectivity/offline_notifier.dart';
 import '../../core/data/friend_stats_broadcast.dart';
 import '../../core/data/models/app_ranking_entry.dart';
 import '../../core/data/repositories/providers.dart';
@@ -22,11 +24,15 @@ class RankingNotifier extends Notifier<List<AppRankingEntry>> {
   }
 
   Future<void> refresh() async {
+    if (!await ensureOnline(ref)) return;
     try {
       state = await ref.read(rankingRepositoryProvider).getRanking();
       _subscribeToRealtimeOnce();
     } catch (e, st) {
       AppLogger.logError('RankingNotifier.refresh', e, st);
+      if (isConnectivityError(e)) {
+        ref.read(isOfflineProvider.notifier).setOffline(true);
+      }
     }
   }
 
