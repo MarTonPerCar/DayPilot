@@ -7,6 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.daypilot_test_desing.core.cache.SessionCache
+import com.example.daypilot_test_desing.core.connectivity.ConnectivityState
+import com.example.daypilot_test_desing.core.connectivity.isConnectivityError
 import com.example.daypilot_test_desing.core.data.model.buildProgressWindow
 import com.example.daypilot_test_desing.core.data.repository.ProgressRepository
 import com.example.daypilot_test_desing.data.supabase.supabase
@@ -49,6 +51,7 @@ class ProgressViewModel(
     suspend fun awaitLoad(): Boolean = load()
 
     private suspend fun load(): Boolean {
+        if (!ConnectivityState.ensureOnline()) return false
         return try {
             val todayProgress = repo.getTodayProgress()
             val history       = repo.getHistory(30)
@@ -125,6 +128,7 @@ class ProgressViewModel(
 
     fun recordTimerComplete() {
         viewModelScope.launch {
+            if (!ConnectivityState.ensureOnline()) return@launch
             try {
                 val awarded = repo.completeTimerSession()  // server-side gated via habits_daily
                 if (!awarded) return@launch
@@ -132,6 +136,7 @@ class ProgressViewModel(
                 // TIMER_DONE notification is now inserted by a Supabase DB trigger.
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to record timer completion", e)
+                if (isConnectivityError(e)) ConnectivityState.setOffline(true)
             }
         }
     }

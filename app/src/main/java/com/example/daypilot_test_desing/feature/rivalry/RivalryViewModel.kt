@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.daypilot_test_desing.core.cache.SessionCache
+import com.example.daypilot_test_desing.core.connectivity.ConnectivityState
 import com.example.daypilot_test_desing.core.data.local.FriendStatsBroadcast
 import com.example.daypilot_test_desing.core.data.repository.RankingRepository
 import com.example.daypilot_test_desing.data.supabase.supabase
@@ -97,6 +98,7 @@ class RivalryViewModel(private val repo: RankingRepository) : ViewModel() {
     }
 
     private suspend fun load(): Boolean = loadMutex.withLock {
+        if (!ConnectivityState.ensureOnline()) return@withLock false
         try {
             val ranking  = repo.getRanking()
             val uid      = repo.getCurrentUserId()

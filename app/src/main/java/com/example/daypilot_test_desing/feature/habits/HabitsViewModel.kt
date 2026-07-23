@@ -3,6 +3,7 @@ package com.example.daypilot_test_desing.feature.habits
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.daypilot_test_desing.core.connectivity.ConnectivityState
 import com.example.daypilot_test_desing.core.data.repository.StepsRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -42,6 +43,7 @@ class HabitsViewModel(private val stepsRepo: StepsRepository) : ViewModel() {
     /** Sync trigger #2: entering the Habits screen mid-session (also used at init, which
      *  doubles as the app-cold-start case for this widget's own points preview). */
     fun refresh(): Job = viewModelScope.launch {
+        if (!ConnectivityState.ensureOnline()) return@launch
         stepsRepo.syncSteps(stepsRepo.getCurrentSteps(), stepsRepo.getGoalSteps())
         val earned = stepsRepo.getPointsEarned()
         _uiState.update { current ->

@@ -6,9 +6,11 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.daypilot_test_desing.core.connectivity.ConnectivityState
 import com.example.daypilot_test_desing.core.data.preferences.AppPreferences
 import com.example.daypilot_test_desing.core.data.repository.UserRepository
 import com.example.daypilot_test_desing.core.reminders.DailyNotificationScheduler
+import com.example.daypilot_test_desing.core.reminders.ReliabilitySettings
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,9 +27,22 @@ class SettingsViewModel(
     private val _uiState = MutableStateFlow(loadPrefsState())
     val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
 
-    init { viewModelScope.launch { loadUserName() } }
+    init {
+        viewModelScope.launch { loadUserName() }
+        refreshReliabilityStatus()
+    }
 
     fun refresh(): Job = viewModelScope.launch { loadUserName() }
+
+    /** Re-checks exact-alarm/battery-optimization grant state — call on resume, since both are
+     *  only changeable by the user in system settings, outside this app's own lifecycle. */
+    fun refreshReliabilityStatus() {
+        val app = getApplication<Application>()
+        _uiState.value = _uiState.value.copy(
+            exactAlarmsGranted        = ReliabilitySettings.canScheduleExactAlarms(app),
+            batteryOptimizationExempt = ReliabilitySettings.isIgnoringBatteryOptimizations(app)
+        )
+    }
 
     /** Suspends until this ViewModel's data has actually loaded (or failed) — used by the
      *  startup join in DayPilotNavGraph, which needs real success/failure, not just "finished". */
@@ -43,6 +58,7 @@ class SettingsViewModel(
     )
 
     private suspend fun loadUserName(): Boolean {
+        if (!ConnectivityState.ensureOnline()) return false
         return try {
             val name = userRepo.getCurrentUser().name
             _uiState.value = _uiState.value.copy(name = name)

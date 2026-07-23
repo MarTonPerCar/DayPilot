@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.daypilot_test_desing.R
+import com.example.daypilot_test_desing.core.connectivity.ConnectivityState
+import com.example.daypilot_test_desing.core.connectivity.isConnectivityError
 import com.example.daypilot_test_desing.core.cache.SessionCache
 import com.example.daypilot_test_desing.core.data.local.FriendStatsBroadcast
 import com.example.daypilot_test_desing.core.data.local.NotificationHub
@@ -56,6 +58,7 @@ class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
     suspend fun awaitLoad(): Boolean = load()
 
     private suspend fun load(): Boolean = loadMutex.withLock {
+        if (!ConnectivityState.ensureOnline()) return@withLock false
         try {
             val fetchedFriends  = repo.getFriends()         // cache-first with 5min TTL
             val fetchedRequests = repo.getFriendRequests()  // always fresh
@@ -144,6 +147,12 @@ class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
             )
         }
         viewModelScope.launch {
+            if (!ConnectivityState.ensureOnline()) {
+                _uiState.update { state ->
+                    state.copy(friendRequests = originalRequests, friends = originalFriends, justAcceptedRequest = false)
+                }
+                return@launch
+            }
             try {
                 repo.acceptRequest(userId)
                 SessionCache.friends.value    = _uiState.value.friends
@@ -153,6 +162,7 @@ class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
                 // FRIEND_ACCEPTED notification is inserted by a Supabase DB trigger, not here.
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to accept friend request from $userId", e)
+                if (isConnectivityError(e)) ConnectivityState.setOffline(true)
                 _uiState.update { state ->
                     state.copy(
                         friendRequests      = originalRequests,
@@ -173,10 +183,15 @@ class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
         val originalRequests = _uiState.value.friendRequests
         _uiState.update { state -> state.copy(friendRequests = state.friendRequests.filter { it.id != userId }) }
         viewModelScope.launch {
+            if (!ConnectivityState.ensureOnline()) {
+                _uiState.update { state -> state.copy(friendRequests = originalRequests) }
+                return@launch
+            }
             try {
                 repo.rejectRequest(userId)
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to reject friend request from $userId", e)
+                if (isConnectivityError(e)) ConnectivityState.setOffline(true)
                 _uiState.update { state ->
                     state.copy(friendRequests = originalRequests, userMessage = R.string.error_reject_request)
                 }
@@ -197,6 +212,10 @@ class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
             )
         }
         viewModelScope.launch {
+            if (!ConnectivityState.ensureOnline()) {
+                _uiState.update { state -> state.copy(friends = originalFriends) }
+                return@launch
+            }
             try {
                 // REACTION notification is inserted by a Supabase DB trigger; the
                 // "reaction sent" confirmation below is local-only, never stored.
@@ -206,6 +225,7 @@ class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
                 _uiState.update { it.copy(userMessage = R.string.friends_reaction_sent) }
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to send reaction $reaction to $userId", e)
+                if (isConnectivityError(e)) ConnectivityState.setOffline(true)
                 _uiState.update { state ->
                     state.copy(friends = originalFriends, userMessage = R.string.error_react_friend)
                 }
@@ -217,6 +237,10 @@ class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
         val originalFriends = _uiState.value.friends
         _uiState.update { state -> state.copy(friends = state.friends.filter { it.id != userId }) }
         viewModelScope.launch {
+            if (!ConnectivityState.ensureOnline()) {
+                _uiState.update { state -> state.copy(friends = originalFriends) }
+                return@launch
+            }
             try {
                 repo.removeFriend(userId)
                 SessionCache.friends.value    = _uiState.value.friends
@@ -225,6 +249,7 @@ class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
                 SessionCache.rankingFetchedAt = 0L
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to remove friend $userId", e)
+                if (isConnectivityError(e)) ConnectivityState.setOffline(true)
                 _uiState.update { state ->
                     state.copy(friends = originalFriends, userMessage = R.string.error_remove_friend)
                 }

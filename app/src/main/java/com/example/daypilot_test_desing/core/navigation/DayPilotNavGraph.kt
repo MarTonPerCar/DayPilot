@@ -4,6 +4,8 @@ import android.app.LocaleManager
 import android.os.Build
 import android.os.LocaleList
 import android.util.Log
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -82,6 +84,8 @@ import com.example.daypilot_test_desing.feature.techhealth.TechHealthScreen
 import com.example.daypilot_test_desing.feature.timer.TimerHubScreen
 import com.example.daypilot_test_desing.feature.timer.TimerScreen
 import com.example.daypilot_test_desing.core.ui.components.DayPilotBottomBar
+import com.example.daypilot_test_desing.core.connectivity.ConnectivityState
+import com.example.daypilot_test_desing.feature.connectivity.NoInternetScreen
 
 private const val TAG = "DayPilotNavGraph"
 
@@ -197,6 +201,29 @@ fun DayPilotNavGraph(
         }
     }
 
+    val isOffline by ConnectivityState.isOffline.collectAsState()
+
+    suspend fun retryAfterReconnect() {
+        if (sessionState == AppSessionViewModel.State.DataLoadFailed) {
+            sessionVM.retryDataLoad()
+        }
+        if (sessionState == AppSessionViewModel.State.Authenticated) {
+            // Startup already succeeded — this is a mid-use failure, so just refresh
+            // whichever ViewModels are already hoisted rather than touching session state.
+            homeVM.refresh()
+            calendarVM.refresh()
+            profileVM.refresh()
+            progressVM.refresh()
+            friendsVM.refresh()
+            rivalryVM.refresh()
+            settingsVM.refresh()
+            notificationsVM.load()
+            habitsVM.refresh()
+            stepsVM.refresh()
+        }
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
     Scaffold(
         bottomBar = {
             if (currentRoute != DayPilotDestinations.LOADING &&
@@ -355,14 +382,24 @@ fun DayPilotNavGraph(
 
             composable(DayPilotDestinations.SETTINGS) {
                 val s by settingsVM.uiState.collectAsState()
+                val settingsLifecycleOwner = LocalLifecycleOwner.current
+                DisposableEffect(settingsLifecycleOwner) {
+                    val observer = LifecycleEventObserver { _, event ->
+                        if (event == Lifecycle.Event.ON_RESUME) settingsVM.refreshReliabilityStatus()
+                    }
+                    settingsLifecycleOwner.lifecycle.addObserver(observer)
+                    onDispose { settingsLifecycleOwner.lifecycle.removeObserver(observer) }
+                }
                 SettingsScreen(
-                    name                    = s.name,
-                    isDarkMode              = s.isDarkMode,
-                    selectedThemeId         = s.selectedThemeId,
-                    selectedLanguage        = s.selectedLanguage,
-                    notificationsEnabled    = s.notificationsEnabled,
-                    taskRemindersEnabled    = s.taskRemindersEnabled,
-                    streakAlertsEnabled     = s.streakAlertsEnabled,
+                    name                      = s.name,
+                    isDarkMode                = s.isDarkMode,
+                    selectedThemeId           = s.selectedThemeId,
+                    selectedLanguage          = s.selectedLanguage,
+                    notificationsEnabled      = s.notificationsEnabled,
+                    taskRemindersEnabled      = s.taskRemindersEnabled,
+                    streakAlertsEnabled       = s.streakAlertsEnabled,
+                    exactAlarmsGranted        = s.exactAlarmsGranted,
+                    batteryOptimizationExempt = s.batteryOptimizationExempt,
                     onToggleDarkMode        = settingsVM::toggleDarkMode,
                     onThemeSelect           = settingsVM::selectTheme,
                     onLanguageSelect        = { code ->
@@ -576,5 +613,10 @@ fun DayPilotNavGraph(
                 )
             }
         }
+    }
+
+    if (isOffline) {
+        NoInternetScreen(onRetry = { retryAfterReconnect() })
+    }
     }
 }

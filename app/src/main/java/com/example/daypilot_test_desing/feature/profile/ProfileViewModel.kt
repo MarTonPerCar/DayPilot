@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.daypilot_test_desing.core.connectivity.ConnectivityState
 import com.example.daypilot_test_desing.core.data.model.TimeZoneRegion
 import com.example.daypilot_test_desing.core.data.repository.ProgressRepository
 import com.example.daypilot_test_desing.core.data.repository.UserRepository
@@ -36,6 +37,7 @@ class ProfileViewModel(
     suspend fun awaitLoad(): Boolean = load()
 
     private suspend fun load(): Boolean {
+        if (!ConnectivityState.ensureOnline()) return false
         return try {
             val user    = userRepo.getCurrentUser()
             val summary = userRepo.getWeeklySummary()
@@ -72,6 +74,10 @@ class ProfileViewModel(
     fun updateProfile(name: String, username: String, region: TimeZoneRegion) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isSavingProfile = true, profileSaveError = false)
+            if (!ConnectivityState.ensureOnline()) {
+                _uiState.value = _uiState.value.copy(isSavingProfile = false, profileSaveError = true)
+                return@launch
+            }
             try {
                 userRepo.updateProfile(name, username, region)
                 load()
@@ -93,6 +99,10 @@ class ProfileViewModel(
 
     fun uploadAvatar(uri: Uri, context: Context): Job = viewModelScope.launch {
         _uiState.value = _uiState.value.copy(isUploadingAvatar = true, avatarUploadError = false)
+        if (!ConnectivityState.ensureOnline()) {
+            _uiState.value = _uiState.value.copy(isUploadingAvatar = false, avatarUploadError = true)
+            return@launch
+        }
         val success = try {
             val (bytes, mimeType) = withContext(Dispatchers.IO) {
                 val b = context.contentResolver.openInputStream(uri)?.use { it.readBytes() }

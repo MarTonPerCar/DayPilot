@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.daypilot_test_desing.R
+import com.example.daypilot_test_desing.core.connectivity.ConnectivityState
+import com.example.daypilot_test_desing.core.connectivity.isConnectivityError
 import com.example.daypilot_test_desing.core.cache.SessionCache
 import com.example.daypilot_test_desing.core.data.model.CalendarTaskData
 import com.example.daypilot_test_desing.core.data.model.NewTaskData
@@ -47,6 +49,10 @@ class CalendarViewModel(
 
     private suspend fun load(): Boolean {
         _uiState.update { it.copy(isLoading = true) }
+        if (!ConnectivityState.ensureOnline()) {
+            _uiState.update { it.copy(isLoading = false) }
+            return false
+        }
         return try {
             val tasks = taskRepo.getTasks()
             _uiState.update { it.copy(tasks = tasks, isLoading = false) }
@@ -123,12 +129,17 @@ class CalendarViewModel(
         _uiState.update { it.copy(tasks = it.tasks + placeholder) }
 
         viewModelScope.launch {
+            if (!ConnectivityState.ensureOnline()) {
+                _uiState.update { state -> state.copy(tasks = state.tasks.filter { it.id != fakeId }) }
+                return@launch
+            }
             try {
                 taskRepo.addTask(data)
                 load()
                 SessionCache.tasks.value = _uiState.value.tasks
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to create task '${data.title}' (recurring=${data.isRecurring})", e)
+                if (isConnectivityError(e)) ConnectivityState.setOffline(true)
                 _uiState.update { state ->
                     state.copy(
                         tasks = state.tasks.filter { it.id != fakeId },
@@ -153,11 +164,18 @@ class CalendarViewModel(
             })
         }
         viewModelScope.launch {
+            if (!ConnectivityState.ensureOnline()) {
+                if (original != null) {
+                    _uiState.update { state -> state.copy(tasks = state.tasks.map { if (it.id == id) original else it }) }
+                }
+                return@launch
+            }
             try {
                 taskRepo.updateTask(id, title, category, difficulty, duration, description)
                 SessionCache.tasks.value = _uiState.value.tasks
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to update task $id", e)
+                if (isConnectivityError(e)) ConnectivityState.setOffline(true)
                 _uiState.update { state ->
                     state.copy(
                         tasks = if (original != null)
@@ -183,6 +201,10 @@ class CalendarViewModel(
             })
         }
         viewModelScope.launch {
+            if (!ConnectivityState.ensureOnline()) {
+                _uiState.update { state -> state.copy(tasks = state.tasks.map { if (it.occurrenceId == occurrenceId) original else it }) }
+                return@launch
+            }
             try {
                 taskRepo.toggleTask(occurrenceId, isDone)
                 if (shouldAwardPoints) {
@@ -192,6 +214,7 @@ class CalendarViewModel(
                 SessionCache.tasks.value = _uiState.value.tasks
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to toggle task occurrence $occurrenceId to isDone=$isDone", e)
+                if (isConnectivityError(e)) ConnectivityState.setOffline(true)
                 _uiState.update { state ->
                     state.copy(
                         tasks = state.tasks.map { if (it.occurrenceId == occurrenceId) original else it },
@@ -207,11 +230,16 @@ class CalendarViewModel(
         // isEarned stays sticky here too — deleting a task never claws back points.
         _uiState.update { state -> state.copy(tasks = state.tasks.filter { it.id != id }) }
         viewModelScope.launch {
+            if (!ConnectivityState.ensureOnline()) {
+                _uiState.update { it.copy(tasks = snapshot) }
+                return@launch
+            }
             try {
                 taskRepo.deleteTask(id)
                 SessionCache.tasks.value = _uiState.value.tasks
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to delete task $id", e)
+                if (isConnectivityError(e)) ConnectivityState.setOffline(true)
                 _uiState.update { it.copy(tasks = snapshot, userMessage = R.string.error_task_delete) }
             }
         }

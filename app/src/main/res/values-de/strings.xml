@@ -88,6 +88,18 @@
     <string name="settings_notifications">Benachrichtigungen</string>
     <string name="settings_notifications_description">Benachrichtigungen aktivieren oder deaktivieren</string>
     <string name="settings_language">Sprache</string>
+    <string name="settings_reliability_section">Zuverlässigkeit</string>
+    <string name="settings_exact_alarms">Exakte Alarme</string>
+    <string name="settings_exact_alarms_description">Damit Aufgaben­erinnerungen und Serien-Warnungen pünktlich ankommen</string>
+    <string name="settings_exact_alarms_granted">Aktiviert</string>
+    <string name="settings_exact_alarms_action">Aktivieren</string>
+    <string name="settings_battery_optimization">Akku-Optimierung</string>
+    <string name="settings_battery_optimization_description">Verhindert, dass das System die Schritterfassung im Hintergrund blockiert</string>
+    <string name="settings_battery_optimization_granted">Deaktiviert</string>
+    <string name="settings_battery_optimization_action">Deaktivieren</string>
+    <string name="settings_autostart_info_title">Zusätzliche Herstellereinstellung</string>
+    <string name="settings_autostart_info_description">Manche Hersteller (Oppo, Xiaomi, Vivo, Huawei, Realme…) haben eine zusätzliche Einstellung für „Autostart“ oder „Im Hintergrund ausführen“, die du für diese App manuell aktivieren musst. Ohne sie funktionieren Schritte und tägliche Erinnerungen möglicherweise nicht, wenn die App länger geschlossen war.</string>
+    <string name="settings_autostart_open_settings">App-Einstellungen öffnen</string>
     <string name="settings_logout">Abmelden</string>
 
     <!-- Calendar -->
@@ -583,5 +595,7 @@
     <string name="error_add_friend">Freundschaftsanfrage konnte nicht gesendet werden. Bitte erneut versuchen.</string>
     <string name="error_react_friend">Reaktion konnte nicht gesendet werden. Bitte erneut versuchen.</string>
     <string name="error_startup_load">Deine Daten konnten nicht geladen werden. Verbindung prüfen und erneut versuchen.</string>
+    <string name="no_internet_title">Keine Internetverbindung</string>
+    <string name="no_internet_subtitle">Überprüfe deine Verbindung und versuche es erneut.</string>
 
 </resources>

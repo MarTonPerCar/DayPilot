@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.daypilot_test_desing.core.cache.SessionCache
+import com.example.daypilot_test_desing.core.connectivity.ConnectivityState
 import com.example.daypilot_test_desing.core.data.local.NotificationHub
 import com.example.daypilot_test_desing.core.data.repository.NotificationRepository
 import com.example.daypilot_test_desing.data.supabase.SupabaseNotificationRepository.toModel
@@ -55,6 +56,7 @@ class NotificationsViewModel(private val repo: NotificationRepository) : ViewMod
     /** Suspends until this ViewModel's data has actually loaded (or failed) — used by the
      *  startup join in DayPilotNavGraph, which needs real success/failure, not just "finished". */
     suspend fun awaitLoad(): Boolean {
+        if (!ConnectivityState.ensureOnline()) return false
         return try {
             val uid = repo.getCurrentUserId() ?: return false
             val fromDb = repo.getAll(uid)
@@ -107,12 +109,16 @@ class NotificationsViewModel(private val repo: NotificationRepository) : ViewMod
 
     fun markAsRead(id: String) {
         NotificationHub.repo.markAsRead(id)
-        viewModelScope.launch { repo.markAsRead(id) }
+        viewModelScope.launch {
+            if (!ConnectivityState.ensureOnline()) return@launch
+            repo.markAsRead(id)
+        }
     }
 
     fun markAllAsRead() {
         NotificationHub.repo.markAllAsRead()
         viewModelScope.launch {
+            if (!ConnectivityState.ensureOnline()) return@launch
             val uid = repo.getCurrentUserId() ?: return@launch
             repo.markAllAsRead(uid)
         }

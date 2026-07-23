@@ -7,5 +7,7 @@ data class SettingsUiState(
     val selectedLanguage: String = "es",
     val notificationsEnabled: Boolean = true,
     val taskRemindersEnabled: Boolean = true,
-    val streakAlertsEnabled: Boolean = true
+    val streakAlertsEnabled: Boolean = true,
+    val exactAlarmsGranted: Boolean = true,
+    val batteryOptimizationExempt: Boolean = true
 )

@@ -32,4 +32,8 @@ class AppPreferences(context: Context) {
     var streakAlertsEnabled: Boolean
         get() = prefs.getBoolean("streak_alerts_enabled", true)
         set(v) { prefs.edit().putBoolean("streak_alerts_enabled", v).apply() }
+
+    var hasRequestedReliabilityPermissions: Boolean
+        get() = prefs.getBoolean("has_requested_reliability_permissions", false)
+        set(v) { prefs.edit().putBoolean("has_requested_reliability_permissions", v).apply() }
 }

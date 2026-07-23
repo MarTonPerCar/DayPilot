@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.daypilot_test_desing.core.connectivity.ConnectivityState
 import com.example.daypilot_test_desing.core.data.model.buildProgressWindow
 import com.example.daypilot_test_desing.core.data.repository.FriendRepository
 import com.example.daypilot_test_desing.core.data.repository.ProgressRepository
@@ -39,6 +40,7 @@ class HomeViewModel(
     suspend fun awaitLoad(): Boolean = load()
 
     private suspend fun load(): Boolean {
+        if (!ConnectivityState.ensureOnline()) return false
         return try {
             coroutineScope {
                 val userD    = async { userRepo.getCurrentUser() }

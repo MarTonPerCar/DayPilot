@@ -18,6 +18,7 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.daypilot_test_desing.core.connectivity.ConnectivityState
 import com.example.daypilot_test_desing.core.data.repository.StepsRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -94,7 +95,9 @@ class StepsViewModel(
     init {
         registerSensorIfPermitted()
         viewModelScope.launch {
-            stepsRepo.hydrateGoalFromServer()
+            if (ConnectivityState.ensureOnline()) {
+                stepsRepo.hydrateGoalFromServer()
+            }
             updateStepsDisplay()
             refreshPoints()
         }
@@ -156,6 +159,7 @@ class StepsViewModel(
         val goal = stepsRepo.getGoalSteps()
         Log.d(TAG, "Triggering steps sync: $steps/$goal")
         viewModelScope.launch {
+            if (!ConnectivityState.ensureOnline()) return@launch
             stepsRepo.syncSteps(steps, goal)
             // Re-fetch so displayed points reflect the server's recomputed milestone level.
             refreshPoints()
@@ -181,6 +185,7 @@ class StepsViewModel(
 
     /** Server round-trip — only called after a sync, never on every sensor tick. */
     private suspend fun refreshPoints() {
+        if (!ConnectivityState.ensureOnline()) return
         val earned = stepsRepo.getPointsEarned()
         _uiState.update { current ->
             current.copy(
@@ -191,6 +196,7 @@ class StepsViewModel(
     }
 
     private suspend fun loadWeeklyStats() {
+        if (!ConnectivityState.ensureOnline()) return
         val stats = stepsRepo.getWeeklyStats()
         _uiState.update { current ->
             current.copy(

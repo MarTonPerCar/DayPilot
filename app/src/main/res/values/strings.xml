@@ -89,6 +89,18 @@
     <string name="settings_notifications">Notificaciones</string>
     <string name="settings_notifications_description">Activar o desactivar notificaciones</string>
     <string name="settings_language">Idioma</string>
+    <string name="settings_reliability_section">Fiabilidad</string>
+    <string name="settings_exact_alarms">Alarmas exactas</string>
+    <string name="settings_exact_alarms_description">Para que los recordatorios y avisos de racha lleguen puntualmente</string>
+    <string name="settings_exact_alarms_granted">Activado</string>
+    <string name="settings_exact_alarms_action">Activar</string>
+    <string name="settings_battery_optimization">Optimización de batería</string>
+    <string name="settings_battery_optimization_description">Evita que el sistema bloquee el seguimiento de pasos en segundo plano</string>
+    <string name="settings_battery_optimization_granted">Desactivada</string>
+    <string name="settings_battery_optimization_action">Desactivar</string>
+    <string name="settings_autostart_info_title">Ajuste adicional del fabricante</string>
+    <string name="settings_autostart_info_description">Algunos fabricantes (Oppo, Xiaomi, Vivo, Huawei, Realme…) tienen un ajuste extra de "inicio automático" o "ejecución en segundo plano" que hay que activar manualmente para esta app. Sin él, los pasos y los avisos diarios pueden no funcionar si la app lleva tiempo cerrada.</string>
+    <string name="settings_autostart_open_settings">Abrir ajustes de la aplicación</string>
     <string name="settings_logout">Cerrar sesión</string>
 
     <!-- Calendar -->
@@ -606,5 +618,7 @@
     <string name="error_add_friend">No se pudo enviar la solicitud de amistad. Inténtalo de nuevo.</string>
     <string name="error_react_friend">No se pudo enviar la reacción. Inténtalo de nuevo.</string>
     <string name="error_startup_load">No se pudieron cargar tus datos. Comprueba tu conexión e inténtalo de nuevo.</string>
+    <string name="no_internet_title">Sin conexión a internet</string>
+    <string name="no_internet_subtitle">Comprueba tu conexión e inténtalo de nuevo.</string>
 
 </resources>
