@@ -20,8 +20,9 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
-// Shares "daypilot_steps" prefs with StepsViewModel — this class owns steps_goal/pending_goal/
-// goal_change_date, the ViewModel owns baseline_date/baseline_steps; don't reuse a key across the two.
+// "daypilot_steps" prefs are the single local source of truth for steps, shared between the
+// live UI (StepsViewModel) and StepsForegroundService — both just call recordRawSteps()/
+// getCurrentSteps() on their own repository instance rather than keeping their own copy.
 class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepository {
 
     companion object {
@@ -29,8 +30,6 @@ class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepos
     }
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-
-    private var currentSteps = 0
 
     private fun today() = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
 
@@ -54,7 +53,7 @@ class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepos
         }
     }
 
-    override fun getCurrentSteps(): Int = currentSteps
+    override fun getCurrentSteps(): Int = prefs.getInt("current_steps", 0)
 
     override fun getGoalSteps(): Int {
         applyPendingGoalIfNewDay()
@@ -143,8 +142,25 @@ class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepos
 
     // Milestone points/STEPS_GOAL notification come from the fn_award_steps_milestones
     // trigger server-side — this only stores the raw sensor count for display/upload.
-    override fun setSteps(steps: Int) {
-        currentSteps = steps
+    override fun recordRawSteps(totalSinceBoot: Int): Int {
+        val today = today()
+        val savedDate = prefs.getString("baseline_date", "")
+        var baseline = prefs.getInt("baseline_steps", -1)
+
+        // A fresh day OR the hardware counter being lower than our stored baseline (only possible
+        // if the device rebooted, since "steps since last reboot" can't otherwise decrease) both
+        // mean: start counting today's steps fresh from this reading.
+        if (baseline < 0 || savedDate != today || totalSinceBoot < baseline) {
+            baseline = totalSinceBoot
+            prefs.edit()
+                .putString("baseline_date", today)
+                .putInt("baseline_steps", baseline)
+                .apply()
+        }
+
+        val dailySteps = maxOf(0, totalSinceBoot - baseline)
+        prefs.edit().putInt("current_steps", dailySteps).apply()
+        return dailySteps
     }
 
     override suspend fun syncSteps(steps: Int, goal: Int) {

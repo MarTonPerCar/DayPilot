@@ -39,6 +39,7 @@ class CalendarViewModel(
     val uiState: StateFlow<CalendarUiState> = _uiState.asStateFlow()
 
     private var realtimeChannel: RealtimeChannel? = null
+    private var realtimeSubscribing = false
     private var refreshing = false
 
     init { refresh() }
@@ -67,8 +68,14 @@ class CalendarViewModel(
 
     // Realtime can only subscribe to base tables, but getTasks() reads a joined
     // tasks+task_days view — so both base tables are watched here instead.
+    //
+    // realtimeSubscribing is set synchronously because load() runs concurrently from both
+    // init/refresh() and the startup awaitLoad() join — without it, both calls could see
+    // realtimeChannel == null and each try to join a channel with the same topic name, and the
+    // second one crashes ("cannot call postgresChangeFlow after joining the channel").
     private fun subscribeToRealtimeOnce() {
-        if (realtimeChannel != null) return
+        if (realtimeChannel != null || realtimeSubscribing) return
+        realtimeSubscribing = true
         val uid = supabase.auth.currentUserOrNull()?.id ?: return
 
         viewModelScope.launch {

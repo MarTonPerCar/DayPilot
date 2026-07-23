@@ -569,6 +569,9 @@
     <!-- Daily phone notifications -->
     <string name="daily_channel_name">Daily Reminders</string>
     <string name="daily_channel_desc">Task and streak reminders</string>
+    <string name="steps_channel_name">Step tracking</string>
+    <string name="steps_channel_desc">Keeps the step counter active in the background</string>
+    <string name="steps_notification_text">Counting your steps in the background</string>
     <string name="notif_task_reminder_title">Today\'s Tasks</string>
     <string name="notif_task_reminder_count">You have %1$d tasks due today</string>
     <string name="notif_task_reminder_none">No tasks for today ✓</string>

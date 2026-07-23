@@ -99,13 +99,13 @@ fun DayPilotNavGraph(
     val sessionVM: AppSessionViewModel          = viewModel()
     val authRepo = remember { SupabaseAuthRepository() }
     val authVM: AuthViewModel                   = viewModel(factory = AuthViewModel.factory(authRepo))
-    val notificationsVM: NotificationsViewModel = viewModel(factory = NotificationsViewModel.factory(SupabaseNotificationRepository))
     val remindersVM: RemindersViewModel         = viewModel()
     val techHealthVM: TechHealthViewModel       = viewModel()
 
     val context = LocalContext.current
     val application = context.applicationContext as Application
     val appPrefs = remember { AppPreferences(context) }
+    val notificationsVM: NotificationsViewModel = viewModel(factory = NotificationsViewModel.factory(application, SupabaseNotificationRepository))
 
     val stepsRepo    = remember { SupabaseStepsRepository(application.getSharedPreferences("daypilot_steps", Context.MODE_PRIVATE)) }
     val progressRepo = remember { SupabaseProgressRepository() }

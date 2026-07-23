@@ -1,16 +1,9 @@
 package com.example.daypilot_test_desing.feature.habits
 
-import android.Manifest
 import android.app.Application
 import android.content.Context
-import android.content.pm.PackageManager
 import android.hardware.Sensor
-import android.hardware.SensorEvent
-import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import android.os.Build
-import android.util.Log
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -19,17 +12,22 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.daypilot_test_desing.core.connectivity.ConnectivityState
+import com.example.daypilot_test_desing.core.data.local.StepsSignal
 import com.example.daypilot_test_desing.core.data.repository.StepsRepository
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
+/**
+ * Purely a display + on-demand-sync layer now — StepsForegroundService owns the actual sensor
+ * listener and keeps counting regardless of whether this ViewModel (or the app) is alive. This
+ * just mirrors whatever the service (or a previous session) already persisted to local prefs,
+ * and reacts to StepsSignal for live updates while the Habits/Steps screen is open.
+ */
 class StepsViewModel(
     application: Application,
     private val stepsRepo: StepsRepository
@@ -38,62 +36,15 @@ class StepsViewModel(
     private val _uiState = MutableStateFlow(StepsUiState())
     val uiState: StateFlow<StepsUiState> = _uiState.asStateFlow()
 
-    private val prefs = application.getSharedPreferences("daypilot_steps", Context.MODE_PRIVATE)
-    private val sensorManager = application.getSystemService(Context.SENSOR_SERVICE) as? SensorManager
-    private val stepSensor    = sensorManager?.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
-
-    private var baseline: Int = -1
     private var lastSyncedSteps: Int = -1
-    private var prevTotalSinceBoot: Int = -1
-    private var prevEventNs: Long = 0L
-
-    private val sensorListener = object : SensorEventListener {
-        override fun onSensorChanged(event: SensorEvent) {
-            val totalSinceBoot = event.values[0].toInt()
-
-            // >10 steps/sec within a 30s gap is sensor noise (emulator artifact or
-            // over-eager step detection), not real steps; larger gaps mean backgrounded.
-            if (prevTotalSinceBoot >= 0 && prevEventNs > 0) {
-                val stepDelta  = totalSinceBoot - prevTotalSinceBoot
-                val timeDeltaS = (event.timestamp - prevEventNs) / 1_000_000_000.0
-                if (stepDelta > 0 && timeDeltaS in 0.001..30.0 && stepDelta / timeDeltaS > 10.0) {
-                    Log.d(TAG, "Rejected step spike: $stepDelta steps in ${timeDeltaS}s")
-                    prevEventNs = event.timestamp
-                    return
-                }
-            }
-            prevTotalSinceBoot = totalSinceBoot
-            prevEventNs        = event.timestamp
-
-            val today = todayStr()
-            val savedDate = prefs.getString("baseline_date", "")
-            if (baseline < 0 || savedDate != today) {
-                baseline = if (savedDate == today) {
-                    prefs.getInt("baseline_steps", totalSinceBoot)
-                } else {
-                    Log.d(TAG, "New day detected, resetting steps baseline to $totalSinceBoot")
-                    prefs.edit()
-                        .putString("baseline_date", today)
-                        .putInt("baseline_steps", totalSinceBoot)
-                        .apply()
-                    // Milestone level/points recompute server-side on this device's next sync.
-                    totalSinceBoot
-                }
-            }
-            val dailySteps = maxOf(0, totalSinceBoot - baseline)
-            val prevSteps  = stepsRepo.getCurrentSteps()
-            stepsRepo.setSteps(dailySteps)
-            // Local-only — keeps the visible counter live every tick without a network call.
-            if (dailySteps != prevSteps) updateStepsDisplay()
-            if (lastSyncedSteps < 0 || dailySteps - lastSyncedSteps >= STEP_SYNC_THRESHOLD) {
-                triggerSync(dailySteps)
-            }
-        }
-        override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
-    }
 
     init {
-        registerSensorIfPermitted()
+        val sensorManager = application.getSystemService(Context.SENSOR_SERVICE) as? SensorManager
+        val hasSensor = sensorManager?.getDefaultSensor(Sensor.TYPE_STEP_COUNTER) != null
+
+        updateStepsDisplay()
+        _uiState.update { it.copy(sensorAvailable = hasSensor) }
+
         viewModelScope.launch {
             if (ConnectivityState.ensureOnline()) {
                 stepsRepo.hydrateGoalFromServer()
@@ -102,66 +53,33 @@ class StepsViewModel(
             refreshPoints()
         }
         viewModelScope.launch { loadWeeklyStats() }
-        updateStepsDisplay()
-        _uiState.update { it.copy(sensorAvailable = stepSensor != null) }
 
-        viewModelScope.launch {
-            while (true) {
-                delay(PERIODIC_SYNC_MS)
-                val steps = stepsRepo.getCurrentSteps()
-                if (steps != lastSyncedSteps) triggerSync(steps)
-            }
-        }
+        StepsSignal.updated.onEach { updateStepsDisplay() }.launchIn(viewModelScope)
 
-        // Sync trigger #1: app comes to the foreground (cold start or resume, same handling).
+        // The service keeps counting/syncing in the background; this just refreshes what's
+        // shown whenever the user comes back to the app, plus does an on-demand sync.
         ProcessLifecycleOwner.get().lifecycle.addObserver(object : DefaultLifecycleObserver {
-            override fun onStop(owner: LifecycleOwner) {
-                triggerSync(stepsRepo.getCurrentSteps())
-            }
             override fun onStart(owner: LifecycleOwner) {
-                registerSensorIfPermitted()
-                // baseline < 0 means the sensor hasn't reported yet this session, so currentSteps
-                // is still 0 — syncing that would clobber today's real server-side count.
-                if (baseline >= 0) triggerSync() else viewModelScope.launch { refreshPoints() }
+                updateStepsDisplay()
+                triggerSync()
             }
         })
     }
 
-    private var sensorRegistered = false
-
-    private fun registerSensorIfPermitted() {
-        if (sensorRegistered) return
-        val ctx = getApplication<Application>()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
-            ContextCompat.checkSelfPermission(ctx, Manifest.permission.ACTIVITY_RECOGNITION)
-                != PackageManager.PERMISSION_GRANTED
-        ) return
-        stepSensor?.let {
-            sensorManager?.registerListener(sensorListener, it, SensorManager.SENSOR_DELAY_NORMAL)
-            sensorRegistered = true
-            Log.d(TAG, "Step sensor registered")
-        }
-    }
-
-    override fun onCleared() {
-        sensorManager?.unregisterListener(sensorListener)
-    }
-
-    /** Sync trigger #2: entering the Steps screen mid-session. */
+    /** Sync trigger: entering the Steps/Habits screen mid-session. */
     fun refresh() {
-        triggerSync()
         updateStepsDisplay()
+        triggerSync()
         viewModelScope.launch { loadWeeklyStats() }
     }
 
     private fun triggerSync(steps: Int = stepsRepo.getCurrentSteps()) {
+        if (steps == lastSyncedSteps) return
         lastSyncedSteps = steps
         val goal = stepsRepo.getGoalSteps()
-        Log.d(TAG, "Triggering steps sync: $steps/$goal")
         viewModelScope.launch {
             if (!ConnectivityState.ensureOnline()) return@launch
             stepsRepo.syncSteps(steps, goal)
-            // Re-fetch so displayed points reflect the server's recomputed milestone level.
             refreshPoints()
         }
     }
@@ -171,7 +89,7 @@ class StepsViewModel(
         updateStepsDisplay()
     }
 
-    /** Local-only — steps/goal fields the sensor and prefs already know synchronously. */
+    /** Local-only — steps/goal fields the prefs already know synchronously. */
     private fun updateStepsDisplay() {
         _uiState.update { current ->
             current.copy(
@@ -208,13 +126,7 @@ class StepsViewModel(
         }
     }
 
-    private fun todayStr() = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
-
     companion object {
-        private const val TAG = "StepsViewModel"
-        private const val STEP_SYNC_THRESHOLD = 50
-        private const val PERIODIC_SYNC_MS    = 5 * 60_000L
-
         fun factory(application: Application, repo: StepsRepository): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")

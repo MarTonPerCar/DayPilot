@@ -592,6 +592,9 @@
     <!-- Daily phone notifications -->
     <string name="daily_channel_name">Recordatorios diarios</string>
     <string name="daily_channel_desc">Recordatorios de tareas y racha</string>
+    <string name="steps_channel_name">Seguimiento de pasos</string>
+    <string name="steps_channel_desc">Mantiene el contador de pasos activo en segundo plano</string>
+    <string name="steps_notification_text">Contando tus pasos en segundo plano</string>
     <string name="notif_task_reminder_title">Tareas de hoy</string>
     <string name="notif_task_reminder_count">Tienes %1$d tareas pendientes hoy</string>
     <string name="notif_task_reminder_none">No tienes tareas para hoy ✓</string>

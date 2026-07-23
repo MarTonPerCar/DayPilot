@@ -20,8 +20,9 @@ import com.example.daypilot_test_desing.feature.settings.SettingsViewModel
 import com.example.daypilot_test_desing.core.reminders.ReliabilitySettings
 import com.example.daypilot_test_desing.core.reminders.createDailyChannel
 import com.example.daypilot_test_desing.core.reminders.createNotificationChannel
-import com.example.daypilot_test_desing.core.reminders.scheduleStepsWorker
+import com.example.daypilot_test_desing.core.reminders.createStepsChannel
 import com.example.daypilot_test_desing.core.reminders.scheduleTechHealthWorker
+import com.example.daypilot_test_desing.core.reminders.startStepsService
 import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
 
 class MainActivity : ComponentActivity() {
@@ -34,8 +35,8 @@ class MainActivity : ComponentActivity() {
         NotificationHub.init(this)
         createNotificationChannel(this)
         createDailyChannel(this)
+        createStepsChannel(this)
         scheduleTechHealthWorker(this)
-        scheduleStepsWorker(this)
 
         val toRequest = mutableListOf<String>()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
@@ -47,6 +48,8 @@ class MainActivity : ComponentActivity() {
                 != PackageManager.PERMISSION_GRANTED
         ) toRequest.add(Manifest.permission.ACTIVITY_RECOGNITION)
         if (toRequest.isNotEmpty()) requestPermissions.launch(toRequest.toTypedArray())
+
+        startStepsService(this)
 
         val appPrefs = AppPreferences(this)
         if (!appPrefs.hasRequestedReliabilityPermissions) {

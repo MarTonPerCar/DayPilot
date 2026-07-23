@@ -11,8 +11,9 @@ import android.provider.Settings
 /**
  * Exact alarms and battery-optimization exemption aren't runtime permissions — the user has to
  * flip them in system settings. Without them, daily task/streak alarms fall back to a lenient
- * setWindow() (deferrable under Doze), and WorkManager's periodic StepsWorker gets throttled,
- * which is why steps/notifications only reliably work while the app is open.
+ * setWindow() (deferrable under Doze), and background execution in general gets throttled —
+ * this is what made notifications unreliable while the app was closed (steps now use a
+ * foreground service instead, which is exempt from most of that throttling).
  */
 object ReliabilitySettings {
 

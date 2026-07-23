@@ -39,6 +39,7 @@ class ProgressViewModel(
     val uiState: StateFlow<ProgressUiState> = _uiState.asStateFlow()
 
     private var realtimeChannel: RealtimeChannel? = null
+    private var realtimeSubscribing = false
 
     init { viewModelScope.launch { load() } }
 
@@ -77,8 +78,15 @@ class ProgressViewModel(
 
     // daily_progress is write-through with no TTL, so without realtime a change from
     // another device wouldn't surface here until the date rolls over.
+    //
+    // realtimeSubscribing is set synchronously (not after the async subscribe work below
+    // finishes) because load() can run concurrently from both init and the startup awaitLoad()
+    // join — without it, both calls see realtimeChannel == null and each try to join a channel
+    // with the same topic name, and the second one crashes ("cannot call postgresChangeFlow
+    // after joining the channel").
     private fun subscribeToRealtimeOnce() {
-        if (realtimeChannel != null) return
+        if (realtimeChannel != null || realtimeSubscribing) return
+        realtimeSubscribing = true
         val uid = supabase.auth.currentUserOrNull()?.id ?: return
         subscribeToRealtime(uid)
     }
