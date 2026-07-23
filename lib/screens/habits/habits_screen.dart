@@ -20,6 +20,12 @@ class HabitsScreen extends ConsumerStatefulWidget {
 }
 
 class _HabitsScreenState extends ConsumerState<HabitsScreen> {
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() => ref.read(stepsNotifierProvider.notifier).refresh());
+  }
+
   void _openTechHealth() {
     Navigator.push(
       context,

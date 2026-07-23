@@ -7,11 +7,13 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'core/auth/auth_gate.dart';
+import 'core/connectivity/offline_notifier.dart';
 import 'core/logging/app_logger.dart';
 import 'core/prefs/app_prefs.dart';
 import 'core/window/desktop_window.dart';
 import 'l10n/app_localizations.dart';
 import 'l10n/locale_notifier.dart';
+import 'screens/no_internet_screen.dart';
 import 'theme/app_theme.dart';
 
 void main() async {
@@ -103,7 +105,17 @@ class DayPilotApp extends StatelessWidget {
                     return Container(
                       color: Colors.black,
                       padding: const EdgeInsets.all(borderWidth),
-                      child: child,
+                      child: Stack(
+                        children: [
+                          ?child,
+                          Consumer(
+                            builder: (context, ref, _) {
+                              if (!ref.watch(isOfflineProvider)) return const SizedBox.shrink();
+                              return const Positioned.fill(child: NoInternetScreen());
+                            },
+                          ),
+                        ],
+                      ),
                     );
                   },
                 );

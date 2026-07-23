@@ -39,6 +39,13 @@ class _MainShellState extends ConsumerState<MainShell> {
     super.dispose();
   }
 
+  void _onDestinationSelected(int index) {
+    setState(() => _index = index);
+    if (index == 1) {
+      ref.read(friendsNotifierProvider.notifier).refresh();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -55,7 +62,7 @@ class _MainShellState extends ConsumerState<MainShell> {
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _index,
-        onDestinationSelected: (i) => setState(() => _index = i),
+        onDestinationSelected: _onDestinationSelected,
         destinations: [
           NavigationDestination(
             icon: const Icon(Icons.home_outlined),

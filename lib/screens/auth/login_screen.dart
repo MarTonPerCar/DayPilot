@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../components/basic/button.dart';
 import '../../components/basic/text_field.dart';
 import '../../components/forms/select_field.dart';
+import '../../core/connectivity/connectivity_service.dart';
 import '../../data/app_data.dart';
 import '../../features/auth/auth_error.dart';
 import '../../features/auth/auth_notifier.dart';
@@ -77,7 +78,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final session = ref.watch(authNotifierProvider);
 
     ref.listen(authNotifierProvider, (previous, next) {
-      if (next.status == AuthStatus.unauthenticated && next.error != null) {
+      if (next.status == AuthStatus.unauthenticated &&
+          next.error != null &&
+          !isConnectivityError(next.error!)) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(friendlyAuthError(next.error!, l10n))),
         );

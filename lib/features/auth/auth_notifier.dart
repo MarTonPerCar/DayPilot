@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/cache/session_cache.dart';
+import '../../core/connectivity/connectivity_service.dart';
+import '../../core/connectivity/offline_notifier.dart';
 import '../../core/data/models/auth_exceptions.dart';
 import '../../core/data/repositories/providers.dart';
 import '../../core/logging/app_logger.dart';
@@ -40,6 +42,10 @@ class AuthNotifier extends Notifier<AuthSession> {
       return;
     }
     state = state.copyWith(status: AuthStatus.authenticating, error: null);
+    if (!await ensureOnline(ref)) {
+      state = state.copyWith(status: AuthStatus.unauthenticated);
+      return;
+    }
     try {
       final user = await ref.read(authRepositoryProvider).login(
             email: email,
@@ -49,6 +55,9 @@ class AuthNotifier extends Notifier<AuthSession> {
       state = state.copyWith(status: AuthStatus.authenticated, user: user);
     } catch (e, st) {
       AppLogger.logError('AuthNotifier.login', e, st);
+      if (isConnectivityError(e)) {
+        ref.read(isOfflineProvider.notifier).setOffline(true);
+      }
       state = AuthSession(status: AuthStatus.unauthenticated, error: e);
     }
   }
@@ -65,6 +74,10 @@ class AuthNotifier extends Notifier<AuthSession> {
       return;
     }
     state = state.copyWith(status: AuthStatus.authenticating, error: null);
+    if (!await ensureOnline(ref)) {
+      state = state.copyWith(status: AuthStatus.unauthenticated);
+      return;
+    }
     try {
       final user = await ref.read(authRepositoryProvider).signUp(
             name: name,
@@ -81,15 +94,26 @@ class AuthNotifier extends Notifier<AuthSession> {
       state = state.copyWith(status: AuthStatus.authenticated, user: user);
     } catch (e, st) {
       AppLogger.logError('AuthNotifier.signUp', e, st);
+      if (isConnectivityError(e)) {
+        ref.read(isOfflineProvider.notifier).setOffline(true);
+      }
       state = AuthSession(status: AuthStatus.unauthenticated, error: e);
     }
   }
 
   Future<void> logout() async {
+    if (!await ensureOnline(ref)) {
+      _invalidateUserScopedProviders();
+      state = AuthSession.initial;
+      return;
+    }
     try {
       await ref.read(authRepositoryProvider).logout();
     } catch (e, st) {
       AppLogger.logError('AuthNotifier.logout', e, st);
+      if (isConnectivityError(e)) {
+        ref.read(isOfflineProvider.notifier).setOffline(true);
+      }
     }
     _invalidateUserScopedProviders();
     state = AuthSession.initial;
