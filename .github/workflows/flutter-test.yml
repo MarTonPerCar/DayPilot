@@ -16,6 +16,20 @@ jobs:
           flutter-version: '3.44.4'
           channel: stable
 
+      - name: Write env.json
+        # pubspec.yaml declares env.json as a required asset, and it's gitignored (real
+        # credentials, never committed). The build workflow fills it from real secrets before
+        # building; here a placeholder is enough — these tests override every Supabase-touching
+        # Riverpod provider with a mock and never call main()/Supabase.initialize, so the actual
+        # values are never read. Only the file's existence matters, to satisfy the asset bundler.
+        run: |
+          cat > env.json <<EOF
+          {
+            "SUPABASE_URL": "https://placeholder.supabase.co",
+            "SUPABASE_KEY": "placeholder"
+          }
+          EOF
+
       - name: Get dependencies
         run: flutter pub get
 
