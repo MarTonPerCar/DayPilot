@@ -1,0 +1,49 @@
+name: Flutter Test
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+  checks: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.44.4'
+          channel: stable
+
+      - name: Write env.json
+        # pubspec.yaml declares env.json as a required asset, and it's gitignored (real
+        # credentials, never committed). The build workflow fills it from real secrets before
+        # building; here a placeholder is enough — these tests override every Supabase-touching
+        # Riverpod provider with a mock and never call main()/Supabase.initialize, so the actual
+        # values are never read. Only the file's existence matters, to satisfy the asset bundler.
+        run: |
+          cat > env.json <<EOF
+          {
+            "SUPABASE_URL": "https://placeholder.supabase.co",
+            "SUPABASE_KEY": "placeholder"
+          }
+          EOF
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Run tests
+        run: flutter test --file-reporter="json:test-results.json"
+
+      - name: Publish per-test results
+        uses: dorny/test-reporter@v2
+        if: success() || failure()
+        with:
+          name: Flutter Test Results
+          path: test-results.json
+          reporter: dart-json

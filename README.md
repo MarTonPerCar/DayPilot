@@ -1,5 +1,9 @@
 # DayPilot (Flutter)
 
+[![Flutter Test](https://github.com/MarTonPerCar/DayPilot/actions/workflows/flutter-test.yml/badge.svg?branch=Incremento-Flutter)](https://github.com/MarTonPerCar/DayPilot/actions/workflows/flutter-test.yml)
+
+*Click the badge to see the per-test breakdown (name and result for each individual test), not just the overall result.*
+
 Flutter port of DayPilot, a productivity app (tasks, steps, Pomodoro timers, app usage limits, social ranking) originally built for Android with Kotlin and Jetpack Compose, backed by Supabase.
 
 Users track daily tasks, steps, and app usage limits, and compete with friends on a 30-day points ranking. The app includes timers (Pomodoro and custom), reminders, a real-time notification system, and a weekly progress summary.
