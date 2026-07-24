@@ -6,7 +6,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../data/models/app_notification_item.dart';
 import '../logging/app_logger.dart';
 import '../prefs/app_prefs.dart';
-import '../utils/iso_date.dart';
 import 'desktop_window.dart' show isDesktopPlatform;
 
 const _dailyNotificationTypes = {'TASK_REMINDER', 'STREAK_RISK'};
@@ -31,7 +30,6 @@ Future<void> _checkForUnseenNotificationsToday() async {
   if (uid == null) return;
 
   try {
-    final today = isoDate(DateTime.now());
     final startOfDay = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
 
     final rows = await client
@@ -43,12 +41,7 @@ Future<void> _checkForUnseenNotificationsToday() async {
 
     for (final row in rows) {
       final item = AppNotificationItem.fromRow(row);
-      await _maybeShowNative(
-        type: row['type'] as String,
-        title: item.title,
-        body: item.body,
-        today: today,
-      );
+      await _maybeShowNative(type: row['type'] as String, title: item.title, body: item.body);
     }
   } catch (e, st) {
     AppLogger.logError('checkForUnseenNotificationsToday', e, st);
@@ -73,12 +66,7 @@ void _subscribeToNewNotifications() {
           final type = row['type'] as String?;
           if (type == null || !_dailyNotificationTypes.contains(type)) return;
           final item = AppNotificationItem.fromRow(row);
-          unawaited(_maybeShowNative(
-            type: type,
-            title: item.title,
-            body: item.body,
-            today: isoDate(DateTime.now()),
-          ));
+          unawaited(_maybeShowNative(type: type, title: item.title, body: item.body));
         },
       )
       .subscribe();
@@ -88,20 +76,11 @@ Future<void> _maybeShowNative({
   required String type,
   required String title,
   required String body,
-  required String today,
 }) async {
   final prefs = await AppPrefs.load();
   if (!prefs.notificationsEnabled) return;
-
-  if (type == 'TASK_REMINDER') {
-    if (!prefs.taskRemindersEnabled) return;
-    if (prefs.taskReminderFiredDate == today) return;
-    await prefs.setTaskReminderFiredDate(today);
-  } else if (type == 'STREAK_RISK') {
-    if (!prefs.streakAlertsEnabled) return;
-    if (prefs.streakAlertFiredDate == today) return;
-    await prefs.setStreakAlertFiredDate(today);
-  }
+  if (type == 'TASK_REMINDER' && !prefs.taskRemindersEnabled) return;
+  if (type == 'STREAK_RISK' && !prefs.streakAlertsEnabled) return;
 
   await _showSystemNotification(title, body);
 }
