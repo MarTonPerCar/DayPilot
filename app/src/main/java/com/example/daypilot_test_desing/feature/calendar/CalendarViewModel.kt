@@ -65,22 +65,20 @@ class CalendarViewModel(
         if (realtimeChannel != null) return
         val uid = supabase.auth.currentUserOrNull()?.id ?: return
 
-        viewModelScope.launch {
-            val channel = supabase.channel("tasks-$uid")
+        val channel = supabase.channel("tasks-$uid")
+        realtimeChannel = channel
 
-            channel.postgresChangeFlow<PostgresAction>(schema = "public") {
-                table = "tasks"
-                filter("user_id", FilterOperator.EQ, uid)
-            }.onEach { refreshFromRealtime() }.launchIn(viewModelScope)
+        channel.postgresChangeFlow<PostgresAction>(schema = "public") {
+            table = "tasks"
+            filter("user_id", FilterOperator.EQ, uid)
+        }.onEach { refreshFromRealtime() }.launchIn(viewModelScope)
 
-            channel.postgresChangeFlow<PostgresAction>(schema = "public") {
-                table = "task_days"
-                filter("user_id", FilterOperator.EQ, uid)
-            }.onEach { refreshFromRealtime() }.launchIn(viewModelScope)
+        channel.postgresChangeFlow<PostgresAction>(schema = "public") {
+            table = "task_days"
+            filter("user_id", FilterOperator.EQ, uid)
+        }.onEach { refreshFromRealtime() }.launchIn(viewModelScope)
 
-            channel.subscribe()
-            realtimeChannel = channel
-        }
+        viewModelScope.launch { channel.subscribe() }
     }
 
     private fun refreshFromRealtime() {

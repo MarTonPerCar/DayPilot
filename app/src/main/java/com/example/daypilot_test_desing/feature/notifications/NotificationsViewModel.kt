@@ -15,7 +15,6 @@ import io.github.jan.supabase.realtime.RealtimeChannel
 import io.github.jan.supabase.realtime.channel
 import io.github.jan.supabase.realtime.postgresChangeFlow
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -71,9 +70,6 @@ class NotificationsViewModel(private val repo: NotificationRepository) : ViewMod
     }
 
     private fun subscribeToRealtime(userId: String) {
-        realtimeChannel?.let { old ->
-            viewModelScope.launch { runCatching { old.unsubscribe() } }
-        }
         viewModelScope.launch {
             val channel = supabase.channel("notifications-$userId")
             channel.postgresChangeFlow<PostgresAction.Insert>(schema = "public") {
@@ -88,15 +84,6 @@ class NotificationsViewModel(private val repo: NotificationRepository) : ViewMod
                         SessionCache.friendsFetchedAt = 0L
                         NotificationHub.notifyFriendsChanged()
                     }
-                }
-            }.launchIn(viewModelScope)
-
-            // supabase-kt settles at UNSUBSCRIBED for good after enough failed rejoin
-            // attempts (e.g. a stale JWT) — rebuild instead of leaving notifications dead.
-            channel.status.onEach { status ->
-                if (status == RealtimeChannel.Status.UNSUBSCRIBED && realtimeChannel === channel) {
-                    delay(5_000)
-                    if (realtimeChannel === channel) subscribeToRealtime(userId)
                 }
             }.launchIn(viewModelScope)
 

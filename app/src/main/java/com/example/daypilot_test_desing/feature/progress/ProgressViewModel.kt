@@ -17,7 +17,6 @@ import io.github.jan.supabase.realtime.RealtimeChannel
 import io.github.jan.supabase.realtime.channel
 import io.github.jan.supabase.realtime.postgresChangeFlow
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -81,41 +80,27 @@ class ProgressViewModel(
     }
 
     private fun subscribeToRealtime(userId: String) {
-        viewModelScope.launch {
-            val channel = supabase.channel("daily-progress-$userId")
-            channel.postgresChangeFlow<PostgresAction.Update>(schema = "public") {
-                table = "daily_progress"
-                filter("user_id", FilterOperator.EQ, userId)
-            }.onEach {
-                SessionCache.todayProgress.value = null
-                load()
-            }.launchIn(viewModelScope)
+        val channel = supabase.channel("daily-progress-$userId")
+        realtimeChannel = channel
 
-            // Force a real refetch instead of serving the 1h-TTL'd stale history chart.
-            channel.postgresChangeFlow<PostgresAction>(schema = "public") {
-                table = "user_daily_log"
-                filter("user_id", FilterOperator.EQ, userId)
-            }.onEach {
-                SessionCache.weeklyHistory.value    = null
-                SessionCache.weeklyHistoryFetchedAt = 0L
-                load()
-            }.launchIn(viewModelScope)
+        channel.postgresChangeFlow<PostgresAction.Update>(schema = "public") {
+            table = "daily_progress"
+            filter("user_id", FilterOperator.EQ, userId)
+        }.onEach {
+            SessionCache.todayProgress.value = null
+            load()
+        }.launchIn(viewModelScope)
 
-            // supabase-kt settles at UNSUBSCRIBED for good after enough failed rejoin
-            // attempts (e.g. a stale JWT) — rebuild instead of leaving progress sync dead.
-            channel.status.onEach { status ->
-                if (status == RealtimeChannel.Status.UNSUBSCRIBED && realtimeChannel === channel) {
-                    delay(5_000)
-                    if (realtimeChannel === channel) {
-                        realtimeChannel = null
-                        subscribeToRealtime(userId)
-                    }
-                }
-            }.launchIn(viewModelScope)
+        channel.postgresChangeFlow<PostgresAction>(schema = "public") {
+            table = "user_daily_log"
+            filter("user_id", FilterOperator.EQ, userId)
+        }.onEach {
+            SessionCache.weeklyHistory.value    = null
+            SessionCache.weeklyHistoryFetchedAt = 0L
+            load()
+        }.launchIn(viewModelScope)
 
-            channel.subscribe()
-            realtimeChannel = channel
-        }
+        viewModelScope.launch { channel.subscribe() }
     }
 
     override fun onCleared() {
