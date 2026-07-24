@@ -1,5 +1,9 @@
 # DayPilot — Rama `Incremento-Android-TestFinal`
 
+[![Android Test](https://github.com/MarTonPerCar/DayPilot/actions/workflows/android-test.yml/badge.svg?branch=Incremento-Android-TestFinal)](https://github.com/MarTonPerCar/DayPilot/actions/workflows/android-test.yml)
+
+*Haz clic en la insignia para ver el detalle de cada test individual (nombre y resultado), no solo el resultado global.*
+
 > **Estado:** Incremento completado  
 > **Base:** `Incremento-Android` (arquitectura MVVM + Supabase integrado)  
 > **Propósito:** Testing intensivo del primer incremento funcional completo
