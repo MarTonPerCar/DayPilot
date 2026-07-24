@@ -38,18 +38,18 @@ object DailyNotificationScheduler {
     }
 
     fun scheduleTaskReminder(context: Context, enabled: Boolean) {
-        if (enabled) scheduleAlarm(context, ALARM_TASK_REMINDER, hour = 9)
+        if (enabled) scheduleAlarm(context, ALARM_TASK_REMINDER, utcHour = 9)
         else cancelAlarm(context, ALARM_TASK_REMINDER)
     }
 
     fun scheduleStreakAlert(context: Context, enabled: Boolean) {
-        if (enabled) scheduleAlarm(context, ALARM_STREAK_DANGER, hour = 22)
+        if (enabled) scheduleAlarm(context, ALARM_STREAK_DANGER, utcHour = 22)
         else cancelAlarm(context, ALARM_STREAK_DANGER)
     }
 
     fun reschedule(context: Context, type: String) {
-        val hour = if (type == ALARM_TASK_REMINDER) 9 else 22
-        scheduleAlarm(context, type, hour)
+        val utcHour = if (type == ALARM_TASK_REMINDER) 9 else 22
+        scheduleAlarm(context, type, utcHour)
     }
 
     fun cancelAll(context: Context) {
@@ -57,8 +57,8 @@ object DailyNotificationScheduler {
         cancelAlarm(context, ALARM_STREAK_DANGER)
     }
 
-    private fun scheduleAlarm(context: Context, type: String, hour: Int) {
-        val triggerAt = nextAlarmMillis(hour)
+    private fun scheduleAlarm(context: Context, type: String, utcHour: Int) {
+        val triggerAt = nextAlarmMillis(utcHour)
         val pi = buildPendingIntent(context, type, PendingIntent.FLAG_UPDATE_CURRENT) ?: return
         val am = context.getSystemService(AlarmManager::class.java) ?: return
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !am.canScheduleExactAlarms()) {
@@ -85,10 +85,14 @@ object DailyNotificationScheduler {
         )
     }
 
-    private fun nextAlarmMillis(hour: Int): Long {
-        val cal = Calendar.getInstance(TimeZone.getDefault()).apply {
-            set(Calendar.HOUR_OF_DAY, hour)
-            set(Calendar.MINUTE, 0)
+    // fn_check_task_reminders / fn_check_streak_danger (Supabase cron) run at utcHour:00 UTC,
+    // not device-local time — anchoring this alarm to UTC (plus a buffer for cron execution
+    // lag) keeps it from firing before the row it's meant to read even exists, which it always
+    // did for any timezone ahead of UTC when this was computed from the device's local hour.
+    private fun nextAlarmMillis(utcHour: Int): Long {
+        val cal = Calendar.getInstance(TimeZone.getTimeZone("UTC")).apply {
+            set(Calendar.HOUR_OF_DAY, utcHour)
+            set(Calendar.MINUTE, CRON_BUFFER_MINUTES)
             set(Calendar.SECOND, 0)
             set(Calendar.MILLISECOND, 0)
         }
@@ -97,4 +101,6 @@ object DailyNotificationScheduler {
         }
         return cal.timeInMillis
     }
+
+    private const val CRON_BUFFER_MINUTES = 15
 }
