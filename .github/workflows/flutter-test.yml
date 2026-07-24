@@ -4,6 +4,10 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+  checks: write
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -34,4 +38,12 @@ jobs:
         run: flutter pub get
 
       - name: Run tests
-        run: flutter test
+        run: flutter test --file-reporter="json:test-results.json"
+
+      - name: Publish per-test results
+        uses: dorny/test-reporter@v2
+        if: success() || failure()
+        with:
+          name: Flutter Test Results
+          path: test-results.json
+          reporter: dart-json
