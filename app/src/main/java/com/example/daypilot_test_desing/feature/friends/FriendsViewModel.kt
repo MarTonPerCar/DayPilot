@@ -80,32 +80,30 @@ class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
         if (realtimeChannel != null) return
         val uid = supabase.auth.currentUserOrNull()?.id ?: return
 
-        viewModelScope.launch {
-            val channel = supabase.channel("friends-$uid")
+        val channel = supabase.channel("friends-$uid")
+        realtimeChannel = channel
 
-            channel.postgresChangeFlow<PostgresAction>(schema = "public") {
-                table = "friends"
-                filter("requester_id", FilterOperator.EQ, uid)
-            }.onEach { refreshFromRealtime() }.launchIn(viewModelScope)
+        channel.postgresChangeFlow<PostgresAction>(schema = "public") {
+            table = "friends"
+            filter("requester_id", FilterOperator.EQ, uid)
+        }.onEach { refreshFromRealtime() }.launchIn(viewModelScope)
 
-            channel.postgresChangeFlow<PostgresAction>(schema = "public") {
-                table = "friends"
-                filter("receiver_id", FilterOperator.EQ, uid)
-            }.onEach { refreshFromRealtime() }.launchIn(viewModelScope)
+        channel.postgresChangeFlow<PostgresAction>(schema = "public") {
+            table = "friends"
+            filter("receiver_id", FilterOperator.EQ, uid)
+        }.onEach { refreshFromRealtime() }.launchIn(viewModelScope)
 
-            channel.postgresChangeFlow<PostgresAction>(schema = "public") {
-                table = "friend_requests"
-                filter("to_user_id", FilterOperator.EQ, uid)
-            }.onEach { refreshFromRealtime() }.launchIn(viewModelScope)
+        channel.postgresChangeFlow<PostgresAction>(schema = "public") {
+            table = "friend_requests"
+            filter("to_user_id", FilterOperator.EQ, uid)
+        }.onEach { refreshFromRealtime() }.launchIn(viewModelScope)
 
-            channel.postgresChangeFlow<PostgresAction>(schema = "public") {
-                table = "reactions"
-                filter("from_user_id", FilterOperator.EQ, uid)
-            }.onEach { refreshFromRealtime() }.launchIn(viewModelScope)
+        channel.postgresChangeFlow<PostgresAction>(schema = "public") {
+            table = "reactions"
+            filter("from_user_id", FilterOperator.EQ, uid)
+        }.onEach { refreshFromRealtime() }.launchIn(viewModelScope)
 
-            channel.subscribe()
-            realtimeChannel = channel
-        }
+        viewModelScope.launch { channel.subscribe() }
 
         FriendStatsBroadcast.addListener(onFriendStatsChanged)
     }

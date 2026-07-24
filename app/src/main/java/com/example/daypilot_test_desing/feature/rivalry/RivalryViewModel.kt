@@ -58,22 +58,20 @@ class RivalryViewModel(private val repo: RankingRepository) : ViewModel() {
         if (realtimeChannel != null) return
         val uid = supabase.auth.currentUserOrNull()?.id ?: return
 
-        viewModelScope.launch {
-            val channel = supabase.channel("ranking-$uid")
+        val channel = supabase.channel("ranking-$uid")
+        realtimeChannel = channel
 
-            channel.postgresChangeFlow<PostgresAction>(schema = "public") {
-                table = "friends"
-                filter("requester_id", FilterOperator.EQ, uid)
-            }.onEach { refreshFromRealtime() }.launchIn(viewModelScope)
+        channel.postgresChangeFlow<PostgresAction>(schema = "public") {
+            table = "friends"
+            filter("requester_id", FilterOperator.EQ, uid)
+        }.onEach { refreshFromRealtime() }.launchIn(viewModelScope)
 
-            channel.postgresChangeFlow<PostgresAction>(schema = "public") {
-                table = "friends"
-                filter("receiver_id", FilterOperator.EQ, uid)
-            }.onEach { refreshFromRealtime() }.launchIn(viewModelScope)
+        channel.postgresChangeFlow<PostgresAction>(schema = "public") {
+            table = "friends"
+            filter("receiver_id", FilterOperator.EQ, uid)
+        }.onEach { refreshFromRealtime() }.launchIn(viewModelScope)
 
-            channel.subscribe()
-            realtimeChannel = channel
-        }
+        viewModelScope.launch { channel.subscribe() }
 
         FriendStatsBroadcast.addListener(onFriendStatsChanged)
     }
