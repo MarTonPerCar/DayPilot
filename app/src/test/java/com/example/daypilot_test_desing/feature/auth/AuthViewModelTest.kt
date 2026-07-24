@@ -7,7 +7,7 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.advanceUntilIdle
+import com.example.daypilot_test_desing.support.realAdvanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -37,7 +37,7 @@ class AuthViewModelTest {
         var successCalled = false
 
         viewModel.login("ana@daypilot.test", "password123") { successCalled = true }
-        advanceUntilIdle()
+        realAdvanceUntilIdle()
 
         assertTrue(successCalled)
         assertFalse(viewModel.uiState.value.loginLoading)
@@ -49,7 +49,7 @@ class AuthViewModelTest {
         var successCalled = false
 
         viewModel.login("", "password123") { successCalled = true }
-        advanceUntilIdle()
+        realAdvanceUntilIdle()
 
         assertFalse(successCalled)
         assertEquals("Please enter your email and password.", viewModel.uiState.value.loginError)
@@ -64,7 +64,7 @@ class AuthViewModelTest {
         var successCalled = false
 
         viewModel.register("Ana", "ana", "ana@daypilot.test", "password123", "ES") { successCalled = true }
-        advanceUntilIdle()
+        realAdvanceUntilIdle()
 
         assertFalse(successCalled)
         assertFalse(viewModel.uiState.value.registerLoading)

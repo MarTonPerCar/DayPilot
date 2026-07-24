@@ -10,7 +10,7 @@ import com.example.daypilot_test_desing.support.initSupabaseSettingsForTest
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.advanceUntilIdle
+import com.example.daypilot_test_desing.support.realAdvanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -47,7 +47,7 @@ class FriendsViewModelTest {
     @Test
     fun `init loads friends and friend requests`() = runTest {
         val viewModel = buildViewModel()
-        advanceUntilIdle()
+        realAdvanceUntilIdle()
 
         val state = viewModel.uiState.value
         assertEquals(listOf(friend1), state.friends)
@@ -57,14 +57,14 @@ class FriendsViewModelTest {
     @Test
     fun `acceptRequest moves the request into friends optimistically then confirms`() = runTest {
         val viewModel = buildViewModel()
-        advanceUntilIdle()
+        realAdvanceUntilIdle()
 
         coEvery { repo.acceptRequest("u2") } returns Unit
         coEvery { repo.getFriends() } returns listOf(friend1, request)
         coEvery { repo.getFriendRequests() } returns emptyList()
 
         viewModel.acceptRequest(request.id)
-        advanceUntilIdle()
+        realAdvanceUntilIdle()
 
         val state = viewModel.uiState.value
         assertTrue(state.justAcceptedRequest)
@@ -75,12 +75,12 @@ class FriendsViewModelTest {
     @Test
     fun `removeFriend failure rolls back the optimistic removal`() = runTest {
         val viewModel = buildViewModel()
-        advanceUntilIdle()
+        realAdvanceUntilIdle()
 
         coEvery { repo.removeFriend("u3") } throws RuntimeException("remove failed")
 
         viewModel.removeFriend("u3")
-        advanceUntilIdle()
+        realAdvanceUntilIdle()
 
         val state = viewModel.uiState.value
         assertEquals(listOf(friend1), state.friends)

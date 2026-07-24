@@ -16,7 +16,7 @@ import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.advanceUntilIdle
+import com.example.daypilot_test_desing.support.realAdvanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -68,7 +68,7 @@ class HomeViewModelTest {
     @Test
     fun `init combines every repository's data into one ui state`() = runTest {
         val viewModel = buildViewModel()
-        advanceUntilIdle()
+        realAdvanceUntilIdle()
 
         val state = viewModel.uiState.value
         assertEquals("Ana", state.userName)
@@ -96,7 +96,7 @@ class HomeViewModelTest {
         coEvery { taskRepo.getTasks() } returns listOf(task("t1", true), task("t1", true), task("t2", false))
 
         val viewModel = buildViewModel()
-        advanceUntilIdle()
+        realAdvanceUntilIdle()
 
         val state = viewModel.uiState.value
         assertEquals(2, state.tasksTotal)

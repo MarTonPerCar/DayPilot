@@ -8,7 +8,7 @@ import com.example.daypilot_test_desing.support.initSupabaseSettingsForTest
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.advanceUntilIdle
+import com.example.daypilot_test_desing.support.realAdvanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -43,7 +43,7 @@ class ProgressViewModelTest {
     @Test
     fun `init loads today's progress, history and ranking`() = runTest {
         val viewModel = buildViewModel()
-        advanceUntilIdle()
+        realAdvanceUntilIdle()
 
         val state = viewModel.uiState.value
         assertEquals(40, state.pointsToday)
@@ -55,13 +55,13 @@ class ProgressViewModelTest {
     @Test
     fun `recordTimerComplete reloads when the server awarded points`() = runTest {
         val viewModel = buildViewModel()
-        advanceUntilIdle()
+        realAdvanceUntilIdle()
 
         coEvery { repo.completeTimerSession() } returns true
         coEvery { repo.getTodayProgress() } returns todayB
 
         viewModel.recordTimerComplete()
-        advanceUntilIdle()
+        realAdvanceUntilIdle()
 
         assertEquals(70, viewModel.uiState.value.pointsToday)
         assertEquals(30, viewModel.uiState.value.pointsFromTimers)
@@ -70,13 +70,13 @@ class ProgressViewModelTest {
     @Test
     fun `recordTimerComplete does not reload when nothing was awarded`() = runTest {
         val viewModel = buildViewModel()
-        advanceUntilIdle()
+        realAdvanceUntilIdle()
 
         coEvery { repo.completeTimerSession() } returns false
         coEvery { repo.getTodayProgress() } returns todayB
 
         viewModel.recordTimerComplete()
-        advanceUntilIdle()
+        realAdvanceUntilIdle()
 
         // Stale todayA value, proving the second getTodayProgress() stub was never reached.
         assertEquals(40, viewModel.uiState.value.pointsToday)

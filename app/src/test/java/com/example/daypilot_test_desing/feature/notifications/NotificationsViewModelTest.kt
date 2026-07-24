@@ -11,7 +11,7 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.advanceUntilIdle
+import com.example.daypilot_test_desing.support.realAdvanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -41,7 +41,7 @@ class NotificationsViewModelTest {
         repo = mockk()
     }
 
-    private fun buildViewModel() = NotificationsViewModel(repo)
+    private fun buildViewModel() = NotificationsViewModel(ApplicationProvider.getApplicationContext(), repo)
 
     @Test
     fun `awaitLoad merges the server's notifications into the shared hub`() = runTest {
@@ -66,7 +66,7 @@ class NotificationsViewModelTest {
         val viewModel = buildViewModel()
 
         viewModel.markAsRead("n1")
-        advanceUntilIdle()
+        realAdvanceUntilIdle()
 
         val stored = NotificationHub.repo.notificationsFlow.value
         assertTrue(stored.first { it.id == "n1" }.isRead)
@@ -82,7 +82,7 @@ class NotificationsViewModelTest {
         val viewModel = buildViewModel()
 
         viewModel.markAllAsRead()
-        advanceUntilIdle()
+        realAdvanceUntilIdle()
 
         assertTrue(NotificationHub.repo.notificationsFlow.value.all { it.isRead })
         coVerify { repo.markAllAsRead("u1") }

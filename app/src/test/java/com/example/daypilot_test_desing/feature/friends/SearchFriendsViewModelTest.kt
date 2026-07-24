@@ -7,7 +7,7 @@ import com.example.daypilot_test_desing.support.MainDispatcherRule
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.advanceUntilIdle
+import com.example.daypilot_test_desing.support.realAdvanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -39,11 +39,11 @@ class SearchFriendsViewModelTest {
     @Test
     fun `search filters out existing friends from the results`() = runTest {
         val viewModel = buildViewModel()
-        advanceUntilIdle()
+        realAdvanceUntilIdle()
         coEvery { repo.searchUsers("jav") } returns listOf(existingFriend, strangerResult)
 
         viewModel.search("jav")
-        advanceUntilIdle()
+        realAdvanceUntilIdle()
 
         val results = viewModel.uiState.value.searchResults
         assertEquals(listOf(strangerResult.copy(hasPendingRequest = false)), results)
@@ -52,15 +52,15 @@ class SearchFriendsViewModelTest {
     @Test
     fun `addFriend failure rolls back the optimistic sent-request state`() = runTest {
         val viewModel = buildViewModel()
-        advanceUntilIdle()
+        realAdvanceUntilIdle()
         coEvery { repo.searchUsers("jav") } returns listOf(strangerResult)
         viewModel.search("jav")
-        advanceUntilIdle()
+        realAdvanceUntilIdle()
 
         coEvery { repo.addFriend("u4") } throws RuntimeException("send failed")
 
         viewModel.addFriend("u4")
-        advanceUntilIdle()
+        realAdvanceUntilIdle()
 
         val state = viewModel.uiState.value
         assertFalse(state.requestJustSent)
@@ -72,11 +72,11 @@ class SearchFriendsViewModelTest {
     fun `init preloads pending sent requests so results show them as already pending`() = runTest {
         coEvery { repo.getPendingSentRequestUserIds() } returns listOf("u4")
         val viewModel = buildViewModel()
-        advanceUntilIdle()
+        realAdvanceUntilIdle()
         coEvery { repo.searchUsers("jav") } returns listOf(strangerResult)
 
         viewModel.search("jav")
-        advanceUntilIdle()
+        realAdvanceUntilIdle()
 
         val result = viewModel.uiState.value.searchResults.single()
         assertTrue(result.hasPendingRequest)

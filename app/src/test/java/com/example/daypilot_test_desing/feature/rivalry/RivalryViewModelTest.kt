@@ -7,7 +7,7 @@ import com.example.daypilot_test_desing.support.initSupabaseSettingsForTest
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.advanceUntilIdle
+import com.example.daypilot_test_desing.support.realAdvanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -43,7 +43,7 @@ class RivalryViewModelTest {
         coEvery { repo.getRanking() } returns listOf(other, me)
 
         val viewModel = buildViewModel()
-        advanceUntilIdle()
+        realAdvanceUntilIdle()
 
         val state = viewModel.uiState.value
         assertEquals("Ana", state.currentUserName)
@@ -57,7 +57,7 @@ class RivalryViewModelTest {
         coEvery { repo.getCurrentUserData() } returns me
 
         val viewModel = buildViewModel()
-        advanceUntilIdle()
+        realAdvanceUntilIdle()
 
         val state = viewModel.uiState.value
         assertEquals("Ana", state.currentUserName)

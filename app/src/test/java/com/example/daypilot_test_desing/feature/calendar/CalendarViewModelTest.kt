@@ -12,7 +12,7 @@ import com.example.daypilot_test_desing.support.initSupabaseSettingsForTest
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.advanceUntilIdle
+import com.example.daypilot_test_desing.support.realAdvanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -59,7 +59,7 @@ class CalendarViewModelTest {
         coEvery { taskRepo.getTasks() } returns listOf(existingTask)
 
         val viewModel = buildViewModel()
-        advanceUntilIdle()
+        realAdvanceUntilIdle()
 
         assertEquals(listOf(existingTask), viewModel.uiState.value.tasks)
         assertFalse(viewModel.uiState.value.isLoading)
@@ -68,12 +68,12 @@ class CalendarViewModelTest {
     @Test
     fun `addTask failure removes the placeholder and sets the create error`() = runTest {
         val viewModel = buildViewModel()
-        advanceUntilIdle()
+        realAdvanceUntilIdle()
 
         coEvery { taskRepo.addTask(newTaskData) } throws RuntimeException("insert failed")
 
         viewModel.addTask(newTaskData)
-        advanceUntilIdle()
+        realAdvanceUntilIdle()
 
         val state = viewModel.uiState.value
         assertEquals(emptyList<CalendarTaskData>(), state.tasks)
@@ -84,12 +84,12 @@ class CalendarViewModelTest {
     fun `toggleTask failure rolls back the optimistic done and earned flags`() = runTest {
         coEvery { taskRepo.getTasks() } returns listOf(existingTask)
         val viewModel = buildViewModel()
-        advanceUntilIdle()
+        realAdvanceUntilIdle()
 
         coEvery { taskRepo.toggleTask("t1", true) } throws RuntimeException("toggle failed")
 
         viewModel.toggleTask("t1", true)
-        advanceUntilIdle()
+        realAdvanceUntilIdle()
 
         val state = viewModel.uiState.value
         assertFalse(state.tasks.single().isDone)

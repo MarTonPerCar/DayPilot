@@ -5,7 +5,7 @@ import com.example.daypilot_test_desing.core.data.model.AppRestriction
 import com.example.daypilot_test_desing.support.MainDispatcherRule
 import com.example.daypilot_test_desing.support.initSupabaseSettingsForTest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.advanceUntilIdle
+import com.example.daypilot_test_desing.support.realAdvanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -41,10 +41,10 @@ class TechHealthViewModelTest {
     @Test
     fun `saveApp adds a new restriction to state`() = runTest {
         val viewModel = buildViewModel()
-        advanceUntilIdle()
+        realAdvanceUntilIdle()
 
         viewModel.saveApp(restriction)
-        advanceUntilIdle()
+        realAdvanceUntilIdle()
 
         assertEquals(listOf(restriction), viewModel.uiState.value.appRestrictions)
     }
@@ -52,12 +52,12 @@ class TechHealthViewModelTest {
     @Test
     fun `toggleRestriction defers the change to pendingActive rather than flipping isEnabled now`() = runTest {
         val viewModel = buildViewModel()
-        advanceUntilIdle()
+        realAdvanceUntilIdle()
         viewModel.saveApp(restriction)
-        advanceUntilIdle()
+        realAdvanceUntilIdle()
 
         viewModel.toggleRestriction(restriction.id, false)
-        advanceUntilIdle()
+        realAdvanceUntilIdle()
 
         val stored = viewModel.uiState.value.appRestrictions.single()
         assertEquals(false, stored.pendingActive)
@@ -67,12 +67,12 @@ class TechHealthViewModelTest {
     @Test
     fun `deleteRestriction soft-deletes by flagging pendingDelete, not removing it`() = runTest {
         val viewModel = buildViewModel()
-        advanceUntilIdle()
+        realAdvanceUntilIdle()
         viewModel.saveApp(restriction)
-        advanceUntilIdle()
+        realAdvanceUntilIdle()
 
         viewModel.deleteRestriction(restriction.id)
-        advanceUntilIdle()
+        realAdvanceUntilIdle()
 
         val stored = viewModel.uiState.value.appRestrictions.single()
         assertTrue(stored.pendingDelete)

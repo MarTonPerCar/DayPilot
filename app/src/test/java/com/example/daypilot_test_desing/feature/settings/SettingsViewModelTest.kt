@@ -7,7 +7,7 @@ import com.example.daypilot_test_desing.support.MainDispatcherRule
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.advanceUntilIdle
+import com.example.daypilot_test_desing.support.realAdvanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -41,7 +41,7 @@ class SettingsViewModelTest {
     @Test
     fun `init reflects the default preferences and loads the user's name`() = runTest {
         val viewModel = buildViewModel()
-        advanceUntilIdle()
+        realAdvanceUntilIdle()
 
         val state = viewModel.uiState.value
         assertEquals("Ana", state.name)
@@ -52,7 +52,7 @@ class SettingsViewModelTest {
     @Test
     fun `toggleDarkMode persists the new value and updates state`() = runTest {
         val viewModel = buildViewModel()
-        advanceUntilIdle()
+        realAdvanceUntilIdle()
 
         viewModel.toggleDarkMode(false)
 
@@ -66,7 +66,7 @@ class SettingsViewModelTest {
     @Test
     fun `disabling the master notifications switch cancels scheduled alarms without crashing`() = runTest {
         val viewModel = buildViewModel()
-        advanceUntilIdle()
+        realAdvanceUntilIdle()
 
         viewModel.toggleNotifications(false)
 
