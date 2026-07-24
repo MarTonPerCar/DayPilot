@@ -13,6 +13,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # SonarCloud's new-code/PR analysis needs full history, not a shallow clone.
+          fetch-depth: 0
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -37,8 +40,8 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
-      - name: Run tests
-        run: flutter test --file-reporter="json:test-results.json"
+      - name: Run tests with coverage
+        run: flutter test --coverage --file-reporter="json:test-results.json"
 
       - name: Publish per-test results
         uses: dorny/test-reporter@v2
@@ -47,3 +50,11 @@ jobs:
           name: Flutter Test Results
           path: test-results.json
           reporter: dart-json
+
+      - name: SonarCloud Scan
+        # Skips cleanly instead of failing CI on forks/PRs that can't see the secret.
+        if: ${{ secrets.SONAR_TOKEN != '' }}
+        uses: sonarsource/sonarqube-scan-action@v5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
