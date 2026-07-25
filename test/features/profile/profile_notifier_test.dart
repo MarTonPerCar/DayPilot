@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:daypilot/core/data/models/app_profile_stats.dart';
 import 'package:daypilot/core/data/models/app_weekly_summary.dart';
 import 'package:daypilot/core/connectivity/connectivity_service.dart';
+import 'package:daypilot/core/connectivity/offline_notifier.dart';
 import 'package:daypilot/core/data/repositories/providers.dart';
 import 'package:daypilot/features/profile/profile_notifier.dart';
 import 'package:daypilot/features/profile/weekly_summary_notifier.dart';
@@ -75,5 +78,22 @@ void main() {
     await container.read(weeklySummaryNotifierProvider.notifier).refresh();
 
     expect(container.read(weeklySummaryNotifierProvider), weeklySummary);
+  });
+
+  test('WeeklySummaryNotifier.refresh while offline never calls the repository', () async {
+    connectivity.online = false;
+
+    await container.read(weeklySummaryNotifierProvider.notifier).refresh();
+
+    expect(container.read(weeklySummaryNotifierProvider), isNull);
+    verifyNever(() => profileRepo.getWeeklySummary());
+  });
+
+  test('a connectivity error while refreshing flips the app into offline mode', () async {
+    when(() => profileRepo.getWeeklySummary()).thenThrow(const SocketException('no route'));
+
+    await container.read(weeklySummaryNotifierProvider.notifier).refresh();
+
+    expect(container.read(isOfflineProvider), isTrue);
   });
 }
