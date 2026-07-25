@@ -204,11 +204,11 @@ fun CatalogCardsPeople() {
             CatalogSection("Habit & Friend Cards") {
                 HabitCard(title = "Tech health", description = "App / group limits",  icon = Icons.Default.PhoneAndroid,  onClick = {})
                 HabitCard(title = "Reminders",   description = "Alerts and routines", icon = Icons.Default.Notifications, onClick = {})
-                FriendCard(name = "Ana López",   email = "ana@example.com",    points = 520, streak = 14)
-                FriendCard(name = "Carlos Ruiz", email = "carlos@example.com", points = 480, streak = 9,
-                    weeklySummary = FriendWeeklySummary(totalPoints = 45, tasksCompleted = 12, totalSteps = 42000, bestStreak = 7))
-                UserSearchCard(name = "Mario García", email = "mario@example.com", points = 340, streak = 7, onAddFriend = {})
-                FriendRequestCard(name = "Ana López", email = "ana@example.com", points = 210, streak = 3, onAccept = {}, onReject = {})
+                FriendCard(info = FriendCardInfo(name = "Ana López",   email = "ana@example.com",    points = 520, streak = 14))
+                FriendCard(info = FriendCardInfo(name = "Carlos Ruiz", email = "carlos@example.com", points = 480, streak = 9,
+                    weeklySummary = FriendWeeklySummary(totalPoints = 45, tasksCompleted = 12, totalSteps = 42000, bestStreak = 7)))
+                UserSearchCard(info = UserCardInfo(name = "Mario García", email = "mario@example.com", points = 340, streak = 7), onAddFriend = {})
+                FriendRequestCard(info = UserCardInfo(name = "Ana López", email = "ana@example.com", points = 210, streak = 3), onAccept = {}, onReject = {})
             }
         }
     }

@@ -62,14 +62,17 @@ import com.example.daypilot_test_desing.feature.reminders.RemindersViewModel
 import com.example.daypilot_test_desing.feature.rivalry.RivalryViewModel
 import com.example.daypilot_test_desing.feature.settings.SettingsViewModel
 import com.example.daypilot_test_desing.feature.techhealth.TechHealthViewModel
+import com.example.daypilot_test_desing.feature.auth.AuthActions
 import com.example.daypilot_test_desing.feature.auth.AuthScreen
 import com.example.daypilot_test_desing.feature.loading.LoadingScreen
+import com.example.daypilot_test_desing.feature.calendar.CalendarActions
 import com.example.daypilot_test_desing.feature.calendar.CalendarScreen
 import com.example.daypilot_test_desing.feature.profile.EditProfileActions
 import com.example.daypilot_test_desing.feature.profile.EditProfileScreen
 import com.example.daypilot_test_desing.feature.profile.EditProfileUiState
 import com.example.daypilot_test_desing.feature.friends.FriendsActions
 import com.example.daypilot_test_desing.feature.friends.FriendsScreen
+import com.example.daypilot_test_desing.feature.habits.HabitsActions
 import com.example.daypilot_test_desing.feature.habits.HabitsScreen
 import com.example.daypilot_test_desing.feature.home.HomeActions
 import com.example.daypilot_test_desing.feature.home.HomeScreen
@@ -233,24 +236,22 @@ fun DayPilotNavGraph(
             composable(DayPilotDestinations.AUTH) {
                 val authState by authVM.uiState.collectAsState()
                 AuthScreen(
-                    onLoginSuccess      = {},
-                    isLoginLoading      = authState.loginLoading,
-                    isRegisterLoading   = authState.registerLoading,
-                    loginError          = authState.loginError,
-                    registerError       = authState.registerError,
-                    onLoginClick        = { email, password ->
-                        authVM.login(email, password) {
-                            sessionVM.notifyAuthenticated()
+                    state = authState,
+                    actions = AuthActions(
+                        onLoginClick        = { email, password ->
+                            authVM.login(email, password) {
+                                sessionVM.notifyAuthenticated()
+                            }
+                        },
+                        onRegisterClick     = { name, username, email, password, region ->
+                            authVM.register(name, username, email, password, region) {
+                                sessionVM.notifyAuthenticated()
+                            }
+                        },
+                        onForgotPassword    = {
+                            navController.navigate(DayPilotDestinations.RESET_PASSWORD)
                         }
-                    },
-                    onRegisterClick     = { name, username, email, password, region ->
-                        authVM.register(name, username, email, password, region) {
-                            sessionVM.notifyAuthenticated()
-                        }
-                    },
-                    onForgotPassword    = {
-                        navController.navigate(DayPilotDestinations.RESET_PASSWORD)
-                    }
+                    )
                 )
             }
 
@@ -412,15 +413,16 @@ fun DayPilotNavGraph(
             composable(DayPilotDestinations.CALENDAR) {
                 val s by calendarVM.uiState.collectAsState()
                 CalendarScreen(
-                    tasks          = s.tasks,
-                    userMessage    = s.userMessage,
-                    onMessageShown = calendarVM::clearUserMessage,
-                    onBack         = { homeVM.refresh(); navController.popBackStack() },
-                    onCreateTask   = calendarVM::addTask,
-                    onTapTask      = {},
-                    onToggleTask   = calendarVM::toggleTask,
-                    onDeleteTask   = calendarVM::deleteTask,
-                    onUpdateTask   = calendarVM::updateTask
+                    state = s,
+                    actions = CalendarActions(
+                        onMessageShown = calendarVM::clearUserMessage,
+                        onBack         = { homeVM.refresh(); navController.popBackStack() },
+                        onCreateTask   = calendarVM::addTask,
+                        onTapTask      = {},
+                        onToggleTask   = calendarVM::toggleTask,
+                        onDeleteTask   = calendarVM::deleteTask,
+                        onUpdateTask   = calendarVM::updateTask
+                    )
                 )
             }
 
@@ -428,20 +430,17 @@ fun DayPilotNavGraph(
                 val s by habitsVM.uiState.collectAsState()
                 LaunchedEffect(Unit) { habitsVM.refresh() }
                 HabitsScreen(
-                    currentSteps          = s.currentSteps,
-                    goalSteps             = s.goalSteps,
-                    pointsEarned          = s.pointsEarned,
-                    pointsRemaining       = s.pointsRemaining,
-                    goalChangedToday      = s.goalChangedToday,
-                    pendingGoal           = s.pendingGoal,
-                    onBack                = { navController.popBackStack() },
-                    onNavigateToTimer     = { navController.navigate(DayPilotDestinations.TIMER_HUB) },
-                    onNavigateToReminders = { navController.navigate(DayPilotDestinations.REMINDERS) },
-                    onNavigateToTechHealth= { navController.navigate(DayPilotDestinations.TECH_HEALTH) },
-                    onConfigureGoal       = { newGoal ->
-                        habitsVM.configureGoal(newGoal)
-                        stepsVM.configureGoal(newGoal)
-                    }
+                    state = s,
+                    actions = HabitsActions(
+                        onBack                = { navController.popBackStack() },
+                        onNavigateToTimer     = { navController.navigate(DayPilotDestinations.TIMER_HUB) },
+                        onNavigateToReminders = { navController.navigate(DayPilotDestinations.REMINDERS) },
+                        onNavigateToTechHealth= { navController.navigate(DayPilotDestinations.TECH_HEALTH) },
+                        onConfigureGoal       = { newGoal ->
+                            habitsVM.configureGoal(newGoal)
+                            stepsVM.configureGoal(newGoal)
+                        }
+                    )
                 )
             }
 

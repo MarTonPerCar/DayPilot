@@ -16,21 +16,31 @@ import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.core.ui.components.basic.*
 import com.example.daypilot_test_desing.core.ui.components.cards.*
 
+data class HabitsActions(
+    val onBack: () -> Unit,
+    val onNavigateToTimer: () -> Unit,
+    val onNavigateToReminders: () -> Unit,
+    val onNavigateToTechHealth: () -> Unit,
+    val onConfigureGoal: (Int) -> Unit = {}
+)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HabitsScreen(
-    currentSteps: Int,
-    goalSteps: Int,
-    pointsEarned: Int,
-    pointsRemaining: Int,
-    goalChangedToday: Boolean = false,
-    pendingGoal: Int? = null,
-    onBack: () -> Unit,
-    onNavigateToTimer: () -> Unit,
-    onNavigateToReminders: () -> Unit,
-    onNavigateToTechHealth: () -> Unit,
-    onConfigureGoal: (Int) -> Unit = {}
+    state: HabitsUiState,
+    actions: HabitsActions
 ) {
+    val currentSteps     = state.currentSteps
+    val goalSteps        = state.goalSteps
+    val pointsEarned     = state.pointsEarned
+    val pointsRemaining  = state.pointsRemaining
+    val goalChangedToday = state.goalChangedToday
+    val pendingGoal      = state.pendingGoal
+    val onBack                 = actions.onBack
+    val onNavigateToTimer      = actions.onNavigateToTimer
+    val onNavigateToReminders  = actions.onNavigateToReminders
+    val onNavigateToTechHealth = actions.onNavigateToTechHealth
+    val onConfigureGoal        = actions.onConfigureGoal
     Scaffold(
         topBar = {
             DayPilotTopBar(

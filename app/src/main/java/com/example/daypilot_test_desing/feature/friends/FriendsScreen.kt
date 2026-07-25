@@ -36,7 +36,9 @@ import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.core.ui.components.basic.DayPilotEmptyState
 import com.example.daypilot_test_desing.core.ui.components.basic.DayPilotTopBarWithAction
 import com.example.daypilot_test_desing.core.ui.components.cards.FriendCard
+import com.example.daypilot_test_desing.core.ui.components.cards.FriendCardInfo
 import com.example.daypilot_test_desing.core.ui.components.cards.FriendRequestCard
+import com.example.daypilot_test_desing.core.ui.components.cards.UserCardInfo
 import com.example.daypilot_test_desing.core.data.model.FriendData
 import com.example.daypilot_test_desing.core.data.model.ReactionType
 
@@ -175,12 +177,14 @@ fun FriendsScreen(
                         ) {
                             friends.forEach { friend ->
                                 FriendCard(
-                                    name = friend.name,
-                                    email = friend.email,
-                                    points = friend.points,
-                                    streak = friend.streak,
-                                    avatarUrl = friend.avatarUrl,
-                                    weeklySummary = friend.weeklySummary,
+                                    info = FriendCardInfo(
+                                        name = friend.name,
+                                        email = friend.email,
+                                        points = friend.points,
+                                        streak = friend.streak,
+                                        avatarUrl = friend.avatarUrl,
+                                        weeklySummary = friend.weeklySummary
+                                    ),
                                     onReact = { reaction -> onReactToFriend(friend.id, reaction) },
                                     onRemove = { friendToRemove = friend }
                                 )
@@ -202,10 +206,12 @@ fun FriendsScreen(
                         ) {
                             items(friendRequests) { request ->
                                 FriendRequestCard(
-                                    name = request.name,
-                                    email = request.email,
-                                    points = request.points,
-                                    streak = request.streak,
+                                    info = UserCardInfo(
+                                        name = request.name,
+                                        email = request.email,
+                                        points = request.points,
+                                        streak = request.streak
+                                    ),
                                     isAccepting = acceptingUserId == request.id,
                                     onAccept = { onAcceptRequest(request.id) },
                                     onReject = { onRejectRequest(request.id) }

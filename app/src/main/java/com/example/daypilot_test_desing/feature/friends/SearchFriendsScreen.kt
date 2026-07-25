@@ -16,6 +16,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.core.ui.components.basic.*
+import com.example.daypilot_test_desing.core.ui.components.cards.UserCardInfo
 import com.example.daypilot_test_desing.core.ui.components.cards.UserSearchCard
 import com.example.daypilot_test_desing.core.data.model.SearchUserData
 
@@ -154,10 +155,12 @@ fun SearchFriendsScreen(
                     LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                         items(searchResults) { user ->
                             UserSearchCard(
-                                name               = user.name,
-                                email              = user.email,
-                                points             = user.points,
-                                streak             = user.streak,
+                                info = UserCardInfo(
+                                    name   = user.name,
+                                    email  = user.email,
+                                    points = user.points,
+                                    streak = user.streak
+                                ),
                                 hasPendingRequest  = user.hasPendingRequest,
                                 onAddFriend        = { onAddFriend(user.id) }
                             )

@@ -22,6 +22,7 @@ import com.example.daypilot_test_desing.core.ui.components.basic.*
 import com.example.daypilot_test_desing.core.ui.components.cards.*
 import com.example.daypilot_test_desing.core.ui.components.DayPilotCalendar
 import com.example.daypilot_test_desing.core.ui.components.forms.TaskFormCard
+import com.example.daypilot_test_desing.core.ui.components.forms.TaskFormInitialData
 import com.example.daypilot_test_desing.core.data.model.CalendarTaskData
 import com.example.daypilot_test_desing.core.data.model.CalendarTaskDot
 import com.example.daypilot_test_desing.core.data.model.NewTaskData
@@ -29,19 +30,31 @@ import com.example.daypilot_test_desing.core.data.model.TaskCategory
 import com.example.daypilot_test_desing.core.data.model.TaskDifficulty
 import java.util.Calendar
 
+data class CalendarActions(
+    val onMessageShown: () -> Unit = {},
+    val onBack: () -> Unit,
+    val onCreateTask: (NewTaskData) -> Unit,
+    val onTapTask: (String) -> Unit,
+    val onToggleTask: (String, Boolean) -> Unit,
+    val onDeleteTask: (String) -> Unit = {},
+    val onUpdateTask: (id: String, title: String, category: TaskCategory, difficulty: TaskDifficulty, duration: Int, description: String) -> Unit = { _, _, _, _, _, _ -> }
+)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CalendarScreen(
-    tasks: List<CalendarTaskData>,
-    @StringRes userMessage: Int? = null,
-    onMessageShown: () -> Unit = {},
-    onBack: () -> Unit,
-    onCreateTask: (NewTaskData) -> Unit,
-    onTapTask: (String) -> Unit,
-    onToggleTask: (String, Boolean) -> Unit,
-    onDeleteTask: (String) -> Unit = {},
-    onUpdateTask: (id: String, title: String, category: TaskCategory, difficulty: TaskDifficulty, duration: Int, description: String) -> Unit = { _, _, _, _, _, _ -> }
+    state: CalendarUiState,
+    actions: CalendarActions
 ) {
+    val tasks       = state.tasks
+    val userMessage = state.userMessage
+    val onMessageShown = actions.onMessageShown
+    val onBack          = actions.onBack
+    val onCreateTask     = actions.onCreateTask
+    val onTapTask        = actions.onTapTask
+    val onToggleTask     = actions.onToggleTask
+    val onDeleteTask     = actions.onDeleteTask
+    val onUpdateTask     = actions.onUpdateTask
     val now        = remember { Calendar.getInstance() }
     val todayDay   = remember { now.get(Calendar.DAY_OF_MONTH) }
     val todayMonth = remember { now.get(Calendar.MONTH) + 1 }
@@ -224,11 +237,13 @@ fun CalendarScreen(
         ) {
             TaskFormCard(
                 isEditing         = editingTaskId != null,
-                initialTitle      = editingTask?.title       ?: "",
-                initialDescription= editingTask?.description ?: "",
-                initialCategory   = editingTask?.category    ?: TaskCategory.PERSONAL,
-                initialDifficulty = editingTask?.difficulty  ?: TaskDifficulty.EASY,
-                initialDuration   = editingTask?.duration    ?: 30,
+                initialData = TaskFormInitialData(
+                    title      = editingTask?.title       ?: "",
+                    description= editingTask?.description ?: "",
+                    category   = editingTask?.category    ?: TaskCategory.PERSONAL,
+                    difficulty = editingTask?.difficulty  ?: TaskDifficulty.EASY,
+                    duration   = editingTask?.duration    ?: 30
+                ),
                 onSave = { title, category, difficulty, duration, description, isRecurring, hasReminder, recurrenceDays ->
                     val currentEditId = editingTaskId
                     if (currentEditId == null) {

@@ -68,18 +68,27 @@ import com.example.daypilot_test_desing.core.data.model.TaskDifficulty
 import com.example.daypilot_test_desing.core.data.model.NewTaskData
 import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
 
+data class TaskFormInitialData(
+    val title: String = "",
+    val description: String = "",
+    val category: TaskCategory = TaskCategory.PERSONAL,
+    val difficulty: TaskDifficulty = TaskDifficulty.EASY,
+    val duration: Int = 30
+)
+
 @Composable
 fun TaskFormCard(
     onSave: (title: String, category: TaskCategory, difficulty: TaskDifficulty, duration: Int, description: String, isRecurring: Boolean, hasReminder: Boolean, recurrenceDays: Int) -> Unit,
     onCancel: () -> Unit,
     modifier: Modifier = Modifier,
     isEditing: Boolean = false,
-    initialTitle: String = "",
-    initialDescription: String = "",
-    initialCategory: TaskCategory = TaskCategory.PERSONAL,
-    initialDifficulty: TaskDifficulty = TaskDifficulty.EASY,
-    initialDuration: Int = 30
+    initialData: TaskFormInitialData = TaskFormInitialData()
 ) {
+    val initialTitle = initialData.title
+    val initialDescription = initialData.description
+    val initialCategory = initialData.category
+    val initialDifficulty = initialData.difficulty
+    val initialDuration = initialData.duration
     var title by remember(initialTitle) { mutableStateOf(initialTitle) }
     var description by remember(initialDescription) { mutableStateOf(initialDescription) }
     var category by remember(initialCategory) { mutableStateOf(initialCategory) }

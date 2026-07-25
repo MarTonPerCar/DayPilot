@@ -31,17 +31,24 @@ import com.example.daypilot_test_desing.core.ui.components.forms.AuthToggle
 import com.example.daypilot_test_desing.core.ui.components.forms.LoginCard
 import com.example.daypilot_test_desing.core.ui.components.forms.RegisterCard
 
+data class AuthActions(
+    val onLoginClick: (email: String, password: String) -> Unit = { _, _ -> },
+    val onRegisterClick: (name: String, username: String, email: String, password: String, region: String) -> Unit = { _, _, _, _, _ -> },
+    val onForgotPassword: () -> Unit = {}
+)
+
 @Composable
 fun AuthScreen(
-    onLoginSuccess: () -> Unit,
-    isLoginLoading: Boolean = false,
-    isRegisterLoading: Boolean = false,
-    loginError: String = "",
-    registerError: String = "",
-    onLoginClick: (email: String, password: String) -> Unit = { _, _ -> },
-    onRegisterClick: (name: String, username: String, email: String, password: String, region: String) -> Unit = { _, _, _, _, _ -> },
-    onForgotPassword: () -> Unit = {}
+    state: AuthUiState,
+    actions: AuthActions
 ) {
+    val isLoginLoading    = state.loginLoading
+    val isRegisterLoading = state.registerLoading
+    val loginError        = state.loginError
+    val registerError     = state.registerError
+    val onLoginClick      = actions.onLoginClick
+    val onRegisterClick   = actions.onRegisterClick
+    val onForgotPassword  = actions.onForgotPassword
     var isLogin by remember { mutableStateOf(true) }
 
     val rotation by animateFloatAsState(

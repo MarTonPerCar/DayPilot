@@ -21,6 +21,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,17 +35,27 @@ import com.example.daypilot_test_desing.core.ui.components.basic.DayPilotIconBut
 import com.example.daypilot_test_desing.core.ui.components.basic.DayPilotStatsRow
 import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
 
+@Immutable
+data class UserCardInfo(
+    val name: String,
+    val email: String,
+    val points: Int,
+    val streak: Int,
+    val avatarUrl: String? = null
+)
+
 @Composable
 private fun UserCardBase(
-    name: String,
-    email: String,
-    points: Int,
-    streak: Int,
+    info: UserCardInfo,
     modifier: Modifier = Modifier,
-    avatarUrl: String? = null,
     onClick: (() -> Unit)? = null,
     action: @Composable (() -> Unit)? = null
 ) {
+    val name      = info.name
+    val email     = info.email
+    val points    = info.points
+    val streak    = info.streak
+    val avatarUrl = info.avatarUrl
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -88,21 +99,13 @@ private fun UserCardBase(
 
 @Composable
 fun UserSearchCard(
-    name: String,
-    email: String,
-    points: Int,
-    streak: Int,
+    info: UserCardInfo,
     onAddFriend: () -> Unit,
     modifier: Modifier = Modifier,
-    avatarUrl: String? = null,
     hasPendingRequest: Boolean = false
 ) {
     UserCardBase(
-        name = name,
-        email = email,
-        points = points,
-        streak = streak,
-        avatarUrl = avatarUrl,
+        info = info,
         modifier = modifier,
         action = {
             if (hasPendingRequest) {
@@ -152,22 +155,14 @@ fun UserSearchCard(
 
 @Composable
 fun FriendRequestCard(
-    name: String,
-    email: String,
-    points: Int,
-    streak: Int,
+    info: UserCardInfo,
     onAccept: () -> Unit,
     onReject: () -> Unit,
     modifier: Modifier = Modifier,
-    avatarUrl: String? = null,
     isAccepting: Boolean = false
 ) {
     UserCardBase(
-        name = name,
-        email = email,
-        points = points,
-        streak = streak,
-        avatarUrl = avatarUrl,
+        info = info,
         modifier = modifier,
         action = {
             if (isAccepting) {
@@ -223,17 +218,11 @@ fun UserCardsPreview() {
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             UserSearchCard(
-                name = "Mario García",
-                email = "mario@example.com",
-                points = 340,
-                streak = 7,
+                info = UserCardInfo(name = "Mario García", email = "mario@example.com", points = 340, streak = 7),
                 onAddFriend = {}
             )
             FriendRequestCard(
-                name = "Ana López",
-                email = "ana@example.com",
-                points = 210,
-                streak = 3,
+                info = UserCardInfo(name = "Ana López", email = "ana@example.com", points = 210, streak = 3),
                 onAccept = {},
                 onReject = {}
             )
