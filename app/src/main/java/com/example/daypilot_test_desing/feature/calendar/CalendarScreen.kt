@@ -474,18 +474,22 @@ fun CalendarScreen(
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         tasksForSelectedDay.forEach { task ->
                             TaskDayCard(
-                                title          = task.title,
-                                category       = task.category,
-                                difficulty     = task.difficulty,
-                                durationMinutes= task.duration,
-                                isCompleted    = task.isDone,
-                                hasReminder    = task.hasReminder,
-                                isRecurring    = task.isRecurring,
-                                isPending      = task.isPending,
-                                onToggleComplete = { onToggleTask(task.occurrenceId, it) },
-                                onTap          = { detailTaskId = task.occurrenceId },
-                                onEdit         = { editingTaskId = task.id },
-                                onDelete       = { onDeleteTask(task.id) }
+                                state = TaskDayCardUiState(
+                                    title          = task.title,
+                                    category       = task.category,
+                                    difficulty     = task.difficulty,
+                                    durationMinutes= task.duration,
+                                    isCompleted    = task.isDone,
+                                    hasReminder    = task.hasReminder,
+                                    isRecurring    = task.isRecurring,
+                                    isPending      = task.isPending
+                                ),
+                                actions = TaskDayCardActions(
+                                    onToggleComplete = { onToggleTask(task.occurrenceId, it) },
+                                    onTap          = { detailTaskId = task.occurrenceId },
+                                    onEdit         = { editingTaskId = task.id },
+                                    onDelete       = { onDeleteTask(task.id) }
+                                )
                             )
                         }
                     }

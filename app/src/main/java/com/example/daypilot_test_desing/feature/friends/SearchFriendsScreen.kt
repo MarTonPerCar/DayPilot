@@ -1,6 +1,5 @@
 package com.example.daypilot_test_desing.feature.friends
 
-import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,19 +19,29 @@ import com.example.daypilot_test_desing.core.ui.components.basic.*
 import com.example.daypilot_test_desing.core.ui.components.cards.UserSearchCard
 import com.example.daypilot_test_desing.core.data.model.SearchUserData
 
+data class SearchFriendsActions(
+    val onSearch: (query: String) -> Unit,
+    val onAddFriend: (userId: String) -> Unit,
+    val onConfirmationDismissed: () -> Unit = {},
+    val onBack: () -> Unit,
+    val onMessageShown: () -> Unit = {}
+)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchFriendsScreen(
-    searchResults: List<SearchUserData>,
-    isLoading: Boolean = false,
-    requestJustSent: Boolean = false,
-    onSearch: (query: String) -> Unit,
-    onAddFriend: (userId: String) -> Unit,
-    onConfirmationDismissed: () -> Unit = {},
-    onBack: () -> Unit,
-    @StringRes userMessage: Int? = null,
-    onMessageShown: () -> Unit = {}
+    state: SearchFriendsUiState,
+    actions: SearchFriendsActions
 ) {
+    val searchResults   = state.searchResults
+    val isLoading       = state.isLoading
+    val requestJustSent = state.requestJustSent
+    val userMessage     = state.userMessage
+    val onSearch                = actions.onSearch
+    val onAddFriend             = actions.onAddFriend
+    val onConfirmationDismissed = actions.onConfirmationDismissed
+    val onBack                  = actions.onBack
+    val onMessageShown          = actions.onMessageShown
     var query by remember { mutableStateOf("") }
     val snackbarHost = remember { SnackbarHostState() }
     val messageText  = userMessage?.let { stringResource(it) }

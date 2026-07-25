@@ -189,10 +189,13 @@ fun CatalogCardsPeople() {
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             CatalogSection("Task Cards") {
-                TaskCard(title = "Finish TFG", category = TaskCategory.STUDY, difficulty = TaskDifficulty.HARD, durationMinutes = 120, isCompleted = false, onToggleComplete = {}, onTap = {})
-                TaskCard(title = "Go for a run", category = TaskCategory.SPORT, difficulty = TaskDifficulty.EASY, durationMinutes = 45, isCompleted = true, onToggleComplete = {}, onTap = {})
+                TaskCard(state = TaskCardUiState(title = "Finish TFG", category = TaskCategory.STUDY, difficulty = TaskDifficulty.HARD, durationMinutes = 120, isCompleted = false), onToggleComplete = {}, onTap = {})
+                TaskCard(state = TaskCardUiState(title = "Go for a run", category = TaskCategory.SPORT, difficulty = TaskDifficulty.EASY, durationMinutes = 45, isCompleted = true), onToggleComplete = {}, onTap = {})
                 TaskMiniCard(title = "Team meeting", difficulty = TaskDifficulty.MEDIUM, onTap = {})
-                TaskDayCard(title = "Presentation", category = TaskCategory.WORK, difficulty = TaskDifficulty.HARD, durationMinutes = 60, isCompleted = false, onToggleComplete = {}, onTap = {}, onEdit = {}, onDelete = {})
+                TaskDayCard(
+                    state = TaskDayCardUiState(title = "Presentation", category = TaskCategory.WORK, difficulty = TaskDifficulty.HARD, durationMinutes = 60, isCompleted = false),
+                    actions = TaskDayCardActions(onToggleComplete = {}, onTap = {}, onEdit = {}, onDelete = {})
+                )
             }
             CatalogSection("Notification Cards") {
                 NotificationCard(title = "Task completed!", message = "You completed 'Go for a run'", timeAgo = "5min ago", type = NotificationType.TASK, isRead = false, onClick = {})
@@ -222,9 +225,9 @@ fun CatalogCardsRankingTimer() {
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             CatalogSection("Ranking & Podium") {
-                RankingCard(name = "Ana López",   position = 1, points = 520, streak = 14)
-                RankingCard(name = "Carlos Ruiz", position = 2, points = 480, streak = 9)
-                CurrentUserRankingCard(name = "Mario García", position = 3, points = 340, streak = 7)
+                RankingCard(entry = RankingEntryUi(name = "Ana López",   position = 1, points = 520, streak = 14))
+                RankingCard(entry = RankingEntryUi(name = "Carlos Ruiz", position = 2, points = 480, streak = 9))
+                CurrentUserRankingCard(entry = RankingEntryUi(name = "Mario García", position = 3, points = 340, streak = 7))
                 PodiumCard(
                     first  = PodiumEntry("Ana López",     520, 14),
                     second = PodiumEntry("Carlos Ruiz",   480, 9),

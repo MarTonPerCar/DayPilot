@@ -65,9 +65,13 @@ import com.example.daypilot_test_desing.feature.techhealth.TechHealthViewModel
 import com.example.daypilot_test_desing.feature.auth.AuthScreen
 import com.example.daypilot_test_desing.feature.loading.LoadingScreen
 import com.example.daypilot_test_desing.feature.calendar.CalendarScreen
+import com.example.daypilot_test_desing.feature.profile.EditProfileActions
 import com.example.daypilot_test_desing.feature.profile.EditProfileScreen
+import com.example.daypilot_test_desing.feature.profile.EditProfileUiState
+import com.example.daypilot_test_desing.feature.friends.FriendsActions
 import com.example.daypilot_test_desing.feature.friends.FriendsScreen
 import com.example.daypilot_test_desing.feature.habits.HabitsScreen
+import com.example.daypilot_test_desing.feature.home.HomeActions
 import com.example.daypilot_test_desing.feature.home.HomeScreen
 import com.example.daypilot_test_desing.feature.notifications.NotificationsScreen
 import com.example.daypilot_test_desing.feature.timer.PomodoroScreen
@@ -76,7 +80,9 @@ import com.example.daypilot_test_desing.feature.progress.ProgressScreen
 import com.example.daypilot_test_desing.feature.reminders.RemindersScreen
 import com.example.daypilot_test_desing.feature.auth.ResetPasswordScreen
 import com.example.daypilot_test_desing.feature.rivalry.RivalryScreen
+import com.example.daypilot_test_desing.feature.friends.SearchFriendsActions
 import com.example.daypilot_test_desing.feature.friends.SearchFriendsScreen
+import com.example.daypilot_test_desing.feature.settings.SettingsActions
 import com.example.daypilot_test_desing.feature.settings.SettingsScreen
 import com.example.daypilot_test_desing.feature.techhealth.TechHealthScreen
 import com.example.daypilot_test_desing.feature.timer.TimerHubScreen
@@ -251,71 +257,60 @@ fun DayPilotNavGraph(
             composable(DayPilotDestinations.HOME) {
                 val s by homeVM.uiState.collectAsState()
                 HomeScreen(
-                    userName            = s.userName,
-                    streak              = s.streak,
-                    stepsToday          = s.stepsToday,
-                    stepsGoal           = s.stepsGoal,
-                    tasksCompleted      = s.tasksCompleted,
-                    tasksTotal          = s.tasksTotal,
-                    progressData        = s.progressData,
-                    pointsToday         = s.pointsToday,
-                    rankingPosition     = s.rankingPosition,
-                    friendCount         = s.friendCount,
-                    timerCompletedToday = s.timerCompletedToday,
-                    onNavigateToCalendar= { navController.navigate(DayPilotDestinations.CALENDAR) },
-                    onNavigateToHabits  = { navController.navigate(DayPilotDestinations.HABITS) },
-                    onNavigateToProgress= { navController.navigate(DayPilotDestinations.PROGRESS) },
-                    onNavigateToRivalry = { navController.navigate(DayPilotDestinations.RIVALRY) }
+                    state = s,
+                    actions = HomeActions(
+                        onNavigateToCalendar= { navController.navigate(DayPilotDestinations.CALENDAR) },
+                        onNavigateToHabits  = { navController.navigate(DayPilotDestinations.HABITS) },
+                        onNavigateToProgress= { navController.navigate(DayPilotDestinations.PROGRESS) },
+                        onNavigateToRivalry = { navController.navigate(DayPilotDestinations.RIVALRY) }
+                    )
                 )
             }
 
             composable(DayPilotDestinations.FRIENDS) {
                 val s by friendsVM.uiState.collectAsState()
                 FriendsScreen(
-                    friends             = s.friends,
-                    friendRequests      = s.friendRequests,
-                    acceptingUserId     = s.acceptingUserId,
-                    justAcceptedRequest = s.justAcceptedRequest,
-                    onAcceptedNavigated = { friendsVM.clearJustAccepted() },
-                    onAcceptRequest     = { userId ->
-                        friendsVM.acceptRequest(userId)
-                        rivalryVM.invalidate()
-                        homeVM.invalidate()
-                    },
-                    onRejectRequest     = friendsVM::rejectRequest,
-                    onTapFriend         = {},
-                    onRemoveFriend      = { userId ->
-                        friendsVM.removeFriend(userId)
-                        rivalryVM.invalidate()
-                        homeVM.invalidate()
-                    },
-                    onReactToFriend     = friendsVM::reactToFriend,
-                    onNavigateToSearch  = { navController.navigate(DayPilotDestinations.SEARCH_FRIENDS) },
-                    userMessage         = s.userMessage,
-                    onMessageShown      = friendsVM::clearUserMessage
+                    state = s,
+                    actions = FriendsActions(
+                        onAcceptedNavigated = { friendsVM.clearJustAccepted() },
+                        onAcceptRequest     = { userId ->
+                            friendsVM.acceptRequest(userId)
+                            rivalryVM.invalidate()
+                            homeVM.invalidate()
+                        },
+                        onRejectRequest     = friendsVM::rejectRequest,
+                        onTapFriend         = {},
+                        onRemoveFriend      = { userId ->
+                            friendsVM.removeFriend(userId)
+                            rivalryVM.invalidate()
+                            homeVM.invalidate()
+                        },
+                        onReactToFriend     = friendsVM::reactToFriend,
+                        onNavigateToSearch  = { navController.navigate(DayPilotDestinations.SEARCH_FRIENDS) },
+                        onMessageShown      = friendsVM::clearUserMessage
+                    )
                 )
             }
 
             composable(DayPilotDestinations.SEARCH_FRIENDS) {
                 val s by searchVM.uiState.collectAsState()
                 SearchFriendsScreen(
-                    searchResults        = s.searchResults,
-                    isLoading            = s.isLoading,
-                    requestJustSent      = s.requestJustSent,
-                    onSearch             = searchVM::search,
-                    onAddFriend          = searchVM::addFriend,
-                    onConfirmationDismissed = {
-                        searchVM.dismissConfirmation()
-                        friendsVM.refresh()
-                        rivalryVM.invalidate()
-                        homeVM.invalidate()
-                        navController.navigate(DayPilotDestinations.FRIENDS) {
-                            popUpTo(DayPilotDestinations.FRIENDS) { inclusive = true }
-                        }
-                    },
-                    onBack               = { navController.popBackStack() },
-                    userMessage          = s.userMessage,
-                    onMessageShown       = searchVM::clearUserMessage
+                    state = s,
+                    actions = SearchFriendsActions(
+                        onSearch             = searchVM::search,
+                        onAddFriend          = searchVM::addFriend,
+                        onConfirmationDismissed = {
+                            searchVM.dismissConfirmation()
+                            friendsVM.refresh()
+                            rivalryVM.invalidate()
+                            homeVM.invalidate()
+                            navController.navigate(DayPilotDestinations.FRIENDS) {
+                                popUpTo(DayPilotDestinations.FRIENDS) { inclusive = true }
+                            }
+                        },
+                        onBack               = { navController.popBackStack() },
+                        onMessageShown       = searchVM::clearUserMessage
+                    )
                 )
             }
 
@@ -333,23 +328,7 @@ fun DayPilotNavGraph(
                 LaunchedEffect(Unit) { profileVM.refresh() }
                 val s by profileVM.uiState.collectAsState()
                 ProfileScreen(
-                    name                = s.name,
-                    username            = s.username,
-                    email               = s.email,
-                    memberSince         = s.memberSince,
-                    level               = s.level,
-                    totalPoints         = s.totalPoints,
-                    pointsToNextLevel   = s.pointsToNextLevel,
-                    currentStreak       = s.currentStreak,
-                    longestStreak       = s.longestStreak,
-                    rankingPosition     = s.rankingPosition,
-                    pointsToday         = s.pointsToday,
-                    pointsFromTasks     = s.pointsFromTasks,
-                    pointsFromSteps     = s.pointsFromSteps,
-                    pointsFromHabits    = s.pointsFromHabits,
-                    pointsFromTimers    = s.pointsFromTimers,
-                    avatarUrl           = s.avatarUrl,
-                    weeklySummary       = s.weeklySummary,
+                    state = s,
                     onNavigateToSettings = { navController.navigate(DayPilotDestinations.SETTINGS) }
                 )
             }
@@ -357,35 +336,31 @@ fun DayPilotNavGraph(
             composable(DayPilotDestinations.SETTINGS) {
                 val s by settingsVM.uiState.collectAsState()
                 SettingsScreen(
-                    name                    = s.name,
-                    isDarkMode              = s.isDarkMode,
-                    selectedThemeId         = s.selectedThemeId,
-                    selectedLanguage        = s.selectedLanguage,
-                    notificationsEnabled    = s.notificationsEnabled,
-                    taskRemindersEnabled    = s.taskRemindersEnabled,
-                    streakAlertsEnabled     = s.streakAlertsEnabled,
-                    onToggleDarkMode        = settingsVM::toggleDarkMode,
-                    onThemeSelect           = settingsVM::selectTheme,
-                    onLanguageSelect        = { code ->
-                        settingsVM.selectLanguage(code)
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            try {
-                                context.getSystemService(LocaleManager::class.java)
-                                    ?.applicationLocales = LocaleList.forLanguageTags(code)
-                            } catch (e: Exception) {
-                                Log.e(TAG, "Failed to set per-app locale to $code", e)
+                    state = s,
+                    actions = SettingsActions(
+                        onToggleDarkMode        = settingsVM::toggleDarkMode,
+                        onThemeSelect           = settingsVM::selectTheme,
+                        onLanguageSelect        = { code ->
+                            settingsVM.selectLanguage(code)
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                try {
+                                    context.getSystemService(LocaleManager::class.java)
+                                        ?.applicationLocales = LocaleList.forLanguageTags(code)
+                                } catch (e: Exception) {
+                                    Log.e(TAG, "Failed to set per-app locale to $code", e)
+                                }
                             }
-                        }
-                    },
-                    onToggleNotifications   = settingsVM::toggleNotifications,
-                    onToggleTaskReminders   = settingsVM::toggleTaskReminders,
-                    onToggleStreakAlerts    = settingsVM::toggleStreakAlerts,
-                    onNavigateToEditProfile = { navController.navigate(DayPilotDestinations.EDIT_PROFILE) },
-                    onLogout                = {
-                        techHealthVM.clearLocalData()
-                        sessionVM.signOut()
-                    },
-                    onBack                  = { navController.popBackStack() }
+                        },
+                        onToggleNotifications   = settingsVM::toggleNotifications,
+                        onToggleTaskReminders   = settingsVM::toggleTaskReminders,
+                        onToggleStreakAlerts    = settingsVM::toggleStreakAlerts,
+                        onNavigateToEditProfile = { navController.navigate(DayPilotDestinations.EDIT_PROFILE) },
+                        onLogout                = {
+                            techHealthVM.clearLocalData()
+                            sessionVM.signOut()
+                        },
+                        onBack                  = { navController.popBackStack() }
+                    )
                 )
             }
 
@@ -398,23 +373,27 @@ fun DayPilotNavGraph(
                     }
                 }
                 EditProfileScreen(
-                    currentName          = s.name,
-                    currentUsername      = s.username,
-                    avatarUrl            = s.avatarUrl,
-                    isUploadingAvatar    = s.isUploadingAvatar,
-                    avatarUploadError    = s.avatarUploadError,
-                    isSavingProfile      = s.isSavingProfile,
-                    profileSaveError     = s.profileSaveError,
-                    onSave               = { name, username, region ->
-                        profileVM.updateProfile(name, username, region)
-                    },
-                    onNavigateToResetPassword = {
-                        navController.navigate(DayPilotDestinations.RESET_PASSWORD)
-                    },
-                    onPhotoSelected      = { uri -> profileVM.uploadAvatar(uri, context) },
-                    onAvatarErrorDismissed = { profileVM.clearAvatarError() },
-                    onProfileSaveErrorDismissed = { profileVM.clearProfileSaveError() },
-                    onBack               = { navController.popBackStack() }
+                    state = EditProfileUiState(
+                        currentName          = s.name,
+                        currentUsername      = s.username,
+                        avatarUrl            = s.avatarUrl,
+                        isUploadingAvatar    = s.isUploadingAvatar,
+                        avatarUploadError    = s.avatarUploadError,
+                        isSavingProfile      = s.isSavingProfile,
+                        profileSaveError     = s.profileSaveError
+                    ),
+                    actions = EditProfileActions(
+                        onSave               = { name, username, region ->
+                            profileVM.updateProfile(name, username, region)
+                        },
+                        onNavigateToResetPassword = {
+                            navController.navigate(DayPilotDestinations.RESET_PASSWORD)
+                        },
+                        onPhotoSelected      = { uri -> profileVM.uploadAvatar(uri, context) },
+                        onAvatarErrorDismissed = { profileVM.clearAvatarError() },
+                        onProfileSaveErrorDismissed = { profileVM.clearProfileSaveError() },
+                        onBack               = { navController.popBackStack() }
+                    )
                 )
             }
 

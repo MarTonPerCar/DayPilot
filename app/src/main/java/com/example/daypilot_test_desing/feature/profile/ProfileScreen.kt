@@ -14,30 +14,30 @@ import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.core.ui.components.basic.*
 import com.example.daypilot_test_desing.core.ui.components.cards.*
-import com.example.daypilot_test_desing.core.data.model.WeeklySummaryData
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
-    name: String,
-    username: String,
-    email: String,
-    memberSince: String,
-    level: Int,
-    totalPoints: Int,
-    pointsToNextLevel: Int,
-    currentStreak: Int,
-    longestStreak: Int,
-    rankingPosition: Int,
-    pointsToday: Int,
-    pointsFromTasks: Int,
-    pointsFromSteps: Int,
-    pointsFromHabits: Int,
-    pointsFromTimers: Int,
-    avatarUrl: String? = null,
-    weeklySummary: WeeklySummaryData,
+    state: ProfileUiState,
     onNavigateToSettings: () -> Unit
 ) {
+    val name              = state.name
+    val username          = state.username
+    val email             = state.email
+    val memberSince       = state.memberSince
+    val level             = state.level
+    val totalPoints       = state.totalPoints
+    val pointsToNextLevel = state.pointsToNextLevel
+    val currentStreak     = state.currentStreak
+    val longestStreak     = state.longestStreak
+    val rankingPosition   = state.rankingPosition
+    val pointsToday       = state.pointsToday
+    val pointsFromTasks   = state.pointsFromTasks
+    val pointsFromSteps   = state.pointsFromSteps
+    val pointsFromHabits  = state.pointsFromHabits
+    val pointsFromTimers  = state.pointsFromTimers
+    val avatarUrl         = state.avatarUrl
+    val weeklySummary     = state.weeklySummary
     Scaffold(
         topBar = {
             DayPilotTopBarWithAction(

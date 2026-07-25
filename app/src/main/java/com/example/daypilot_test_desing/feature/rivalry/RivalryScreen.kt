@@ -31,6 +31,7 @@ import com.example.daypilot_test_desing.core.ui.components.basic.DayPilotTopBar
 import com.example.daypilot_test_desing.core.ui.components.cards.CurrentUserRankingCard
 import com.example.daypilot_test_desing.core.ui.components.cards.PodiumCard
 import com.example.daypilot_test_desing.core.ui.components.cards.RankingCard
+import com.example.daypilot_test_desing.core.ui.components.cards.RankingEntryUi
 import com.example.daypilot_test_desing.core.data.model.PodiumEntry
 import com.example.daypilot_test_desing.core.data.model.RankingData
 
@@ -66,11 +67,13 @@ fun RivalryScreen(
         ) {
             item {
                 CurrentUserRankingCard(
-                    name     = currentUserName,
-                    position = currentUserPosition,
-                    points   = currentUserPoints,
-                    streak   = currentUserStreak,
-                    level    = currentUserLevel
+                    entry = RankingEntryUi(
+                        name     = currentUserName,
+                        position = currentUserPosition,
+                        points   = currentUserPoints,
+                        streak   = currentUserStreak,
+                        level    = currentUserLevel
+                    )
                 )
             }
 
@@ -138,12 +141,14 @@ fun RivalryScreen(
                         item { Spacer(Modifier.height(4.dp)) }
                         itemsIndexed(ranking.drop(3)) { index, entry ->
                             RankingCard(
-                                name          = entry.name,
-                                position      = index + 4,
-                                points        = entry.points,
-                                streak        = entry.streak,
-                                level         = entry.level,
-                                avatarUrl     = entry.avatarUrl,
+                                entry = RankingEntryUi(
+                                    name      = entry.name,
+                                    position  = index + 4,
+                                    points    = entry.points,
+                                    streak    = entry.streak,
+                                    level     = entry.level,
+                                    avatarUrl = entry.avatarUrl
+                                ),
                                 isCurrentUser = entry.id == currentUserId
                             )
                         }
@@ -151,12 +156,14 @@ fun RivalryScreen(
                 } else {
                     itemsIndexed(ranking) { index, entry ->
                         RankingCard(
-                            name          = entry.name,
-                            position      = index + 1,
-                            points        = entry.points,
-                            streak        = entry.streak,
-                            level         = entry.level,
-                            avatarUrl     = entry.avatarUrl,
+                            entry = RankingEntryUi(
+                                name      = entry.name,
+                                position  = index + 1,
+                                points    = entry.points,
+                                streak    = entry.streak,
+                                level     = entry.level,
+                                avatarUrl = entry.avatarUrl
+                            ),
                             isCurrentUser = entry.id == currentUserId
                         )
                     }

@@ -1,6 +1,5 @@
 package com.example.daypilot_test_desing.feature.friends
 
-import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -41,23 +40,36 @@ import com.example.daypilot_test_desing.core.ui.components.cards.FriendRequestCa
 import com.example.daypilot_test_desing.core.data.model.FriendData
 import com.example.daypilot_test_desing.core.data.model.ReactionType
 
+data class FriendsActions(
+    val onAcceptRequest: (String) -> Unit,
+    val onRejectRequest: (String) -> Unit,
+    val onTapFriend: (String) -> Unit,
+    val onRemoveFriend: (String) -> Unit,
+    val onNavigateToSearch: () -> Unit,
+    val onReactToFriend: (userId: String, reaction: ReactionType) -> Unit = { _, _ -> },
+    val onAcceptedNavigated: () -> Unit = {},
+    val onMessageShown: () -> Unit = {}
+)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FriendsScreen(
-    friends: List<FriendData>,
-    friendRequests: List<FriendData>,
-    onAcceptRequest: (String) -> Unit,
-    onRejectRequest: (String) -> Unit,
-    onTapFriend: (String) -> Unit,
-    onRemoveFriend: (String) -> Unit,
-    onNavigateToSearch: () -> Unit,
-    onReactToFriend: (userId: String, reaction: ReactionType) -> Unit = { _, _ -> },
-    acceptingUserId: String? = null,
-    justAcceptedRequest: Boolean = false,
-    onAcceptedNavigated: () -> Unit = {},
-    @StringRes userMessage: Int? = null,
-    onMessageShown: () -> Unit = {}
+    state: FriendsUiState,
+    actions: FriendsActions
 ) {
+    val friends             = state.friends
+    val friendRequests      = state.friendRequests
+    val acceptingUserId     = state.acceptingUserId
+    val justAcceptedRequest = state.justAcceptedRequest
+    val userMessage         = state.userMessage
+    val onAcceptRequest      = actions.onAcceptRequest
+    val onRejectRequest      = actions.onRejectRequest
+    val onTapFriend          = actions.onTapFriend
+    val onRemoveFriend       = actions.onRemoveFriend
+    val onNavigateToSearch   = actions.onNavigateToSearch
+    val onReactToFriend      = actions.onReactToFriend
+    val onAcceptedNavigated  = actions.onAcceptedNavigated
+    val onMessageShown       = actions.onMessageShown
     var selectedTab by remember { mutableIntStateOf(0) }
     var friendToRemove by remember { mutableStateOf<FriendData?>(null) }
     val snackbarHost = remember { SnackbarHostState() }

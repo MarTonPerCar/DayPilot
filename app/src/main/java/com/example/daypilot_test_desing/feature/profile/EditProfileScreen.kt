@@ -25,24 +25,37 @@ import com.example.daypilot_test_desing.core.data.model.TimeZoneRegion
 import com.yalantis.ucrop.UCrop
 import java.io.File
 
+@Immutable
+data class EditProfileUiState(
+    val currentName: String,
+    val currentUsername: String,
+    val currentRegion: TimeZoneRegion = TimeZoneRegion.EUROPE_MADRID,
+    val avatarUrl: String? = null,
+    val isUploadingAvatar: Boolean = false,
+    val avatarUploadError: Boolean = false,
+    val isSavingProfile: Boolean = false,
+    val profileSaveError: Boolean = false
+)
+
+data class EditProfileActions(
+    val onSave: (name: String, username: String, region: TimeZoneRegion) -> Unit,
+    val onNavigateToResetPassword: () -> Unit,
+    val onPhotoSelected: (Uri) -> Unit,
+    val onAvatarErrorDismissed: () -> Unit = {},
+    val onProfileSaveErrorDismissed: () -> Unit = {},
+    val onBack: () -> Unit
+)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditProfileScreen(
-    currentName: String,
-    currentUsername: String,
-    currentRegion: TimeZoneRegion = TimeZoneRegion.EUROPE_MADRID,
-    avatarUrl: String? = null,
-    isUploadingAvatar: Boolean = false,
-    avatarUploadError: Boolean = false,
-    isSavingProfile: Boolean = false,
-    profileSaveError: Boolean = false,
-    onSave: (name: String, username: String, region: TimeZoneRegion) -> Unit,
-    onNavigateToResetPassword: () -> Unit,
-    onPhotoSelected: (Uri) -> Unit,
-    onAvatarErrorDismissed: () -> Unit = {},
-    onProfileSaveErrorDismissed: () -> Unit = {},
-    onBack: () -> Unit
+    state: EditProfileUiState,
+    actions: EditProfileActions
 ) {
+    val (currentName, currentUsername, currentRegion, avatarUrl, isUploadingAvatar,
+        avatarUploadError, isSavingProfile, profileSaveError) = state
+    val (onSave, onNavigateToResetPassword, onPhotoSelected,
+        onAvatarErrorDismissed, onProfileSaveErrorDismissed, onBack) = actions
     val context         = LocalContext.current
     val snackbarHost    = remember { SnackbarHostState() }
     var name            by remember { mutableStateOf(currentName) }

@@ -34,6 +34,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -55,18 +56,29 @@ import com.example.daypilot_test_desing.core.data.model.TaskCategory
 import com.example.daypilot_test_desing.core.data.model.TaskDifficulty
 import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
 
+@Immutable
+data class TaskCardUiState(
+    val title: String,
+    val category: TaskCategory,
+    val difficulty: TaskDifficulty,
+    val durationMinutes: Int,
+    val hasReminder: Boolean = false,
+    val isCompleted: Boolean = false
+)
+
 @Composable
 fun TaskCard(
-    title: String,
-    category: TaskCategory,
-    difficulty: TaskDifficulty,
-    durationMinutes: Int,
-    hasReminder: Boolean = false,
-    isCompleted: Boolean = false,
+    state: TaskCardUiState,
     onToggleComplete: (Boolean) -> Unit,
     onTap: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val title           = state.title
+    val category        = state.category
+    val difficulty      = state.difficulty
+    val durationMinutes = state.durationMinutes
+    val hasReminder     = state.hasReminder
+    val isCompleted     = state.isCompleted
     val textColor by animateColorAsState(
         targetValue = if (isCompleted) MaterialTheme.colorScheme.onSurfaceVariant
         else MaterialTheme.colorScheme.onSurface,
@@ -194,22 +206,43 @@ fun TaskMiniCard(
     }
 }
 
+@Immutable
+data class TaskDayCardUiState(
+    val title: String,
+    val category: TaskCategory,
+    val difficulty: TaskDifficulty,
+    val durationMinutes: Int,
+    val isCompleted: Boolean = false,
+    val hasReminder: Boolean = false,
+    val isRecurring: Boolean = false,
+    val isPending: Boolean = false
+)
+
+data class TaskDayCardActions(
+    val onToggleComplete: (Boolean) -> Unit,
+    val onTap: () -> Unit,
+    val onEdit: () -> Unit,
+    val onDelete: () -> Unit
+)
+
 @Composable
 fun TaskDayCard(
-    title: String,
-    category: TaskCategory,
-    difficulty: TaskDifficulty,
-    durationMinutes: Int,
-    isCompleted: Boolean = false,
-    hasReminder: Boolean = false,
-    isRecurring: Boolean = false,
-    isPending: Boolean = false,
-    onToggleComplete: (Boolean) -> Unit,
-    onTap: () -> Unit,
-    onEdit: () -> Unit,
-    onDelete: () -> Unit,
+    state: TaskDayCardUiState,
+    actions: TaskDayCardActions,
     modifier: Modifier = Modifier
 ) {
+    val title           = state.title
+    val category        = state.category
+    val difficulty      = state.difficulty
+    val durationMinutes = state.durationMinutes
+    val isCompleted     = state.isCompleted
+    val hasReminder     = state.hasReminder
+    val isRecurring     = state.isRecurring
+    val isPending       = state.isPending
+    val onToggleComplete = actions.onToggleComplete
+    val onTap             = actions.onTap
+    val onEdit            = actions.onEdit
+    val onDelete          = actions.onDelete
     var showDeleteConfirm by remember { mutableStateOf(false) }
 
     if (showDeleteConfirm) {
@@ -379,11 +412,13 @@ fun TaskCardsPreview() {
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             TaskCard(
-                title = "Terminar TFG",
-                category = TaskCategory.STUDY,
-                difficulty = TaskDifficulty.HARD,
-                durationMinutes = 120,
-                isCompleted = false,
+                state = TaskCardUiState(
+                    title = "Terminar TFG",
+                    category = TaskCategory.STUDY,
+                    difficulty = TaskDifficulty.HARD,
+                    durationMinutes = 120,
+                    isCompleted = false
+                ),
                 onToggleComplete = {},
                 onTap = {}
             )
@@ -393,15 +428,19 @@ fun TaskCardsPreview() {
                 onTap = {}
             )
             TaskDayCard(
-                title = "Presentación",
-                category = TaskCategory.WORK,
-                difficulty = TaskDifficulty.HARD,
-                durationMinutes = 60,
-                isCompleted = false,
-                onToggleComplete = {},
-                onTap = {},
-                onEdit = {},
-                onDelete = {}
+                state = TaskDayCardUiState(
+                    title = "Presentación",
+                    category = TaskCategory.WORK,
+                    difficulty = TaskDifficulty.HARD,
+                    durationMinutes = 60,
+                    isCompleted = false
+                ),
+                actions = TaskDayCardActions(
+                    onToggleComplete = {},
+                    onTap = {},
+                    onEdit = {},
+                    onDelete = {}
+                )
             )
         }
     }

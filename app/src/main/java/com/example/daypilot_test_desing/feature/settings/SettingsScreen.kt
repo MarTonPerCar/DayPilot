@@ -18,26 +18,40 @@ import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.core.ui.components.basic.*
 
+data class SettingsActions(
+    val onToggleDarkMode: (Boolean) -> Unit,
+    val onThemeSelect: (String) -> Unit,
+    val onLanguageSelect: (String) -> Unit,
+    val onToggleNotifications: (Boolean) -> Unit,
+    val onToggleTaskReminders: (Boolean) -> Unit,
+    val onToggleStreakAlerts: (Boolean) -> Unit,
+    val onNavigateToEditProfile: () -> Unit,
+    val onLogout: () -> Unit,
+    val onBack: () -> Unit
+)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    name: String,
-    isDarkMode: Boolean,
-    selectedThemeId: String,
-    selectedLanguage: String,
-    notificationsEnabled: Boolean,
-    taskRemindersEnabled: Boolean,
-    streakAlertsEnabled: Boolean,
-    onToggleDarkMode: (Boolean) -> Unit,
-    onThemeSelect: (String) -> Unit,
-    onLanguageSelect: (String) -> Unit,
-    onToggleNotifications: (Boolean) -> Unit,
-    onToggleTaskReminders: (Boolean) -> Unit,
-    onToggleStreakAlerts: (Boolean) -> Unit,
-    onNavigateToEditProfile: () -> Unit,
-    onLogout: () -> Unit,
-    onBack: () -> Unit
+    state: SettingsUiState,
+    actions: SettingsActions
 ) {
+    val name                 = state.name
+    val isDarkMode           = state.isDarkMode
+    val selectedThemeId      = state.selectedThemeId
+    val selectedLanguage     = state.selectedLanguage
+    val notificationsEnabled = state.notificationsEnabled
+    val taskRemindersEnabled = state.taskRemindersEnabled
+    val streakAlertsEnabled  = state.streakAlertsEnabled
+    val onToggleDarkMode        = actions.onToggleDarkMode
+    val onThemeSelect            = actions.onThemeSelect
+    val onLanguageSelect         = actions.onLanguageSelect
+    val onToggleNotifications   = actions.onToggleNotifications
+    val onToggleTaskReminders   = actions.onToggleTaskReminders
+    val onToggleStreakAlerts    = actions.onToggleStreakAlerts
+    val onNavigateToEditProfile = actions.onNavigateToEditProfile
+    val onLogout                 = actions.onLogout
+    val onBack                   = actions.onBack
     Scaffold(
         topBar = {
             DayPilotTopBar(
