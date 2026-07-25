@@ -42,6 +42,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
@@ -226,6 +227,124 @@ data class TaskDayCardActions(
 )
 
 @Composable
+private fun DeleteTaskDialog(taskTitle: String, onDismiss: () -> Unit, onConfirm: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = stringResource(R.string.task_delete_title),
+                fontWeight = FontWeight.Bold
+            )
+        },
+        text = {
+            Text(stringResource(R.string.task_delete_message, taskTitle))
+        },
+        confirmButton = {
+            TextButton(onClick = onConfirm) {
+                Text(
+                    text = stringResource(R.string.common_delete),
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.common_cancel))
+            }
+        },
+        shape = RoundedCornerShape(20.dp)
+    )
+}
+
+@Composable
+private fun TaskDifficultyCategoryStrip(difficultyColor: Color, categoryColor: Color, isCompleted: Boolean) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(3.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight()
+                .background(difficultyColor.copy(alpha = if (isCompleted) 0.3f else 0.8f))
+        )
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight()
+                .background(categoryColor.copy(alpha = if (isCompleted) 0.3f else 0.8f))
+        )
+    }
+}
+
+@Composable
+private fun TaskDayBadgesRow(
+    category: TaskCategory,
+    durationMinutes: Int,
+    hasReminder: Boolean,
+    isRecurring: Boolean
+) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        CategoryChip(category = category)
+        DurationChip(minutes = durationMinutes)
+        if (hasReminder) {
+            Icon(
+                imageVector = Icons.Default.Notifications,
+                contentDescription = null,
+                modifier = Modifier.size(14.dp),
+                tint = MaterialTheme.colorScheme.primary
+            )
+        }
+        if (isRecurring) {
+            Icon(
+                imageVector = Icons.Default.Refresh,
+                contentDescription = null,
+                modifier = Modifier.size(14.dp),
+                tint = MaterialTheme.colorScheme.secondary
+            )
+        }
+    }
+}
+
+@Composable
+private fun TaskDayTrailingActions(isPending: Boolean, onEdit: () -> Unit, onDeleteRequest: () -> Unit) {
+    if (isPending) {
+        Box(modifier = Modifier.size(32.dp), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+        }
+    } else {
+        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            IconButton(
+                onClick = onEdit,
+                modifier = Modifier.size(32.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = stringResource(R.string.common_edit),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+            IconButton(
+                onClick = onDeleteRequest,
+                modifier = Modifier.size(32.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = stringResource(R.string.common_delete),
+                    tint = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
 fun TaskDayCard(
     state: TaskDayCardUiState,
     actions: TaskDayCardActions,
@@ -246,34 +365,13 @@ fun TaskDayCard(
     var showDeleteConfirm by remember { mutableStateOf(false) }
 
     if (showDeleteConfirm) {
-        AlertDialog(
-            onDismissRequest = { showDeleteConfirm = false },
-            title = {
-                Text(
-                    text = stringResource(R.string.task_delete_title),
-                    fontWeight = FontWeight.Bold
-                )
-            },
-            text = {
-                Text(stringResource(R.string.task_delete_message, title))
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    showDeleteConfirm = false
-                    onDelete()
-                }) {
-                    Text(
-                        text = stringResource(R.string.common_delete),
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDeleteConfirm = false }) {
-                    Text(stringResource(R.string.common_cancel))
-                }
-            },
-            shape = RoundedCornerShape(20.dp)
+        DeleteTaskDialog(
+            taskTitle = title,
+            onDismiss = { showDeleteConfirm = false },
+            onConfirm = {
+                showDeleteConfirm = false
+                onDelete()
+            }
         )
     }
 
@@ -292,24 +390,11 @@ fun TaskDayCard(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(3.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight()
-                    .background(difficulty.color.copy(alpha = if (isCompleted) 0.3f else 0.8f))
-            )
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight()
-                    .background(category.color.copy(alpha = if (isCompleted) 0.3f else 0.8f))
-            )
-        }
+        TaskDifficultyCategoryStrip(
+            difficultyColor = difficulty.color,
+            categoryColor = category.color,
+            isCompleted = isCompleted
+        )
 
         Row(
             modifier = Modifier
@@ -342,61 +427,19 @@ fun TaskDayCard(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    CategoryChip(category = category)
-                    DurationChip(minutes = durationMinutes)
-                    if (hasReminder) {
-                        Icon(
-                            imageVector = Icons.Default.Notifications,
-                            contentDescription = null,
-                            modifier = Modifier.size(14.dp),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                    if (isRecurring) {
-                        Icon(
-                            imageVector = Icons.Default.Refresh,
-                            contentDescription = null,
-                            modifier = Modifier.size(14.dp),
-                            tint = MaterialTheme.colorScheme.secondary
-                        )
-                    }
-                }
+                TaskDayBadgesRow(
+                    category = category,
+                    durationMinutes = durationMinutes,
+                    hasReminder = hasReminder,
+                    isRecurring = isRecurring
+                )
             }
 
-            if (isPending) {
-                Box(modifier = Modifier.size(32.dp), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
-                }
-            } else {
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    IconButton(
-                        onClick = onEdit,
-                        modifier = Modifier.size(32.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = stringResource(R.string.common_edit),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(16.dp)
-                        )
-                    }
-                    IconButton(
-                        onClick = { showDeleteConfirm = true },
-                        modifier = Modifier.size(32.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = stringResource(R.string.common_delete),
-                            tint = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.size(16.dp)
-                        )
-                    }
-                }
-            }
+            TaskDayTrailingActions(
+                isPending = isPending,
+                onEdit = onEdit,
+                onDeleteRequest = { showDeleteConfirm = true }
+            )
         }
     }
 }
