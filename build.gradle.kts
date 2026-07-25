@@ -11,13 +11,17 @@ sonar {
         property("sonar.projectKey", "daypilot-test_daypilot-android")
         property("sonar.organization", "daypilot-test")
         property("sonar.host.url", "https://sonarcloud.io")
+        // Resolved via Gradle's own build-directory API instead of a hand-written relative
+        // string — a bare "app/build/..." path silently failed to resolve in CI even though
+        // it matched the real file when checked locally.
+        val appBuildDir = project(":app").layout.buildDirectory.get()
         property(
             "sonar.coverage.jacoco.xmlReportPaths",
-            "app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml"
+            "$appBuildDir/reports/jacoco/jacocoTestReport/jacocoTestReport.xml"
         )
         property(
             "sonar.androidLint.reportPaths",
-            "app/build/reports/lint-results-debug.xml"
+            "$appBuildDir/reports/lint-results-debug.xml"
         )
         property(
             "sonar.exclusions",
