@@ -10,6 +10,7 @@ import android.hardware.SensorManager
 import android.os.Build
 import android.util.Log
 import androidx.core.content.ContextCompat
+import androidx.core.content.edit
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
@@ -67,10 +68,10 @@ class StepsWorker(
             val baseline = if (savedDate == today) {
                 prefs.getInt("baseline_steps", totalSinceBoot)
             } else {
-                prefs.edit()
-                    .putString("baseline_date", today)
-                    .putInt("baseline_steps", totalSinceBoot)
-                    .apply()
+                prefs.edit {
+                    putString("baseline_date", today)
+                    putInt("baseline_steps", totalSinceBoot)
+                }
                 totalSinceBoot
             }
             val dailySteps = maxOf(0, totalSinceBoot - baseline)

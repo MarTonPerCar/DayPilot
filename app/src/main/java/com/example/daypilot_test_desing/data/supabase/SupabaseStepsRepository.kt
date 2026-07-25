@@ -2,6 +2,7 @@ package com.example.daypilot_test_desing.data.supabase
 
 import android.content.SharedPreferences
 import android.util.Log
+import androidx.core.content.edit
 import com.example.daypilot_test_desing.core.data.repository.StepsRepository
 import com.example.daypilot_test_desing.core.data.repository.StepsWeeklyStats
 import com.example.daypilot_test_desing.data.supabase.dto.DailyLogDto
@@ -46,11 +47,11 @@ class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepos
         val pendingGoal = prefs.getInt("pending_goal", -1)
         val pendingDate = prefs.getString("goal_change_date", "") ?: ""
         if (pendingGoal > 0 && pendingDate.isNotEmpty() && pendingDate <= today()) {
-            prefs.edit()
-                .putInt("steps_goal", pendingGoal)
-                .putInt("pending_goal", -1)
-                .putString("goal_change_date", "")
-                .apply()
+            prefs.edit {
+                putInt("steps_goal", pendingGoal)
+                putInt("pending_goal", -1)
+                putString("goal_change_date", "")
+            }
         }
     }
 
@@ -92,10 +93,10 @@ class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepos
 
     override fun configureGoal(newGoal: Int) {
         val applyDate = tomorrow()
-        prefs.edit()
-            .putInt("pending_goal", newGoal)
-            .putString("goal_change_date", applyDate)
-            .apply()
+        prefs.edit {
+            putInt("pending_goal", newGoal)
+            putString("goal_change_date", applyDate)
+        }
         // Mirrors to users.pending_steps_goal/_date so other devices see the same pending change.
         scope.launch { pushPendingGoalToServer(newGoal, applyDate) }
     }
@@ -129,10 +130,10 @@ class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepos
                 val localGoal = prefs.getInt("pending_goal", -1)
                 val localDate = prefs.getString("goal_change_date", "")
                 if (serverGoal != localGoal || serverDate != localDate) {
-                    prefs.edit()
-                        .putInt("pending_goal", serverGoal)
-                        .putString("goal_change_date", serverDate)
-                        .apply()
+                    prefs.edit {
+                        putInt("pending_goal", serverGoal)
+                        putString("goal_change_date", serverDate)
+                    }
                     Log.d(TAG, "Adopted pending goal from server: $serverGoal effective $serverDate")
                 }
             }
@@ -177,7 +178,7 @@ class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepos
             }.decodeList<HabitsDailyUpsertDto>().firstOrNull()
             // Write the placeholder even with no row found, so the guard above stops re-querying forever.
             val goal = if (row != null && row.stepsGoal > 0) row.stepsGoal else 10_000
-            prefs.edit().putInt("steps_goal", goal).apply()
+            prefs.edit { putInt("steps_goal", goal) }
             Log.d(TAG, "Hydrated steps goal from DB: $goal")
         } catch (e: Exception) {
             Log.e(TAG, "Failed to hydrate steps goal from server", e)

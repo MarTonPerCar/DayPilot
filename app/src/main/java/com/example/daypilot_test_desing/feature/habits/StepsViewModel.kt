@@ -11,6 +11,7 @@ import android.hardware.SensorManager
 import android.os.Build
 import android.util.Log
 import androidx.core.content.ContextCompat
+import androidx.core.content.edit
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -71,10 +72,10 @@ class StepsViewModel(
                     prefs.getInt("baseline_steps", totalSinceBoot)
                 } else {
                     Log.d(TAG, "New day detected, resetting steps baseline to $totalSinceBoot")
-                    prefs.edit()
-                        .putString("baseline_date", today)
-                        .putInt("baseline_steps", totalSinceBoot)
-                        .apply()
+                    prefs.edit {
+                        putString("baseline_date", today)
+                        putInt("baseline_steps", totalSinceBoot)
+                    }
                     // Milestone level/points recompute server-side on this device's next sync.
                     totalSinceBoot
                 }
