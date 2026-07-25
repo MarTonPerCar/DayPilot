@@ -53,6 +53,131 @@ data class FriendsActions(
     val onMessageShown: () -> Unit = {}
 )
 
+@Composable
+private fun RemoveFriendDialog(friend: FriendData, onDismiss: () -> Unit, onConfirm: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title   = { Text(stringResource(R.string.friends_remove_confirm_title)) },
+        text    = { Text(stringResource(R.string.friends_remove_confirm_message, friend.name)) },
+        confirmButton = {
+            TextButton(onClick = onConfirm) {
+                Text(
+                    text  = stringResource(R.string.common_delete),
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.common_cancel))
+            }
+        }
+    )
+}
+
+@Composable
+private fun FriendsTabRow(
+    tabs: List<String>,
+    selectedTab: Int,
+    friendRequestsCount: Int,
+    onSelectTab: (Int) -> Unit
+) {
+    TabRow(
+        selectedTabIndex = selectedTab,
+        containerColor = MaterialTheme.colorScheme.background,
+        contentColor = MaterialTheme.colorScheme.primary
+    ) {
+        tabs.forEachIndexed { index, title ->
+            Tab(
+                selected = selectedTab == index,
+                onClick = { onSelectTab(index) },
+                text = {
+                    Text(
+                        text = if (index == 1 && friendRequestsCount > 0)
+                            "$title ($friendRequestsCount)"
+                        else title,
+                        fontWeight = if (selectedTab == index)
+                            FontWeight.SemiBold
+                        else
+                            FontWeight.Normal
+                    )
+                }
+            )
+        }
+    }
+}
+
+@Composable
+private fun FriendsListTab(
+    friends: List<FriendData>,
+    onReact: (FriendData, ReactionType) -> Unit,
+    onRemoveRequested: (FriendData) -> Unit
+) {
+    if (friends.isEmpty()) {
+        DayPilotEmptyState(
+            message = stringResource(R.string.friends_empty),
+            icon = Icons.Default.PersonAdd
+        )
+    } else {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            friends.forEach { friend ->
+                FriendCard(
+                    info = FriendCardInfo(
+                        name = friend.name,
+                        email = friend.email,
+                        points = friend.points,
+                        streak = friend.streak,
+                        avatarUrl = friend.avatarUrl,
+                        weeklySummary = friend.weeklySummary
+                    ),
+                    onReact = { reaction -> onReact(friend, reaction) },
+                    onRemove = { onRemoveRequested(friend) }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun FriendRequestsTab(
+    friendRequests: List<FriendData>,
+    acceptingUserId: String?,
+    onAccept: (String) -> Unit,
+    onReject: (String) -> Unit
+) {
+    if (friendRequests.isEmpty()) {
+        DayPilotEmptyState(
+            message = stringResource(R.string.friends_requests_empty)
+        )
+    } else {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            items(friendRequests) { request ->
+                FriendRequestCard(
+                    info = UserCardInfo(
+                        name = request.name,
+                        email = request.email,
+                        points = request.points,
+                        streak = request.streak
+                    ),
+                    isAccepting = acceptingUserId == request.id,
+                    onAccept = { onAccept(request.id) },
+                    onReject = { onReject(request.id) }
+                )
+            }
+        }
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FriendsScreen(
@@ -96,25 +221,12 @@ fun FriendsScreen(
     }
 
     friendToRemove?.let { friend ->
-        AlertDialog(
-            onDismissRequest = { friendToRemove = null },
-            title   = { Text(stringResource(R.string.friends_remove_confirm_title)) },
-            text    = { Text(stringResource(R.string.friends_remove_confirm_message, friend.name)) },
-            confirmButton = {
-                TextButton(onClick = {
-                    onRemoveFriend(friend.id)
-                    friendToRemove = null
-                }) {
-                    Text(
-                        text  = stringResource(R.string.common_delete),
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { friendToRemove = null }) {
-                    Text(stringResource(R.string.common_cancel))
-                }
+        RemoveFriendDialog(
+            friend = friend,
+            onDismiss = { friendToRemove = null },
+            onConfirm = {
+                onRemoveFriend(friend.id)
+                friendToRemove = null
             }
         )
     }
@@ -136,90 +248,25 @@ fun FriendsScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            TabRow(
-                selectedTabIndex = selectedTab,
-                containerColor = MaterialTheme.colorScheme.background,
-                contentColor = MaterialTheme.colorScheme.primary
-            ) {
-                tabs.forEachIndexed { index, title ->
-                    Tab(
-                        selected = selectedTab == index,
-                        onClick = { selectedTab = index },
-                        text = {
-                            Text(
-                                text = if (index == 1 && friendRequests.isNotEmpty())
-                                    "$title (${friendRequests.size})"
-                                else title,
-                                fontWeight = if (selectedTab == index)
-                                    FontWeight.SemiBold
-                                else
-                                    FontWeight.Normal
-                            )
-                        }
-                    )
-                }
-            }
+            FriendsTabRow(
+                tabs = tabs,
+                selectedTab = selectedTab,
+                friendRequestsCount = friendRequests.size,
+                onSelectTab = { selectedTab = it }
+            )
 
             when (selectedTab) {
-                0 -> {
-                    if (friends.isEmpty()) {
-                        DayPilotEmptyState(
-                            message = stringResource(R.string.friends_empty),
-                            icon = Icons.Default.PersonAdd
-                        )
-                    } else {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .verticalScroll(rememberScrollState())
-                                .padding(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(10.dp)
-                        ) {
-                            friends.forEach { friend ->
-                                FriendCard(
-                                    info = FriendCardInfo(
-                                        name = friend.name,
-                                        email = friend.email,
-                                        points = friend.points,
-                                        streak = friend.streak,
-                                        avatarUrl = friend.avatarUrl,
-                                        weeklySummary = friend.weeklySummary
-                                    ),
-                                    onReact = { reaction -> onReactToFriend(friend.id, reaction) },
-                                    onRemove = { friendToRemove = friend }
-                                )
-                            }
-                        }
-                    }
-                }
-
-                1 -> {
-                    if (friendRequests.isEmpty()) {
-                        DayPilotEmptyState(
-                            message = stringResource(R.string.friends_requests_empty)
-                        )
-                    } else {
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(10.dp)
-                        ) {
-                            items(friendRequests) { request ->
-                                FriendRequestCard(
-                                    info = UserCardInfo(
-                                        name = request.name,
-                                        email = request.email,
-                                        points = request.points,
-                                        streak = request.streak
-                                    ),
-                                    isAccepting = acceptingUserId == request.id,
-                                    onAccept = { onAcceptRequest(request.id) },
-                                    onReject = { onRejectRequest(request.id) }
-                                )
-                            }
-                        }
-                    }
-                }
+                0 -> FriendsListTab(
+                    friends = friends,
+                    onReact = { friend, reaction -> onReactToFriend(friend.id, reaction) },
+                    onRemoveRequested = { friendToRemove = it }
+                )
+                1 -> FriendRequestsTab(
+                    friendRequests = friendRequests,
+                    acceptingUserId = acceptingUserId,
+                    onAccept = onAcceptRequest,
+                    onReject = onRejectRequest
+                )
             }
         }
     }
