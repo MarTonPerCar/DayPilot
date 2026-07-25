@@ -162,7 +162,8 @@ fun DayPilotNavGraph(
                     ).awaitAll().all { it }
                 }
 
-                val succeeded = loadAll() || loadAll()
+                var succeeded = loadAll()
+                if (!succeeded) succeeded = loadAll()
                 if (succeeded) {
                     val s = settingsVM.uiState.value
                     DailyNotificationScheduler.scheduleAll(

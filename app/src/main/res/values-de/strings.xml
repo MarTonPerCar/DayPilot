@@ -41,6 +41,7 @@
     <string name="weekly_summary_streak">beste Serie</string>
     <string name="weekly_summary_reactions">Reaktionen deiner Freunde</string>
     <string name="weekly_summary_no_reactions">Noch keine Reaktionen</string>
+    <string name="weekly_summary_no_data">Noch keine Wochenübersicht verfügbar</string>
     <string name="weekly_friend_summary">Wochenzusammenfassung</string>
     <string name="weekly_friend_react">Reagieren</string>
     <string name="weekly_friend_reacted">Bereits reagiert</string>
@@ -70,6 +71,7 @@
     <string name="edit_profile_change_password">Passwort ändern</string>
     <string name="edit_profile_save">Änderungen speichern</string>
     <string name="edit_profile_photo_error">Foto konnte nicht hochgeladen werden. Bitte erneut versuchen.</string>
+    <string name="edit_profile_save_error">Änderungen konnten nicht gespeichert werden. Bitte erneut versuchen.</string>
 
     <!-- Photo Picker -->
     <string name="photo_picker_title">Foto ändern</string>
@@ -158,11 +160,19 @@
     <string name="tech_health_limit_minutes">Limit %1$d Min.</string>
     <string name="tech_health_point_earned">Tagespunkt verdient</string>
     <string name="tech_health_point_pending">Halte alle deine Limits heute ein, um 1 Punkt zu verdienen</string>
+    <string name="tech_health_point_warning">Du benötigst mindestens 3 aktive Einschränkungen, um den Punkt zu erhalten</string>
+    <string name="tech_health_point_info_title">Punkt für digitale Gesundheit</string>
+    <string name="tech_health_point_info_body">Aktiviere mindestens 3 Einschränkungen und überschreite an diesem Tag kein Limit. Wenn dir das gelingt, erhältst du 10 Extrapunkte, die morgen zu deinen Punkten hinzugefügt werden.</string>
     <string name="tech_health_no_permission_title">Zugriff auf App-Nutzung erforderlich</string>
     <string name="tech_health_no_permission_body">Um die Bildschirmzeit zu verfolgen, gehe zu Einstellungen → Datenzugang zu Apps und aktiviere DayPilot.</string>
     <string name="tech_health_open_settings">Einstellungen öffnen</string>
     <string name="tech_health_daily_limit">Tageslimit</string>
     <string name="tech_health_app_limits">App-Limits</string>
+    <string name="accessibility_service_description">DayPilot nutzt diesen Dienst, um zu erkennen, welche App im Vordergrund läuft, damit die in Digitale Gesundheit festgelegten Nutzungslimits durchgesetzt werden können.</string>
+    <string name="block_limit_reached">Limit erreicht</string>
+    <string name="block_motivational">Zeit für etwas anderes!</string>
+    <string name="block_explanation">Du hast die für %1$s festgelegte Nutzungszeit überschritten. Mach eine Pause und versuche es später erneut.</string>
+    <string name="block_go_home">Zum Start</string>
 
     <!-- Common -->
     <string name="common_back">Zurück</string>
@@ -433,6 +443,11 @@
 
     <!-- Task Cards -->
     <string name="task_reminder_icon">Erinnerung</string>
+    <string name="task_detail_description">Beschreibung</string>
+    <string name="task_detail_recurring">Wiederkehrende Aufgabe</string>
+    <string name="task_detail_reminder">Erinnerung aktiviert</string>
+    <string name="task_mark_done">Als erledigt markieren</string>
+    <string name="task_mark_pending">Als ausstehend markieren</string>
     <string name="task_delete_title">Aufgabe löschen</string>
     <string name="task_delete_message">Möchtest du \"%1$s\" wirklich löschen?</string>
 
@@ -447,6 +462,12 @@
     <string name="user_add_friend">Freund hinzufügen</string>
     <string name="user_accept_request">Akzeptieren</string>
     <string name="user_reject_request">Ablehnen</string>
+    <string name="friends_remove_confirm_title">Freund entfernen?</string>
+    <string name="friends_remove_confirm_message">Möchtest du %1$s wirklich aus deiner Freundesliste entfernen?</string>
+    <string name="user_request_sent">Anfrage gesendet</string>
+    <string name="user_request_sent_dialog_title">Anfrage gesendet</string>
+    <string name="user_request_sent_dialog_message">Deine Freundschaftsanfrage wurde erfolgreich gesendet.</string>
+    <string name="user_request_sent_dialog_button">Verstanden</string>
 
 
     <!-- App Limit Form -->

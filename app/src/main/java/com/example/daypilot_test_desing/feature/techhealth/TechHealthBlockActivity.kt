@@ -53,6 +53,7 @@ class TechHealthBlockActivity : ComponentActivity() {
     }
 
     @Deprecated("Deprecated in Java") // hay que mantenerlo aunque esté deprecated, el nuevo predictive back no aplica aquí
+    @Suppress("MissingSuperCall") // intencional: el bloqueo no debe poder cerrarse con el botón atrás
     override fun onBackPressed() {
     }
 

@@ -41,6 +41,7 @@
     <string name="weekly_summary_streak">best streak</string>
     <string name="weekly_summary_reactions">Your friends\' reactions</string>
     <string name="weekly_summary_no_reactions">Nobody has reacted yet</string>
+    <string name="weekly_summary_no_data">No weekly summary available yet</string>
     <string name="weekly_friend_summary">Weekly summary</string>
     <string name="weekly_friend_react">React</string>
     <string name="weekly_friend_reacted">Already reacted</string>
@@ -70,6 +71,7 @@
     <string name="edit_profile_change_password">Change password</string>
     <string name="edit_profile_save">Save changes</string>
     <string name="edit_profile_photo_error">Could not upload photo. Please try again.</string>
+    <string name="edit_profile_save_error">Could not save changes. Please try again.</string>
 
     <!-- Photo Picker -->
     <string name="photo_picker_title">Change photo</string>
@@ -158,11 +160,19 @@
     <string name="tech_health_limit_minutes">limit %1$d min</string>
     <string name="tech_health_point_earned">Daily point earned</string>
     <string name="tech_health_point_pending">Stay within all your limits today to earn 1 point</string>
+    <string name="tech_health_point_warning">You need at least 3 active restrictions to earn the point</string>
+    <string name="tech_health_point_info_title">Tech health point</string>
+    <string name="tech_health_point_info_body">Turn on at least 3 restrictions and stay within every limit during the day. If you manage it, you\'ll earn 10 extra points added to tomorrow\'s total.</string>
     <string name="tech_health_no_permission_title">App usage permission required</string>
     <string name="tech_health_no_permission_body">To track screen time, go to Settings → Usage data access and enable DayPilot.</string>
     <string name="tech_health_open_settings">Open Settings</string>
     <string name="tech_health_daily_limit">Daily limit</string>
     <string name="tech_health_app_limits">App limits</string>
+    <string name="accessibility_service_description">DayPilot uses this service to detect which app is in the foreground so it can enforce the usage limits configured in Tech Health.</string>
+    <string name="block_limit_reached">Limit reached</string>
+    <string name="block_motivational">Time to do something else!</string>
+    <string name="block_explanation">You\'ve exceeded the usage time configured for %1$s. Take a break and try again later.</string>
+    <string name="block_go_home">Go home</string>
 
     <!-- Common -->
     <string name="common_back">Back</string>
@@ -433,6 +443,11 @@
 
     <!-- Task Cards -->
     <string name="task_reminder_icon">Reminder</string>
+    <string name="task_detail_description">Description</string>
+    <string name="task_detail_recurring">Recurring task</string>
+    <string name="task_detail_reminder">Reminder enabled</string>
+    <string name="task_mark_done">Mark as done</string>
+    <string name="task_mark_pending">Mark as pending</string>
     <string name="task_delete_title">Delete task</string>
     <string name="task_delete_message">Are you sure you want to delete \"%1$s\"?</string>
 
@@ -447,6 +462,12 @@
     <string name="user_add_friend">Add friend</string>
     <string name="user_accept_request">Accept</string>
     <string name="user_reject_request">Reject</string>
+    <string name="friends_remove_confirm_title">Remove friend?</string>
+    <string name="friends_remove_confirm_message">Are you sure you want to remove %1$s from your friends list?</string>
+    <string name="user_request_sent">Request sent</string>
+    <string name="user_request_sent_dialog_title">Request sent</string>
+    <string name="user_request_sent_dialog_message">Your friend request was sent successfully.</string>
+    <string name="user_request_sent_dialog_button">Got it</string>
 
 
     <!-- App Limit Form -->
