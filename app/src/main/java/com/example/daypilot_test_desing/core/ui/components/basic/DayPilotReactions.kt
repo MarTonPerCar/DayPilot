@@ -283,9 +283,9 @@ private fun ReactionPickerRow(onReact: (ReactionType) -> Unit, onDismiss: () -> 
 
 @Composable
 fun DayPilotReactionButton(
+    modifier: Modifier = Modifier,
     selectedReaction: ReactionType? = null,
-    onReact: (ReactionType) -> Unit = {},
-    modifier: Modifier = Modifier
+    onReact: (ReactionType) -> Unit = {}
 ) {
     val alreadyReacted = selectedReaction != null
     var expanded by remember { mutableStateOf(false) }

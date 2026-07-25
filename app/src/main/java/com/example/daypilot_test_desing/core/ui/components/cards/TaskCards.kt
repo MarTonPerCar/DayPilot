@@ -152,9 +152,9 @@ fun TaskCard(
 fun TaskMiniCard(
     title: String,
     difficulty: TaskDifficulty,
-    isCompleted: Boolean = false,
     onTap: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isCompleted: Boolean = false
 ) {
     val textColor by animateColorAsState(
         targetValue = if (isCompleted) MaterialTheme.colorScheme.onSurfaceVariant

@@ -58,11 +58,11 @@ private fun formatTrigger(triggerAtMillis: Long): String {
 fun ReminderCard(
     title: String,
     time: String,
-    triggerAtMillis: Long = 0L,
     isEnabled: Boolean,
     onToggle: (Boolean) -> Unit,
     onDelete: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    triggerAtMillis: Long = 0L
 ) {
     val displayTime = if (triggerAtMillis > 0L) formatTrigger(triggerAtMillis) else time
     var showDeleteConfirm by remember { mutableStateOf(false) }
