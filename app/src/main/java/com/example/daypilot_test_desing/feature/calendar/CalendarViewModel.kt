@@ -12,12 +12,14 @@ import com.example.daypilot_test_desing.core.data.model.TaskCategory
 import com.example.daypilot_test_desing.core.data.model.TaskDifficulty
 import com.example.daypilot_test_desing.core.data.repository.ProgressRepository
 import com.example.daypilot_test_desing.core.data.repository.TaskRepository
+import com.example.daypilot_test_desing.data.supabase.freshRealtimeChannel
+import com.example.daypilot_test_desing.data.supabase.realtimeCleanupScope
+import com.example.daypilot_test_desing.data.supabase.removeRealtimeChannel
 import com.example.daypilot_test_desing.data.supabase.supabase
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.query.filter.FilterOperator
 import io.github.jan.supabase.realtime.PostgresAction
 import io.github.jan.supabase.realtime.RealtimeChannel
-import io.github.jan.supabase.realtime.channel
 import io.github.jan.supabase.realtime.postgresChangeFlow
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -61,11 +63,11 @@ class CalendarViewModel(
 
     // Realtime can only subscribe to base tables, but getTasks() reads a joined
     // tasks+task_days view — so both base tables are watched here instead.
-    private fun subscribeToRealtimeOnce() {
+    private suspend fun subscribeToRealtimeOnce() {
         if (realtimeChannel != null) return
         val uid = supabase.auth.currentUserOrNull()?.id ?: return
 
-        val channel = supabase.channel("tasks-$uid")
+        val channel = freshRealtimeChannel("tasks-$uid")
         realtimeChannel = channel
 
         channel.postgresChangeFlow<PostgresAction>(schema = "public") {
@@ -78,7 +80,7 @@ class CalendarViewModel(
             filter("user_id", FilterOperator.EQ, uid)
         }.onEach { refreshFromRealtime() }.launchIn(viewModelScope)
 
-        viewModelScope.launch { channel.subscribe() }
+        channel.subscribe()
     }
 
     private fun refreshFromRealtime() {
@@ -96,7 +98,7 @@ class CalendarViewModel(
 
     override fun onCleared() {
         super.onCleared()
-        viewModelScope.launch { runCatching { realtimeChannel?.unsubscribe() } }
+        realtimeCleanupScope.launch { removeRealtimeChannel(realtimeChannel) }
     }
 
     fun refresh(): Job = viewModelScope.launch { load() }

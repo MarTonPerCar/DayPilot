@@ -7,12 +7,14 @@ import androidx.lifecycle.viewModelScope
 import com.example.daypilot_test_desing.core.cache.SessionCache
 import com.example.daypilot_test_desing.core.data.local.FriendStatsBroadcast
 import com.example.daypilot_test_desing.core.data.repository.RankingRepository
+import com.example.daypilot_test_desing.data.supabase.freshRealtimeChannel
+import com.example.daypilot_test_desing.data.supabase.realtimeCleanupScope
+import com.example.daypilot_test_desing.data.supabase.removeRealtimeChannel
 import com.example.daypilot_test_desing.data.supabase.supabase
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.query.filter.FilterOperator
 import io.github.jan.supabase.realtime.PostgresAction
 import io.github.jan.supabase.realtime.RealtimeChannel
-import io.github.jan.supabase.realtime.channel
 import io.github.jan.supabase.realtime.postgresChangeFlow
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -53,11 +55,11 @@ class RivalryViewModel(private val repo: RankingRepository) : ViewModel() {
     // friends_ranking is a VIEW and never emits its own Realtime events, so this
     // watches the base `friends` table plus the shared friend-stats broadcast channel
     // (same instance FriendsViewModel listens to — don't create a second one).
-    private fun subscribeToRealtimeOnce() {
+    private suspend fun subscribeToRealtimeOnce() {
         if (realtimeChannel != null) return
         val uid = supabase.auth.currentUserOrNull()?.id ?: return
 
-        val channel = supabase.channel("ranking-$uid")
+        val channel = freshRealtimeChannel("ranking-$uid")
         realtimeChannel = channel
 
         channel.postgresChangeFlow<PostgresAction>(schema = "public") {
@@ -70,7 +72,7 @@ class RivalryViewModel(private val repo: RankingRepository) : ViewModel() {
             filter("receiver_id", FilterOperator.EQ, uid)
         }.onEach { refreshFromRealtime() }.launchIn(viewModelScope)
 
-        viewModelScope.launch { channel.subscribe() }
+        channel.subscribe()
 
         FriendStatsBroadcast.addListener(onFriendStatsChanged)
     }
@@ -90,7 +92,7 @@ class RivalryViewModel(private val repo: RankingRepository) : ViewModel() {
 
     override fun onCleared() {
         super.onCleared()
-        viewModelScope.launch { runCatching { realtimeChannel?.unsubscribe() } }
+        realtimeCleanupScope.launch { removeRealtimeChannel(realtimeChannel) }
         FriendStatsBroadcast.removeListener(onFriendStatsChanged)
     }
 

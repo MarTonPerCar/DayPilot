@@ -9,12 +9,14 @@ import androidx.lifecycle.viewModelScope
 import com.example.daypilot_test_desing.core.cache.SessionCache
 import com.example.daypilot_test_desing.core.data.model.buildProgressWindow
 import com.example.daypilot_test_desing.core.data.repository.ProgressRepository
+import com.example.daypilot_test_desing.data.supabase.freshRealtimeChannel
+import com.example.daypilot_test_desing.data.supabase.realtimeCleanupScope
+import com.example.daypilot_test_desing.data.supabase.removeRealtimeChannel
 import com.example.daypilot_test_desing.data.supabase.supabase
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.query.filter.FilterOperator
 import io.github.jan.supabase.realtime.PostgresAction
 import io.github.jan.supabase.realtime.RealtimeChannel
-import io.github.jan.supabase.realtime.channel
 import io.github.jan.supabase.realtime.postgresChangeFlow
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -73,14 +75,14 @@ class ProgressViewModel(
 
     // daily_progress is write-through with no TTL, so without realtime a change from
     // another device wouldn't surface here until the date rolls over.
-    private fun subscribeToRealtimeOnce() {
+    private suspend fun subscribeToRealtimeOnce() {
         if (realtimeChannel != null) return
         val uid = supabase.auth.currentUserOrNull()?.id ?: return
         subscribeToRealtime(uid)
     }
 
-    private fun subscribeToRealtime(userId: String) {
-        val channel = supabase.channel("daily-progress-$userId")
+    private suspend fun subscribeToRealtime(userId: String) {
+        val channel = freshRealtimeChannel("daily-progress-$userId")
         realtimeChannel = channel
 
         channel.postgresChangeFlow<PostgresAction.Update>(schema = "public") {
@@ -100,12 +102,12 @@ class ProgressViewModel(
             load()
         }.launchIn(viewModelScope)
 
-        viewModelScope.launch { channel.subscribe() }
+        channel.subscribe()
     }
 
     override fun onCleared() {
         super.onCleared()
-        viewModelScope.launch { runCatching { realtimeChannel?.unsubscribe() } }
+        realtimeCleanupScope.launch { removeRealtimeChannel(realtimeChannel) }
     }
 
     fun recordTimerComplete() {

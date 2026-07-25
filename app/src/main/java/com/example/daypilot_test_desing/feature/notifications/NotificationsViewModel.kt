@@ -9,10 +9,11 @@ import com.example.daypilot_test_desing.core.data.local.NotificationHub
 import com.example.daypilot_test_desing.core.data.repository.NotificationRepository
 import com.example.daypilot_test_desing.data.supabase.SupabaseNotificationRepository.toModel
 import com.example.daypilot_test_desing.data.supabase.dto.NotificationDto
-import com.example.daypilot_test_desing.data.supabase.supabase
+import com.example.daypilot_test_desing.data.supabase.freshRealtimeChannel
+import com.example.daypilot_test_desing.data.supabase.realtimeCleanupScope
+import com.example.daypilot_test_desing.data.supabase.removeRealtimeChannel
 import io.github.jan.supabase.realtime.PostgresAction
 import io.github.jan.supabase.realtime.RealtimeChannel
-import io.github.jan.supabase.realtime.channel
 import io.github.jan.supabase.realtime.postgresChangeFlow
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -69,27 +70,25 @@ class NotificationsViewModel(private val repo: NotificationRepository) : ViewMod
         }
     }
 
-    private fun subscribeToRealtime(userId: String) {
-        viewModelScope.launch {
-            val channel = supabase.channel("notifications-$userId")
-            channel.postgresChangeFlow<PostgresAction.Insert>(schema = "public") {
-                table = "notifications"
-            }.onEach { change ->
-                runCatching {
-                    val dto = json.decodeFromJsonElement<NotificationDto>(change.record)
-                    NotificationHub.repo.add(dto.toModel())
-                    if (dto.type == "FRIEND_REQUEST" || dto.type == "FRIEND_ACCEPTED") {
-                        // Drop the cache slot so the refresh this triggers fetches fresh data.
-                        SessionCache.friends.value    = null
-                        SessionCache.friendsFetchedAt = 0L
-                        NotificationHub.notifyFriendsChanged()
-                    }
+    private suspend fun subscribeToRealtime(userId: String) {
+        val channel = freshRealtimeChannel("notifications-$userId")
+        channel.postgresChangeFlow<PostgresAction.Insert>(schema = "public") {
+            table = "notifications"
+        }.onEach { change ->
+            runCatching {
+                val dto = json.decodeFromJsonElement<NotificationDto>(change.record)
+                NotificationHub.repo.add(dto.toModel())
+                if (dto.type == "FRIEND_REQUEST" || dto.type == "FRIEND_ACCEPTED") {
+                    // Drop the cache slot so the refresh this triggers fetches fresh data.
+                    SessionCache.friends.value    = null
+                    SessionCache.friendsFetchedAt = 0L
+                    NotificationHub.notifyFriendsChanged()
                 }
-            }.launchIn(viewModelScope)
+            }
+        }.launchIn(viewModelScope)
 
-            channel.subscribe()
-            realtimeChannel = channel
-        }
+        channel.subscribe()
+        realtimeChannel = channel
     }
 
     fun markAsRead(id: String) {
@@ -107,7 +106,7 @@ class NotificationsViewModel(private val repo: NotificationRepository) : ViewMod
 
     override fun onCleared() {
         super.onCleared()
-        viewModelScope.launch { runCatching { realtimeChannel?.unsubscribe() } }
+        realtimeCleanupScope.launch { removeRealtimeChannel(realtimeChannel) }
     }
 
     companion object {
