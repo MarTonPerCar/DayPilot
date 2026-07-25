@@ -356,6 +356,70 @@ private fun TechHealthPermissionGate(
 }
 
 @Composable
+private fun PermissionStatusBadgeIcon(number: String, isGranted: Boolean) {
+    Box(
+        modifier = Modifier
+            .size(32.dp)
+            .background(
+                color = if (isGranted) MaterialTheme.colorScheme.primary
+                        else MaterialTheme.colorScheme.primaryContainer,
+                shape = CircleShape
+            )
+            .clip(CircleShape),
+        contentAlignment = Alignment.Center
+    ) {
+        if (isGranted) {
+            Icon(
+                imageVector        = Icons.Default.Check,
+                contentDescription = null,
+                tint               = MaterialTheme.colorScheme.onPrimary,
+                modifier           = Modifier.size(18.dp)
+            )
+        } else {
+            Text(
+                text       = number,
+                fontSize   = 14.sp,
+                fontWeight = FontWeight.Bold,
+                color      = MaterialTheme.colorScheme.onPrimaryContainer
+            )
+        }
+    }
+}
+
+@Composable
+private fun PermissionGrantedBadge() {
+    Surface(
+        shape = RoundedCornerShape(8.dp),
+        color = MaterialTheme.colorScheme.primaryContainer
+    ) {
+        Text(
+            text     = stringResource(R.string.tech_health_perm_granted),
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+            style    = MaterialTheme.typography.labelSmall,
+            color    = MaterialTheme.colorScheme.onPrimaryContainer,
+            fontWeight = FontWeight.SemiBold
+        )
+    }
+}
+
+@Composable
+private fun PermissionActionSection(steps: String, buttonText: String, onOpen: () -> Unit) {
+    Text(
+        text       = steps,
+        style      = MaterialTheme.typography.bodySmall,
+        fontWeight = FontWeight.Bold,
+        color      = MaterialTheme.colorScheme.onSurface
+    )
+    Button(
+        onClick  = onOpen,
+        modifier = Modifier.fillMaxWidth(),
+        shape    = RoundedCornerShape(12.dp)
+    ) {
+        Text(buttonText)
+    }
+}
+
+@Composable
 private fun PermissionCard(
     number: String,
     title: String,
@@ -381,33 +445,7 @@ private fun PermissionCard(
                 verticalAlignment     = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(32.dp)
-                        .background(
-                            color = if (isGranted) MaterialTheme.colorScheme.primary
-                                    else MaterialTheme.colorScheme.primaryContainer,
-                            shape = CircleShape
-                        )
-                        .clip(CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    if (isGranted) {
-                        Icon(
-                            imageVector        = Icons.Default.Check,
-                            contentDescription = null,
-                            tint               = MaterialTheme.colorScheme.onPrimary,
-                            modifier           = Modifier.size(18.dp)
-                        )
-                    } else {
-                        Text(
-                            text       = number,
-                            fontSize   = 14.sp,
-                            fontWeight = FontWeight.Bold,
-                            color      = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                    }
-                }
+                PermissionStatusBadgeIcon(number = number, isGranted = isGranted)
                 Text(
                     text       = title,
                     style      = MaterialTheme.typography.titleSmall,
@@ -415,20 +453,7 @@ private fun PermissionCard(
                     color      = MaterialTheme.colorScheme.onSurface,
                     modifier   = Modifier.weight(1f)
                 )
-                if (isGranted) {
-                    Surface(
-                        shape = RoundedCornerShape(8.dp),
-                        color = MaterialTheme.colorScheme.primaryContainer
-                    ) {
-                        Text(
-                            text     = stringResource(R.string.tech_health_perm_granted),
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
-                            style    = MaterialTheme.typography.labelSmall,
-                            color    = MaterialTheme.colorScheme.onPrimaryContainer,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    }
-                }
+                if (isGranted) PermissionGrantedBadge()
             }
 
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
@@ -439,21 +464,7 @@ private fun PermissionCard(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
-            if (!isGranted) {
-                Text(
-                    text       = steps,
-                    style      = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.Bold,
-                    color      = MaterialTheme.colorScheme.onSurface
-                )
-                Button(
-                    onClick  = onOpen,
-                    modifier = Modifier.fillMaxWidth(),
-                    shape    = RoundedCornerShape(12.dp)
-                ) {
-                    Text(buttonText)
-                }
-            }
+            if (!isGranted) PermissionActionSection(steps = steps, buttonText = buttonText, onOpen = onOpen)
         }
     }
 }

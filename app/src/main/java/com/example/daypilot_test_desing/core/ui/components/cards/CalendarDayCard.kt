@@ -39,6 +39,43 @@ data class CalendarDayCardState(
 )
 
 @Composable
+private fun dayBackgroundTarget(isSelected: Boolean, isToday: Boolean): Color = when {
+    isSelected -> MaterialTheme.colorScheme.primary
+    isToday -> MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
+    else -> Color.Transparent
+}
+
+@Composable
+private fun dayTextTarget(isSelected: Boolean, isToday: Boolean, isCurrentMonth: Boolean): Color = when {
+    isSelected -> MaterialTheme.colorScheme.onPrimary
+    !isCurrentMonth -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+    isToday -> MaterialTheme.colorScheme.primary
+    else -> MaterialTheme.colorScheme.onSurface
+}
+
+@Composable
+private fun todayBorderModifier(isToday: Boolean, isSelected: Boolean): Modifier =
+    if (isToday && !isSelected) {
+        Modifier.border(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.primary,
+            shape = RoundedCornerShape(10.dp)
+        )
+    } else Modifier
+
+@Composable
+private fun TaskDotsRow(hasEasyTask: Boolean, hasMediumTask: Boolean, hasHardTask: Boolean) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(2.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        if (hasEasyTask) TaskDot(color = Color(0xFF4CAF50))
+        if (hasMediumTask) TaskDot(color = Color(0xFFFF9800))
+        if (hasHardTask) TaskDot(color = Color(0xFFF44336))
+    }
+}
+
+@Composable
 fun CalendarDayCard(
     state: CalendarDayCardState,
     onClick: () -> Unit,
@@ -52,22 +89,13 @@ fun CalendarDayCard(
     val hasHardTask    = state.hasHardTask
     val isCurrentMonth = state.isCurrentMonth
     val bgColor by animateColorAsState(
-        targetValue = when {
-            isSelected -> MaterialTheme.colorScheme.primary
-            isToday -> MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
-            else -> Color.Transparent
-        },
+        targetValue = dayBackgroundTarget(isSelected, isToday),
         animationSpec = tween(200),
         label = "day_bg"
     )
 
     val textColor by animateColorAsState(
-        targetValue = when {
-            isSelected -> MaterialTheme.colorScheme.onPrimary
-            !isCurrentMonth -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
-            isToday -> MaterialTheme.colorScheme.primary
-            else -> MaterialTheme.colorScheme.onSurface
-        },
+        targetValue = dayTextTarget(isSelected, isToday, isCurrentMonth),
         animationSpec = tween(200),
         label = "day_text"
     )
@@ -77,15 +105,7 @@ fun CalendarDayCard(
             .aspectRatio(1f)
             .clip(RoundedCornerShape(10.dp))
             .background(bgColor)
-            .then(
-                if (isToday && !isSelected)
-                    Modifier.border(
-                        width = 1.dp,
-                        color = MaterialTheme.colorScheme.primary,
-                        shape = RoundedCornerShape(10.dp)
-                    )
-                else Modifier
-            )
+            .then(todayBorderModifier(isToday, isSelected))
             .clickable { onClick() }
             .padding(4.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -98,20 +118,7 @@ fun CalendarDayCard(
             color = textColor
         )
 
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(2.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            if (hasEasyTask) {
-                TaskDot(color = Color(0xFF4CAF50))
-            }
-            if (hasMediumTask) {
-                TaskDot(color = Color(0xFFFF9800))
-            }
-            if (hasHardTask) {
-                TaskDot(color = Color(0xFFF44336))
-            }
-        }
+        TaskDotsRow(hasEasyTask = hasEasyTask, hasMediumTask = hasMediumTask, hasHardTask = hasHardTask)
     }
 }
 

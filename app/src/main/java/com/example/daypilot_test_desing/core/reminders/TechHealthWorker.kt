@@ -44,33 +44,45 @@ class TechHealthWorker(
             if (!AppUsageTracker.hasPermission(applicationContext)) return Result.success()
 
             val usageMap = AppUsageTracker.getTodayUsage(applicationContext)
-
-            repository.getAppRestrictions().filter { it.isEnabled }.forEach { r ->
-                val used = usageMap[r.packageName] ?: 0
-                if (used != r.usedMinutesToday) repository.updateUsage(r.id, used)
-                if (used >= r.dailyLimitMinutes && r.dailyLimitMinutes > 0 && !r.isViolatedToday) {
-                    repository.markViolated(r.id)
-                    markAppViolatedInSupabase(r.packageName)
-                }
-            }
-
-            repository.getGroupRestrictions().filter { it.isEnabled }.forEach { g ->
-                g.apps.forEach { app ->
-                    val appUsed = usageMap[app.packageName] ?: 0
-                    if (appUsed != app.usedMinutesToday) repository.updateGroupAppUsage(g.id, app.packageName, appUsed)
-                }
-                val used = g.apps.sumOf { usageMap[it.packageName] ?: 0 }
-                if (used != g.usedMinutesToday) repository.updateGroupUsage(g.id, used)
-                if (used >= g.dailyLimitMinutes && g.dailyLimitMinutes > 0 && !g.isViolatedToday) {
-                    repository.markGroupViolated(g.id)
-                    markGroupViolatedInSupabase(g.groupName)
-                }
-            }
+            processAppRestrictions(repository, usageMap)
+            processGroupRestrictions(repository, usageMap)
 
             Result.success()
         } catch (e: Exception) {
             Log.e(TAG, "Periodic usage check failed", e)
             Result.failure()
+        }
+    }
+
+    private suspend fun processAppRestrictions(
+        repository: SharedPrefsTechHealthRepository,
+        usageMap: Map<String, Int>
+    ) {
+        repository.getAppRestrictions().filter { it.isEnabled }.forEach { r ->
+            val used = usageMap[r.packageName] ?: 0
+            if (used != r.usedMinutesToday) repository.updateUsage(r.id, used)
+            if (used >= r.dailyLimitMinutes && r.dailyLimitMinutes > 0 && !r.isViolatedToday) {
+                repository.markViolated(r.id)
+                markAppViolatedInSupabase(r.packageName)
+            }
+        }
+    }
+
+    private suspend fun processGroupRestrictions(
+        repository: SharedPrefsTechHealthRepository,
+        usageMap: Map<String, Int>
+    ) {
+        repository.getGroupRestrictions().filter { it.isEnabled }.forEach { g ->
+            g.apps.forEach { app ->
+                val appUsed = usageMap[app.packageName] ?: 0
+                if (appUsed != app.usedMinutesToday) repository.updateGroupAppUsage(g.id, app.packageName, appUsed)
+            }
+            val used = g.apps.sumOf { usageMap[it.packageName] ?: 0 }
+            if (used != g.usedMinutesToday) repository.updateGroupUsage(g.id, used)
+            if (used >= g.dailyLimitMinutes && g.dailyLimitMinutes > 0 && !g.isViolatedToday) {
+                repository.markGroupViolated(g.id)
+                markGroupViolatedInSupabase(g.groupName)
+            }
         }
     }
 
