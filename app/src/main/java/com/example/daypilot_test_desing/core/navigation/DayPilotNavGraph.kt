@@ -18,6 +18,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -31,8 +32,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 
-import com.example.daypilot_test_desing.core.data.local.NotificationHub
-import com.example.daypilot_test_desing.core.data.model.NotificationType
 import com.example.daypilot_test_desing.core.data.preferences.AppPreferences
 
 import com.example.daypilot_test_desing.core.reminders.DailyNotificationScheduler
@@ -95,6 +94,418 @@ import com.example.daypilot_test_desing.core.ui.components.DayPilotBottomBar
 
 private const val TAG = "DayPilotNavGraph"
 
+private suspend fun handleSessionStateChange(
+    sessionState: AppSessionViewModel.State,
+    navController: NavHostController,
+    sessionVM: AppSessionViewModel,
+    context: Context,
+    homeVM: HomeViewModel,
+    calendarVM: CalendarViewModel,
+    profileVM: ProfileViewModel,
+    progressVM: ProgressViewModel,
+    friendsVM: FriendsViewModel,
+    rivalryVM: RivalryViewModel,
+    settingsVM: SettingsViewModel,
+    notificationsVM: NotificationsViewModel
+) {
+    val current = navController.currentBackStackEntry?.destination?.route
+    when (sessionState) {
+        AppSessionViewModel.State.DataLoading -> {
+            // joinAll() can't see failure — awaitLoad() can, so a failed batch gets one retry.
+            suspend fun loadAll(): Boolean = coroutineScope {
+                listOf(
+                    async { homeVM.awaitLoad() },
+                    async { calendarVM.awaitLoad() },
+                    async { profileVM.awaitLoad() },
+                    async { progressVM.awaitLoad() },
+                    async { friendsVM.awaitLoad() },
+                    async { rivalryVM.awaitLoad() },
+                    async { settingsVM.awaitLoad() },
+                    async { notificationsVM.awaitLoad() },
+                ).awaitAll().all { it }
+            }
+
+            var succeeded = loadAll()
+            if (!succeeded) succeeded = loadAll()
+            if (succeeded) {
+                val s = settingsVM.uiState.value
+                DailyNotificationScheduler.scheduleAll(
+                    context              = context,
+                    notificationsEnabled = s.notificationsEnabled,
+                    taskOn               = s.taskRemindersEnabled,
+                    streakOn             = s.streakAlertsEnabled
+                )
+                sessionVM.markDataLoaded()
+            } else {
+                sessionVM.markDataLoadFailed()
+            }
+        }
+        AppSessionViewModel.State.DataLoadFailed -> { /* show LoadingScreen with retry, wait */ }
+        AppSessionViewModel.State.Authenticated -> {
+            if (current == DayPilotDestinations.LOADING ||
+                current == DayPilotDestinations.AUTH   ||
+                current == null) {
+                navController.navigate(DayPilotDestinations.HOME) {
+                    popUpTo(0) { inclusive = true }
+                }
+            }
+        }
+        AppSessionViewModel.State.Unauthenticated -> {
+            if (current != null && current != DayPilotDestinations.AUTH) {
+                navController.navigate(DayPilotDestinations.AUTH) {
+                    popUpTo(0) { inclusive = true }
+                }
+            }
+        }
+        AppSessionViewModel.State.Loading -> { /* show LoadingScreen, wait */ }
+    }
+}
+
+@Composable
+private fun LoadingRoute(sessionState: AppSessionViewModel.State, sessionVM: AppSessionViewModel) {
+    LoadingScreen(
+        isError = sessionState == AppSessionViewModel.State.DataLoadFailed,
+        onRetry = { sessionVM.retryDataLoad() }
+    )
+}
+
+@Composable
+private fun AuthRoute(authVM: AuthViewModel, sessionVM: AppSessionViewModel, navController: NavHostController) {
+    val authState by authVM.uiState.collectAsState()
+    AuthScreen(
+        state = authState,
+        actions = AuthActions(
+            onLoginClick        = { email, password ->
+                authVM.login(email, password) {
+                    sessionVM.notifyAuthenticated()
+                }
+            },
+            onRegisterClick     = { name, username, email, password, region ->
+                authVM.register(name, username, email, password, region) {
+                    sessionVM.notifyAuthenticated()
+                }
+            },
+            onForgotPassword    = {
+                navController.navigate(DayPilotDestinations.RESET_PASSWORD)
+            }
+        )
+    )
+}
+
+@Composable
+private fun HomeRoute(homeVM: HomeViewModel, navController: NavHostController) {
+    val s by homeVM.uiState.collectAsState()
+    HomeScreen(
+        state = s,
+        actions = HomeActions(
+            onNavigateToCalendar= { navController.navigate(DayPilotDestinations.CALENDAR) },
+            onNavigateToHabits  = { navController.navigate(DayPilotDestinations.HABITS) },
+            onNavigateToProgress= { navController.navigate(DayPilotDestinations.PROGRESS) },
+            onNavigateToRivalry = { navController.navigate(DayPilotDestinations.RIVALRY) }
+        )
+    )
+}
+
+@Composable
+private fun FriendsRoute(
+    friendsVM: FriendsViewModel,
+    rivalryVM: RivalryViewModel,
+    homeVM: HomeViewModel,
+    navController: NavHostController
+) {
+    val s by friendsVM.uiState.collectAsState()
+    FriendsScreen(
+        state = s,
+        actions = FriendsActions(
+            onAcceptedNavigated = { friendsVM.clearJustAccepted() },
+            onAcceptRequest     = { userId ->
+                friendsVM.acceptRequest(userId)
+                rivalryVM.invalidate()
+                homeVM.invalidate()
+            },
+            onRejectRequest     = friendsVM::rejectRequest,
+            onTapFriend         = {},
+            onRemoveFriend      = { userId ->
+                friendsVM.removeFriend(userId)
+                rivalryVM.invalidate()
+                homeVM.invalidate()
+            },
+            onReactToFriend     = friendsVM::reactToFriend,
+            onNavigateToSearch  = { navController.navigate(DayPilotDestinations.SEARCH_FRIENDS) },
+            onMessageShown      = friendsVM::clearUserMessage
+        )
+    )
+}
+
+@Composable
+private fun SearchFriendsRoute(
+    searchVM: SearchFriendsViewModel,
+    friendsVM: FriendsViewModel,
+    rivalryVM: RivalryViewModel,
+    homeVM: HomeViewModel,
+    navController: NavHostController
+) {
+    val s by searchVM.uiState.collectAsState()
+    SearchFriendsScreen(
+        state = s,
+        actions = SearchFriendsActions(
+            onSearch             = searchVM::search,
+            onAddFriend          = searchVM::addFriend,
+            onConfirmationDismissed = {
+                searchVM.dismissConfirmation()
+                friendsVM.refresh()
+                rivalryVM.invalidate()
+                homeVM.invalidate()
+                navController.navigate(DayPilotDestinations.FRIENDS) {
+                    popUpTo(DayPilotDestinations.FRIENDS) { inclusive = true }
+                }
+            },
+            onBack               = { navController.popBackStack() },
+            onMessageShown       = searchVM::clearUserMessage
+        )
+    )
+}
+
+@Composable
+private fun NotificationsRoute(notificationsVM: NotificationsViewModel, navController: NavHostController) {
+    val s by notificationsVM.uiState.collectAsState()
+    NotificationsScreen(
+        notifications    = s.notifications,
+        onTapNotification= notificationsVM::markAsRead,
+        onMarkAllAsRead  = notificationsVM::markAllAsRead,
+        onBack           = { navController.popBackStack() }
+    )
+}
+
+@Composable
+private fun ProfileRoute(profileVM: ProfileViewModel, navController: NavHostController) {
+    LaunchedEffect(Unit) { profileVM.refresh() }
+    val s by profileVM.uiState.collectAsState()
+    ProfileScreen(
+        state = s,
+        onNavigateToSettings = { navController.navigate(DayPilotDestinations.SETTINGS) }
+    )
+}
+
+private fun applyPerAppLocale(context: Context, code: String) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        try {
+            context.getSystemService(LocaleManager::class.java)
+                ?.applicationLocales = LocaleList.forLanguageTags(code)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to set per-app locale to $code", e)
+        }
+    }
+}
+
+@Composable
+private fun SettingsRoute(
+    settingsVM: SettingsViewModel,
+    techHealthVM: TechHealthViewModel,
+    sessionVM: AppSessionViewModel,
+    context: Context,
+    navController: NavHostController
+) {
+    val s by settingsVM.uiState.collectAsState()
+    SettingsScreen(
+        state = s,
+        actions = SettingsActions(
+            onToggleDarkMode        = settingsVM::toggleDarkMode,
+            onThemeSelect           = settingsVM::selectTheme,
+            onLanguageSelect        = { code ->
+                settingsVM.selectLanguage(code)
+                applyPerAppLocale(context, code)
+            },
+            onToggleNotifications   = settingsVM::toggleNotifications,
+            onToggleTaskReminders   = settingsVM::toggleTaskReminders,
+            onToggleStreakAlerts    = settingsVM::toggleStreakAlerts,
+            onNavigateToEditProfile = { navController.navigate(DayPilotDestinations.EDIT_PROFILE) },
+            onLogout                = {
+                techHealthVM.clearLocalData()
+                sessionVM.signOut()
+            },
+            onBack                  = { navController.popBackStack() }
+        )
+    )
+}
+
+@Composable
+private fun EditProfileRoute(profileVM: ProfileViewModel, context: Context, navController: NavHostController) {
+    val s by profileVM.uiState.collectAsState()
+    LaunchedEffect(s.profileSaveSuccess) {
+        if (s.profileSaveSuccess) {
+            profileVM.clearProfileSaveSuccess()
+            navController.popBackStack()
+        }
+    }
+    EditProfileScreen(
+        state = EditProfileUiState(
+            currentName          = s.name,
+            currentUsername      = s.username,
+            avatarUrl            = s.avatarUrl,
+            isUploadingAvatar    = s.isUploadingAvatar,
+            avatarUploadError    = s.avatarUploadError,
+            isSavingProfile      = s.isSavingProfile,
+            profileSaveError     = s.profileSaveError
+        ),
+        actions = EditProfileActions(
+            onSave               = { name, username, region ->
+                profileVM.updateProfile(name, username, region)
+            },
+            onNavigateToResetPassword = {
+                navController.navigate(DayPilotDestinations.RESET_PASSWORD)
+            },
+            onPhotoSelected      = { uri -> profileVM.uploadAvatar(uri, context) },
+            onAvatarErrorDismissed = { profileVM.clearAvatarError() },
+            onProfileSaveErrorDismissed = { profileVM.clearProfileSaveError() },
+            onBack               = { navController.popBackStack() }
+        )
+    )
+}
+
+@Composable
+private fun ResetPasswordRoute(authVM: AuthViewModel, navController: NavHostController) {
+    val authState by authVM.uiState.collectAsState()
+    LaunchedEffect(Unit) { authVM.clearResetState() }
+    ResetPasswordScreen(
+        isLoading        = authState.resetLoading,
+        isSuccess        = authState.resetSent,
+        errorMessage     = authState.resetError,
+        onSendResetEmail = authVM::sendResetEmail,
+        onBack           = { navController.popBackStack() }
+    )
+}
+
+@Composable
+private fun CalendarRoute(calendarVM: CalendarViewModel, homeVM: HomeViewModel, navController: NavHostController) {
+    val s by calendarVM.uiState.collectAsState()
+    CalendarScreen(
+        state = s,
+        actions = CalendarActions(
+            onMessageShown = calendarVM::clearUserMessage,
+            onBack         = { homeVM.refresh(); navController.popBackStack() },
+            onCreateTask   = calendarVM::addTask,
+            onTapTask      = {},
+            onToggleTask   = calendarVM::toggleTask,
+            onDeleteTask   = calendarVM::deleteTask,
+            onUpdateTask   = calendarVM::updateTask
+        )
+    )
+}
+
+@Composable
+private fun HabitsRoute(habitsVM: HabitsViewModel, stepsVM: StepsViewModel, navController: NavHostController) {
+    val s by habitsVM.uiState.collectAsState()
+    LaunchedEffect(Unit) { habitsVM.refresh() }
+    HabitsScreen(
+        state = s,
+        actions = HabitsActions(
+            onBack                = { navController.popBackStack() },
+            onNavigateToTimer     = { navController.navigate(DayPilotDestinations.TIMER_HUB) },
+            onNavigateToReminders = { navController.navigate(DayPilotDestinations.REMINDERS) },
+            onNavigateToTechHealth= { navController.navigate(DayPilotDestinations.TECH_HEALTH) },
+            onConfigureGoal       = { newGoal ->
+                habitsVM.configureGoal(newGoal)
+                stepsVM.configureGoal(newGoal)
+            }
+        )
+    )
+}
+
+@Composable
+private fun TimerHubRoute(navController: NavHostController) {
+    TimerHubScreen(
+        onNavigateToTimer    = { id, minutes ->
+            navController.navigate(DayPilotDestinations.timerRoute(id, minutes))
+        },
+        onNavigateToPomodoro = { sessions ->
+            navController.navigate(DayPilotDestinations.pomodoroRoute(sessions))
+        },
+        onBack = { navController.popBackStack() }
+    )
+}
+
+@Composable
+private fun ProgressRoute(progressVM: ProgressViewModel, navController: NavHostController) {
+    LaunchedEffect(Unit) { progressVM.refresh() }
+    val s by progressVM.uiState.collectAsState()
+    ProgressScreen(
+        state = s,
+        onBack = { navController.popBackStack() }
+    )
+}
+
+@Composable
+private fun RivalryRoute(rivalryVM: RivalryViewModel, navController: NavHostController) {
+    LaunchedEffect(Unit) { rivalryVM.refresh() }
+    val s by rivalryVM.uiState.collectAsState()
+    RivalryScreen(
+        state = s,
+        onBack = { navController.popBackStack() }
+    )
+}
+
+@Composable
+private fun TimerRoute(backStackEntry: NavBackStackEntry, progressVM: ProgressViewModel, navController: NavHostController) {
+    val mode    = backStackEntry.arguments?.getString("timerMode") ?: "TRAINING"
+    val minutes = backStackEntry.arguments?.getInt("minutes") ?: 30
+    val ps by progressVM.uiState.collectAsState()
+    TimerScreen(
+        timerMode        = mode,
+        customMinutes    = minutes,
+        pointEarnedToday = ps.timerCompletedToday,
+        onTimerCompleted = { progressVM.recordTimerComplete() },
+        onBack           = { navController.popBackStack() }
+    )
+}
+
+@Composable
+private fun PomodoroRoute(backStackEntry: NavBackStackEntry, progressVM: ProgressViewModel, navController: NavHostController) {
+    val sessions = backStackEntry.arguments?.getInt("sessions") ?: 4
+    PomodoroScreen(
+        totalSessions = sessions,
+        onCompleted   = { progressVM.recordTimerComplete() },
+        onBack        = { navController.popBackStack() }
+    )
+}
+
+@Composable
+private fun RemindersRoute(remindersVM: RemindersViewModel, navController: NavHostController) {
+    val s by remindersVM.uiState.collectAsState()
+    RemindersScreen(
+        reminders       = s.reminders,
+        onAddReminder   = remindersVM::addReminder,
+        onDeleteReminder= remindersVM::deleteReminder,
+        onToggleReminder= remindersVM::toggleReminder,
+        onBack          = { navController.popBackStack() }
+    )
+}
+
+@Composable
+private fun TechHealthRoute(techHealthVM: TechHealthViewModel, navController: NavHostController) {
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) techHealthVM.refreshUsage()
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+    val s by techHealthVM.uiState.collectAsState()
+    TechHealthScreen(
+        state = s,
+        actions = TechHealthActions(
+            onSaveApp              = { restriction, _ -> techHealthVM.saveApp(restriction) },
+            onSaveGroup            = { group, _       -> techHealthVM.saveGroup(group) },
+            onToggleRestriction    = techHealthVM::toggleRestriction,
+            onDeleteRestriction    = techHealthVM::deleteRestriction,
+            onToggleGroup          = techHealthVM::toggleGroup,
+            onDeleteGroup          = techHealthVM::deleteGroup,
+            onBack                 = { navController.popBackStack() }
+        )
+    )
+}
+
 @Composable
 fun DayPilotNavGraph(
     navController: NavHostController = rememberNavController()
@@ -155,57 +566,20 @@ fun DayPilotNavGraph(
     // LEVEL_UP detection lives in SupabaseProgressRepository.logPoints(), not here.
     val sessionState by sessionVM.state.collectAsState()
     LaunchedEffect(sessionState) {
-        val current = navController.currentBackStackEntry?.destination?.route
-        when (sessionState) {
-            AppSessionViewModel.State.DataLoading -> {
-                // joinAll() can't see failure — awaitLoad() can, so a failed batch gets one retry.
-                suspend fun loadAll(): Boolean = coroutineScope {
-                    listOf(
-                        async { homeVM.awaitLoad() },
-                        async { calendarVM.awaitLoad() },
-                        async { profileVM.awaitLoad() },
-                        async { progressVM.awaitLoad() },
-                        async { friendsVM.awaitLoad() },
-                        async { rivalryVM.awaitLoad() },
-                        async { settingsVM.awaitLoad() },
-                        async { notificationsVM.awaitLoad() },
-                    ).awaitAll().all { it }
-                }
-
-                var succeeded = loadAll()
-                if (!succeeded) succeeded = loadAll()
-                if (succeeded) {
-                    val s = settingsVM.uiState.value
-                    DailyNotificationScheduler.scheduleAll(
-                        context              = context,
-                        notificationsEnabled = s.notificationsEnabled,
-                        taskOn               = s.taskRemindersEnabled,
-                        streakOn             = s.streakAlertsEnabled
-                    )
-                    sessionVM.markDataLoaded()
-                } else {
-                    sessionVM.markDataLoadFailed()
-                }
-            }
-            AppSessionViewModel.State.DataLoadFailed -> { /* show LoadingScreen with retry, wait */ }
-            AppSessionViewModel.State.Authenticated -> {
-                if (current == DayPilotDestinations.LOADING ||
-                    current == DayPilotDestinations.AUTH   ||
-                    current == null) {
-                    navController.navigate(DayPilotDestinations.HOME) {
-                        popUpTo(0) { inclusive = true }
-                    }
-                }
-            }
-            AppSessionViewModel.State.Unauthenticated -> {
-                if (current != null && current != DayPilotDestinations.AUTH) {
-                    navController.navigate(DayPilotDestinations.AUTH) {
-                        popUpTo(0) { inclusive = true }
-                    }
-                }
-            }
-            AppSessionViewModel.State.Loading -> { /* show LoadingScreen, wait */ }
-        }
+        handleSessionStateChange(
+            sessionState    = sessionState,
+            navController   = navController,
+            sessionVM       = sessionVM,
+            context         = context,
+            homeVM          = homeVM,
+            calendarVM      = calendarVM,
+            profileVM       = profileVM,
+            progressVM      = progressVM,
+            friendsVM       = friendsVM,
+            rivalryVM       = rivalryVM,
+            settingsVM      = settingsVM,
+            notificationsVM = notificationsVM
+        )
     }
 
     Scaffold(
@@ -228,251 +602,75 @@ fun DayPilotNavGraph(
         ) {
 
             composable(DayPilotDestinations.LOADING) {
-                LoadingScreen(
-                    isError = sessionState == AppSessionViewModel.State.DataLoadFailed,
-                    onRetry = { sessionVM.retryDataLoad() }
-                )
+                LoadingRoute(sessionState = sessionState, sessionVM = sessionVM)
             }
 
             composable(DayPilotDestinations.AUTH) {
-                val authState by authVM.uiState.collectAsState()
-                AuthScreen(
-                    state = authState,
-                    actions = AuthActions(
-                        onLoginClick        = { email, password ->
-                            authVM.login(email, password) {
-                                sessionVM.notifyAuthenticated()
-                            }
-                        },
-                        onRegisterClick     = { name, username, email, password, region ->
-                            authVM.register(name, username, email, password, region) {
-                                sessionVM.notifyAuthenticated()
-                            }
-                        },
-                        onForgotPassword    = {
-                            navController.navigate(DayPilotDestinations.RESET_PASSWORD)
-                        }
-                    )
-                )
+                AuthRoute(authVM = authVM, sessionVM = sessionVM, navController = navController)
             }
 
             composable(DayPilotDestinations.HOME) {
-                val s by homeVM.uiState.collectAsState()
-                HomeScreen(
-                    state = s,
-                    actions = HomeActions(
-                        onNavigateToCalendar= { navController.navigate(DayPilotDestinations.CALENDAR) },
-                        onNavigateToHabits  = { navController.navigate(DayPilotDestinations.HABITS) },
-                        onNavigateToProgress= { navController.navigate(DayPilotDestinations.PROGRESS) },
-                        onNavigateToRivalry = { navController.navigate(DayPilotDestinations.RIVALRY) }
-                    )
-                )
+                HomeRoute(homeVM = homeVM, navController = navController)
             }
 
             composable(DayPilotDestinations.FRIENDS) {
-                val s by friendsVM.uiState.collectAsState()
-                FriendsScreen(
-                    state = s,
-                    actions = FriendsActions(
-                        onAcceptedNavigated = { friendsVM.clearJustAccepted() },
-                        onAcceptRequest     = { userId ->
-                            friendsVM.acceptRequest(userId)
-                            rivalryVM.invalidate()
-                            homeVM.invalidate()
-                        },
-                        onRejectRequest     = friendsVM::rejectRequest,
-                        onTapFriend         = {},
-                        onRemoveFriend      = { userId ->
-                            friendsVM.removeFriend(userId)
-                            rivalryVM.invalidate()
-                            homeVM.invalidate()
-                        },
-                        onReactToFriend     = friendsVM::reactToFriend,
-                        onNavigateToSearch  = { navController.navigate(DayPilotDestinations.SEARCH_FRIENDS) },
-                        onMessageShown      = friendsVM::clearUserMessage
-                    )
-                )
+                FriendsRoute(friendsVM = friendsVM, rivalryVM = rivalryVM, homeVM = homeVM, navController = navController)
             }
 
             composable(DayPilotDestinations.SEARCH_FRIENDS) {
-                val s by searchVM.uiState.collectAsState()
-                SearchFriendsScreen(
-                    state = s,
-                    actions = SearchFriendsActions(
-                        onSearch             = searchVM::search,
-                        onAddFriend          = searchVM::addFriend,
-                        onConfirmationDismissed = {
-                            searchVM.dismissConfirmation()
-                            friendsVM.refresh()
-                            rivalryVM.invalidate()
-                            homeVM.invalidate()
-                            navController.navigate(DayPilotDestinations.FRIENDS) {
-                                popUpTo(DayPilotDestinations.FRIENDS) { inclusive = true }
-                            }
-                        },
-                        onBack               = { navController.popBackStack() },
-                        onMessageShown       = searchVM::clearUserMessage
-                    )
+                SearchFriendsRoute(
+                    searchVM = searchVM,
+                    friendsVM = friendsVM,
+                    rivalryVM = rivalryVM,
+                    homeVM = homeVM,
+                    navController = navController
                 )
             }
 
             composable(DayPilotDestinations.NOTIFICATIONS) {
-                val s by notificationsVM.uiState.collectAsState()
-                NotificationsScreen(
-                    notifications    = s.notifications,
-                    onTapNotification= notificationsVM::markAsRead,
-                    onMarkAllAsRead  = notificationsVM::markAllAsRead,
-                    onBack           = { navController.popBackStack() }
-                )
+                NotificationsRoute(notificationsVM = notificationsVM, navController = navController)
             }
 
             composable(DayPilotDestinations.PROFILE) {
-                LaunchedEffect(Unit) { profileVM.refresh() }
-                val s by profileVM.uiState.collectAsState()
-                ProfileScreen(
-                    state = s,
-                    onNavigateToSettings = { navController.navigate(DayPilotDestinations.SETTINGS) }
-                )
+                ProfileRoute(profileVM = profileVM, navController = navController)
             }
 
             composable(DayPilotDestinations.SETTINGS) {
-                val s by settingsVM.uiState.collectAsState()
-                SettingsScreen(
-                    state = s,
-                    actions = SettingsActions(
-                        onToggleDarkMode        = settingsVM::toggleDarkMode,
-                        onThemeSelect           = settingsVM::selectTheme,
-                        onLanguageSelect        = { code ->
-                            settingsVM.selectLanguage(code)
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                try {
-                                    context.getSystemService(LocaleManager::class.java)
-                                        ?.applicationLocales = LocaleList.forLanguageTags(code)
-                                } catch (e: Exception) {
-                                    Log.e(TAG, "Failed to set per-app locale to $code", e)
-                                }
-                            }
-                        },
-                        onToggleNotifications   = settingsVM::toggleNotifications,
-                        onToggleTaskReminders   = settingsVM::toggleTaskReminders,
-                        onToggleStreakAlerts    = settingsVM::toggleStreakAlerts,
-                        onNavigateToEditProfile = { navController.navigate(DayPilotDestinations.EDIT_PROFILE) },
-                        onLogout                = {
-                            techHealthVM.clearLocalData()
-                            sessionVM.signOut()
-                        },
-                        onBack                  = { navController.popBackStack() }
-                    )
+                SettingsRoute(
+                    settingsVM = settingsVM,
+                    techHealthVM = techHealthVM,
+                    sessionVM = sessionVM,
+                    context = context,
+                    navController = navController
                 )
             }
 
             composable(DayPilotDestinations.EDIT_PROFILE) {
-                val s by profileVM.uiState.collectAsState()
-                LaunchedEffect(s.profileSaveSuccess) {
-                    if (s.profileSaveSuccess) {
-                        profileVM.clearProfileSaveSuccess()
-                        navController.popBackStack()
-                    }
-                }
-                EditProfileScreen(
-                    state = EditProfileUiState(
-                        currentName          = s.name,
-                        currentUsername      = s.username,
-                        avatarUrl            = s.avatarUrl,
-                        isUploadingAvatar    = s.isUploadingAvatar,
-                        avatarUploadError    = s.avatarUploadError,
-                        isSavingProfile      = s.isSavingProfile,
-                        profileSaveError     = s.profileSaveError
-                    ),
-                    actions = EditProfileActions(
-                        onSave               = { name, username, region ->
-                            profileVM.updateProfile(name, username, region)
-                        },
-                        onNavigateToResetPassword = {
-                            navController.navigate(DayPilotDestinations.RESET_PASSWORD)
-                        },
-                        onPhotoSelected      = { uri -> profileVM.uploadAvatar(uri, context) },
-                        onAvatarErrorDismissed = { profileVM.clearAvatarError() },
-                        onProfileSaveErrorDismissed = { profileVM.clearProfileSaveError() },
-                        onBack               = { navController.popBackStack() }
-                    )
-                )
+                EditProfileRoute(profileVM = profileVM, context = context, navController = navController)
             }
 
             composable(DayPilotDestinations.RESET_PASSWORD) {
-                val authState by authVM.uiState.collectAsState()
-                LaunchedEffect(Unit) { authVM.clearResetState() }
-                ResetPasswordScreen(
-                    isLoading        = authState.resetLoading,
-                    isSuccess        = authState.resetSent,
-                    errorMessage     = authState.resetError,
-                    onSendResetEmail = authVM::sendResetEmail,
-                    onBack           = { navController.popBackStack() }
-                )
+                ResetPasswordRoute(authVM = authVM, navController = navController)
             }
 
             composable(DayPilotDestinations.CALENDAR) {
-                val s by calendarVM.uiState.collectAsState()
-                CalendarScreen(
-                    state = s,
-                    actions = CalendarActions(
-                        onMessageShown = calendarVM::clearUserMessage,
-                        onBack         = { homeVM.refresh(); navController.popBackStack() },
-                        onCreateTask   = calendarVM::addTask,
-                        onTapTask      = {},
-                        onToggleTask   = calendarVM::toggleTask,
-                        onDeleteTask   = calendarVM::deleteTask,
-                        onUpdateTask   = calendarVM::updateTask
-                    )
-                )
+                CalendarRoute(calendarVM = calendarVM, homeVM = homeVM, navController = navController)
             }
 
             composable(DayPilotDestinations.HABITS) {
-                val s by habitsVM.uiState.collectAsState()
-                LaunchedEffect(Unit) { habitsVM.refresh() }
-                HabitsScreen(
-                    state = s,
-                    actions = HabitsActions(
-                        onBack                = { navController.popBackStack() },
-                        onNavigateToTimer     = { navController.navigate(DayPilotDestinations.TIMER_HUB) },
-                        onNavigateToReminders = { navController.navigate(DayPilotDestinations.REMINDERS) },
-                        onNavigateToTechHealth= { navController.navigate(DayPilotDestinations.TECH_HEALTH) },
-                        onConfigureGoal       = { newGoal ->
-                            habitsVM.configureGoal(newGoal)
-                            stepsVM.configureGoal(newGoal)
-                        }
-                    )
-                )
+                HabitsRoute(habitsVM = habitsVM, stepsVM = stepsVM, navController = navController)
             }
 
             composable(DayPilotDestinations.TIMER_HUB) {
-                TimerHubScreen(
-                    onNavigateToTimer    = { id, minutes ->
-                        navController.navigate(DayPilotDestinations.timerRoute(id, minutes))
-                    },
-                    onNavigateToPomodoro = { sessions ->
-                        navController.navigate(DayPilotDestinations.pomodoroRoute(sessions))
-                    },
-                    onBack = { navController.popBackStack() }
-                )
+                TimerHubRoute(navController = navController)
             }
 
             composable(DayPilotDestinations.PROGRESS) {
-                LaunchedEffect(Unit) { progressVM.refresh() }
-                val s by progressVM.uiState.collectAsState()
-                ProgressScreen(
-                    state = s,
-                    onBack = { navController.popBackStack() }
-                )
+                ProgressRoute(progressVM = progressVM, navController = navController)
             }
 
             composable(DayPilotDestinations.RIVALRY) {
-                LaunchedEffect(Unit) { rivalryVM.refresh() }
-                val s by rivalryVM.uiState.collectAsState()
-                RivalryScreen(
-                    state = s,
-                    onBack = { navController.popBackStack() }
-                )
+                RivalryRoute(rivalryVM = rivalryVM, navController = navController)
             }
 
             composable(
@@ -482,63 +680,22 @@ fun DayPilotNavGraph(
                     navArgument("minutes")   { type = NavType.IntType }
                 )
             ) { backStackEntry ->
-                val mode    = backStackEntry.arguments?.getString("timerMode") ?: "TRAINING"
-                val minutes = backStackEntry.arguments?.getInt("minutes") ?: 30
-                val ps by progressVM.uiState.collectAsState()
-                TimerScreen(
-                    timerMode        = mode,
-                    customMinutes    = minutes,
-                    pointEarnedToday = ps.timerCompletedToday,
-                    onTimerCompleted = { progressVM.recordTimerComplete() },
-                    onBack           = { navController.popBackStack() }
-                )
+                TimerRoute(backStackEntry = backStackEntry, progressVM = progressVM, navController = navController)
             }
 
             composable(
                 route     = DayPilotDestinations.POMODORO,
                 arguments = listOf(navArgument("sessions") { type = NavType.IntType })
             ) { backStackEntry ->
-                val sessions = backStackEntry.arguments?.getInt("sessions") ?: 4
-                PomodoroScreen(
-                    totalSessions = sessions,
-                    onCompleted   = { progressVM.recordTimerComplete() },
-                    onBack        = { navController.popBackStack() }
-                )
+                PomodoroRoute(backStackEntry = backStackEntry, progressVM = progressVM, navController = navController)
             }
 
             composable(DayPilotDestinations.REMINDERS) {
-                val s by remindersVM.uiState.collectAsState()
-                RemindersScreen(
-                    reminders       = s.reminders,
-                    onAddReminder   = remindersVM::addReminder,
-                    onDeleteReminder= remindersVM::deleteReminder,
-                    onToggleReminder= remindersVM::toggleReminder,
-                    onBack          = { navController.popBackStack() }
-                )
+                RemindersRoute(remindersVM = remindersVM, navController = navController)
             }
 
             composable(DayPilotDestinations.TECH_HEALTH) {
-                val lifecycleOwner = LocalLifecycleOwner.current
-                DisposableEffect(lifecycleOwner) {
-                    val observer = LifecycleEventObserver { _, event ->
-                        if (event == Lifecycle.Event.ON_RESUME) techHealthVM.refreshUsage()
-                    }
-                    lifecycleOwner.lifecycle.addObserver(observer)
-                    onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
-                }
-                val s by techHealthVM.uiState.collectAsState()
-                TechHealthScreen(
-                    state = s,
-                    actions = TechHealthActions(
-                        onSaveApp              = { restriction, _ -> techHealthVM.saveApp(restriction) },
-                        onSaveGroup            = { group, _       -> techHealthVM.saveGroup(group) },
-                        onToggleRestriction    = techHealthVM::toggleRestriction,
-                        onDeleteRestriction    = techHealthVM::deleteRestriction,
-                        onToggleGroup          = techHealthVM::toggleGroup,
-                        onDeleteGroup          = techHealthVM::deleteGroup,
-                        onBack                 = { navController.popBackStack() }
-                    )
-                )
+                TechHealthRoute(techHealthVM = techHealthVM, navController = navController)
             }
         }
     }
