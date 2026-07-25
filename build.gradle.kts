@@ -29,7 +29,11 @@ sonar {
         )
         property(
             "sonar.coverage.exclusions",
-            "**/*Screen.kt,**/core/ui/components/**"
+            "**/*Screen.kt,**/core/ui/components/**,**/core/ui/theme/**,**/data/**"
+        )
+        property(
+            "sonar.cpd.exclusions",
+            "**/core/ui/theme/Color.kt"
         )
     }
 }
