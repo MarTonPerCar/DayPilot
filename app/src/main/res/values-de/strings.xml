@@ -4,15 +4,11 @@
     <string name="app_name">DayPilot</string>
 
     <!-- Auth -->
-    <string name="login_title">Anmelden</string>
-    <string name="register_title">Konto erstellen</string>
     <string name="email">E-Mail</string>
     <string name="password">Passwort</string>
     <string name="username">Benutzername</string>
     <string name="name">Name</string>
     <string name="region">Region / Zeitzone</string>
-    <string name="enter">Einloggen</string>
-    <string name="register">Registrieren</string>
     <string name="forgot_password">Passwort vergessen?</string>
     <string name="back_to_login">Zurück zur Anmeldung</string>
 
@@ -23,8 +19,6 @@
     <string name="reset_password_success">✅ E-Mail gesendet. Überprüfe deinen Posteingang.</string>
 
     <!-- Home -->
-    <string name="home_title">DayPilot</string>
-    <string name="home_sections">Bereiche</string>
 
     <!-- Friends -->
     <string name="search_friends_title">Buscar amigos</string>
@@ -40,28 +34,13 @@
     <string name="weekly_summary_steps">Schritte</string>
     <string name="weekly_summary_streak">beste Serie</string>
     <string name="weekly_summary_reactions">Reaktionen deiner Freunde</string>
-    <string name="weekly_summary_no_reactions">Noch keine Reaktionen</string>
     <string name="weekly_summary_no_data">Noch keine Wochenübersicht verfügbar</string>
-    <string name="weekly_friend_summary">Wochenzusammenfassung</string>
-    <string name="weekly_friend_react">Reagieren</string>
-    <string name="weekly_friend_reacted">Bereits reagiert</string>
 
     <!-- Profile -->
     <string name="profile_title">Profil</string>
     <string name="profile_email">E-Mail</string>
     <string name="profile_since">Seit</string>
     <string name="profile_username">Benutzername</string>
-    <string name="profile_section_account">Konto</string>
-    <string name="profile_section_stats">Heutige Statistiken</string>
-    <string name="profile_section_weekly">Wöchentliche Aktivität</string>
-    <string name="profile_points_today">Punkte heute</string>
-    <string name="profile_points_tasks">Aufgaben</string>
-    <string name="profile_points_steps">Schritte</string>
-    <string name="profile_points_habits">Gewohnheiten</string>
-    <string name="profile_points_timers">Timer</string>
-    <string name="profile_ranking">Rangliste</string>
-    <string name="profile_account">Konto</string>
-    <string name="profile_edit">Profil bearbeiten</string>
 
     <!-- Edit Profile -->
     <string name="edit_profile_title">Profil bearbeiten</string>
@@ -81,10 +60,8 @@
 
     <!-- Settings -->
     <string name="settings_title">Einstellungen</string>
-    <string name="settings_profile_section">Profil</string>
     <string name="settings_edit_profile">Profil bearbeiten</string>
     <string name="settings_edit_profile_description">Name, Benutzername, Region und Passwort</string>
-    <string name="settings_appearance">Erscheinungsbild</string>
     <string name="settings_dark_mode">Dunkelmodus</string>
     <string name="settings_dark_mode_description">Dunkles Theme aktivieren</string>
     <string name="settings_notifications">Benachrichtigungen</string>
@@ -94,13 +71,10 @@
 
     <!-- Calendar -->
     <string name="calendar_title">Kalender</string>
-    <string name="calendar_day_tasks">Aufgaben für Tag %1$d</string>
     <string name="calendar_no_tasks">Keine Aufgaben für diesen Tag</string>
-    <string name="calendar_add_task">Aufgabe hinzufügen</string>
 
     <!-- Habits -->
     <string name="habits_title">Gewohnheiten</string>
-    <string name="habits_timers">Timer</string>
     <string name="habits_other">Andere Gewohnheiten</string>
     <string name="habits_tech_health_title">Tech-Gesundheit</string>
     <string name="habits_tech_health_description">App / Gruppen-Limits + Benachrichtigungen</string>
@@ -115,15 +89,12 @@
     <string name="habits_timers_description">Pomodoro, Training und mehr</string>
 
     <!-- Timer -->
-    <string name="timer_completed">Abgeschlossen! 🎉</string>
-    <string name="timer_restart">Neustart</string>
 
     <!-- Progress -->
     <string name="progress_title">Fortschritt</string>
 
     <!-- Rivalry -->
     <string name="rivalry_title">Rivalität</string>
-    <string name="rivalry_your_position">Deine Position</string>
     <string name="rivalry_ranking">Rangliste</string>
     <string name="rivalry_no_friends">Du hast noch keine Freunde zum Wettkampf.\nFüge jemanden hinzu!</string>
 
@@ -146,7 +117,6 @@
     <string name="notifications_filter_streak">Serie</string>
     <string name="notifications_filter_reminders">Erinnerungen</string>
     <string name="notifications_filter_achievements">Erfolge</string>
-    <string name="notifications_unread">ungelesen</string>
 
     <!-- Reminders -->
     <string name="reminders_title">Erinnerungen</string>
@@ -155,19 +125,11 @@
 
     <!-- Tech Health -->
     <string name="tech_health_title">Tech-Gesundheit</string>
-    <string name="tech_health_screen_usage">Bildschirmnutzung heute</string>
-    <string name="tech_health_used_minutes">%1$d Min. genutzt</string>
-    <string name="tech_health_limit_minutes">Limit %1$d Min.</string>
     <string name="tech_health_point_earned">Tagespunkt verdient</string>
     <string name="tech_health_point_pending">Halte alle deine Limits heute ein, um 1 Punkt zu verdienen</string>
     <string name="tech_health_point_warning">Du benötigst mindestens 3 aktive Einschränkungen, um den Punkt zu erhalten</string>
     <string name="tech_health_point_info_title">Punkt für digitale Gesundheit</string>
     <string name="tech_health_point_info_body">Aktiviere mindestens 3 Einschränkungen und überschreite an diesem Tag kein Limit. Wenn dir das gelingt, erhältst du 10 Extrapunkte, die morgen zu deinen Punkten hinzugefügt werden.</string>
-    <string name="tech_health_no_permission_title">Zugriff auf App-Nutzung erforderlich</string>
-    <string name="tech_health_no_permission_body">Um die Bildschirmzeit zu verfolgen, gehe zu Einstellungen → Datenzugang zu Apps und aktiviere DayPilot.</string>
-    <string name="tech_health_open_settings">Einstellungen öffnen</string>
-    <string name="tech_health_daily_limit">Tageslimit</string>
-    <string name="tech_health_app_limits">App-Limits</string>
     <string name="accessibility_service_description">DayPilot nutzt diesen Dienst, um zu erkennen, welche App im Vordergrund läuft, damit die in Digitale Gesundheit festgelegten Nutzungslimits durchgesetzt werden können.</string>
     <string name="block_limit_reached">Limit erreicht</string>
     <string name="block_motivational">Zeit für etwas anderes!</string>
@@ -178,10 +140,7 @@
     <string name="common_back">Zurück</string>
     <string name="common_save">Speichern</string>
     <string name="common_cancel">Abbrechen</string>
-    <string name="common_confirm">Bestätigen</string>
     <string name="common_delete">Löschen</string>
-    <string name="common_loading">Laden...</string>
-    <string name="common_error">Ein Fehler ist aufgetreten</string>
     <string name="common_retry">Erneut versuchen</string>
     <string name="common_settings">Einstellungen</string>
     <string name="common_points">Pkt.</string>
@@ -276,8 +235,6 @@
     <string name="task_increase_duration">Dauer erhöhen</string>
     <string name="task_section_info">Informationen</string>
     <string name="task_section_details">Details</string>
-    <string name="task_section_reminder">Erinnerung</string>
-    <string name="task_section_recurrence">Wiederholung</string>
     <string name="task_section_extras">Erinnerung &amp; Wiederholung</string>
     <string name="task_reminder_label">Erinnerung aktivieren</string>
     <string name="task_reminder_description">Du erhältst eine Benachrichtigung</string>
@@ -429,8 +386,6 @@
     <string name="steps_points_earned">Heute verdiente Punkte</string>
     <string name="steps_pts_value">%1$d Pkt.</string>
     <string name="steps_goal_reached">Ziel erreicht!</string>
-    <string name="steps_see_details">Details</string>
-    <string name="steps_sensor_unavailable">Schrittzähler-Sensor nicht verfügbar auf diesem Gerät. Verbinde ein physisches Gerät um deine Schritte zu erfassen.</string>
 
 
     <!-- Steps Summary Card -->
@@ -443,7 +398,6 @@
 
     <!-- Task Cards -->
     <string name="task_reminder_icon">Erinnerung</string>
-    <string name="task_detail_description">Beschreibung</string>
     <string name="task_detail_recurring">Wiederkehrende Aufgabe</string>
     <string name="task_detail_reminder">Erinnerung aktiviert</string>
     <string name="task_mark_done">Als erledigt markieren</string>
@@ -482,10 +436,6 @@
     <string name="app_limit_form_group_apps_label">Gruppen-Apps</string>
     <string name="app_limit_form_group_apps_pick">Apps auswählen</string>
     <string name="app_limit_form_group_apps_change">Apps ändern</string>
-    <string name="app_limit_form_notif_title">Benachrichtigungen</string>
-    <string name="app_limit_form_notif_description">Warnen wenn Limit überschritten</string>
-    <string name="app_limit_form_notif_interval_label">Benachrichtigung wiederholen (5s → 60s)</string>
-    <string name="app_limit_form_notif_selected">Ausgewählt: %1$ds</string>
     <string name="app_limit_form_limit_group">Tageslimit (1.5h → 10h)</string>
     <string name="app_limit_form_limit_app">Tageslimit (30 Min → 6 Std)</string>
     <string name="app_limit_form_limit_selected">Ausgewählt: %1$s</string>
@@ -498,7 +448,6 @@
     <string name="auth_register">Konto erstellen</string>
     <string name="auth_login_tab">Anmelde-Tab</string>
     <string name="auth_register_tab">Registrierungs-Tab</string>
-    <string name="auth_forgot_password">Passwort vergessen?</string>
     <string name="auth_enter">Einloggen</string>
     <string name="auth_name_label">Name</string>
     <string name="auth_username_label">Benutzername</string>
@@ -591,10 +540,6 @@
     <string name="reminder_early_body">Deine Erinnerung aktiviert in 10 Minuten</string>
 
     <!-- Tech Health Notifications -->
-    <string name="tech_health_channel_name">Tech-Gesundheit</string>
-    <string name="tech_health_channel_desc">Benachrichtigungen wenn das Nutzungslimit einer App erreicht wird</string>
-    <string name="tech_health_notif_title">Limit erreicht: %s</string>
-    <string name="tech_health_notif_body">Du hast %1$d Min. von %2$d Min. genutzt</string>
 
     <!-- Daily phone notifications -->
     <string name="daily_channel_name">Tägliche Erinnerungen</string>
