@@ -17,15 +17,16 @@ import com.example.daypilot_test_desing.core.data.model.ProgressFilter
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProgressScreen(
-    progressData: List<DayProgress>,
-    rankingPosition: Int,
-    pointsToday: Int,
-    pointsFromTasks: Int,
-    pointsFromSteps: Int,
-    pointsFromHabits: Int,
-    pointsFromTimers: Int,
+    state: ProgressUiState,
     onBack: () -> Unit
 ) {
+    val progressData     = state.progressData
+    val rankingPosition  = state.rankingPosition
+    val pointsToday      = state.pointsToday
+    val pointsFromTasks  = state.pointsFromTasks
+    val pointsFromSteps  = state.pointsFromSteps
+    val pointsFromHabits = state.pointsFromHabits
+    val pointsFromTimers = state.pointsFromTimers
     var selectedFilter by remember { mutableStateOf(ProgressFilter.POINTS) }
 
     Scaffold(

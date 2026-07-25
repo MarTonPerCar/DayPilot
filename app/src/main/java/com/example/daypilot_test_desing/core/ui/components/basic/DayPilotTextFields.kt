@@ -60,24 +60,39 @@ fun dayPilotTextFieldColors() = OutlinedTextFieldDefaults.colors(
     cursorColor             = MaterialTheme.colorScheme.primary
 )
 
+data class DayPilotTextFieldOptions(
+    val placeholder        : String = "",
+    val leadingIcon        : ImageVector? = null,
+    val trailingIcon       : ImageVector? = null,
+    val onTrailingIconClick: (() -> Unit)? = null,
+    val keyboardType       : KeyboardType = KeyboardType.Text,
+    val singleLine         : Boolean = true,
+    val minLines           : Int = 1,
+    val maxLines           : Int = 1,
+    val enabled            : Boolean = true,
+    val isError            : Boolean = false,
+    val errorMessage       : String = ""
+)
+
 @Composable
 fun DayPilotTextField(
     value              : String,
     onValueChange      : (String) -> Unit,
     label              : String,
     modifier           : Modifier = Modifier,
-    placeholder        : String = "",
-    leadingIcon        : ImageVector? = null,
-    trailingIcon       : ImageVector? = null,
-    onTrailingIconClick: (() -> Unit)? = null,
-    keyboardType       : KeyboardType = KeyboardType.Text,
-    singleLine         : Boolean = true,
-    minLines           : Int = 1,
-    maxLines           : Int = 1,
-    enabled            : Boolean = true,
-    isError            : Boolean = false,
-    errorMessage       : String = ""
+    options            : DayPilotTextFieldOptions = DayPilotTextFieldOptions()
 ) {
+    val placeholder         = options.placeholder
+    val leadingIcon         = options.leadingIcon
+    val trailingIcon        = options.trailingIcon
+    val onTrailingIconClick = options.onTrailingIconClick
+    val keyboardType        = options.keyboardType
+    val singleLine          = options.singleLine
+    val minLines            = options.minLines
+    val maxLines            = options.maxLines
+    val enabled             = options.enabled
+    val isError             = options.isError
+    val errorMessage        = options.errorMessage
     Column(modifier = modifier) {
         OutlinedTextField(
             value         = value,
@@ -314,16 +329,20 @@ fun DayPilotTextFieldsPreview() {
                 value         = name,
                 onValueChange = { name = it },
                 label         = "Nombre",
-                leadingIcon   = Icons.Default.Person,
-                placeholder   = "Tu nombre"
+                options = DayPilotTextFieldOptions(
+                    leadingIcon   = Icons.Default.Person,
+                    placeholder   = "Tu nombre"
+                )
             )
             DayPilotTextField(
                 value         = "Campo con error",
                 onValueChange = {},
                 label         = "Email",
-                leadingIcon   = Icons.Default.Email,
-                isError       = true,
-                errorMessage  = "El email no es válido"
+                options = DayPilotTextFieldOptions(
+                    leadingIcon   = Icons.Default.Email,
+                    isError       = true,
+                    errorMessage  = "El email no es válido"
+                )
             )
             DayPilotPasswordField(
                 value         = password,

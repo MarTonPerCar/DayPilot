@@ -96,17 +96,25 @@ fun DayPilotTopBarWithAction(
     )
 }
 
+data class TopBarAction(
+    val icon: ImageVector,
+    val description: String = "",
+    val onClick: () -> Unit
+)
+
 @Composable
 fun DayPilotTopBarWithTwoActions(
     title: String,
-    firstActionIcon: ImageVector,
-    firstActionDescription: String = "",
-    onFirstAction: () -> Unit,
-    secondActionIcon: ImageVector,
-    secondActionDescription: String = "",
-    onSecondAction: () -> Unit,
+    firstAction: TopBarAction,
+    secondAction: TopBarAction,
     onBack: (() -> Unit)? = null
 ) {
+    val firstActionIcon = firstAction.icon
+    val firstActionDescription = firstAction.description
+    val onFirstAction = firstAction.onClick
+    val secondActionIcon = secondAction.icon
+    val secondActionDescription = secondAction.description
+    val onSecondAction = secondAction.onClick
     TopAppBar(
         title = {
             Text(

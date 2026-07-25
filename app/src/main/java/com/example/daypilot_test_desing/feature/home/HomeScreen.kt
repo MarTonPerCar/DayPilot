@@ -56,14 +56,16 @@ fun HomeScreen(
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 DailySummaryCard(
-                    userName        = userName,
-                    streak          = streak,
-                    stepsToday      = stepsToday,
-                    stepsGoal       = stepsGoal,
-                    tasksCompleted  = tasksCompleted,
-                    tasksTotal      = tasksTotal,
-                    pointsToday     = pointsToday,
-                    rankingPosition = rankingPosition,
+                    info = DailySummaryInfo(
+                        userName        = userName,
+                        streak          = streak,
+                        stepsToday      = stepsToday,
+                        stepsGoal       = stepsGoal,
+                        tasksCompleted  = tasksCompleted,
+                        tasksTotal      = tasksTotal,
+                        pointsToday     = pointsToday,
+                        rankingPosition = rankingPosition
+                    ),
                     modifier        = Modifier
                         .fillMaxWidth()
                         .height(summaryHeight)

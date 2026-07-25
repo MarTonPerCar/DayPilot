@@ -58,14 +58,16 @@ fun ProfileScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             ProfileStatsCard(
-                name          = name,
-                username      = username,
-                level             = level,
-                totalPoints       = totalPoints,
-                pointsToNextLevel = pointsToNextLevel,
-                currentStreak = currentStreak,
-                longestStreak = longestStreak,
-                avatarUrl     = avatarUrl
+                info = ProfileStatsInfo(
+                    name          = name,
+                    username      = username,
+                    level             = level,
+                    totalPoints       = totalPoints,
+                    pointsToNextLevel = pointsToNextLevel,
+                    currentStreak = currentStreak,
+                    longestStreak = longestStreak,
+                    avatarUrl     = avatarUrl
+                )
             )
 
             Card(

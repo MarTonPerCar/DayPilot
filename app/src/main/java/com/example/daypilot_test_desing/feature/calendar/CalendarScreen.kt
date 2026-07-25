@@ -21,6 +21,8 @@ import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.core.ui.components.basic.*
 import com.example.daypilot_test_desing.core.ui.components.cards.*
 import com.example.daypilot_test_desing.core.ui.components.DayPilotCalendar
+import com.example.daypilot_test_desing.core.ui.components.DayPilotCalendarActions
+import com.example.daypilot_test_desing.core.ui.components.DayPilotCalendarState
 import com.example.daypilot_test_desing.core.ui.components.forms.TaskFormCard
 import com.example.daypilot_test_desing.core.ui.components.forms.TaskFormInitialData
 import com.example.daypilot_test_desing.core.data.model.CalendarTaskData
@@ -295,29 +297,33 @@ fun CalendarScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             DayPilotCalendar(
-                month = currentMonth,
-                year = currentYear,
-                taskDots = taskDots,
-                selectedDay = selectedDay,
-                onDaySelected = { selectedDay = it },
-                onPreviousMonth = {
-                    val newMonth = if (currentMonth == 1) 12 else currentMonth - 1
-                    val newYear  = if (currentMonth == 1) currentYear - 1 else currentYear
-                    currentMonth = newMonth
-                    currentYear  = newYear
-                    selectedDay  = autoSelectDay(newMonth, newYear)
-                },
-                onNextMonth = {
-                    val newMonth = if (currentMonth == 12) 1 else currentMonth + 1
-                    val newYear  = if (currentMonth == 12) currentYear + 1 else currentYear
-                    currentMonth = newMonth
-                    currentYear  = newYear
-                    selectedDay  = autoSelectDay(newMonth, newYear)
-                },
-                onAddTask = { day ->
-                    dayForNewTask = day
-                    showAddSheet = true
-                }
+                state = DayPilotCalendarState(
+                    month = currentMonth,
+                    year = currentYear,
+                    taskDots = taskDots,
+                    selectedDay = selectedDay
+                ),
+                actions = DayPilotCalendarActions(
+                    onDaySelected = { selectedDay = it },
+                    onPreviousMonth = {
+                        val newMonth = if (currentMonth == 1) 12 else currentMonth - 1
+                        val newYear  = if (currentMonth == 1) currentYear - 1 else currentYear
+                        currentMonth = newMonth
+                        currentYear  = newYear
+                        selectedDay  = autoSelectDay(newMonth, newYear)
+                    },
+                    onNextMonth = {
+                        val newMonth = if (currentMonth == 12) 1 else currentMonth + 1
+                        val newYear  = if (currentMonth == 12) currentYear + 1 else currentYear
+                        currentMonth = newMonth
+                        currentYear  = newYear
+                        selectedDay  = autoSelectDay(newMonth, newYear)
+                    },
+                    onAddTask = { day ->
+                        dayForNewTask = day
+                        showAddSheet = true
+                    }
+                )
             )
 
             selectedDay?.let {

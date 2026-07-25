@@ -34,23 +34,35 @@ import com.example.daypilot_test_desing.core.ui.components.forms.AppLimitFormCar
 import com.example.daypilot_test_desing.core.data.model.AppRestriction
 import com.example.daypilot_test_desing.core.data.model.GroupRestriction
 
+data class TechHealthActions(
+    val onSaveApp: (AppRestriction, isEdit: Boolean) -> Unit,
+    val onSaveGroup: (GroupRestriction, isEdit: Boolean) -> Unit,
+    val onToggleRestriction: (String, Boolean) -> Unit,
+    val onDeleteRestriction: (String) -> Unit,
+    val onToggleGroup: (String, Boolean) -> Unit,
+    val onDeleteGroup: (String) -> Unit,
+    val onBack: () -> Unit
+)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TechHealthScreen(
-    appRestrictions: List<AppRestriction>,
-    groupRestrictions: List<GroupRestriction>,
-    hasUsagePermission: Boolean = true,
-    hasAccessibilityPermission: Boolean = false,
-    techHealthPointEarned: Boolean = false,
-    activeRestrictionCount: Int = 0,
-    onSaveApp: (AppRestriction, isEdit: Boolean) -> Unit,
-    onSaveGroup: (GroupRestriction, isEdit: Boolean) -> Unit,
-    onToggleRestriction: (String, Boolean) -> Unit,
-    onDeleteRestriction: (String) -> Unit,
-    onToggleGroup: (String, Boolean) -> Unit,
-    onDeleteGroup: (String) -> Unit,
-    onBack: () -> Unit
+    state: TechHealthUiState,
+    actions: TechHealthActions
 ) {
+    val appRestrictions             = state.appRestrictions
+    val groupRestrictions           = state.groupRestrictions
+    val hasUsagePermission          = state.hasUsagePermission
+    val hasAccessibilityPermission  = state.hasAccessibilityPermission
+    val techHealthPointEarned       = state.techHealthPointEarned
+    val activeRestrictionCount      = state.activeRestrictionCount
+    val onSaveApp             = actions.onSaveApp
+    val onSaveGroup            = actions.onSaveGroup
+    val onToggleRestriction    = actions.onToggleRestriction
+    val onDeleteRestriction    = actions.onDeleteRestriction
+    val onToggleGroup          = actions.onToggleGroup
+    val onDeleteGroup          = actions.onDeleteGroup
+    val onBack                  = actions.onBack
     if (!hasUsagePermission || !hasAccessibilityPermission) {
         TechHealthPermissionGate(
             hasUsagePermission         = hasUsagePermission,

@@ -37,6 +37,7 @@ import com.example.daypilot_test_desing.core.ui.components.basic.DayPilotButtonT
 import com.example.daypilot_test_desing.core.ui.components.basic.DayPilotDropdownField
 import com.example.daypilot_test_desing.core.ui.components.basic.DayPilotPasswordField
 import com.example.daypilot_test_desing.core.ui.components.basic.DayPilotTextField
+import com.example.daypilot_test_desing.core.ui.components.basic.DayPilotTextFieldOptions
 import com.example.daypilot_test_desing.core.data.model.TimeZoneRegion
 import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
 
@@ -115,8 +116,10 @@ fun LoginCard(
             value = email,
             onValueChange = { email = it },
             label = stringResource(R.string.email),
-            keyboardType = KeyboardType.Email,
-            isError = errorMessage.isNotEmpty()
+            options = DayPilotTextFieldOptions(
+                keyboardType = KeyboardType.Email,
+                isError = errorMessage.isNotEmpty()
+            )
         )
 
         DayPilotPasswordField(
@@ -187,8 +190,10 @@ fun RegisterCard(
             value = email,
             onValueChange = { email = it },
             label = stringResource(R.string.email),
-            keyboardType = KeyboardType.Email,
-            isError = errorMessage.isNotEmpty()
+            options = DayPilotTextFieldOptions(
+                keyboardType = KeyboardType.Email,
+                isError = errorMessage.isNotEmpty()
+            )
         )
 
         DayPilotPasswordField(

@@ -38,15 +38,16 @@ import com.example.daypilot_test_desing.core.data.model.RankingData
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RivalryScreen(
-    currentUserName: String,
-    currentUserId: String,
-    currentUserPosition: Int,
-    currentUserPoints: Int,
-    currentUserStreak: Int,
-    currentUserLevel: Int,
-    ranking: List<RankingData>,
+    state: RivalryUiState,
     onBack: () -> Unit
 ) {
+    val currentUserName     = state.currentUserName
+    val currentUserId       = state.currentUserId
+    val currentUserPosition = state.currentUserPosition
+    val currentUserPoints   = state.currentUserPoints
+    val currentUserStreak   = state.currentUserStreak
+    val currentUserLevel    = state.currentUserLevel
+    val ranking              = state.ranking
     val hasFriends = ranking.any { it.id != currentUserId }
 
     Scaffold(

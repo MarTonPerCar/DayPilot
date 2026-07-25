@@ -87,6 +87,7 @@ import com.example.daypilot_test_desing.feature.friends.SearchFriendsActions
 import com.example.daypilot_test_desing.feature.friends.SearchFriendsScreen
 import com.example.daypilot_test_desing.feature.settings.SettingsActions
 import com.example.daypilot_test_desing.feature.settings.SettingsScreen
+import com.example.daypilot_test_desing.feature.techhealth.TechHealthActions
 import com.example.daypilot_test_desing.feature.techhealth.TechHealthScreen
 import com.example.daypilot_test_desing.feature.timer.TimerHubScreen
 import com.example.daypilot_test_desing.feature.timer.TimerScreen
@@ -460,14 +461,8 @@ fun DayPilotNavGraph(
                 LaunchedEffect(Unit) { progressVM.refresh() }
                 val s by progressVM.uiState.collectAsState()
                 ProgressScreen(
-                    progressData    = s.progressData,
-                    rankingPosition = s.rankingPosition,
-                    pointsToday     = s.pointsToday,
-                    pointsFromTasks = s.pointsFromTasks,
-                    pointsFromSteps = s.pointsFromSteps,
-                    pointsFromHabits= s.pointsFromHabits,
-                    pointsFromTimers= s.pointsFromTimers,
-                    onBack          = { navController.popBackStack() }
+                    state = s,
+                    onBack = { navController.popBackStack() }
                 )
             }
 
@@ -475,14 +470,8 @@ fun DayPilotNavGraph(
                 LaunchedEffect(Unit) { rivalryVM.refresh() }
                 val s by rivalryVM.uiState.collectAsState()
                 RivalryScreen(
-                    currentUserName     = s.currentUserName,
-                    currentUserId       = s.currentUserId,
-                    currentUserPosition = s.currentUserPosition,
-                    currentUserPoints   = s.currentUserPoints,
-                    currentUserStreak   = s.currentUserStreak,
-                    currentUserLevel    = s.currentUserLevel,
-                    ranking             = s.ranking,
-                    onBack              = { navController.popBackStack() }
+                    state = s,
+                    onBack = { navController.popBackStack() }
                 )
             }
 
@@ -539,19 +528,16 @@ fun DayPilotNavGraph(
                 }
                 val s by techHealthVM.uiState.collectAsState()
                 TechHealthScreen(
-                    appRestrictions        = s.appRestrictions,
-                    groupRestrictions      = s.groupRestrictions,
-                    hasUsagePermission     = s.hasUsagePermission,
-                    hasAccessibilityPermission = s.hasAccessibilityPermission,
-                    techHealthPointEarned  = s.techHealthPointEarned,
-                    activeRestrictionCount = s.activeRestrictionCount,
-                    onSaveApp              = { restriction, _ -> techHealthVM.saveApp(restriction) },
-                    onSaveGroup            = { group, _       -> techHealthVM.saveGroup(group) },
-                    onToggleRestriction    = techHealthVM::toggleRestriction,
-                    onDeleteRestriction    = techHealthVM::deleteRestriction,
-                    onToggleGroup          = techHealthVM::toggleGroup,
-                    onDeleteGroup          = techHealthVM::deleteGroup,
-                    onBack                 = { navController.popBackStack() }
+                    state = s,
+                    actions = TechHealthActions(
+                        onSaveApp              = { restriction, _ -> techHealthVM.saveApp(restriction) },
+                        onSaveGroup            = { group, _       -> techHealthVM.saveGroup(group) },
+                        onToggleRestriction    = techHealthVM::toggleRestriction,
+                        onDeleteRestriction    = techHealthVM::deleteRestriction,
+                        onToggleGroup          = techHealthVM::toggleGroup,
+                        onDeleteGroup          = techHealthVM::deleteGroup,
+                        onBack                 = { navController.popBackStack() }
+                    )
                 )
             }
         }

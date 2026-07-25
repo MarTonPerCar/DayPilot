@@ -51,6 +51,7 @@ import com.example.daypilot_test_desing.core.ui.components.basic.AppInfo
 import com.example.daypilot_test_desing.core.ui.components.basic.AppMultiPickerSheet
 import com.example.daypilot_test_desing.core.ui.components.basic.AppPickerSheet
 import com.example.daypilot_test_desing.core.ui.components.basic.DayPilotTextField
+import com.example.daypilot_test_desing.core.ui.components.basic.DayPilotTextFieldOptions
 import com.example.daypilot_test_desing.core.data.model.AppRestriction
 import com.example.daypilot_test_desing.core.data.model.GroupRestriction
 import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
@@ -265,7 +266,9 @@ fun AppLimitFormCard(
                     value = groupName,
                     onValueChange = { groupName = it },
                     label = stringResource(R.string.app_limit_form_group_name_label),
-                    placeholder = stringResource(R.string.app_limit_form_group_name_placeholder)
+                    options = DayPilotTextFieldOptions(
+                        placeholder = stringResource(R.string.app_limit_form_group_name_placeholder)
+                    )
                 )
                 Text(
                     text = stringResource(R.string.app_limit_form_group_apps_label),

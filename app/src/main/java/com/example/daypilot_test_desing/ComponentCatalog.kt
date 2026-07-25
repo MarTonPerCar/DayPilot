@@ -14,6 +14,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.core.ui.components.DayPilotCalendar
+import com.example.daypilot_test_desing.core.ui.components.DayPilotCalendarActions
+import com.example.daypilot_test_desing.core.ui.components.DayPilotCalendarState
 import com.example.daypilot_test_desing.core.ui.components.basic.*
 import com.example.daypilot_test_desing.core.ui.components.cards.*
 import com.example.daypilot_test_desing.core.ui.components.forms.*
@@ -67,9 +69,9 @@ fun CatalogBasicInputs() {
             CatalogSection("TextFields") {
                 var text by remember { mutableStateOf("") }
                 var pass  by remember { mutableStateOf("") }
-                DayPilotTextField(value = text, onValueChange = { text = it }, label = "Name", leadingIcon = Icons.Default.Person)
+                DayPilotTextField(value = text, onValueChange = { text = it }, label = "Name", options = DayPilotTextFieldOptions(leadingIcon = Icons.Default.Person))
                 DayPilotPasswordField(value = pass, onValueChange = { pass = it })
-                DayPilotTextField(value = "Error field", onValueChange = {}, label = "Email", isError = true, errorMessage = "Invalid email")
+                DayPilotTextField(value = "Error field", onValueChange = {}, label = "Email", options = DayPilotTextFieldOptions(isError = true, errorMessage = "Invalid email"))
             }
         }
     }
@@ -268,7 +270,7 @@ fun CatalogCardsStats() {
         ) {
             CatalogSection("Stats & Profile Cards") {
                 StatsCard(rankingPosition = 2, pointsToday = 8, pointsFromTasks = 4, pointsFromSteps = 2, pointsFromHabits = 1, pointsFromTimers = 1)
-                ProfileStatsCard(name = "Mario García", username = "mariogarcia", level = 7, totalPoints = 340, pointsToNextLevel = 350, currentStreak = 7, longestStreak = 14)
+                ProfileStatsCard(info = ProfileStatsInfo(name = "Mario García", username = "mariogarcia", level = 7, totalPoints = 340, pointsToNextLevel = 350, currentStreak = 7, longestStreak = 14))
                 ProfileInfoRow(label = "Email",    value = "mario@example.com")
                 ProfileInfoRow(label = "Username", value = "@mariogarcia")
             }
@@ -277,10 +279,10 @@ fun CatalogCardsStats() {
                     summary = WeeklySummaryData(totalPoints = 45, tasksCompleted = 12, totalSteps = 42000, bestStreak = 7,
                         reactions = listOf(ReceivedReaction("Ana", ReactionType.CLAP), ReceivedReaction("Carlos", ReactionType.FIRE)))
                 )
-                DailySummaryCard(userName = "Mario", streak = 7, stepsToday = 1200, stepsGoal = 2000, tasksCompleted = 3, tasksTotal = 5, pointsToday = 8, rankingPosition = 2)
+                DailySummaryCard(info = DailySummaryInfo(userName = "Mario", streak = 7, stepsToday = 1200, stepsGoal = 2000, tasksCompleted = 3, tasksTotal = 5, pointsToday = 8, rankingPosition = 2))
             }
             CatalogSection("Steps & App Limit Cards") {
-                StepsCard(currentSteps = 1200, goalSteps = 2000, pointsEarned = 1, pointsRemaining = 5, onConfigureGoal = { _ -> })
+                StepsCard(info = StepsCardInfo(currentSteps = 1200, goalSteps = 2000, pointsEarned = 1, pointsRemaining = 5), onConfigureGoal = { _ -> })
                 StepsSummaryCard(totalSteps7Days = 42000, bestDaySteps = 8500, dailyAverage = 6000, goalStreak = 4)
                 AppLimitCard(
                     restriction = AppRestriction(id = "1", appName = "YouTube", packageName = "com.google.youtube", dailyLimitMinutes = 120, isEnabled = true, usedMinutesToday = 45),
@@ -321,17 +323,21 @@ fun CatalogCardsCalendar() {
             }
             CatalogSection("Calendar") {
                 DayPilotCalendar(
-                    month = 5, year = 2026,
-                    taskDots = listOf(
-                        CalendarTaskDot(day = 5,  month = 5, year = 2026, color = Color(0xFF4CAF50)),
-                        CalendarTaskDot(day = 10, month = 5, year = 2026, color = Color(0xFFFF9800)),
-                        CalendarTaskDot(day = 15, month = 5, year = 2026, color = Color(0xFFF44336))
+                    state = DayPilotCalendarState(
+                        month = 5, year = 2026,
+                        taskDots = listOf(
+                            CalendarTaskDot(day = 5,  month = 5, year = 2026, color = Color(0xFF4CAF50)),
+                            CalendarTaskDot(day = 10, month = 5, year = 2026, color = Color(0xFFFF9800)),
+                            CalendarTaskDot(day = 15, month = 5, year = 2026, color = Color(0xFFF44336))
+                        ),
+                        selectedDay     = 5
                     ),
-                    selectedDay     = 5,
-                    onDaySelected   = {},
-                    onPreviousMonth = {},
-                    onNextMonth     = {},
-                    onAddTask       = {}
+                    actions = DayPilotCalendarActions(
+                        onDaySelected   = {},
+                        onPreviousMonth = {},
+                        onNextMonth     = {},
+                        onAddTask       = {}
+                    )
                 )
             }
         }

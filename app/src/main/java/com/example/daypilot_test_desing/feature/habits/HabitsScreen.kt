@@ -65,12 +65,14 @@ fun HabitsScreen(
             )
 
             StepsCard(
-                currentSteps    = currentSteps,
-                goalSteps       = goalSteps,
-                pointsEarned    = pointsEarned,
-                pointsRemaining = pointsRemaining,
-                goalLocked      = goalChangedToday,
-                pendingGoal     = pendingGoal,
+                info = StepsCardInfo(
+                    currentSteps    = currentSteps,
+                    goalSteps       = goalSteps,
+                    pointsEarned    = pointsEarned,
+                    pointsRemaining = pointsRemaining,
+                    goalLocked      = goalChangedToday,
+                    pendingGoal     = pendingGoal
+                ),
                 onConfigureGoal = onConfigureGoal
             )
 

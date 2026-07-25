@@ -36,6 +36,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -58,18 +59,29 @@ import com.example.daypilot_test_desing.core.ui.components.basic.MilestoneChip
 import com.example.daypilot_test_desing.core.ui.components.basic.StepStatRow
 import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
 
+@Immutable
+data class StepsCardInfo(
+    val currentSteps: Int,
+    val goalSteps: Int,
+    val pointsEarned: Int,
+    val pointsRemaining: Int,
+    val goalLocked: Boolean = false,
+    val pendingGoal: Int? = null
+)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StepsCard(
-    currentSteps: Int,
-    goalSteps: Int,
-    pointsEarned: Int,
-    pointsRemaining: Int,
-    goalLocked: Boolean = false,
-    pendingGoal: Int? = null,
+    info: StepsCardInfo,
     onConfigureGoal: (newGoal: Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val currentSteps    = info.currentSteps
+    val goalSteps        = info.goalSteps
+    val pointsEarned      = info.pointsEarned
+    val pointsRemaining   = info.pointsRemaining
+    val goalLocked        = info.goalLocked
+    val pendingGoal       = info.pendingGoal
     var showGoalSheet by remember { mutableStateOf(false) }
     var sliderValue by remember(goalSteps) { mutableFloatStateOf(goalSteps.toFloat()) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -363,10 +375,12 @@ fun StepsCardPreview() {
                 .padding(16.dp)
         ) {
             StepsCard(
-                currentSteps = 1200,
-                goalSteps = 2000,
-                pointsEarned = 1,
-                pointsRemaining = 5,
+                info = StepsCardInfo(
+                    currentSteps = 1200,
+                    goalSteps = 2000,
+                    pointsEarned = 1,
+                    pointsRemaining = 5
+                ),
                 onConfigureGoal = {}
             )
         }

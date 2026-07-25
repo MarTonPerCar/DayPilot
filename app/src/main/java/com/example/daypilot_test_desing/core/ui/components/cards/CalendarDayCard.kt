@@ -15,6 +15,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,18 +27,30 @@ import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.core.ui.components.basic.TaskDot
 import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
 
+@Immutable
+data class CalendarDayCardState(
+    val day: Int,
+    val isToday: Boolean = false,
+    val isSelected: Boolean = false,
+    val hasEasyTask: Boolean = false,
+    val hasMediumTask: Boolean = false,
+    val hasHardTask: Boolean = false,
+    val isCurrentMonth: Boolean = true
+)
+
 @Composable
 fun CalendarDayCard(
-    modifier: Modifier = Modifier,
-    day: Int,
-    isToday: Boolean = false,
-    isSelected: Boolean = false,
-    hasEasyTask: Boolean = false,
-    hasMediumTask: Boolean = false,
-    hasHardTask: Boolean = false,
-    isCurrentMonth: Boolean = true,
-    onClick: () -> Unit
+    state: CalendarDayCardState,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
+    val day            = state.day
+    val isToday        = state.isToday
+    val isSelected     = state.isSelected
+    val hasEasyTask    = state.hasEasyTask
+    val hasMediumTask  = state.hasMediumTask
+    val hasHardTask    = state.hasHardTask
+    val isCurrentMonth = state.isCurrentMonth
     val bgColor by animateColorAsState(
         targetValue = when {
             isSelected -> MaterialTheme.colorScheme.primary
@@ -117,65 +130,49 @@ fun CalendarDayCardPreview() {
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 CalendarDayCard(
-                    day = 14,
-                    isToday = false,
-                    isSelected = false,
-                    isCurrentMonth = true,
+                    state = CalendarDayCardState(day = 14, isToday = false, isSelected = false, isCurrentMonth = true),
                     onClick = {},
                     modifier = Modifier.weight(1f)
                 )
                 CalendarDayCard(
-                    day = 15,
-                    isToday = true,
-                    isSelected = false,
-                    hasEasyTask = true,
-                    hasMediumTask = true,
-                    isCurrentMonth = true,
+                    state = CalendarDayCardState(
+                        day = 15, isToday = true, isSelected = false,
+                        hasEasyTask = true, hasMediumTask = true, isCurrentMonth = true
+                    ),
                     onClick = {},
                     modifier = Modifier.weight(1f)
                 )
                 CalendarDayCard(
-                    day = 16,
-                    isToday = false,
-                    isSelected = true,
-                    hasHardTask = true,
-                    isCurrentMonth = true,
+                    state = CalendarDayCardState(
+                        day = 16, isToday = false, isSelected = true,
+                        hasHardTask = true, isCurrentMonth = true
+                    ),
                     onClick = {},
                     modifier = Modifier.weight(1f)
                 )
                 CalendarDayCard(
-                    day = 17,
-                    isToday = false,
-                    isSelected = false,
-                    hasEasyTask = true,
-                    hasMediumTask = true,
-                    hasHardTask = true,
-                    isCurrentMonth = true,
+                    state = CalendarDayCardState(
+                        day = 17, isToday = false, isSelected = false,
+                        hasEasyTask = true, hasMediumTask = true, hasHardTask = true, isCurrentMonth = true
+                    ),
                     onClick = {},
                     modifier = Modifier.weight(1f)
                 )
                 CalendarDayCard(
-                    day = 18,
-                    isToday = false,
-                    isSelected = false,
-                    isCurrentMonth = false,
+                    state = CalendarDayCardState(day = 18, isToday = false, isSelected = false, isCurrentMonth = false),
                     onClick = {},
                     modifier = Modifier.weight(1f)
                 )
                 CalendarDayCard(
-                    day = 19,
-                    isToday = false,
-                    isSelected = false,
-                    isCurrentMonth = true,
+                    state = CalendarDayCardState(day = 19, isToday = false, isSelected = false, isCurrentMonth = true),
                     onClick = {},
                     modifier = Modifier.weight(1f)
                 )
                 CalendarDayCard(
-                    day = 20,
-                    isToday = false,
-                    isSelected = false,
-                    hasEasyTask = true,
-                    isCurrentMonth = true,
+                    state = CalendarDayCardState(
+                        day = 20, isToday = false, isSelected = false,
+                        hasEasyTask = true, isCurrentMonth = true
+                    ),
                     onClick = {},
                     modifier = Modifier.weight(1f)
                 )
