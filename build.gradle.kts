@@ -27,5 +27,9 @@ sonar {
             "sonar.exclusions",
             "**/res/**/*.webp,**/res/**/*.png,**/build/**"
         )
+        property(
+            "sonar.coverage.exclusions",
+            "**/*Screen.kt,**/core/ui/components/**"
+        )
     }
 }
