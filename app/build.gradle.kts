@@ -110,7 +110,6 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         html.required.set(true)
     }
 
-    // Generated code and tests themselves don't belong in a coverage number.
     val excludes = listOf(
         "**/R.class", "**/R$*.class", "**/BuildConfig.*", "**/Manifest*.*",
         "**/*Test*.*", "**/di/**", "android/**/*.*"
