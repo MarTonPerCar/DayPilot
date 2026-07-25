@@ -451,13 +451,13 @@ private fun GroupAppPickerSheetDialog(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppLimitFormCard(
+    onSaveApp: (AppRestriction) -> Unit,
+    onSaveGroup: (GroupRestriction) -> Unit,
+    onCancel: () -> Unit,
     modifier: Modifier = Modifier,
     isEditing: Boolean = false,
     initialApp: AppRestriction? = null,
     initialGroup: GroupRestriction? = null,
-    onSaveApp: (AppRestriction) -> Unit,
-    onSaveGroup: (GroupRestriction) -> Unit,
-    onCancel: () -> Unit,
 ) {
     var restrictionType by remember {
         mutableStateOf(if (initialGroup != null) RestrictionType.GROUP else RestrictionType.APP)

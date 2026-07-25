@@ -58,9 +58,9 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun DayPilotReactionBar(
+    onReact: (ReactionType) -> Unit,
     modifier: Modifier = Modifier,
-    selectedReaction: ReactionType? = null,
-    onReact: (ReactionType) -> Unit
+    selectedReaction: ReactionType? = null
 ) {
     Row(
         modifier = modifier

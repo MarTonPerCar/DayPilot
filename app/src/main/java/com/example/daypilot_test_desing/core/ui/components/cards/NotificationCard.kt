@@ -30,13 +30,13 @@ import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
 
 @Composable
 fun NotificationCard(
-    modifier: Modifier = Modifier,
     title: String,
     message: String,
     timeAgo: String,
     type: NotificationType,
-    isRead: Boolean = false,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    isRead: Boolean = false
 ) {
     Row(
         modifier = modifier
