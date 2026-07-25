@@ -194,6 +194,94 @@ fun DayPilotReactionSummary(
 }
 
 @Composable
+private fun ReactionToggleIcon(alreadyReacted: Boolean, rotation: Float) {
+    AnimatedContent(
+        targetState = alreadyReacted,
+        transitionSpec = {
+            (fadeIn(spring(stiffness = Spring.StiffnessMedium)) +
+             scaleIn(spring(dampingRatio = Spring.DampingRatioMediumBouncy))) togetherWith
+            (fadeOut(tween(80)) + scaleOut(tween(80)))
+        },
+        label = "reaction_icon"
+    ) { reacted ->
+        if (reacted) {
+            Icon(
+                imageVector = Icons.Default.Check,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier.size(16.dp)
+            )
+        } else {
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier
+                    .size(16.dp)
+                    .rotate(rotation)
+            )
+        }
+    }
+}
+
+@Composable
+private fun ReactionPickerItem(reaction: ReactionType, onSelected: () -> Unit) {
+    var pressed by remember { mutableStateOf(false) }
+    val scale by animateFloatAsState(
+        targetValue = if (pressed) 1.4f else 1f,
+        animationSpec = tween(150),
+        label = "reaction_scale_${reaction.name}",
+        finishedListener = {
+            if (pressed) {
+                onSelected()
+                pressed = false
+            }
+        }
+    )
+    Box(
+        modifier = Modifier
+            .size(36.dp)
+            .clip(CircleShape)
+            .background(Color.Transparent)
+            .clickable { pressed = true },
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = stringResource(reaction.emojiRes),
+            fontSize = 20.sp,
+            modifier = Modifier.scale(scale)
+        )
+    }
+}
+
+@Composable
+private fun ReactionPickerRow(onReact: (ReactionType) -> Unit, onDismiss: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .clip(RoundedCornerShape(50))
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .border(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                shape = RoundedCornerShape(50)
+            )
+            .padding(horizontal = 8.dp, vertical = 6.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        ReactionType.entries.forEach { reaction ->
+            ReactionPickerItem(
+                reaction = reaction,
+                onSelected = {
+                    onReact(reaction)
+                    onDismiss()
+                }
+            )
+        }
+    }
+}
+
+@Composable
 fun DayPilotReactionButton(
     selectedReaction: ReactionType? = null,
     onReact: (ReactionType) -> Unit = {},
@@ -217,33 +305,7 @@ fun DayPilotReactionButton(
                 .clickable(enabled = !alreadyReacted) { expanded = !expanded },
             contentAlignment = Alignment.Center
         ) {
-            AnimatedContent(
-                targetState = alreadyReacted,
-                transitionSpec = {
-                    (fadeIn(spring(stiffness = Spring.StiffnessMedium)) +
-                     scaleIn(spring(dampingRatio = Spring.DampingRatioMediumBouncy))) togetherWith
-                    (fadeOut(tween(80)) + scaleOut(tween(80)))
-                },
-                label = "reaction_icon"
-            ) { reacted ->
-                if (reacted) {
-                    Icon(
-                        imageVector = Icons.Default.Check,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier.size(16.dp)
-                    )
-                } else {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier
-                            .size(16.dp)
-                            .rotate(rotation)
-                    )
-                }
-            }
+            ReactionToggleIcon(alreadyReacted = alreadyReacted, rotation = rotation)
         }
 
         if (expanded && !alreadyReacted) {
@@ -264,49 +326,7 @@ fun DayPilotReactionButton(
                         transformOrigin = TransformOrigin(1f, 1f)
                     )
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(50))
-                            .background(MaterialTheme.colorScheme.surfaceVariant)
-                            .border(
-                                width = 1.dp,
-                                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
-                                shape = RoundedCornerShape(50)
-                            )
-                            .padding(horizontal = 8.dp, vertical = 6.dp),
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        ReactionType.entries.forEach { reaction ->
-                            var pressed by remember { mutableStateOf(false) }
-                            val scale by animateFloatAsState(
-                                targetValue = if (pressed) 1.4f else 1f,
-                                animationSpec = tween(150),
-                                label = "reaction_scale_${reaction.name}",
-                                finishedListener = {
-                                    if (pressed) {
-                                        onReact(reaction)
-                                        expanded = false
-                                        pressed = false
-                                    }
-                                }
-                            )
-                            Box(
-                                modifier = Modifier
-                                    .size(36.dp)
-                                    .clip(CircleShape)
-                                    .background(Color.Transparent)
-                                    .clickable { pressed = true },
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = stringResource(reaction.emojiRes),
-                                    fontSize = 20.sp,
-                                    modifier = Modifier.scale(scale)
-                                )
-                            }
-                        }
-                    }
+                    ReactionPickerRow(onReact = onReact, onDismiss = { expanded = false })
                 }
             }
         }
