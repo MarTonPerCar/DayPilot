@@ -46,6 +46,105 @@ data class EditProfileActions(
     val onBack: () -> Unit
 )
 
+@Composable
+private fun AvatarPicker(
+    name: String,
+    avatarUrl: String?,
+    isUploadingAvatar: Boolean,
+    onEditClick: () -> Unit
+) {
+    Box(contentAlignment = Alignment.BottomEnd) {
+        Box(contentAlignment = Alignment.Center) {
+            DayPilotAvatar(
+                name      = name,
+                avatarUrl = avatarUrl,
+                size      = 90
+            )
+            if (isUploadingAvatar) {
+                CircularProgressIndicator(
+                    modifier    = Modifier.size(90.dp),
+                    strokeWidth = 3.dp,
+                    color       = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
+                )
+            }
+        }
+        Box(
+            modifier = Modifier
+                .size(28.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.primary),
+            contentAlignment = Alignment.Center
+        ) {
+            IconButton(
+                onClick  = onEditClick,
+                modifier = Modifier.size(28.dp)
+            ) {
+                Icon(
+                    imageVector        = Icons.Default.CameraAlt,
+                    contentDescription = stringResource(R.string.edit_profile_change_photo),
+                    tint               = MaterialTheme.colorScheme.onPrimary,
+                    modifier           = Modifier.size(14.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun PhotoPickerDialogHost(
+    show: Boolean,
+    onDismiss: () -> Unit,
+    onPhotoSelected: (Uri) -> Unit
+) {
+    val context = LocalContext.current
+
+    val cropLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        val croppedUri = UCrop.getOutput(result.data ?: return@rememberLauncherForActivityResult)
+        croppedUri?.let { onPhotoSelected(it) }
+    }
+
+    fun launchCrop(sourceUri: Uri) {
+        val destFile = File(context.cacheDir, "avatar_cropped_${System.currentTimeMillis()}.jpg")
+        val destUri  = Uri.fromFile(destFile)
+        UCrop.of(sourceUri, destUri)
+            .withAspectRatio(1f, 1f)
+            .withMaxResultSize(512, 512)
+            .getIntent(context)
+            .also { cropLauncher.launch(it) }
+    }
+
+    var cameraUri by remember { mutableStateOf<Uri?>(null) }
+
+    val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+        if (success) cameraUri?.let { launchCrop(it) }
+    }
+
+    val galleryLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        uri?.let { launchCrop(it) }
+    }
+
+    if (show) {
+        DayPilotPhotoPickerDialog(
+            onDismiss         = onDismiss,
+            onPickFromCamera  = {
+                onDismiss()
+                val tempFile = File(context.cacheDir, "avatar_temp.jpg")
+                val uri = FileProvider.getUriForFile(
+                    context,
+                    "${context.packageName}.fileprovider",
+                    tempFile
+                )
+                cameraUri = uri
+                cameraLauncher.launch(uri)
+            },
+            onPickFromGallery = {
+                onDismiss()
+                galleryLauncher.launch("image/*")
+            }
+        )
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditProfileScreen(
@@ -79,53 +178,13 @@ fun EditProfileScreen(
         }
     }
 
-    val cropLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        val croppedUri = UCrop.getOutput(result.data ?: return@rememberLauncherForActivityResult)
-        croppedUri?.let { onPhotoSelected(it) }
-    }
-
-    fun launchCrop(sourceUri: Uri) {
-        val destFile = File(context.cacheDir, "avatar_cropped_${System.currentTimeMillis()}.jpg")
-        val destUri  = Uri.fromFile(destFile)
-        UCrop.of(sourceUri, destUri)
-            .withAspectRatio(1f, 1f)
-            .withMaxResultSize(512, 512)
-            .getIntent(context)
-            .also { cropLauncher.launch(it) }
-    }
-
-    var cameraUri by remember { mutableStateOf<Uri?>(null) }
-
-    val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
-        if (success) cameraUri?.let { launchCrop(it) }
-    }
-
-    val galleryLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        uri?.let { launchCrop(it) }
-    }
-
     val regions = TimeZoneRegion.entries
 
-    if (showPhotoDialog) {
-        DayPilotPhotoPickerDialog(
-            onDismiss         = { showPhotoDialog = false },
-            onPickFromCamera  = {
-                showPhotoDialog = false
-                val tempFile = File(context.cacheDir, "avatar_temp.jpg")
-                val uri = FileProvider.getUriForFile(
-                    context,
-                    "${context.packageName}.fileprovider",
-                    tempFile
-                )
-                cameraUri = uri
-                cameraLauncher.launch(uri)
-            },
-            onPickFromGallery = {
-                showPhotoDialog = false
-                galleryLauncher.launch("image/*")
-            }
-        )
-    }
+    PhotoPickerDialogHost(
+        show = showPhotoDialog,
+        onDismiss = { showPhotoDialog = false },
+        onPhotoSelected = onPhotoSelected
+    )
 
     Scaffold(
         topBar = {
@@ -148,41 +207,12 @@ fun EditProfileScreen(
         ) {
             Spacer(Modifier.height(8.dp))
 
-            Box(contentAlignment = Alignment.BottomEnd) {
-                Box(contentAlignment = Alignment.Center) {
-                    DayPilotAvatar(
-                        name      = name,
-                        avatarUrl = avatarUrl,
-                        size      = 90
-                    )
-                    if (isUploadingAvatar) {
-                        CircularProgressIndicator(
-                            modifier    = Modifier.size(90.dp),
-                            strokeWidth = 3.dp,
-                            color       = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
-                        )
-                    }
-                }
-                Box(
-                    modifier = Modifier
-                        .size(28.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primary),
-                    contentAlignment = Alignment.Center
-                ) {
-                    IconButton(
-                        onClick  = { if (!isUploadingAvatar) showPhotoDialog = true },
-                        modifier = Modifier.size(28.dp)
-                    ) {
-                        Icon(
-                            imageVector        = Icons.Default.CameraAlt,
-                            contentDescription = stringResource(R.string.edit_profile_change_photo),
-                            tint               = MaterialTheme.colorScheme.onPrimary,
-                            modifier           = Modifier.size(14.dp)
-                        )
-                    }
-                }
-            }
+            AvatarPicker(
+                name = name,
+                avatarUrl = avatarUrl,
+                isUploadingAvatar = isUploadingAvatar,
+                onEditClick = { if (!isUploadingAvatar) showPhotoDialog = true }
+            )
 
             TextButton(
                 onClick  = { showPhotoDialog = true },
