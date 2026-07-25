@@ -38,7 +38,7 @@ class AuthNotifier extends Notifier<AuthSession> {
 
   Future<void> login({required String email, required String password}) async {
     if (email.isEmpty || password.isEmpty) {
-      state = AuthSession(status: AuthStatus.unauthenticated, error: const EmptyCredentialsError());
+      state = const AuthSession(status: AuthStatus.unauthenticated, error: EmptyCredentialsError());
       return;
     }
     state = state.copyWith(status: AuthStatus.authenticating, error: null);
@@ -70,7 +70,7 @@ class AuthNotifier extends Notifier<AuthSession> {
     String? region,
   }) async {
     if (name.isEmpty || username.isEmpty || email.isEmpty || password.isEmpty) {
-      state = AuthSession(status: AuthStatus.unauthenticated, error: const EmptyRegisterFieldsError());
+      state = const AuthSession(status: AuthStatus.unauthenticated, error: EmptyRegisterFieldsError());
       return;
     }
     state = state.copyWith(status: AuthStatus.authenticating, error: null);
@@ -87,7 +87,7 @@ class AuthNotifier extends Notifier<AuthSession> {
             region: region,
           );
       if (user == null) {
-        state = AuthSession(status: AuthStatus.unauthenticated, error: const EmailConfirmationRequiredError());
+        state = const AuthSession(status: AuthStatus.unauthenticated, error: EmailConfirmationRequiredError());
         return;
       }
       _invalidateUserScopedProviders();

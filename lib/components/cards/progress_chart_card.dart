@@ -221,6 +221,21 @@ class _LineChartPainter extends CustomPainter {
     final maxValue = data.isEmpty ? 0.0 : data.reduce(max);
     final niceMax = _niceCeil(maxValue);
 
+    _drawGrid(canvas, chartRect, niceMax);
+    if (data.isEmpty) return;
+
+    final todayIndex = data.length - 1;
+    final points = _computePoints(chartRect, niceMax);
+
+    _drawArea(canvas, chartRect, points);
+    _drawLine(canvas, points);
+    _drawDots(canvas, points);
+    _drawTodayMarker(canvas, chartRect, points[todayIndex]);
+    _drawValueLabels(canvas, points, todayIndex);
+    _drawDayLabels(canvas, chartRect, points, todayIndex);
+  }
+
+  void _drawGrid(Canvas canvas, Rect chartRect, double niceMax) {
     for (int i = 0; i <= 4; i++) {
       final v = niceMax * i / 4;
       final y = chartRect.bottom - chartRect.height * (i / 4);
@@ -234,19 +249,19 @@ class _LineChartPainter extends CustomPainter {
       final tp = _text(_fmtAxis(v), labelColor);
       tp.paint(canvas, Offset(0, y - tp.height / 2));
     }
+  }
 
-    if (data.isEmpty) return;
-
-    final todayIndex = data.length - 1;
-
-    final points = <Offset>[
+  List<Offset> _computePoints(Rect chartRect, double niceMax) {
+    return [
       for (int i = 0; i < data.length; i++)
         Offset(
           chartRect.left + chartRect.width * ((i + 0.5) / data.length),
           chartRect.bottom - chartRect.height * (niceMax == 0 ? 0 : (data[i] / niceMax).clamp(0.0, 1.0)),
         ),
     ];
+  }
 
+  void _drawArea(Canvas canvas, Rect chartRect, List<Offset> points) {
     final areaPath = Path()..moveTo(points.first.dx, chartRect.bottom);
     for (final p in points) {
       areaPath.lineTo(p.dx, p.dy);
@@ -262,7 +277,9 @@ class _LineChartPainter extends CustomPainter {
           colors: [lineColor.withAlpha(70), lineColor.withAlpha(0)],
         ).createShader(chartRect),
     );
+  }
 
+  void _drawLine(Canvas canvas, List<Offset> points) {
     final linePath = Path()..moveTo(points.first.dx, points.first.dy);
     for (final p in points.skip(1)) {
       linePath.lineTo(p.dx, p.dy);
@@ -276,29 +293,36 @@ class _LineChartPainter extends CustomPainter {
         ..strokeJoin = StrokeJoin.round
         ..strokeCap = StrokeCap.round,
     );
+  }
 
+  void _drawDots(Canvas canvas, List<Offset> points) {
     final dotPaint = Paint()..color = lineColor;
     for (final p in points) {
       canvas.drawCircle(p, 3, dotPaint);
     }
+  }
 
-    final todayX = points[todayIndex].dx;
+  void _drawTodayMarker(Canvas canvas, Rect chartRect, Offset todayPoint) {
     _drawDashedLine(
       canvas,
-      Offset(todayX, chartRect.top),
-      Offset(todayX, chartRect.bottom),
+      Offset(todayPoint.dx, chartRect.top),
+      Offset(todayPoint.dx, chartRect.bottom),
       Paint()
         ..color = lineColor.withAlpha(180)
         ..strokeWidth = 1.5,
     );
+  }
 
+  void _drawValueLabels(Canvas canvas, List<Offset> points, int todayIndex) {
     for (int i = 0; i < points.length; i++) {
       final isToday = i == todayIndex;
       if (i % daysStep != 0 && !isToday) continue;
       final tp = _text(_fmtAxis(data[i]), lineColor, bold: isToday);
       tp.paint(canvas, Offset(points[i].dx - tp.width / 2, points[i].dy - tp.height - 4));
     }
+  }
 
+  void _drawDayLabels(Canvas canvas, Rect chartRect, List<Offset> points, int todayIndex) {
     for (int i = 0; i < dayLabels.length && i < points.length; i++) {
       final isToday = i == todayIndex;
       final day = dayLabels[i];
@@ -347,13 +371,16 @@ class _LineChartPainter extends CustomPainter {
     final raw = maxValue / 4;
     final magnitude = pow(10, (log(raw) / ln10).floor()).toDouble();
     final residual = raw / magnitude;
-    final niceStep = residual <= 1
-        ? 1
-        : residual <= 2
-            ? 2
-            : residual <= 5
-                ? 5
-                : 10;
+    final int niceStep;
+    if (residual <= 1) {
+      niceStep = 1;
+    } else if (residual <= 2) {
+      niceStep = 2;
+    } else if (residual <= 5) {
+      niceStep = 5;
+    } else {
+      niceStep = 10;
+    }
     return niceStep * magnitude * 4;
   }
 

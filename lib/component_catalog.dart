@@ -44,6 +44,11 @@ import 'components/cards/month_calendar_card.dart';
 import 'components/cards/progress_chart_card.dart';
 import 'data/app_data.dart';
 
+// Sample names reused across this catalog's previews.
+const _sampleName1 = 'Mario García';
+const _sampleName2 = 'Ana López';
+const _sampleName3 = 'Carlos Ruiz';
+
 class ComponentCatalog extends StatefulWidget {
   const ComponentCatalog({super.key});
 
@@ -111,8 +116,8 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
         children: [
 
-          _SectionHeader('TopBar'),
-          _Preview(child: DayPilotTopBar(title: 'Sin botón atrás')),
+          const _SectionHeader('TopBar'),
+          const _Preview(child: DayPilotTopBar(title: 'Sin botón atrás')),
           const SizedBox(height: 8),
           _Preview(
             child: DayPilotTopBar(
@@ -134,7 +139,7 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             ),
           ),
 
-          _SectionHeader('Botones'),
+          const _SectionHeader('Botones'),
           Wrap(
             spacing: 8,
             runSpacing: 8,
@@ -161,7 +166,7 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             ],
           ),
 
-          _SectionHeader('Campos de texto'),
+          const _SectionHeader('Campos de texto'),
           const DayPilotTextField(
             label: 'Nombre de usuario',
             hint: 'p.ej. mario_garcia',
@@ -183,22 +188,22 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
           const SizedBox(height: 10),
           const DayPilotPasswordField(),
 
-          _SectionHeader('Avatar'),
-          Row(
+          const _SectionHeader('Avatar'),
+          const Row(
             children: [
-              const DayPilotAvatar(name: 'Mario García', size: 32),
-              const SizedBox(width: 12),
-              const DayPilotAvatar(name: 'Ana López', size: 44),
-              const SizedBox(width: 12),
-              const DayPilotAvatar(name: 'Carlos Ruiz', size: 56),
-              const SizedBox(width: 12),
-              const DayPilotAvatar(name: 'X', size: 44),
-              const SizedBox(width: 12),
-              const DayPilotAvatar(size: 44),
+              DayPilotAvatar(name: _sampleName1, size: 32),
+              SizedBox(width: 12),
+              DayPilotAvatar(name: _sampleName2, size: 44),
+              SizedBox(width: 12),
+              DayPilotAvatar(name: _sampleName3, size: 56),
+              SizedBox(width: 12),
+              DayPilotAvatar(name: 'X', size: 44),
+              SizedBox(width: 12),
+              DayPilotAvatar(size: 44),
             ],
           ),
 
-          _SectionHeader('Estado vacío'),
+          const _SectionHeader('Estado vacío'),
           const DayPilotEmptyState(
             icon: Icons.task_alt_outlined,
             title: 'Sin tareas por hoy',
@@ -210,14 +215,14 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             title: 'Sin amigos aún',
           ),
 
-          _SectionHeader('Separador'),
+          const _SectionHeader('Separador'),
           const DayPilotDivider(),
           const SizedBox(height: 8),
           const DayPilotDivider(label: 'o continúa con'),
           const SizedBox(height: 8),
           const DayPilotDivider(label: 'hoy'),
 
-          _SectionHeader('Filtros'),
+          const _SectionHeader('Filtros'),
           DayPilotFilterSelector<String>(
             options: _filterOptions,
             selected: _filter,
@@ -225,7 +230,7 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             onSelected: (s) => setState(() => _filter = s),
           ),
 
-          _SectionHeader('Punto de dificultad'),
+          const _SectionHeader('Punto de dificultad'),
           Row(
             children: [
               const TaskDot(priority: TaskDifficulty.easy),
@@ -246,7 +251,7 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             ],
           ),
 
-          _SectionHeader('Indicador de sección'),
+          const _SectionHeader('Indicador de sección'),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
@@ -267,7 +272,7 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             ),
           ),
 
-          _SectionHeader('Tarjeta de tarea'),
+          const _SectionHeader('Tarjeta de tarea'),
           TaskCard(
             title: 'Diseñar pantalla de inicio',
             description: 'Crear wireframe y componentes base',
@@ -292,7 +297,7 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             completed: true,
           ),
 
-          _SectionHeader('Tarjeta de tarea (deslizar)'),
+          const _SectionHeader('Tarjeta de tarea (deslizar)'),
           Text(
             'Desliza hacia la izquierda para eliminar',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -311,45 +316,45 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             onDelete: () => setState(() => _swipeEpoch++),
           ),
 
-          _SectionHeader('Ranking'),
-          RankingCard(
+          const _SectionHeader('Ranking'),
+          const RankingCard(
             position: 1,
             username: 'mario_garcia',
             points: 2840,
             streak: 12,
             isCurrentUser: true,
           ),
-          RankingCard(
+          const RankingCard(
             position: 2,
             username: 'ana_lopez',
             points: 2610,
             streak: 8,
           ),
-          RankingCard(
+          const RankingCard(
             position: 3,
             username: 'carlos_ruiz',
             points: 2290,
             streak: 5,
           ),
-          RankingCard(
+          const RankingCard(
             position: 4,
             username: 'lucia_fdez',
             points: 1870,
           ),
 
-          _SectionHeader('Podio'),
-          PodiumCard(
-            firstName: 'Mario García',
+          const _SectionHeader('Podio'),
+          const PodiumCard(
+            firstName: _sampleName1,
             firstPoints: 2840,
-            secondName: 'Ana López',
+            secondName: _sampleName2,
             secondPoints: 2610,
-            thirdName: 'Carlos Ruiz',
+            thirdName: _sampleName3,
             thirdPoints: 2290,
           ),
 
-          _SectionHeader('Tarjeta de amigo'),
+          const _SectionHeader('Tarjeta de amigo'),
           FriendCard(
-            name: 'Ana López',
+            name: _sampleName2,
             email: 'ana.lopez@daypilot.test',
             points: 2610,
             streak: 8,
@@ -374,14 +379,14 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             onDecline: () {},
           ),
 
-          _SectionHeader('Búsqueda de usuario'),
+          const _SectionHeader('Búsqueda de usuario'),
           const UserSearchCard(
             name: 'Nueva Persona',
             email: 'nueva.persona@daypilot.test',
           ),
           const SizedBox(height: 8),
           const UserSearchCard(
-            name: 'Ana López',
+            name: _sampleName2,
             email: 'ana.lopez@daypilot.test',
             isFriend: true,
           ),
@@ -392,7 +397,7 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             isPending: true,
           ),
 
-          _SectionHeader('Hub de hábitos'),
+          const _SectionHeader('Hub de hábitos'),
           HabitCard(
             icon: Icons.directions_walk_rounded,
             title: 'Pasos',
@@ -418,7 +423,7 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             onTap: () {},
           ),
 
-          _SectionHeader('Límite de app'),
+          const _SectionHeader('Límite de app'),
           AppLimitCard(
             appName: 'Instagram',
             appIcon: Icons.photo_camera_outlined,
@@ -436,7 +441,7 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             enabled: true,
           ),
 
-          _SectionHeader('Límite de grupo'),
+          const _SectionHeader('Límite de grupo'),
           GroupLimitCard(
             groupName: 'Redes sociales',
             groupIcon: Icons.people_alt_outlined,
@@ -447,7 +452,7 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             onToggle: () => setState(() => _groupEnabled = !_groupEnabled),
           ),
 
-          _SectionHeader('Notificación'),
+          const _SectionHeader('Notificación'),
           const NotificationCard(
             type: NotificationType.social,
             content: 'pedro_gz quiere ser tu amigo',
@@ -476,7 +481,7 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             read: false,
           ),
 
-          _SectionHeader('Temporizador activo'),
+          const _SectionHeader('Temporizador activo'),
           TimerCard(
             modeName: 'Pomodoro',
             progress: 0.65,
@@ -485,7 +490,7 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             onPlayPause: () {},
           ),
 
-          _SectionHeader('Hub de temporizadores'),
+          const _SectionHeader('Hub de temporizadores'),
           TimerHubCard(
             icon: Icons.timer_rounded,
             title: 'Pomodoro',
@@ -517,9 +522,9 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             onTap: () {},
           ),
 
-          _SectionHeader('Estadísticas de perfil'),
+          const _SectionHeader('Estadísticas de perfil'),
           const ProfileStatsCard(
-            name: 'Mario García',
+            name: _sampleName1,
             username: 'mario_garcia',
             level: 8,
             currentXp: 640,
@@ -529,7 +534,7 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             bestStreak: 18,
           ),
 
-          _SectionHeader('Resumen semanal'),
+          const _SectionHeader('Resumen semanal'),
           const WeeklyReactionCard(
             weekLabel: '23 jun – 29 jun',
             points: 1340,
@@ -537,29 +542,29 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             tasks: 24,
             streak: 6,
             reactions: [
-              WeeklyReaction(name: 'Ana López', emoji: '👍'),
+              WeeklyReaction(name: _sampleName2, emoji: '👍'),
               WeeklyReaction(name: 'Lucía Fdez', emoji: '🔥'),
-              WeeklyReaction(name: 'Carlos Ruiz', emoji: '❤️'),
+              WeeklyReaction(name: _sampleName3, emoji: '❤️'),
             ],
           ),
 
-          _SectionHeader('Pasos de hoy'),
+          const _SectionHeader('Pasos de hoy'),
           const StepsCard(
             steps: 7432,
             goal: 10000,
             pointsEarned: 37,
           ),
 
-          _SectionHeader('Resumen semanal de pasos'),
+          const _SectionHeader('Resumen semanal de pasos'),
           const StepsSummaryCard(
             weeklySteps: [8210, 11430, 6800, 9340, 7432, 4200, 0],
             goal: 10000,
           ),
 
-          _SectionHeader('Calendario'),
+          const _SectionHeader('Calendario'),
           const CalendarWeekRow(),
 
-          _SectionHeader('Calendario mensual'),
+          const _SectionHeader('Calendario mensual'),
           MonthCalendarCard(
             month: _catalogMonth,
             selectedDay: _catalogSelectedDay,
@@ -574,7 +579,7 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             onDaySelected: (d) => setState(() => _catalogSelectedDay = d),
           ),
 
-          _SectionHeader('Chips de categoría y dificultad'),
+          const _SectionHeader('Chips de categoría y dificultad'),
           Wrap(
             spacing: 8,
             runSpacing: 8,
@@ -584,7 +589,7 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             ],
           ),
 
-          _SectionHeader('Filtro desplegable'),
+          const _SectionHeader('Filtro desplegable'),
           Row(
             children: [
               Expanded(
@@ -620,7 +625,7 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             ],
           ),
 
-          _SectionHeader('Tarjeta de tarea del calendario'),
+          const _SectionHeader('Tarjeta de tarea del calendario'),
           CalendarTaskCard(
             title: 'Preparar presentación TFG',
             difficulty: TaskDifficulty.hard,
@@ -632,7 +637,7 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             onDelete: () {},
           ),
 
-          _SectionHeader('Resumen del día'),
+          const _SectionHeader('Resumen del día'),
           const DailySummaryCard(
             userName: 'Demo',
             streak: 7,
@@ -644,7 +649,7 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             rankingPosition: 4,
           ),
 
-          _SectionHeader('Gráfica de progreso'),
+          const _SectionHeader('Gráfica de progreso'),
           const ProgressChartCard(
             pointsHistory: AppData.last30DaysPoints,
             stepsHistory: AppData.last30DaysSteps,
@@ -652,7 +657,7 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             dayLabels: AppData.last30DaysLabels,
           ),
 
-          _SectionHeader('Progreso de pasos'),
+          const _SectionHeader('Progreso de pasos'),
           StepsProgressCard(
             steps: AppData.stepsToday,
             goal: _catalogStepsGoal,
@@ -660,10 +665,10 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             onConfigureGoal: () => setState(() => _catalogStepsGoal += 1000),
           ),
 
-          _SectionHeader('Preset de cronómetro'),
+          const _SectionHeader('Preset de cronómetro'),
           TimerPresetCard(preset: AppData.timerPresets.first, onPlay: () {}),
 
-          _SectionHeader('Tarjeta de recordatorio'),
+          const _SectionHeader('Tarjeta de recordatorio'),
           ReminderCard(
             title: 'Estirar la espalda',
             dateTime: DateTime.now().add(const Duration(hours: 2)),
@@ -672,14 +677,14 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             onDelete: () {},
           ),
 
-          _SectionHeader('Tarjeta de restricción tecnológica'),
+          const _SectionHeader('Tarjeta de restricción tecnológica'),
           TechRestrictionCard(
             restriction: _catalogRestriction,
             onToggle: (v) => setState(() => _catalogRestriction.enabled = v),
             onDelete: () {},
           ),
 
-          _SectionHeader('Sección plegable'),
+          const _SectionHeader('Sección plegable'),
           DayPilotCollapsibleSection(
             icon: Icons.list_alt_rounded,
             title: 'Detalles',
@@ -699,7 +704,7 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             ],
           ),
 
-          _SectionHeader('Switch tile'),
+          const _SectionHeader('Switch tile'),
           DayPilotFormSection(
             title: 'Opciones',
             children: [
@@ -719,7 +724,7 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             ],
           ),
 
-          _SectionHeader('Select field'),
+          const _SectionHeader('Select field'),
           DayPilotSelectField<String>(
             label: 'Frecuencia',
             value: _selectVal,
@@ -730,7 +735,7 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             onChanged: (v) => setState(() => _selectVal = v),
           ),
 
-          _SectionHeader('Slider'),
+          const _SectionHeader('Slider'),
           DayPilotFormSection(
             title: 'Límite de tiempo',
             children: [
@@ -746,7 +751,7 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             ],
           ),
 
-          _SectionHeader('Stepper'),
+          const _SectionHeader('Stepper'),
           DayPilotFormSection(
             title: 'Duración',
             children: [
@@ -762,21 +767,21 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             ],
           ),
 
-          _SectionHeader('Selector de fecha'),
+          const _SectionHeader('Selector de fecha'),
           DayPilotDateField(
             label: 'Fecha límite',
             value: _pickedDate,
             onChanged: (d) => setState(() => _pickedDate = d),
           ),
 
-          _SectionHeader('Selector de hora'),
+          const _SectionHeader('Selector de hora'),
           DayPilotTimeField(
             label: 'Hora de aviso',
             value: _pickedTime,
             onChanged: (t) => setState(() => _pickedTime = t),
           ),
 
-          _SectionHeader('Grupo de radio'),
+          const _SectionHeader('Grupo de radio'),
           DayPilotFormSection(
             title: 'Dificultad',
             children: [
@@ -793,7 +798,7 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             ],
           ),
 
-          _SectionHeader('Grupo de chips (multi)'),
+          const _SectionHeader('Grupo de chips (multi)'),
           DayPilotFormSection(
             title: 'Categorías',
             children: [
@@ -806,7 +811,7 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             ],
           ),
           const SizedBox(height: 12),
-          _SectionHeader('Grupo de chips (selección única)'),
+          const _SectionHeader('Grupo de chips (selección única)'),
           DayPilotFormSection(
             title: 'Dificultad',
             children: [
@@ -824,7 +829,7 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             ],
           ),
 
-          _SectionHeader('Selector de color'),
+          const _SectionHeader('Selector de color'),
           DayPilotFormSection(
             title: 'Color de categoría',
             children: [
@@ -837,7 +842,7 @@ class _ComponentCatalogState extends State<ComponentCatalog> {
             ],
           ),
 
-          _SectionHeader('Sección de formulario'),
+          const _SectionHeader('Sección de formulario'),
           DayPilotFormSection(
             title: 'Configuración del temporizador',
             children: [

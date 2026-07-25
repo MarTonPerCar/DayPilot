@@ -78,8 +78,8 @@ class StepsCard extends StatelessWidget {
                 if (pointsEarned > 0)
                   Row(
                     children: [
-                      Icon(Icons.star_rounded,
-                          size: 14, color: const Color(0xFFFFD700)),
+                      const Icon(Icons.star_rounded,
+                          size: 14, color: Color(0xFFFFD700)),
                       const SizedBox(width: 3),
                       Text(
                         l10n.stepsPointsEarned(pointsEarned),

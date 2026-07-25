@@ -77,11 +77,25 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   }
 
   Future<void> _pickAndUploadAvatar() async {
-    final l10n = AppLocalizations.of(context);
-
     final source = await _chooseImageSource();
     if (source == null || !mounted) return;
 
+    final bytes = await _pickImageBytes(source);
+    if (bytes == null || !mounted) return;
+
+    final cropped = await Navigator.of(context).push<Uint8List>(
+      MaterialPageRoute(builder: (_) => PhotoCropScreen(imageBytes: bytes)),
+    );
+    if (cropped == null || !mounted) return;
+
+    await _uploadCroppedAvatar(cropped);
+  }
+
+  /// Picks an image with [source] and returns its raw bytes, or null if the
+  /// user cancelled. Isolated from [_pickAndUploadAvatar] mainly to keep the
+  /// desktop window-focus workaround (lost after the native file picker
+  /// closes) out of the main pick→crop→upload flow.
+  Future<Uint8List?> _pickImageBytes(ImageSource source) async {
     isPickingFileNotifier.value = true;
     final XFile? picked;
     try {
@@ -93,15 +107,12 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       }
       isPickingFileNotifier.value = false;
     }
-    if (picked == null || !mounted) return;
+    if (picked == null || !mounted) return null;
+    return picked.readAsBytes();
+  }
 
-    final bytes = await picked.readAsBytes();
-    if (!mounted) return;
-
-    final cropped = await Navigator.of(context).push<Uint8List>(
-      MaterialPageRoute(builder: (_) => PhotoCropScreen(imageBytes: bytes)),
-    );
-    if (cropped == null || !mounted) return;
+  Future<void> _uploadCroppedAvatar(Uint8List cropped) async {
+    final l10n = AppLocalizations.of(context);
 
     setState(() => _uploadingAvatar = true);
     if (!await ensureOnlineFromWidget(ref)) {
@@ -119,7 +130,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         _uploadingAvatar = false;
       });
     } catch (e, st) {
-      AppLogger.logError('EditProfileScreen._pickAndUploadAvatar', e, st);
+      AppLogger.logError('EditProfileScreen._uploadCroppedAvatar', e, st);
       if (isConnectivityError(e)) {
         ref.read(isOfflineProvider.notifier).setOffline(true);
       }
