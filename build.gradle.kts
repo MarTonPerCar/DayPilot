@@ -3,4 +3,17 @@ plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.kotlin.android) apply false
     alias(libs.plugins.kotlin.compose) apply false
+    id("org.sonarqube") version "5.1.0.4882"
+}
+
+sonar {
+    properties {
+        property("sonar.projectKey", "MarTonPerCar_DayPilot-Android")
+        property("sonar.organization", "martonpercar")
+        property("sonar.host.url", "https://sonarcloud.io")
+        property(
+            "sonar.coverage.jacoco.xmlReportPaths",
+            "app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml"
+        )
+    }
 }

@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
+    jacoco
 }
 
 val localProperties = Properties().apply {
@@ -96,4 +97,27 @@ dependencies {
     implementation(libs.coil.network.okhttp)
     implementation(libs.ucrop)
     implementation(libs.androidx.work.runtime.ktx)
+}
+
+jacoco {
+    toolVersion = "0.8.12"
+}
+
+tasks.register<JacocoReport>("jacocoTestReport") {
+    dependsOn("testDebugUnitTest")
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+
+    // Generated code and tests themselves don't belong in a coverage number.
+    val excludes = listOf(
+        "**/R.class", "**/R$*.class", "**/BuildConfig.*", "**/Manifest*.*",
+        "**/*Test*.*", "**/di/**", "android/**/*.*"
+    )
+    val javaClasses = fileTree("${layout.buildDirectory.get()}/intermediates/javac/debug/classes") { exclude(excludes) }
+    val kotlinClasses = fileTree("${layout.buildDirectory.get()}/tmp/kotlin-classes/debug") { exclude(excludes) }
+    classDirectories.setFrom(files(javaClasses, kotlinClasses))
+    sourceDirectories.setFrom(files("${project.projectDir}/src/main/java"))
+    executionData.setFrom(fileTree(layout.buildDirectory.get()) { include("**/*.exec", "**/*.ec") })
 }
