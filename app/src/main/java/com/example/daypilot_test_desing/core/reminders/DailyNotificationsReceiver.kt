@@ -79,9 +79,12 @@ class DailyNotificationsReceiver : BroadcastReceiver() {
     }
 
     private fun decodeBody(context: Context, rawBody: String, @StringRes fallback: Int): String {
-        val decoded = NotificationBodyCodec.decodeBody(rawBody) ?: return context.getString(fallback)
-        val (resId, arg) = decoded
-        return if (arg != null) context.getString(resId, arg) else context.getString(resId)
+        return when (val decoded = NotificationBodyCodec.decodeBody(rawBody)) {
+            null -> context.getString(fallback)
+            is NotificationBody.PlainText -> decoded.arg?.let { context.getString(decoded.resId, it) }
+                ?: context.getString(decoded.resId)
+            is NotificationBody.Count -> context.resources.getQuantityString(decoded.resId, decoded.quantity, decoded.quantity)
+        }
     }
 
     private fun notify(context: Context, id: Int, title: String, body: String) {

@@ -19,6 +19,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -57,7 +58,9 @@ private fun RankingCardBase(
     val (name, position, points, streak, level, avatarUrl) = entry
     val shape = RoundedCornerShape(20.dp)
     val featuredDesc = if (isFeaturedSummary) {
-        stringResource(R.string.rivalry_your_position_desc, name, level, streak, points)
+        val streakPhrase = pluralStringResource(R.plurals.rivalry_streak_phrase, streak, streak)
+        val pointsPhrase = pluralStringResource(R.plurals.rivalry_points_phrase, points, points)
+        stringResource(R.string.rivalry_your_position_desc, name, level, streakPhrase, pointsPhrase)
     } else null
     val summaryModifier = if (featuredDesc != null) {
         Modifier.semantics(mergeDescendants = true) { contentDescription = featuredDesc }
@@ -133,7 +136,7 @@ private fun RankingCardBase(
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(
-                    text = stringResource(R.string.ranking_streak, streak),
+                    text = pluralStringResource(R.plurals.ranking_streak, streak, streak),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

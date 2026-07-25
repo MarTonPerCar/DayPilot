@@ -39,6 +39,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -132,8 +133,9 @@ private fun GroupLimitHeaderRow(restriction: GroupRestriction, onToggle: (Boolea
                 }
             }
             Text(
-                text = stringResource(
-                    R.string.tech_health_group_apps_count,
+                text = pluralStringResource(
+                    R.plurals.tech_health_group_apps_count,
+                    restriction.apps.size,
                     restriction.apps.size
                 ),
                 style = MaterialTheme.typography.bodySmall,

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="app_picker_selected_count">
+        <item quantity="one">%1$d seleccionada</item>
+        <item quantity="other">%1$d seleccionadas</item>
+    </plurals>
+
+    <plurals name="indicator_tasks_progress">
+        <item quantity="one">%1$d/%2$d tarea</item>
+        <item quantity="other">%1$d/%2$d tareas</item>
+    </plurals>
+
+    <plurals name="daily_summary_streak_days">
+        <item quantity="one">%1$d día</item>
+        <item quantity="other">%1$d días</item>
+    </plurals>
+
+    <plurals name="tech_health_group_apps_count">
+        <item quantity="one">%1$d app</item>
+        <item quantity="other">%1$d apps</item>
+    </plurals>
+
+    <plurals name="ranking_streak">
+        <item quantity="one">%1$d🔥 racha</item>
+        <item quantity="other">%1$d🔥 racha</item>
+    </plurals>
+
+    <plurals name="rivalry_streak_phrase">
+        <item quantity="one">racha de %1$d</item>
+        <item quantity="other">racha de %1$d</item>
+    </plurals>
+
+    <plurals name="rivalry_points_phrase">
+        <item quantity="one">%1$d punto</item>
+        <item quantity="other">%1$d puntos</item>
+    </plurals>
+
+    <plurals name="steps_pending_goal">
+        <item quantity="one">Meta pendiente: %1$d paso (activa mañana)</item>
+        <item quantity="other">Meta pendiente: %1$d pasos (activa mañana)</item>
+    </plurals>
+
+    <plurals name="steps_goal_value">
+        <item quantity="one">%1$d paso</item>
+        <item quantity="other">%1$d pasos</item>
+    </plurals>
+
+    <plurals name="timer_custom_minutes">
+        <item quantity="one">%1$d minuto</item>
+        <item quantity="other">%1$d minutos</item>
+    </plurals>
+
+    <plurals name="timer_pomodoro_sessions_value">
+        <item quantity="one">%1$d sesión</item>
+        <item quantity="other">%1$d sesiones</item>
+    </plurals>
+
+    <plurals name="notif_task_reminder_count">
+        <item quantity="one">Tienes %1$d tarea pendiente hoy</item>
+        <item quantity="other">Tienes %1$d tareas pendientes hoy</item>
+    </plurals>
+</resources>

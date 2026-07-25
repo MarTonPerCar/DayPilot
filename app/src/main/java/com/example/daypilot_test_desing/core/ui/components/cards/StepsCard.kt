@@ -49,6 +49,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -94,7 +95,7 @@ private fun GoalConfigSheetContent(
             horizontalArrangement = Arrangement.Center
         ) {
             Text(
-                text = stringResource(R.string.steps_goal_value, sliderValue.toInt()),
+                text = pluralStringResource(R.plurals.steps_goal_value, sliderValue.toInt(), sliderValue.toInt()),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary
@@ -242,7 +243,7 @@ private fun PendingGoalBanner(pendingGoal: Int) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = stringResource(R.string.steps_pending_goal, pendingGoal),
+            text = pluralStringResource(R.plurals.steps_pending_goal, pendingGoal, pendingGoal),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.primary
         )

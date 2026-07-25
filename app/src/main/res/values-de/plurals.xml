@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="app_picker_selected_count">
+        <item quantity="one">%1$d ausgewählt</item>
+        <item quantity="other">%1$d ausgewählt</item>
+    </plurals>
+
+    <plurals name="indicator_tasks_progress">
+        <item quantity="one">%1$d/%2$d Aufgabe</item>
+        <item quantity="other">%1$d/%2$d Aufgaben</item>
+    </plurals>
+
+    <plurals name="daily_summary_streak_days">
+        <item quantity="one">%1$d Tag</item>
+        <item quantity="other">%1$d Tage</item>
+    </plurals>
+
+    <plurals name="tech_health_group_apps_count">
+        <item quantity="one">%1$d App</item>
+        <item quantity="other">%1$d Apps</item>
+    </plurals>
+
+    <plurals name="ranking_streak">
+        <item quantity="one">%1$d🔥 Serie</item>
+        <item quantity="other">%1$d🔥 Serie</item>
+    </plurals>
+
+    <plurals name="rivalry_streak_phrase">
+        <item quantity="one">%1$d Tag Serie</item>
+        <item quantity="other">%1$d Tage Serie</item>
+    </plurals>
+
+    <plurals name="rivalry_points_phrase">
+        <item quantity="one">%1$d Punkt</item>
+        <item quantity="other">%1$d Punkte</item>
+    </plurals>
+
+    <plurals name="steps_pending_goal">
+        <item quantity="one">Ausstehendes Ziel: %1$d Schritt (aktiv morgen)</item>
+        <item quantity="other">Ausstehendes Ziel: %1$d Schritte (aktiv morgen)</item>
+    </plurals>
+
+    <plurals name="steps_goal_value">
+        <item quantity="one">%1$d Schritt</item>
+        <item quantity="other">%1$d Schritte</item>
+    </plurals>
+
+    <plurals name="timer_custom_minutes">
+        <item quantity="one">%1$d Minute</item>
+        <item quantity="other">%1$d Minuten</item>
+    </plurals>
+
+    <plurals name="timer_pomodoro_sessions_value">
+        <item quantity="one">%1$d Sitzung</item>
+        <item quantity="other">%1$d Sitzungen</item>
+    </plurals>
+
+    <plurals name="notif_task_reminder_count">
+        <item quantity="one">Du hast %1$d Aufgabe für heute</item>
+        <item quantity="other">Du hast %1$d Aufgaben für heute</item>
+    </plurals>
+</resources>

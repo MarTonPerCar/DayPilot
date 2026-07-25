@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- App -->
     <string name="app_name">DayPilot</string>
 
@@ -149,7 +149,6 @@
     <!-- App Picker -->
     <string name="app_picker_title">Elegir app</string>
     <string name="app_picker_group_title">Apps del grupo</string>
-    <string name="app_picker_selected_count">%1$d seleccionadas</string>
     <string name="app_picker_search">Buscar</string>
     <string name="app_picker_close">Cerrar</string>
     <string name="app_picker_confirm">Listo</string>
@@ -280,7 +279,6 @@
 
 
     <!-- Home Section Indicator -->
-    <string name="indicator_tasks_progress">%1$d/%2$d tareas</string>
     <string name="indicator_steps_progress">👣 %1$d%% pasos</string>
     <string name="indicator_timer_done">Cronómetro completado</string>
     <string name="indicator_timer_pending">Cronómetro pendiente</string>
@@ -309,7 +307,6 @@
     <!-- Daily Summary Card -->
     <string name="daily_summary_hello">¡Hola, %1$s!</string>
     <string name="daily_summary_subtitle">Resumen de hoy</string>
-    <string name="daily_summary_streak_days">%1$d días</string>
     <string name="daily_summary_steps_goal">meta %1$d</string>
     <string name="daily_summary_tasks_completed">completadas</string>
     <string name="daily_summary_points_today">hoy</string>
@@ -325,7 +322,6 @@
     <string name="tech_health_delete_group_title">Eliminar grupo</string>
     <string name="tech_health_delete_group_message">El grupo \"%1$s\" se eliminará mañana. Hoy seguirá activo si ya has usado las apps.</string>
     <string name="tech_health_group_badge">Grupo</string>
-    <string name="tech_health_group_apps_count">%1$d apps</string>
     <string name="tech_health_group_hide_apps">▲ Ocultar apps</string>
     <string name="tech_health_group_show_apps">▼ Ver apps (%1$d)</string>
 
@@ -350,9 +346,8 @@
 
 
     <!-- Ranking Card -->
-    <string name="ranking_streak">%1$d🔥 racha</string>
     <string name="ranking_points">puntos</string>
-    <string name="rivalry_your_position_desc">Tu posición: %1$s, nivel %2$d, racha de %3$d, %4$d puntos</string>
+    <string name="rivalry_your_position_desc">Tu posición: %1$s, nivel %2$d, %3$s, %4$s</string>
 
 
     <!-- Reminder Card -->
@@ -375,9 +370,7 @@
     <string name="steps_widget_desc">Widget de pasos</string>
     <string name="steps_configure_goal">Configurar meta</string>
     <string name="steps_goal_locked">Bloqueado hasta mañana</string>
-    <string name="steps_pending_goal">Meta pendiente: %1$d pasos (activa mañana)</string>
     <string name="steps_goal_sheet_title">Configurar meta de pasos</string>
-    <string name="steps_goal_value">%1$d pasos</string>
     <string name="steps_goal_of">de %1$d</string>
     <string name="steps_quick_goals">Metas rápidas</string>
     <string name="steps_milestones">Hitos</string>
@@ -497,7 +490,8 @@
     <!-- Tech Health Screen -->
     <string name="tech_health_add_restriction">Añadir restricción</string>
     <string name="tech_health_restrictions_title">Restricciones</string>
-    <string name="tech_health_restrictions_count">%1$d en total</string>
+    <!-- "en total" is invariant across quantities (adverbial, not a noun) — not a real plural case. -->
+    <string name="tech_health_restrictions_count" tools:ignore="PluralsCandidate">%1$d en total</string>
     <string name="tech_health_empty">No hay restricciones\nPulsa + para crear una.</string>
     <string name="tech_health_groups_title">Grupos</string>
 
@@ -519,14 +513,12 @@
     <!-- Timer Hub Screen -->
     <string name="timer_hub_title">Cronómetros</string>
     <string name="timer_custom_sheet_title">Cronómetro personalizado</string>
-    <string name="timer_custom_minutes">%1$d minutos</string>
     <string name="timer_custom_start">Iniciar</string>
     <string name="timer_pomodoro_sheet_title">Configurar Pomodoro</string>
     <string name="timer_pomodoro_work_label">Trabajo</string>
     <string name="timer_pomodoro_break_label">Descanso</string>
     <string name="timer_pomodoro_total_label">Total</string>
     <string name="timer_pomodoro_sessions_label">Número de sesiones</string>
-    <string name="timer_pomodoro_sessions_value">%1$d sesiones</string>
     <string name="timer_pomodoro_min_sessions">1 sesión (30 min)</string>
     <string name="timer_pomodoro_max_sessions">8 sesiones (4h)</string>
     <string name="timer_pomodoro_start">Iniciar Pomodoro</string>
@@ -547,7 +539,6 @@
     <string name="daily_channel_name">Recordatorios diarios</string>
     <string name="daily_channel_desc">Recordatorios de tareas y racha</string>
     <string name="notif_task_reminder_title">Tareas de hoy</string>
-    <string name="notif_task_reminder_count">Tienes %1$d tareas pendientes hoy</string>
     <string name="notif_task_reminder_none">No tienes tareas para hoy ✓</string>
     <string name="notif_task_reminder_generic">Revisa tus tareas para hoy</string>
     <string name="notif_streak_danger_title">¡Racha en peligro! 🔥</string>

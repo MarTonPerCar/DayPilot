@@ -10,6 +10,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.font.FontWeight
@@ -19,6 +20,7 @@ import com.example.daypilot_test_desing.core.ui.components.basic.*
 import com.example.daypilot_test_desing.core.ui.components.cards.*
 import com.example.daypilot_test_desing.core.data.model.NotificationData
 import com.example.daypilot_test_desing.core.data.model.NotificationType
+import com.example.daypilot_test_desing.core.reminders.NotificationBody
 import com.example.daypilot_test_desing.core.reminders.NotificationBodyCodec
 
 @Composable
@@ -175,9 +177,11 @@ private fun decodedTitle(notification: NotificationData): String =
         ?: notification.title
 
 @Composable
-private fun decodedMessage(notification: NotificationData): String {
-    val decoded = NotificationBodyCodec.decodeBody(notification.message) ?: return notification.message
-    val (resId, arg) = decoded
-    return if (arg != null) stringResource(resId, arg) else stringResource(resId)
-}
+private fun decodedMessage(notification: NotificationData): String =
+    when (val decoded = NotificationBodyCodec.decodeBody(notification.message)) {
+        null -> notification.message
+        is NotificationBody.PlainText -> decoded.arg?.let { stringResource(decoded.resId, it) }
+            ?: stringResource(decoded.resId)
+        is NotificationBody.Count -> pluralStringResource(decoded.resId, decoded.quantity, decoded.quantity)
+    }
 

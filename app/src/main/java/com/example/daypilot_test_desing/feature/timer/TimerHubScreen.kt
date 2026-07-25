@@ -42,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.invisibleToUser
 import androidx.compose.ui.semantics.semantics
@@ -77,7 +78,7 @@ private fun CustomTimerSheetContent(
             horizontalArrangement = Arrangement.Center
         ) {
             Text(
-                text = stringResource(R.string.timer_custom_minutes, customMinutes.toInt()),
+                text = pluralStringResource(R.plurals.timer_custom_minutes, customMinutes.toInt(), customMinutes.toInt()),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF00ACC1)
@@ -251,8 +252,9 @@ private fun PomodoroSheetContent(
             horizontalArrangement = Arrangement.Center
         ) {
             Text(
-                text = stringResource(
-                    R.string.timer_pomodoro_sessions_value,
+                text = pluralStringResource(
+                    R.plurals.timer_pomodoro_sessions_value,
+                    pomodoroSessions.toInt(),
                     pomodoroSessions.toInt()
                 ),
                 style = MaterialTheme.typography.headlineSmall,
