@@ -8,8 +8,8 @@ plugins {
 
 sonar {
     properties {
-        property("sonar.projectKey", "MarTonPerCar_DayPilot-Android")
-        property("sonar.organization", "martonpercar")
+        property("sonar.projectKey", "daypilot-test_daypilot-android")
+        property("sonar.organization", "daypilot-test")
         property("sonar.host.url", "https://sonarcloud.io")
         property(
             "sonar.coverage.jacoco.xmlReportPaths",
