@@ -61,6 +61,9 @@ android {
             isReturnDefaultValues = true
         }
     }
+    lint {
+        abortOnError = false
+    }
 }
 
 dependencies {
@@ -118,5 +121,5 @@ tasks.register<JacocoReport>("jacocoTestReport") {
     val kotlinClasses = fileTree("${layout.buildDirectory.get()}/tmp/kotlin-classes/debug") { exclude(excludes) }
     classDirectories.setFrom(files(javaClasses, kotlinClasses))
     sourceDirectories.setFrom(files("${project.projectDir}/src/main/java"))
-    executionData.setFrom(fileTree(layout.buildDirectory.get()) { include("**/*.exec", "**/*.ec") })
+    executionData.setFrom(files("${layout.buildDirectory.get()}/jacoco/testDebugUnitTest.exec"))
 }

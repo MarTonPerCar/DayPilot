@@ -15,5 +15,13 @@ sonar {
             "sonar.coverage.jacoco.xmlReportPaths",
             "app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml"
         )
+        property(
+            "sonar.androidLint.reportPaths",
+            "app/build/reports/lint-results-debug.xml"
+        )
+        property(
+            "sonar.exclusions",
+            "**/res/**/*.webp,**/res/**/*.png,**/build/**"
+        )
     }
 }
