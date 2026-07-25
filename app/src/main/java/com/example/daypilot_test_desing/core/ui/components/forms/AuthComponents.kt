@@ -25,6 +25,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -49,11 +51,13 @@ fun AuthToggle(isLogin: Boolean, onToggle: (Boolean) -> Unit) {
     ) {
         ToggleOption(
             text = stringResource(R.string.auth_login),
+            contentDescription = stringResource(R.string.auth_login_tab),
             selected = isLogin,
             onClick = { onToggle(true) }
         )
         ToggleOption(
             text = stringResource(R.string.auth_register),
+            contentDescription = stringResource(R.string.auth_register_tab),
             selected = !isLogin,
             onClick = { onToggle(false) }
         )
@@ -61,7 +65,7 @@ fun AuthToggle(isLogin: Boolean, onToggle: (Boolean) -> Unit) {
 }
 
 @Composable
-fun ToggleOption(text: String, selected: Boolean, onClick: () -> Unit) {
+fun ToggleOption(text: String, selected: Boolean, onClick: () -> Unit, contentDescription: String? = null) {
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(50))
@@ -70,6 +74,11 @@ fun ToggleOption(text: String, selected: Boolean, onClick: () -> Unit) {
                 else MaterialTheme.colorScheme.surfaceVariant
             )
             .clickable { onClick() }
+            .then(
+                if (contentDescription != null)
+                    Modifier.semantics { this.contentDescription = contentDescription }
+                else Modifier
+            )
             .padding(horizontal = 20.dp, vertical = 10.dp),
         contentAlignment = Alignment.Center
     ) {

@@ -22,12 +22,15 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -73,6 +76,7 @@ fun DayPilotCalendar(
 
     val monthNames = Month.entries.map { stringResource(it.nameRes) }
     val dayHeaders = WeekDay.entries.map { stringResource(it.headerRes) }
+    val dayHeaderFullNames = WeekDay.entries.map { stringResource(it.fullNameRes) }
 
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -116,10 +120,12 @@ fun DayPilotCalendar(
             }
 
             Row(modifier = Modifier.fillMaxWidth()) {
-                dayHeaders.forEach { header ->
+                dayHeaders.forEachIndexed { index, header ->
                     Text(
                         text = header,
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier
+                            .weight(1f)
+                            .semantics { contentDescription = dayHeaderFullNames[index] },
                         textAlign = TextAlign.Center,
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.SemiBold,
@@ -183,6 +189,7 @@ fun CalendarDayCell(
                 }
             )
             .clickable { onClick() }
+            .minimumInteractiveComponentSize()
             .padding(vertical = 4.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(2.dp)

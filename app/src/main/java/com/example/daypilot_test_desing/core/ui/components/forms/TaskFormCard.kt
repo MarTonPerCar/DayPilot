@@ -413,7 +413,11 @@ fun DurationSelector(
             shape = RoundedCornerShape(10.dp),
             border = ButtonDefaults.outlinedButtonBorder
         ) {
-            Icon(Icons.Default.Remove, contentDescription = null, modifier = Modifier.size(16.dp))
+            Icon(
+                Icons.Default.Remove,
+                contentDescription = stringResource(R.string.task_decrease_duration),
+                modifier = Modifier.size(16.dp)
+            )
         }
         Box(
             modifier = Modifier
@@ -436,7 +440,11 @@ fun DurationSelector(
             shape = RoundedCornerShape(10.dp),
             border = ButtonDefaults.outlinedButtonBorder
         ) {
-            Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
+            Icon(
+                Icons.Default.Add,
+                contentDescription = stringResource(R.string.task_increase_duration),
+                modifier = Modifier.size(16.dp)
+            )
         }
     }
 }

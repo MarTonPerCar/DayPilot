@@ -9,6 +9,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.core.ui.components.basic.*
@@ -46,7 +48,11 @@ fun HabitsScreen(
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            DayPilotSectionHeader(title = stringResource(R.string.steps_title))
+            val stepsSectionDesc = stringResource(R.string.steps_section_desc)
+            DayPilotSectionHeader(
+                title = stringResource(R.string.steps_title),
+                modifier = Modifier.semantics { contentDescription = stepsSectionDesc }
+            )
 
             StepsCard(
                 currentSteps    = currentSteps,

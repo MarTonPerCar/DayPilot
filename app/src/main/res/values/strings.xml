@@ -108,6 +108,7 @@
 
     <!-- Steps -->
     <string name="steps_title">Pasos</string>
+    <string name="steps_section_desc">Sección de pasos</string>
 
     <string name="habits_timers_title">Cronómetros</string>
     <string name="habits_timers_description">Pomodoro, entrenamiento y más</string>
@@ -235,6 +236,13 @@
     <string name="day_fri">F</string>
     <string name="day_sat">S</string>
     <string name="day_sun">S</string>
+    <string name="day_mon_full">Lunes</string>
+    <string name="day_tue_full">Martes</string>
+    <string name="day_wed_full">Miércoles</string>
+    <string name="day_thu_full">Jueves</string>
+    <string name="day_fri_full">Viernes</string>
+    <string name="day_sat_full">Sábado</string>
+    <string name="day_sun_full">Domingo</string>
 
     <!-- Reaction emojis -->
     <string name="reaction_fire_emoji">🔥</string>
@@ -261,6 +269,8 @@
     <string name="task_category_label">Categoría</string>
     <string name="task_difficulty_label">Dificultad</string>
     <string name="task_duration_label">Duración estimada</string>
+    <string name="task_decrease_duration">Reducir duración</string>
+    <string name="task_increase_duration">Aumentar duración</string>
     <string name="task_section_info">Información</string>
     <string name="task_section_details">Detalles</string>
     <string name="task_section_reminder">Recordatorio</string>
@@ -325,6 +335,10 @@
     <string name="tech_health_delete_app_message">La restricción de \"%1$s\" se eliminará mañana. Hoy seguirá activa si ya has usado la app.</string>
     <string name="tech_health_delete_tomorrow">Eliminar mañana</string>
     <string name="tech_health_app_badge">App</string>
+    <string name="tech_health_app_badge_desc">Insignia de app, %1$s</string>
+    <string name="tech_health_switch_desc">Activado, límite de %1$s</string>
+    <string name="tech_health_edit_desc">Editar límite de %1$s</string>
+    <string name="tech_health_delete_desc">Eliminar límite de %1$s</string>
     <string name="tech_health_pending_delete">🗑 Se elimina mañana</string>
     <string name="tech_health_pending_activate">Se activa mañana</string>
     <string name="tech_health_pending_deactivate">Se desactiva mañana</string>
@@ -361,6 +375,7 @@
 
     <!-- Profile Stats Card -->
     <string name="profile_level_badge">⚡ Nivel %1$d</string>
+    <string name="profile_header_desc">%1$s, @%2$s, nivel %3$d</string>
     <string name="profile_level_progress">Progreso nivel %1$d</string>
     <string name="profile_level_points">%1$d / %2$d pts</string>
     <string name="profile_stat_total_points">Puntos totales</string>
@@ -380,6 +395,7 @@
     <!-- Ranking Card -->
     <string name="ranking_streak">%1$d🔥 racha</string>
     <string name="ranking_points">puntos</string>
+    <string name="rivalry_your_position_desc">Tu posición: %1$s, nivel %2$d, racha de %3$d, %4$d puntos</string>
 
 
     <!-- Reminder Card -->
@@ -399,6 +415,7 @@
 
     <!-- Steps Card -->
     <string name="steps_label">Pasos</string>
+    <string name="steps_widget_desc">Widget de pasos</string>
     <string name="steps_configure_goal">Configurar meta</string>
     <string name="steps_goal_locked">Bloqueado hasta mañana</string>
     <string name="steps_pending_goal">Meta pendiente: %1$d pasos (activa mañana)</string>
@@ -407,6 +424,8 @@
     <string name="steps_goal_of">de %1$d</string>
     <string name="steps_quick_goals">Metas rápidas</string>
     <string name="steps_milestones">Hitos</string>
+    <string name="steps_milestone_reached">Hito %1$s, alcanzado</string>
+    <string name="steps_milestone_pending">Hito %1$s, pendiente</string>
     <string name="steps_next_milestone">Siguiente meta</string>
     <string name="steps_points_earned">Puntos ganados hoy</string>
     <string name="steps_pts_value">%1$d pts</string>
@@ -479,6 +498,8 @@
     <!-- Auth Components -->
     <string name="auth_login">Iniciar sesión</string>
     <string name="auth_register">Crear cuenta</string>
+    <string name="auth_login_tab">Pestaña de inicio de sesión</string>
+    <string name="auth_register_tab">Pestaña de registro</string>
     <string name="auth_forgot_password">¿Has olvidado tu contraseña?</string>
     <string name="auth_enter">Entrar</string>
     <string name="auth_name_label">Nombre</string>

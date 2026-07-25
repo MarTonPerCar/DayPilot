@@ -39,6 +39,8 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -156,6 +158,11 @@ fun AppLimitCard(
                                 .clip(RoundedCornerShape(4.dp))
                                 .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f))
                                 .padding(horizontal = 6.dp, vertical = 2.dp)
+                                .semantics {
+                                    contentDescription = context.getString(
+                                        R.string.tech_health_app_badge_desc, restriction.appName
+                                    )
+                                }
                         ) {
                             Text(
                                 text = stringResource(R.string.tech_health_app_badge),
@@ -178,7 +185,12 @@ fun AppLimitCard(
                     colors = SwitchDefaults.colors(
                         checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
                         checkedTrackColor = MaterialTheme.colorScheme.primary
-                    )
+                    ),
+                    modifier = Modifier.semantics {
+                        contentDescription = context.getString(
+                            R.string.tech_health_switch_desc, restriction.appName
+                        )
+                    }
                 )
             }
 
@@ -248,7 +260,13 @@ fun AppLimitCard(
                 } else {
                     OutlinedButton(
                         onClick = onEdit,
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier
+                            .weight(1f)
+                            .semantics {
+                                contentDescription = context.getString(
+                                    R.string.tech_health_edit_desc, restriction.appName
+                                )
+                            },
                         shape = RoundedCornerShape(10.dp)
                     ) {
                         Icon(
@@ -264,7 +282,13 @@ fun AppLimitCard(
                     }
                     TextButton(
                         onClick = { showDeleteConfirm = true },
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier
+                            .weight(1f)
+                            .semantics {
+                                contentDescription = context.getString(
+                                    R.string.tech_health_delete_desc, restriction.appName
+                                )
+                            }
                     ) {
                         Text(
                             text = stringResource(R.string.common_delete),

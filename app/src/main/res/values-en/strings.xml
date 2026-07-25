@@ -107,6 +107,7 @@
 
     <!-- Steps -->
     <string name="steps_title">Steps</string>
+    <string name="steps_section_desc">Steps section</string>
 
     <string name="habits_timers_title">Timers</string>
     <string name="habits_timers_description">Pomodoro, training and more</string>
@@ -226,6 +227,13 @@
     <string name="day_fri">F</string>
     <string name="day_sat">S</string>
     <string name="day_sun">S</string>
+    <string name="day_mon_full">Monday</string>
+    <string name="day_tue_full">Tuesday</string>
+    <string name="day_wed_full">Wednesday</string>
+    <string name="day_thu_full">Thursday</string>
+    <string name="day_fri_full">Friday</string>
+    <string name="day_sat_full">Saturday</string>
+    <string name="day_sun_full">Sunday</string>
 
     <!-- Reaction emojis -->
     <string name="reaction_fire_emoji">🔥</string>
@@ -254,6 +262,8 @@
     <string name="task_category_label">Category</string>
     <string name="task_difficulty_label">Difficulty</string>
     <string name="task_duration_label">Estimated duration</string>
+    <string name="task_decrease_duration">Decrease duration</string>
+    <string name="task_increase_duration">Increase duration</string>
     <string name="task_section_info">Information</string>
     <string name="task_section_details">Details</string>
     <string name="task_section_reminder">Reminder</string>
@@ -314,6 +324,10 @@
     <string name="tech_health_delete_app_message">The restriction for \"%1$s\" will be deleted tomorrow. It will remain active today if you\'ve already used the app.</string>
     <string name="tech_health_delete_tomorrow">Delete tomorrow</string>
     <string name="tech_health_app_badge">App</string>
+    <string name="tech_health_app_badge_desc">%1$s app badge</string>
+    <string name="tech_health_switch_desc">Enabled, %1$s limit</string>
+    <string name="tech_health_edit_desc">Edit %1$s limit</string>
+    <string name="tech_health_delete_desc">Delete %1$s limit</string>
     <string name="tech_health_pending_delete">🗑 Deleting tomorrow</string>
     <string name="tech_health_pending_activate">Turns on tomorrow</string>
     <string name="tech_health_pending_deactivate">Turns off tomorrow</string>
@@ -350,6 +364,7 @@
 
     <!-- Profile Stats Card -->
     <string name="profile_level_badge">⚡ Level %1$d</string>
+    <string name="profile_header_desc">%1$s, @%2$s, level %3$d</string>
     <string name="profile_level_progress">Progress level %1$d</string>
     <string name="profile_level_points">%1$d / %2$d pts</string>
     <string name="profile_stat_total_points">Total points</string>
@@ -369,6 +384,7 @@
     <!-- Ranking Card -->
     <string name="ranking_streak">%1$d🔥 streak</string>
     <string name="ranking_points">points</string>
+    <string name="rivalry_your_position_desc">Your position: %1$s, level %2$d, %3$d day streak, %4$d points</string>
 
 
     <!-- Reminder Card -->
@@ -388,6 +404,7 @@
 
     <!-- Steps Card -->
     <string name="steps_label">Steps</string>
+    <string name="steps_widget_desc">Steps widget</string>
     <string name="steps_configure_goal">Configure goal</string>
     <string name="steps_goal_locked">Locked until tomorrow</string>
     <string name="steps_pending_goal">Pending goal: %1$d steps (active tomorrow)</string>
@@ -396,6 +413,8 @@
     <string name="steps_goal_of">of %1$d</string>
     <string name="steps_quick_goals">Quick goals</string>
     <string name="steps_milestones">Milestones</string>
+    <string name="steps_milestone_reached">Milestone %1$s, reached</string>
+    <string name="steps_milestone_pending">Milestone %1$s, pending</string>
     <string name="steps_next_milestone">Next milestone</string>
     <string name="steps_points_earned">Points earned today</string>
     <string name="steps_pts_value">%1$d pts</string>
@@ -456,6 +475,8 @@
     <!-- Auth Components -->
     <string name="auth_login">Log in</string>
     <string name="auth_register">Create account</string>
+    <string name="auth_login_tab">Sign in tab</string>
+    <string name="auth_register_tab">Register tab</string>
     <string name="auth_forgot_password">Forgot your password?</string>
     <string name="auth_enter">Enter</string>
     <string name="auth_name_label">Name</string>

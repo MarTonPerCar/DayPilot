@@ -24,6 +24,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -79,7 +81,11 @@ fun ProfileStatsCard(
                 ) {
                     DayPilotAvatar(name = name, avatarUrl = avatarUrl, size = 64)
 
-                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    val headerDesc = stringResource(R.string.profile_header_desc, name, username, level)
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                        modifier = Modifier.semantics(mergeDescendants = true) { contentDescription = headerDesc }
+                    ) {
                         Text(
                             text = name,
                             style = MaterialTheme.typography.titleLarge,
@@ -94,14 +100,14 @@ fun ProfileStatsCard(
                         Box(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(8.dp))
-                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f))
+                                .background(MaterialTheme.colorScheme.primaryContainer)
                                 .padding(horizontal = 10.dp, vertical = 4.dp)
                         ) {
                             Text(
                                 text = stringResource(R.string.profile_level_badge, level),
                                 style = MaterialTheme.typography.labelMedium,
                                 fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
                             )
                         }
                     }

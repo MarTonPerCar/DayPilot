@@ -43,6 +43,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.invisibleToUser
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -179,7 +181,7 @@ fun TimerHubScreen(
                                 .weight(1f)
                                 .clip(RoundedCornerShape(8.dp))
                                 .background(
-                                    if (isSelected) Color(0xFF00ACC1)
+                                    if (isSelected) Color(0xFF00747F)
                                     else MaterialTheme.colorScheme.surfaceVariant
                                 )
                                 .clickable { customMinutes = min.toFloat() }
@@ -363,7 +365,10 @@ fun TimerHubScreen(
         }
     }
 
+    val sheetOpen = showCustomSheet || showPomodoroSheet
+
     Scaffold(
+        modifier = Modifier.semantics { if (sheetOpen) invisibleToUser() },
         topBar = {
             DayPilotTopBar(
                 title = stringResource(R.string.timer_hub_title),

@@ -19,6 +19,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -43,9 +45,16 @@ private fun RankingCardBase(
     level: Int = 1,
     modifier: Modifier = Modifier,
     avatarUrl: String? = null,
-    isCurrentUser: Boolean = false
+    isCurrentUser: Boolean = false,
+    isFeaturedSummary: Boolean = false
 ) {
     val shape = RoundedCornerShape(20.dp)
+    val featuredDesc = if (isFeaturedSummary) {
+        stringResource(R.string.rivalry_your_position_desc, name, level, streak, points)
+    } else null
+    val summaryModifier = if (featuredDesc != null) {
+        Modifier.semantics(mergeDescendants = true) { contentDescription = featuredDesc }
+    } else Modifier
 
     val borderModifier = if (isCurrentUser) {
         Modifier.border(
@@ -63,7 +72,8 @@ private fun RankingCardBase(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .then(borderModifier),
+            .then(borderModifier)
+            .then(summaryModifier),
         shape = shape,
         colors = CardDefaults.cardColors(
             containerColor = if (isCurrentUser)
@@ -180,7 +190,8 @@ fun CurrentUserRankingCard(
         streak        = streak,
         level         = level,
         modifier      = modifier,
-        isCurrentUser = true
+        isCurrentUser = true,
+        isFeaturedSummary = true
     )
 }
 

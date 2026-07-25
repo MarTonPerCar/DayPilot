@@ -107,6 +107,7 @@
 
     <!-- Steps -->
     <string name="steps_title">Schritte</string>
+    <string name="steps_section_desc">Abschnitt Schritte</string>
 
     <string name="habits_timers_title">Timer</string>
     <string name="habits_timers_description">Pomodoro, Training und mehr</string>
@@ -226,6 +227,13 @@
     <string name="day_fri">F</string>
     <string name="day_sat">S</string>
     <string name="day_sun">S</string>
+    <string name="day_mon_full">Montag</string>
+    <string name="day_tue_full">Dienstag</string>
+    <string name="day_wed_full">Mittwoch</string>
+    <string name="day_thu_full">Donnerstag</string>
+    <string name="day_fri_full">Freitag</string>
+    <string name="day_sat_full">Samstag</string>
+    <string name="day_sun_full">Sonntag</string>
 
     <!-- Reaction emojis -->
     <string name="reaction_fire_emoji">🔥</string>
@@ -254,6 +262,8 @@
     <string name="task_category_label">Kategorie</string>
     <string name="task_difficulty_label">Schwierigkeitsgrad</string>
     <string name="task_duration_label">Geschätzte Dauer</string>
+    <string name="task_decrease_duration">Dauer verringern</string>
+    <string name="task_increase_duration">Dauer erhöhen</string>
     <string name="task_section_info">Informationen</string>
     <string name="task_section_details">Details</string>
     <string name="task_section_reminder">Erinnerung</string>
@@ -314,6 +324,10 @@
     <string name="tech_health_delete_app_message">Die Einschränkung für \"%1$s\" wird morgen gelöscht. Sie bleibt heute aktiv, wenn du die App bereits genutzt hast.</string>
     <string name="tech_health_delete_tomorrow">Morgen löschen</string>
     <string name="tech_health_app_badge">App</string>
+    <string name="tech_health_app_badge_desc">%1$s App-Abzeichen</string>
+    <string name="tech_health_switch_desc">Aktiviert, %1$s-Limit</string>
+    <string name="tech_health_edit_desc">%1$s-Limit bearbeiten</string>
+    <string name="tech_health_delete_desc">%1$s-Limit löschen</string>
     <string name="tech_health_pending_delete">🗑 Wird morgen gelöscht</string>
     <string name="tech_health_pending_activate">Wird morgen aktiviert</string>
     <string name="tech_health_pending_deactivate">Wird morgen deaktiviert</string>
@@ -350,6 +364,7 @@
 
     <!-- Profile Stats Card -->
     <string name="profile_level_badge">⚡ Stufe %1$d</string>
+    <string name="profile_header_desc">%1$s, @%2$s, Stufe %3$d</string>
     <string name="profile_level_progress">Fortschritt Stufe %1$d</string>
     <string name="profile_level_points">%1$d / %2$d Pkt.</string>
     <string name="profile_stat_total_points">Gesamtpunkte</string>
@@ -369,6 +384,7 @@
     <!-- Ranking Card -->
     <string name="ranking_streak">%1$d🔥 Serie</string>
     <string name="ranking_points">Punkte</string>
+    <string name="rivalry_your_position_desc">Deine Position: %1$s, Stufe %2$d, %3$d Tage Serie, %4$d Punkte</string>
 
 
     <!-- Reminder Card -->
@@ -388,6 +404,7 @@
 
     <!-- Steps Card -->
     <string name="steps_label">Schritte</string>
+    <string name="steps_widget_desc">Schritte-Widget</string>
     <string name="steps_configure_goal">Ziel konfigurieren</string>
     <string name="steps_goal_locked">Bis morgen gesperrt</string>
     <string name="steps_pending_goal">Ausstehendes Ziel: %1$d Schritte (aktiv morgen)</string>
@@ -396,6 +413,8 @@
     <string name="steps_goal_of">von %1$d</string>
     <string name="steps_quick_goals">Schnellziele</string>
     <string name="steps_milestones">Meilensteine</string>
+    <string name="steps_milestone_reached">Meilenstein %1$s, erreicht</string>
+    <string name="steps_milestone_pending">Meilenstein %1$s, ausstehend</string>
     <string name="steps_next_milestone">Nächster Meilenstein</string>
     <string name="steps_points_earned">Heute verdiente Punkte</string>
     <string name="steps_pts_value">%1$d Pkt.</string>
@@ -456,6 +475,8 @@
     <!-- Auth Components -->
     <string name="auth_login">Anmelden</string>
     <string name="auth_register">Konto erstellen</string>
+    <string name="auth_login_tab">Anmelde-Tab</string>
+    <string name="auth_register_tab">Registrierungs-Tab</string>
     <string name="auth_forgot_password">Passwort vergessen?</string>
     <string name="auth_enter">Einloggen</string>
     <string name="auth_name_label">Name</string>
