@@ -139,6 +139,7 @@ class DayPilotAccessibilityService : AccessibilityService() {
         }
     }
 
+    // Required AccessibilityService override; nothing to clean up on interrupt.
     override fun onInterrupt() {}
 
     override fun onDestroy() {

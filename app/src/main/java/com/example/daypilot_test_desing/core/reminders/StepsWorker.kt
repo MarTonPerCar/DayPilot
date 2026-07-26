@@ -101,6 +101,7 @@ class StepsWorker(
                         sensorManager.unregisterListener(this)
                         if (cont.isActive) cont.resume(event.values[0].toInt())
                     }
+                    // Required SensorEventListener override; a one-shot step read doesn't care about accuracy.
                     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
                 }
                 cont.invokeOnCancellation { sensorManager.unregisterListener(listener) }
