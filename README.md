@@ -131,6 +131,8 @@ El análisis de SonarCloud corre en CI solo en esta rama (no en `Incremento-Andr
 | `Incremento-Android-TestFinal` | Esta rama — trabajo y testing |
 | `Intensive-Android-Testing` | Misma app con timings acelerados para pruebas exhaustivas |
 
+Para la lista completa de dependencias (Android y Flutter), consulta la sección [Dependencias](https://github.com/MarTonPerCar/DayPilot/blob/master/README.md#dependencias) del README de `master`.
+
 ---
 
 ## Convenciones de esta rama
