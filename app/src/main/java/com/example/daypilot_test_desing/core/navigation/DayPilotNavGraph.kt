@@ -94,19 +94,26 @@ import com.example.daypilot_test_desing.core.ui.components.DayPilotBottomBar
 
 private const val TAG = "DayPilotNavGraph"
 
+/** ViewModels whose initial load must finish (or be retried once) before the app leaves the
+ *  DataLoading screen — bundled together purely to keep [handleSessionStateChange]'s parameter
+ *  count down, not a reusable abstraction. */
+private class StartupViewModels(
+    val homeVM: HomeViewModel,
+    val calendarVM: CalendarViewModel,
+    val profileVM: ProfileViewModel,
+    val progressVM: ProgressViewModel,
+    val friendsVM: FriendsViewModel,
+    val rivalryVM: RivalryViewModel,
+    val settingsVM: SettingsViewModel,
+    val notificationsVM: NotificationsViewModel
+)
+
 private suspend fun handleSessionStateChange(
     sessionState: AppSessionViewModel.State,
     navController: NavHostController,
     sessionVM: AppSessionViewModel,
     context: Context,
-    homeVM: HomeViewModel,
-    calendarVM: CalendarViewModel,
-    profileVM: ProfileViewModel,
-    progressVM: ProgressViewModel,
-    friendsVM: FriendsViewModel,
-    rivalryVM: RivalryViewModel,
-    settingsVM: SettingsViewModel,
-    notificationsVM: NotificationsViewModel
+    viewModels: StartupViewModels
 ) {
     val current = navController.currentBackStackEntry?.destination?.route
     when (sessionState) {
@@ -114,21 +121,21 @@ private suspend fun handleSessionStateChange(
             // joinAll() can't see failure — awaitLoad() can, so a failed batch gets one retry.
             suspend fun loadAll(): Boolean = coroutineScope {
                 listOf(
-                    async { homeVM.awaitLoad() },
-                    async { calendarVM.awaitLoad() },
-                    async { profileVM.awaitLoad() },
-                    async { progressVM.awaitLoad() },
-                    async { friendsVM.awaitLoad() },
-                    async { rivalryVM.awaitLoad() },
-                    async { settingsVM.awaitLoad() },
-                    async { notificationsVM.awaitLoad() },
+                    async { viewModels.homeVM.awaitLoad() },
+                    async { viewModels.calendarVM.awaitLoad() },
+                    async { viewModels.profileVM.awaitLoad() },
+                    async { viewModels.progressVM.awaitLoad() },
+                    async { viewModels.friendsVM.awaitLoad() },
+                    async { viewModels.rivalryVM.awaitLoad() },
+                    async { viewModels.settingsVM.awaitLoad() },
+                    async { viewModels.notificationsVM.awaitLoad() },
                 ).awaitAll().all { it }
             }
 
             var succeeded = loadAll()
             if (!succeeded) succeeded = loadAll()
             if (succeeded) {
-                val s = settingsVM.uiState.value
+                val s = viewModels.settingsVM.uiState.value
                 DailyNotificationScheduler.scheduleAll(
                     context              = context,
                     notificationsEnabled = s.notificationsEnabled,
@@ -567,18 +574,20 @@ fun DayPilotNavGraph(
     val sessionState by sessionVM.state.collectAsState()
     LaunchedEffect(sessionState) {
         handleSessionStateChange(
-            sessionState    = sessionState,
-            navController   = navController,
-            sessionVM       = sessionVM,
-            context         = context,
-            homeVM          = homeVM,
-            calendarVM      = calendarVM,
-            profileVM       = profileVM,
-            progressVM      = progressVM,
-            friendsVM       = friendsVM,
-            rivalryVM       = rivalryVM,
-            settingsVM      = settingsVM,
-            notificationsVM = notificationsVM
+            sessionState  = sessionState,
+            navController = navController,
+            sessionVM     = sessionVM,
+            context       = context,
+            viewModels    = StartupViewModels(
+                homeVM          = homeVM,
+                calendarVM      = calendarVM,
+                profileVM       = profileVM,
+                progressVM      = progressVM,
+                friendsVM       = friendsVM,
+                rivalryVM       = rivalryVM,
+                settingsVM      = settingsVM,
+                notificationsVM = notificationsVM
+            )
         )
     }
 

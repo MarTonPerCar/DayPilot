@@ -211,17 +211,18 @@ private fun DrawScope.drawTrend(points: List<Offset>, values: List<Float>, chart
     drawTrendPoints(points, values, lineColor, textMeasurer)
 }
 
+private data class ChartGeometry(val chartHeight: Float, val yAxisWidth: Float, val barWidth: Float)
+
 // Position-based, not dayOfMonth-based — dayOfMonth rolls over a month boundary.
 private fun DrawScope.drawXAxisLabels(
     values: List<Float>,
     todayIndex: Int,
     dayLabels: List<Int>,
-    chartHeight: Float,
-    yAxisWidth: Float,
-    barWidth: Float,
+    geometry: ChartGeometry,
     lineColor: Color,
     textMeasurer: TextMeasurer
 ) {
+    val (chartHeight, yAxisWidth, barWidth) = geometry
     values.forEachIndexed { index, _ ->
         val showLabel = index % 5 == 4 || index == todayIndex
         if (!showLabel) return@forEachIndexed
@@ -281,7 +282,10 @@ private fun ProgressChart(
             val points = chartPoints(animValues, chartMax, chartHeight, yAxisWidth, barWidth)
             drawTrend(points, animValues, chartHeight, lineColor, textMeasurer)
 
-            drawXAxisLabels(animValues, todayIndex, dayLabels, chartHeight, yAxisWidth, barWidth, lineColor, textMeasurer)
+            drawXAxisLabels(
+                animValues, todayIndex, dayLabels,
+                ChartGeometry(chartHeight, yAxisWidth, barWidth), lineColor, textMeasurer
+            )
         }
     }
 }

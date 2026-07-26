@@ -77,9 +77,20 @@ data class TaskFormInitialData(
     val duration: Int = 30
 )
 
+data class TaskFormResult(
+    val title: String,
+    val category: TaskCategory,
+    val difficulty: TaskDifficulty,
+    val duration: Int,
+    val description: String,
+    val isRecurring: Boolean,
+    val hasReminder: Boolean,
+    val recurrenceDays: Int
+)
+
 @Composable
 fun TaskFormCard(
-    onSave: (title: String, category: TaskCategory, difficulty: TaskDifficulty, duration: Int, description: String, isRecurring: Boolean, hasReminder: Boolean, recurrenceDays: Int) -> Unit,
+    onSave: (TaskFormResult) -> Unit,
     onCancel: () -> Unit,
     modifier: Modifier = Modifier,
     isEditing: Boolean = false,
@@ -258,7 +269,22 @@ fun TaskFormCard(
                 Text(stringResource(R.string.common_cancel))
             }
             Button(
-                onClick = { if (title.isNotBlank()) onSave(title.trim(), category, difficulty, duration, description.trim(), recurring, reminder, recurrenceDays) },
+                onClick = {
+                    if (title.isNotBlank()) {
+                        onSave(
+                            TaskFormResult(
+                                title = title.trim(),
+                                category = category,
+                                difficulty = difficulty,
+                                duration = duration,
+                                description = description.trim(),
+                                isRecurring = recurring,
+                                hasReminder = reminder,
+                                recurrenceDays = recurrenceDays
+                            )
+                        )
+                    }
+                },
                 enabled = title.isNotBlank(),
                 modifier = Modifier
                     .weight(1f)
@@ -463,7 +489,7 @@ fun DurationSelector(
 fun TaskFormCardPreview() {
     DayPilotTheme(theme = DayPilotTheme.SAGE_GREEN, darkMode = true) {
         Box(Modifier.background(MaterialTheme.colorScheme.background)) {
-            TaskFormCard(onSave = { _, _, _, _, _, _, _, _ -> }, onCancel = {})
+            TaskFormCard(onSave = {}, onCancel = {})
         }
     }
 }

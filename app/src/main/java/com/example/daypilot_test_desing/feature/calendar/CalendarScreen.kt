@@ -25,6 +25,7 @@ import com.example.daypilot_test_desing.core.ui.components.DayPilotCalendarActio
 import com.example.daypilot_test_desing.core.ui.components.DayPilotCalendarState
 import com.example.daypilot_test_desing.core.ui.components.forms.TaskFormCard
 import com.example.daypilot_test_desing.core.ui.components.forms.TaskFormInitialData
+import com.example.daypilot_test_desing.core.ui.components.forms.TaskFormResult
 import com.example.daypilot_test_desing.core.data.model.CalendarTaskData
 import com.example.daypilot_test_desing.core.data.model.CalendarTaskDot
 import com.example.daypilot_test_desing.core.data.model.NewTaskData
@@ -182,15 +183,15 @@ private fun TaskDetailSheet(
     }
 }
 
+private data class NewTaskDate(val day: Int, val month: Int, val year: Int)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TaskFormSheet(
     show: Boolean,
     editingTaskId: String?,
     editingTask: CalendarTaskData?,
-    dayForNewTask: Int,
-    currentMonth: Int,
-    currentYear: Int,
+    dateForNewTask: NewTaskDate,
     sheetState: SheetState,
     onDismiss: () -> Unit,
     onCreateTask: (NewTaskData) -> Unit,
@@ -212,25 +213,25 @@ private fun TaskFormSheet(
                 difficulty = editingTask?.difficulty  ?: TaskDifficulty.EASY,
                 duration   = editingTask?.duration    ?: 30
             ),
-            onSave = { title, category, difficulty, duration, description, isRecurring, hasReminder, recurrenceDays ->
+            onSave = { result ->
                 if (editingTaskId == null) {
                     onCreateTask(
                         NewTaskData(
-                            day           = dayForNewTask,
-                            month         = currentMonth,
-                            year          = currentYear,
-                            title         = title,
-                            category      = category,
-                            difficulty    = difficulty,
-                            duration      = duration,
-                            description   = description,
-                            isRecurring   = isRecurring,
-                            hasReminder   = hasReminder,
-                            recurrenceDays= recurrenceDays
+                            day           = dateForNewTask.day,
+                            month         = dateForNewTask.month,
+                            year          = dateForNewTask.year,
+                            title         = result.title,
+                            category      = result.category,
+                            difficulty    = result.difficulty,
+                            duration      = result.duration,
+                            description   = result.description,
+                            isRecurring   = result.isRecurring,
+                            hasReminder   = result.hasReminder,
+                            recurrenceDays= result.recurrenceDays
                         )
                     )
                 } else {
-                    onUpdateTask(editingTaskId, title, category, difficulty, duration, description)
+                    onUpdateTask(editingTaskId, result.title, result.category, result.difficulty, result.duration, result.description)
                 }
                 onDismiss()
             },
@@ -445,21 +446,32 @@ private fun DayTasksList(
     }
 }
 
+private data class TaskFilterState(
+    val selectedDifficulty: TaskDifficulty?,
+    val onDifficultySelect: (TaskDifficulty?) -> Unit,
+    val selectedCategory: TaskCategory?,
+    val onCategorySelect: (TaskCategory?) -> Unit
+)
+
+private data class TaskRowActions(
+    val onToggle: (String, Boolean) -> Unit,
+    val onTap: (String) -> Unit,
+    val onEdit: (String) -> Unit,
+    val onDelete: (String) -> Unit
+)
+
 @Composable
 private fun SelectedDaySection(
     selectedDay: Int,
     tasksForSelectedDay: List<CalendarTaskData>,
-    selectedDifficulty: TaskDifficulty?,
-    onDifficultySelect: (TaskDifficulty?) -> Unit,
-    selectedCategory: TaskCategory?,
-    onCategorySelect: (TaskCategory?) -> Unit,
+    filterState: TaskFilterState,
     onAddTask: () -> Unit,
-    onToggle: (String, Boolean) -> Unit,
-    onTap: (String) -> Unit,
-    onEdit: (String) -> Unit,
-    onDelete: (String) -> Unit
+    rowActions: TaskRowActions
 ) {
-    TaskFiltersRow(selectedDifficulty, onDifficultySelect, selectedCategory, onCategorySelect)
+    TaskFiltersRow(
+        filterState.selectedDifficulty, filterState.onDifficultySelect,
+        filterState.selectedCategory, filterState.onCategorySelect
+    )
 
     DayPilotSectionHeader(
         title = stringResource(R.string.calendar_day_tasks_title, selectedDay),
@@ -467,7 +479,9 @@ private fun SelectedDaySection(
         onAction = onAddTask
     )
 
-    DayTasksList(tasksForSelectedDay, onToggle, onTap, onEdit, onDelete)
+    DayTasksList(
+        tasksForSelectedDay, rowActions.onToggle, rowActions.onTap, rowActions.onEdit, rowActions.onDelete
+    )
 
     Spacer(Modifier.height(8.dp))
 }
@@ -555,9 +569,7 @@ fun CalendarScreen(
         show = showAddSheet || editingTaskId != null,
         editingTaskId = editingTaskId,
         editingTask = editingTask,
-        dayForNewTask = dayForNewTask,
-        currentMonth = currentMonth,
-        currentYear = currentYear,
+        dateForNewTask = NewTaskDate(dayForNewTask, currentMonth, currentYear),
         sheetState = sheetState,
         onDismiss = {
             showAddSheet = false
@@ -619,18 +631,22 @@ fun CalendarScreen(
                 SelectedDaySection(
                     selectedDay = day,
                     tasksForSelectedDay = tasksForSelectedDay,
-                    selectedDifficulty = selectedDifficulty,
-                    onDifficultySelect = { selectedDifficulty = it },
-                    selectedCategory = selectedCategory,
-                    onCategorySelect = { selectedCategory = it },
+                    filterState = TaskFilterState(
+                        selectedDifficulty = selectedDifficulty,
+                        onDifficultySelect = { selectedDifficulty = it },
+                        selectedCategory = selectedCategory,
+                        onCategorySelect = { selectedCategory = it }
+                    ),
                     onAddTask = {
                         dayForNewTask = selectedDay ?: 1
                         showAddSheet = true
                     },
-                    onToggle = onToggleTask,
-                    onTap = { detailTaskId = it },
-                    onEdit = { editingTaskId = it },
-                    onDelete = onDeleteTask
+                    rowActions = TaskRowActions(
+                        onToggle = onToggleTask,
+                        onTap = { detailTaskId = it },
+                        onEdit = { editingTaskId = it },
+                        onDelete = onDeleteTask
+                    )
                 )
             }
         }
