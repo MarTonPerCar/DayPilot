@@ -479,6 +479,74 @@ private class AppLimitFormState(
 private fun rememberAppLimitFormState(initialApp: AppRestriction?, initialGroup: GroupRestriction?) =
     remember { AppLimitFormState(initialApp, initialGroup) }
 
+@Composable
+private fun AppLimitFormFields(form: AppLimitFormState, isEditing: Boolean, onCancel: () -> Unit, onSave: () -> Unit) {
+    val isGroup = form.isGroup
+
+    Text(
+        text = stringResource(
+            if (isEditing) R.string.app_limit_form_title_edit
+            else R.string.app_limit_form_title_new
+        ),
+        style = MaterialTheme.typography.titleMedium,
+        fontWeight = FontWeight.Bold,
+        color = MaterialTheme.colorScheme.onSurface
+    )
+
+    if (!isEditing) {
+        RestrictionTypeSelector(
+            restrictionType = form.restrictionType,
+            onSelect = { form.restrictionType = it }
+        )
+    }
+
+    if (!isGroup) {
+        AppPickerButton(
+            selectedApp = form.selectedApp,
+            isEditing = isEditing,
+            onClick = { form.showAppPicker = true }
+        )
+    }
+
+    if (isGroup) {
+        GroupNameAndAppsSection(
+            groupName = form.groupName,
+            onGroupNameChange = { form.groupName = it },
+            groupApps = form.groupApps,
+            onRemoveApp = { form.groupApps = form.groupApps - it },
+            onPickApps = { form.showGroupAppPicker = true }
+        )
+    }
+
+    LimitSliderSection(
+        isGroup = isGroup,
+        limitMinutes = form.limitMinutes,
+        onChange = { form.limitMinutes = it }
+    )
+
+    AppLimitFormActionsRow(
+        isValid = form.isValid,
+        isEditing = isEditing,
+        onCancel = onCancel,
+        onSave = onSave
+    )
+}
+
+private fun saveForm(
+    form: AppLimitFormState,
+    initialApp: AppRestriction?,
+    initialGroup: GroupRestriction?,
+    onSaveApp: (AppRestriction) -> Unit,
+    onSaveGroup: (GroupRestriction) -> Unit
+) {
+    if (!form.isValid) return
+    if (form.isGroup) {
+        onSaveGroup(buildGroupRestriction(initialGroup, form.groupName, form.groupApps, form.limitMinutes))
+    } else {
+        onSaveApp(buildAppRestriction(initialApp, form.selectedApp!!, form.limitMinutes))
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppLimitFormCard(
@@ -491,7 +559,6 @@ fun AppLimitFormCard(
     initialGroup: GroupRestriction? = null,
 ) {
     val form = rememberAppLimitFormState(initialApp, initialGroup)
-    val isGroup = form.isGroup
 
     AppPickerSheetDialog(
         show = form.showAppPicker,
@@ -518,60 +585,11 @@ fun AppLimitFormCard(
                 .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(
-                text = stringResource(
-                    if (isEditing) R.string.app_limit_form_title_edit
-                    else R.string.app_limit_form_title_new
-                ),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-
-            if (!isEditing) {
-                RestrictionTypeSelector(
-                    restrictionType = form.restrictionType,
-                    onSelect = { form.restrictionType = it }
-                )
-            }
-
-            if (!isGroup) {
-                AppPickerButton(
-                    selectedApp = form.selectedApp,
-                    isEditing = isEditing,
-                    onClick = { form.showAppPicker = true }
-                )
-            }
-
-            if (isGroup) {
-                GroupNameAndAppsSection(
-                    groupName = form.groupName,
-                    onGroupNameChange = { form.groupName = it },
-                    groupApps = form.groupApps,
-                    onRemoveApp = { form.groupApps = form.groupApps - it },
-                    onPickApps = { form.showGroupAppPicker = true }
-                )
-            }
-
-            LimitSliderSection(
-                isGroup = isGroup,
-                limitMinutes = form.limitMinutes,
-                onChange = { form.limitMinutes = it }
-            )
-
-            AppLimitFormActionsRow(
-                isValid = form.isValid,
+            AppLimitFormFields(
+                form = form,
                 isEditing = isEditing,
                 onCancel = onCancel,
-                onSave = {
-                    if (form.isValid) {
-                        if (isGroup) {
-                            onSaveGroup(buildGroupRestriction(initialGroup, form.groupName, form.groupApps, form.limitMinutes))
-                        } else {
-                            onSaveApp(buildAppRestriction(initialApp, form.selectedApp!!, form.limitMinutes))
-                        }
-                    }
-                }
+                onSave = { saveForm(form, initialApp, initialGroup, onSaveApp, onSaveGroup) }
             )
         }
     }

@@ -89,8 +89,9 @@ class StepsViewModel(
                 triggerSync(dailySteps)
             }
         }
-        // Required SensorEventListener override; steps math doesn't depend on sensor accuracy.
-        override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
+        override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+            // Required SensorEventListener override; steps math doesn't depend on sensor accuracy.
+        }
     }
 
     init {

@@ -172,34 +172,15 @@ private suspend fun playCompletionSound(context: android.content.Context) {
     if (ringtone?.isPlaying == true) ringtone.stop()
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TimerScreen(
-    timerMode: String,
-    customMinutes: Int = 0,
-    pointEarnedToday: Boolean = false,
-    onBack: () -> Unit,
-    onTimerCompleted: () -> Unit = {}
-) {
-    val context      = LocalContext.current
-    val mode         = TimerMode.entries.find { it.name == timerMode } ?: TimerMode.TRAINING
-    val totalSeconds = if (customMinutes > 0) customMinutes * 60 else mode.durationMinutes * 60
-    val label = if (timerMode == "CUSTOM") stringResource(R.string.timer_custom) else stringResource(mode.labelRes)
-    val durationMinutes = if (customMinutes > 0) customMinutes else mode.durationMinutes
+/** All of [TimerScreen]'s ticking state, pulled into its own class purely so `runTicker()`'s
+ *  loop is a real top-level member function instead of a local one nested inside the
+ *  Composable — that's what actually keeps [TimerScreen]'s own cognitive complexity down. */
+private class TimerState(val totalSeconds: Int) {
+    var secondsLeft by mutableIntStateOf(totalSeconds)
+    var isRunning by mutableStateOf(false)
+    var isFinished by mutableStateOf(false)
 
-    var secondsLeft by remember { mutableIntStateOf(totalSeconds) }
-    var isRunning   by remember { mutableStateOf(false) }
-    var isFinished  by remember { mutableStateOf(false) }
-
-    val progress = secondsLeft.toFloat() / totalSeconds
-
-    val animatedProgress by animateFloatAsState(
-        targetValue   = progress,
-        animationSpec = tween(500),
-        label         = "timer_progress"
-    )
-
-    fun resetTimer() {
+    fun reset() {
         secondsLeft = totalSeconds
         isRunning   = false
         isFinished  = false
@@ -215,17 +196,80 @@ fun TimerScreen(
             }
         }
     }
+}
 
-    LaunchedEffect(isRunning) { runTicker() }
+@Composable
+private fun rememberTimerState(totalSeconds: Int) = remember { TimerState(totalSeconds) }
 
-    LaunchedEffect(isFinished) {
-        if (!isFinished) return@LaunchedEffect
+@Composable
+private fun TimerBody(
+    state: TimerState,
+    durationMinutes: Int,
+    pointEarnedToday: Boolean,
+    animatedProgress: Float,
+    primaryColor: Color,
+    surfaceVarColor: Color
+) {
+    val minutes = state.secondsLeft / 60
+    val seconds = state.secondsLeft % 60
+
+    Box(
+        modifier         = Modifier.size(260.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        TimerRing(animatedProgress = animatedProgress, primaryColor = primaryColor, surfaceVarColor = surfaceVarColor)
+        TimerCenterContent(
+            minutes = minutes,
+            seconds = seconds,
+            durationMinutes = durationMinutes,
+            isFinished = state.isFinished
+        )
+    }
+
+    if (pointEarnedToday || state.isFinished) {
+        PointEarnedBadge()
+    }
+
+    TimerControlsRow(
+        isRunning = state.isRunning,
+        isFinished = state.isFinished,
+        onReset = { state.reset() },
+        onToggle = { if (!state.isFinished) state.isRunning = !state.isRunning }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TimerScreen(
+    timerMode: String,
+    customMinutes: Int = 0,
+    pointEarnedToday: Boolean = false,
+    onBack: () -> Unit,
+    onTimerCompleted: () -> Unit = {}
+) {
+    val context      = LocalContext.current
+    val mode         = TimerMode.entries.find { it.name == timerMode } ?: TimerMode.TRAINING
+    val totalSeconds = if (customMinutes > 0) customMinutes * 60 else mode.durationMinutes * 60
+    val label = if (timerMode == "CUSTOM") stringResource(R.string.timer_custom) else stringResource(mode.labelRes)
+    val durationMinutes = if (customMinutes > 0) customMinutes else mode.durationMinutes
+
+    val state = rememberTimerState(totalSeconds)
+    val progress = state.secondsLeft.toFloat() / totalSeconds
+
+    val animatedProgress by animateFloatAsState(
+        targetValue   = progress,
+        animationSpec = tween(500),
+        label         = "timer_progress"
+    )
+
+    LaunchedEffect(state.isRunning) { state.runTicker() }
+
+    LaunchedEffect(state.isFinished) {
+        if (!state.isFinished) return@LaunchedEffect
         onTimerCompleted()
         playCompletionSound(context)
     }
 
-    val minutes     = secondsLeft / 60
-    val seconds     = secondsLeft % 60
     val primaryColor    = MaterialTheme.colorScheme.primary
     val surfaceVarColor = MaterialTheme.colorScheme.surfaceVariant
 
@@ -246,28 +290,13 @@ fun TimerScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(32.dp, Alignment.CenterVertically)
         ) {
-            Box(
-                modifier         = Modifier.size(260.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                TimerRing(animatedProgress = animatedProgress, primaryColor = primaryColor, surfaceVarColor = surfaceVarColor)
-                TimerCenterContent(
-                    minutes = minutes,
-                    seconds = seconds,
-                    durationMinutes = durationMinutes,
-                    isFinished = isFinished
-                )
-            }
-
-            if (pointEarnedToday || isFinished) {
-                PointEarnedBadge()
-            }
-
-            TimerControlsRow(
-                isRunning = isRunning,
-                isFinished = isFinished,
-                onReset = { resetTimer() },
-                onToggle = { if (!isFinished) isRunning = !isRunning }
+            TimerBody(
+                state = state,
+                durationMinutes = durationMinutes,
+                pointEarnedToday = pointEarnedToday,
+                animatedProgress = animatedProgress,
+                primaryColor = primaryColor,
+                surfaceVarColor = surfaceVarColor
             )
         }
     }

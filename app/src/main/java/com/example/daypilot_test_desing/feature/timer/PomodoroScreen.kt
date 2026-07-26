@@ -41,6 +41,111 @@ private fun PomodoroPhase.advance(totalSessions: Int, workSeconds: Int, breakSec
     else copy(isFinished = true)
 }
 
+/** All of [PomodoroScreen]'s ticking state, pulled into its own class purely so `runTicker()`'s
+ *  loop is a real top-level member function instead of a local one nested inside the
+ *  Composable — that's what actually keeps [PomodoroScreen]'s own cognitive complexity down. */
+private class PomodoroState(private val totalSessions: Int, val workSeconds: Int, val breakSeconds: Int) {
+    var currentSession by mutableIntStateOf(1)
+    var isWorkPhase by mutableStateOf(true)
+    var secondsLeft by mutableIntStateOf(workSeconds)
+    var isRunning by mutableStateOf(false)
+    var isFinished by mutableStateOf(false)
+    var phaseEndCount by mutableIntStateOf(0)
+
+    fun applyPhase(next: PomodoroPhase) {
+        currentSession = next.session
+        isWorkPhase = next.isWork
+        secondsLeft = next.secondsLeft
+        isFinished = next.isFinished
+    }
+
+    fun reset() {
+        currentSession = 1
+        isWorkPhase    = true
+        secondsLeft    = workSeconds
+        isRunning      = false
+        isFinished     = false
+    }
+
+    fun skipPhase() {
+        isRunning = false
+        applyPhase(
+            PomodoroPhase(currentSession, isWorkPhase, secondsLeft, isFinished)
+                .advance(totalSessions, workSeconds, breakSeconds)
+        )
+    }
+
+    suspend fun runTicker() {
+        while (isRunning && !isFinished) {
+            delay(1000)
+            secondsLeft--
+
+            if (secondsLeft <= 0) {
+                isRunning = false
+                phaseEndCount++
+                applyPhase(
+                    PomodoroPhase(currentSession, isWorkPhase, secondsLeft, isFinished)
+                        .advance(totalSessions, workSeconds, breakSeconds)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun rememberPomodoroState(totalSessions: Int, workSeconds: Int, breakSeconds: Int) =
+    remember { PomodoroState(totalSessions, workSeconds, breakSeconds) }
+
+@Composable
+private fun PomodoroBody(
+    state: PomodoroState,
+    totalSessions: Int,
+    arcColor: Color,
+    workColor: Color,
+    surfaceVarColor: Color,
+    animatedProgress: Float
+) {
+    val minutes = state.secondsLeft / 60
+    val seconds = state.secondsLeft % 60
+
+    PomodoroSessionDots(
+        totalSessions = totalSessions,
+        currentSession = state.currentSession,
+        workColor = workColor,
+        arcColor = arcColor
+    )
+
+    PomodoroPhaseBadge(
+        isWorkPhase = state.isWorkPhase,
+        isFinished = state.isFinished,
+        currentSession = state.currentSession,
+        totalSessions = totalSessions,
+        arcColor = arcColor
+    )
+
+    PomodoroRing(
+        animatedProgress = animatedProgress,
+        arcColor = arcColor,
+        surfaceVarColor = surfaceVarColor,
+        minutes = minutes,
+        seconds = seconds,
+        isWorkPhase = state.isWorkPhase
+    )
+
+    PomodoroControlsRow(
+        isRunning = state.isRunning,
+        isFinished = state.isFinished,
+        arcColor = arcColor,
+        onReset = { state.reset() },
+        onToggle = { if (!state.isFinished) state.isRunning = !state.isRunning },
+        onSkip = { if (!state.isFinished) state.skipPhase() }
+    )
+
+    if (state.isFinished) {
+        PomodoroFinishedBadge()
+    }
+}
+
 private suspend fun playPhaseSound(context: android.content.Context, isFinished: Boolean) {
     val uri = if (isFinished)
         RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
@@ -276,54 +381,15 @@ fun PomodoroScreen(
     onCompleted: () -> Unit = {},
     onBack: () -> Unit
 ) {
-    val context      = LocalContext.current
-    val workSeconds  = 25 * 60
-    val breakSeconds = 5  * 60
+    val context = LocalContext.current
+    val state = rememberPomodoroState(totalSessions, workSeconds = 25 * 60, breakSeconds = 5 * 60)
 
-    var currentSession by remember { mutableIntStateOf(1) }
-    var isWorkPhase    by remember { mutableStateOf(true) }
-    var secondsLeft    by remember { mutableIntStateOf(workSeconds) }
-    var isRunning      by remember { mutableStateOf(false) }
-    var isFinished     by remember { mutableStateOf(false) }
-    var phaseEndCount  by remember { mutableIntStateOf(0) }
-
-    fun applyPhase(next: PomodoroPhase) {
-        currentSession = next.session
-        isWorkPhase = next.isWork
-        secondsLeft = next.secondsLeft
-        isFinished = next.isFinished
-    }
-
-    fun skipPhase() {
-        isRunning = false
-        applyPhase(
-            PomodoroPhase(currentSession, isWorkPhase, secondsLeft, isFinished)
-                .advance(totalSessions, workSeconds, breakSeconds)
-        )
-    }
-
-    suspend fun runTicker() {
-        while (isRunning && !isFinished) {
-            delay(1000)
-            secondsLeft--
-
-            if (secondsLeft <= 0) {
-                isRunning = false
-                phaseEndCount++
-                applyPhase(
-                    PomodoroPhase(currentSession, isWorkPhase, secondsLeft, isFinished)
-                        .advance(totalSessions, workSeconds, breakSeconds)
-                )
-            }
-        }
-    }
-
-    val totalSeconds = if (isWorkPhase) workSeconds else breakSeconds
-    val progress     = secondsLeft.toFloat() / totalSeconds
+    val totalSeconds = if (state.isWorkPhase) state.workSeconds else state.breakSeconds
+    val progress = state.secondsLeft.toFloat() / totalSeconds
 
     val workColor  = Color(0xFFE53935)
     val breakColor = Color(0xFF1E88E5)
-    val arcColor   = if (isWorkPhase) workColor else breakColor
+    val arcColor   = if (state.isWorkPhase) workColor else breakColor
 
     val animatedProgress by animateFloatAsState(
         targetValue   = progress,
@@ -333,20 +399,17 @@ fun PomodoroScreen(
 
     val surfaceVarColor = MaterialTheme.colorScheme.surfaceVariant
 
-    LaunchedEffect(isRunning) { runTicker() }
+    LaunchedEffect(state.isRunning) { state.runTicker() }
 
-    LaunchedEffect(isFinished) {
-        if (!isFinished) return@LaunchedEffect
+    LaunchedEffect(state.isFinished) {
+        if (!state.isFinished) return@LaunchedEffect
         onCompleted()
     }
 
-    LaunchedEffect(phaseEndCount) {
-        if (phaseEndCount == 0) return@LaunchedEffect
-        playPhaseSound(context, isFinished)
+    LaunchedEffect(state.phaseEndCount) {
+        if (state.phaseEndCount == 0) return@LaunchedEffect
+        playPhaseSound(context, state.isFinished)
     }
-
-    val minutes = secondsLeft / 60
-    val seconds = secondsLeft % 60
 
     Scaffold(
         topBar = {
@@ -365,48 +428,14 @@ fun PomodoroScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(24.dp, Alignment.CenterVertically)
         ) {
-            PomodoroSessionDots(
+            PomodoroBody(
+                state = state,
                 totalSessions = totalSessions,
-                currentSession = currentSession,
+                arcColor = arcColor,
                 workColor = workColor,
-                arcColor = arcColor
-            )
-
-            PomodoroPhaseBadge(
-                isWorkPhase = isWorkPhase,
-                isFinished = isFinished,
-                currentSession = currentSession,
-                totalSessions = totalSessions,
-                arcColor = arcColor
-            )
-
-            PomodoroRing(
-                animatedProgress = animatedProgress,
-                arcColor = arcColor,
                 surfaceVarColor = surfaceVarColor,
-                minutes = minutes,
-                seconds = seconds,
-                isWorkPhase = isWorkPhase
+                animatedProgress = animatedProgress
             )
-
-            PomodoroControlsRow(
-                isRunning = isRunning,
-                isFinished = isFinished,
-                arcColor = arcColor,
-                onReset = {
-                    currentSession = 1
-                    isWorkPhase    = true
-                    secondsLeft    = workSeconds
-                    isRunning      = false
-                    isFinished     = false
-                },
-                onToggle = { if (!isFinished) isRunning = !isRunning },
-                onSkip = { if (!isFinished) skipPhase() }
-            )
-
-            if (isFinished) {
-                PomodoroFinishedBadge()
-            }
         }
     }
 }

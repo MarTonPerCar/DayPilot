@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -75,6 +76,37 @@ private fun showDateTimePicker(context: Context, onSelected: (Calendar) -> Unit)
     ).show()
 }
 
+private fun minutesLabel(minutes: Int) = if (minutes == 60) "1h" else "${minutes}m"
+
+@Composable
+private fun RowScope.QuickMinuteChip(minutes: Int, isSelected: Boolean, onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .weight(1f)
+            .clip(RoundedCornerShape(10.dp))
+            .background(
+                if (isSelected) MaterialTheme.colorScheme.primary
+                else MaterialTheme.colorScheme.surfaceVariant
+            )
+            .border(
+                width = if (isSelected) 0.dp else 1.dp,
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                shape = RoundedCornerShape(10.dp)
+            )
+            .clickable(onClick = onClick)
+            .padding(vertical = 10.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = minutesLabel(minutes),
+            style = MaterialTheme.typography.labelMedium,
+            fontWeight = FontWeight.SemiBold,
+            color = if (isSelected) MaterialTheme.colorScheme.onPrimary
+            else MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
 @Composable
 private fun QuickMinutesSelector(quickMinutes: Int?, onSelect: (Int?) -> Unit) {
     Row(
@@ -82,32 +114,11 @@ private fun QuickMinutesSelector(quickMinutes: Int?, onSelect: (Int?) -> Unit) {
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         listOf(5, 10, 15, 30, 60).forEach { minutes ->
-            val isSelected = quickMinutes == minutes
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(
-                        if (isSelected) MaterialTheme.colorScheme.primary
-                        else MaterialTheme.colorScheme.surfaceVariant
-                    )
-                    .border(
-                        width = if (isSelected) 0.dp else 1.dp,
-                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
-                        shape = RoundedCornerShape(10.dp)
-                    )
-                    .clickable { onSelect(if (quickMinutes == minutes) null else minutes) }
-                    .padding(vertical = 10.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = if (minutes == 60) "1h" else "${minutes}m",
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    color = if (isSelected) MaterialTheme.colorScheme.onPrimary
-                    else MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
+            QuickMinuteChip(
+                minutes = minutes,
+                isSelected = quickMinutes == minutes,
+                onClick = { onSelect(if (quickMinutes == minutes) null else minutes) }
+            )
         }
     }
 }

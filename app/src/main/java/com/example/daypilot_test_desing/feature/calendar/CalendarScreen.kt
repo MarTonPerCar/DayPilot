@@ -201,13 +201,13 @@ private fun TaskDetailSheet(
 }
 
 private data class NewTaskDate(val day: Int, val month: Int, val year: Int)
+private data class EditingTask(val id: String?, val task: CalendarTaskData?)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TaskFormSheet(
     show: Boolean,
-    editingTaskId: String?,
-    editingTask: CalendarTaskData?,
+    editing: EditingTask,
     dateForNewTask: NewTaskDate,
     sheetState: SheetState,
     onDismiss: () -> Unit,
@@ -215,6 +215,8 @@ private fun TaskFormSheet(
     onUpdateTask: (id: String, title: String, category: TaskCategory, difficulty: TaskDifficulty, duration: Int, description: String) -> Unit
 ) {
     if (!show) return
+    val editingTaskId = editing.id
+    val editingTask = editing.task
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
@@ -608,8 +610,7 @@ fun CalendarScreen(
 
     TaskFormSheet(
         show = showAddSheet || editingTaskId != null,
-        editingTaskId = editingTaskId,
-        editingTask = editingTask,
+        editing = EditingTask(editingTaskId, editingTask),
         dateForNewTask = NewTaskDate(dayForNewTask, currentMonth, currentYear),
         sheetState = sheetState,
         onDismiss = {
