@@ -37,6 +37,25 @@ Esta es la rama de trabajo activa para el incremento final: UI real, arquitectur
 2. `flutter pub get`
 3. `flutter run -d <windows|linux|macos|android|chrome>`
 
+## Calidad de código (SonarCloud)
+
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/quality_gate?project=daypilot-test_daypilot-flutter&branch=Incremento-Flutter-TestFinal)](https://sonarcloud.io/summary/new_code?id=daypilot-test_daypilot-flutter&branch=Incremento-Flutter-TestFinal)
+
+El análisis de SonarCloud corre en CI solo en esta rama (no en `Incremento-Flutter`, que se mantiene libre de la integración). Última medición sobre el código completo, no solo el nuevo:
+
+| Métrica | Valor |
+|---|---|
+| Quality Gate | ✅ OK |
+| Cobertura | 57.9 % |
+| Bugs | 0 |
+| Vulnerabilidades | 0 |
+| Code Smells | 0 |
+| Duplicación | 2.3 % |
+| Fiabilidad | A |
+| Seguridad | A |
+| Revisión de seguridad | A |
+| Mantenibilidad | A |
+
 ## Ramas relacionadas
 
 | Rama | Propósito |
