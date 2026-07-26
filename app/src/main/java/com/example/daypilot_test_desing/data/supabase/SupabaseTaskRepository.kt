@@ -11,6 +11,7 @@ import com.example.daypilot_test_desing.data.supabase.dto.CalendarTaskDto
 import com.example.daypilot_test_desing.data.supabase.dto.NewTaskDayDto
 import com.example.daypilot_test_desing.data.supabase.dto.NewTaskDto
 import com.example.daypilot_test_desing.data.supabase.dto.TaskIdDto
+import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
@@ -19,13 +20,15 @@ import kotlinx.serialization.json.put
 import java.util.Calendar
 import java.util.UUID
 
-class SupabaseTaskRepository : TaskRepository {
+class SupabaseTaskRepository(
+    private val client: SupabaseClient = supabase
+) : TaskRepository {
 
     companion object {
         private const val TAG = "SupabaseTaskRepository"
     }
 
-    private fun userId(): String? = supabase.auth.currentUserOrNull()?.id
+    private fun userId(): String? = client.auth.currentUserOrNull()?.id
 
     override suspend fun getTasks(): List<CalendarTaskData> {
         SessionCache.tasks.value?.let { return it }
@@ -37,7 +40,7 @@ class SupabaseTaskRepository : TaskRepository {
             val fromDate = "%04d-%02d-%02d".format(from.get(Calendar.YEAR), from.get(Calendar.MONTH) + 1, from.get(Calendar.DAY_OF_MONTH))
             val toDate = "%04d-%02d-%02d".format(to.get(Calendar.YEAR), to.get(Calendar.MONTH) + 1, to.get(Calendar.DAY_OF_MONTH))
 
-            val result = supabase.from("calendar_tasks")
+            val result = client.from("calendar_tasks")
                 .select {
                     filter {
                         eq("user_id", uid)
@@ -63,7 +66,7 @@ class SupabaseTaskRepository : TaskRepository {
         try {
             // Read back the id Postgrest actually stored — it can diverge from the
             // client-generated one, and task_days' FK insert needs the real id or it 23503s.
-            val realTaskId = supabase.from("tasks").insert(buildJsonObject {
+            val realTaskId = client.from("tasks").insert(buildJsonObject {
                 put("id",                taskId)
                 put("user_id",           uid)
                 put("title",             data.title)
@@ -78,7 +81,7 @@ class SupabaseTaskRepository : TaskRepository {
             }.decodeSingle<TaskIdDto>().id
             Log.d(TAG, "Inserted task $realTaskId '${data.title}' (client id was $taskId)")
 
-            supabase.from("task_days").insert(
+            client.from("task_days").insert(
                 NewTaskDayDto(taskId = realTaskId, userId = uid, date = date)
             )
             Log.d(TAG, "Inserted first task_days row for $realTaskId on $date")
@@ -103,7 +106,7 @@ class SupabaseTaskRepository : TaskRepository {
                     cal.add(Calendar.DAY_OF_YEAR, data.recurrenceDays)
                 }
                 if (recurringDays.isNotEmpty()) {
-                    supabase.from("task_days").insert(recurringDays)
+                    client.from("task_days").insert(recurringDays)
                     Log.d(TAG, "Inserted ${recurringDays.size} recurring task_days rows for $realTaskId")
                 }
             }
@@ -125,7 +128,7 @@ class SupabaseTaskRepository : TaskRepository {
     ) {
         val uid = userId() ?: return
         try {
-            supabase.from("tasks").update({
+            client.from("tasks").update({
                 set("title", title)
                 set("description", description.ifBlank { null })
                 set("category", category.toDbString())
@@ -146,7 +149,7 @@ class SupabaseTaskRepository : TaskRepository {
         val uid = userId() ?: return
         val completedAt: String? = if (isDone) java.time.Instant.now().toString() else null
         try {
-            supabase.from("task_days").update({
+            client.from("task_days").update({
                 set("is_completed", isDone)
                 set("completed_at", completedAt)
                 // is_earned only ever goes false -> true, so it can't be paid out twice.
@@ -168,7 +171,7 @@ class SupabaseTaskRepository : TaskRepository {
     override suspend fun deleteTask(id: String) {
         val uid = userId() ?: return
         try {
-            supabase.from("tasks").delete {
+            client.from("tasks").delete {
                 filter { eq("id", id); eq("user_id", uid) }
             }
             Log.d(TAG, "Deleted task $id")
