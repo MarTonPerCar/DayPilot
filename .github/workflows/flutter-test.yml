@@ -37,8 +37,8 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
-      - name: Run tests
-        run: flutter test --file-reporter="json:test-results.json"
+      - name: Run tests with coverage
+        run: flutter test --coverage --file-reporter="json:test-results.json"
 
       - name: Publish per-test results
         uses: dorny/test-reporter@v2

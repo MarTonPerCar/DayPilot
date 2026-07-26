@@ -122,7 +122,7 @@ Future<void> initDesktopWindow() async {
   await windowManager.hide();
 
   await windowManager.waitUntilReadyToShow(
-    WindowOptions(
+    const WindowOptions(
       size: mobileWindowSize,
       minimumSize: mobileWindowSize,
       maximumSize: mobileWindowSize,

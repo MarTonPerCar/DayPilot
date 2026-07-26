@@ -32,7 +32,11 @@ class _CustomTimerSheetState extends State<_CustomTimerSheet> {
   static const _quick = [15, 30, 45, 60, 90];
   int _minutes = 30;
 
-  String _fmt(int m) => m >= 60 ? '${(m / 60).toStringAsFixed(m % 60 == 0 ? 0 : 1)}h' : '${m}m';
+  String _fmt(int m) {
+    if (m < 60) return '${m}m';
+    final decimals = m % 60 == 0 ? 0 : 1;
+    return '${(m / 60).toStringAsFixed(decimals)}h';
+  }
 
   @override
   Widget build(BuildContext context) {

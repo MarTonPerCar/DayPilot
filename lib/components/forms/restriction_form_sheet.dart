@@ -25,7 +25,7 @@ Future<void> showAddRestrictionSheet(
 }
 
 Future<int?> _showAppPicker(BuildContext context) {
-  final apps = AppData.mockInstallableApps;
+  const apps = AppData.mockInstallableApps;
   return showModalBottomSheet<int>(
     context: context,
     isScrollControlled: true,
@@ -94,7 +94,7 @@ class _RestrictionFormSheetState extends State<_RestrictionFormSheet> {
 
   Future<void> _submit() async {
     if (!_canCreate) return;
-    final apps = AppData.mockInstallableApps;
+    const apps = AppData.mockInstallableApps;
     final (name, _, _) = apps[_selectedAppIndex!];
     setState(() => _saving = true);
     try {
@@ -117,7 +117,7 @@ class _RestrictionFormSheetState extends State<_RestrictionFormSheet> {
     final colors = Theme.of(context).colorScheme;
     final text = Theme.of(context).textTheme;
     final l10n = AppLocalizations.of(context);
-    final apps = AppData.mockInstallableApps;
+    const apps = AppData.mockInstallableApps;
 
     return Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
