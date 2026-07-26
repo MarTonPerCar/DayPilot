@@ -3,6 +3,23 @@
    <configuration>
       <verify-metadata>true</verify-metadata>
       <verify-signatures>false</verify-signatures>
+      <trusted-artifacts>
+         <!-- Android Studio's own IDE sync resolves this via a detached configuration (Kotlin
+              DSL editor source attachment for the Gradle API) outside any gradlew build this
+              session ran, so it was never captured by the write-verification-metadata task. It's
+              Gradle's own first-party distribution, fetched straight from the Gradle
+              distributions repository. -->
+         <trust group="gradle" name="gradle" reason="Gradle's own distribution sources, fetched by Android Studio's IDE sync"/>
+         <!-- Android Studio's "download sources"/"download javadoc" features resolve -sources.jar
+              and -javadoc.jar for the whole dependency graph (build-plugin classpath and, as seen
+              with androidTest deps, regular test classpaths too) via configurations separate from
+              any real build/test execution classpath this project's write-verification-metadata
+              task runs cover. These jars are never compiled or executed — editor-only reference
+              material — so trusting them by filename pattern doesn't weaken verification of the
+              actual jars/aars/poms used to build and run the app, which stay checksum-verified. -->
+         <trust file=".*-sources\.jar" regex="true" reason="IDE-only sources jars (editor navigation), never compiled or executed as part of the build"/>
+         <trust file=".*-javadoc\.jar" regex="true" reason="IDE-only javadoc jars (editor navigation), never compiled or executed as part of the build"/>
+      </trusted-artifacts>
    </configuration>
    <components>
       <component group="androidx.activity" name="activity" version="1.12.1">
