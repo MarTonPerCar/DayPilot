@@ -45,6 +45,8 @@ This branch, `Incremento-Flutter`, is the **stable, permanent home** for the fin
 | `Test-Diseño-Flutter` | Design-system-only base this work builds on |
 | `Test-Supabase-Flutter` | Standalone spike validating `supabase_flutter` against the real project database |
 
+For the full dependency list (Android and Flutter), see the [Dependencias](https://github.com/MarTonPerCar/DayPilot/blob/master/README.md#dependencias) section of the `master` README.
+
 ## Downloads
 
 Releases for this branch are tagged `v2.1.X.Y.Z` (the repo-wide scheme: `V`=platform — `1` Android, `2` Flutter — `SV`=branch — `1` main, `2` TestFinal — followed by the real semantic version). CI also maintains a floating `incremento-flutter-latest` tag that always points at the newest build for this branch specifically.
