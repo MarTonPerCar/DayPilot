@@ -25,10 +25,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Remove
@@ -141,7 +141,7 @@ fun TaskFormCard(
 
         FormSection(
             title = stringResource(R.string.task_section_details),
-            icon = Icons.Default.List
+            icon = Icons.AutoMirrored.Filled.List
         ) {
             Text(
                 text = stringResource(R.string.task_category_label),
@@ -447,7 +447,7 @@ fun DurationSelector(
             onClick = { if (value - step >= min) onValueChange(value - step) },
             modifier = Modifier.size(40.dp),
             shape = RoundedCornerShape(10.dp),
-            border = ButtonDefaults.outlinedButtonBorder
+            border = ButtonDefaults.outlinedButtonBorder(enabled = true)
         ) {
             Icon(
                 Icons.Default.Remove,
@@ -474,7 +474,7 @@ fun DurationSelector(
             onClick = { onValueChange(value + step) },
             modifier = Modifier.size(40.dp),
             shape = RoundedCornerShape(10.dp),
-            border = ButtonDefaults.outlinedButtonBorder
+            border = ButtonDefaults.outlinedButtonBorder(enabled = true)
         ) {
             Icon(
                 Icons.Default.Add,

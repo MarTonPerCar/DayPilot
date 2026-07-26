@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -323,7 +324,7 @@ private fun DifficultyFilterDropdown(selectedDifficulty: TaskDifficulty?, onSele
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.calendar_filter_all)) },
                 onClick = { onSelect(null); showMenu = false },
-                leadingIcon = { Icon(Icons.Default.List, contentDescription = null, modifier = Modifier.size(16.dp)) }
+                leadingIcon = { Icon(Icons.AutoMirrored.Filled.List, contentDescription = null, modifier = Modifier.size(16.dp)) }
             )
             TaskDifficulty.entries.forEach { diff ->
                 DifficultyDropdownItem(
@@ -419,7 +420,7 @@ private fun CategoryFilterDropdown(selectedCategory: TaskCategory?, onSelect: (T
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.calendar_filter_all)) },
                 onClick = { onSelect(null); showMenu = false },
-                leadingIcon = { Icon(Icons.Default.List, contentDescription = null, modifier = Modifier.size(16.dp)) }
+                leadingIcon = { Icon(Icons.AutoMirrored.Filled.List, contentDescription = null, modifier = Modifier.size(16.dp)) }
             )
             TaskCategory.entries.forEach { cat ->
                 CategoryDropdownItem(

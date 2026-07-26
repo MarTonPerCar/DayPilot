@@ -44,7 +44,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.invisibleToUser
+import androidx.compose.ui.semantics.hideFromAccessibility
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -401,7 +401,7 @@ fun TimerHubScreen(
     val sheetOpen = showCustomSheet || showPomodoroSheet
 
     Scaffold(
-        modifier = Modifier.semantics { if (sheetOpen) invisibleToUser() },
+        modifier = Modifier.semantics { if (sheetOpen) hideFromAccessibility() },
         topBar = {
             DayPilotTopBar(
                 title = stringResource(R.string.timer_hub_title),
