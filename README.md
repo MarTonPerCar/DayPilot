@@ -1,57 +1,57 @@
 # DayPilot
 
-Productivity app (tasks, steps, Pomodoro timers, app usage limits, social ranking), backed by Supabase. Originally built for Android with Kotlin and Jetpack Compose, later ported to Flutter for cross-platform desktop support.
+Aplicación de productividad (tareas, pasos, temporizadores Pomodoro, límites de uso de apps, ranking social), con Supabase como backend. Construida originalmente para Android con Kotlin y Jetpack Compose, y más tarde adaptada a Flutter para dar soporte multiplataforma de escritorio.
 
-Users track daily tasks, steps, and app usage limits, and compete with friends on a 30-day points ranking. The app includes timers (Pomodoro and custom), reminders, a real-time notification system, and a weekly progress summary.
+Los usuarios registran tareas diarias, pasos y límites de uso de apps, y compiten con sus amigos en un ranking de puntos de 30 días. La app incluye temporizadores (Pomodoro y personalizados), recordatorios, un sistema de notificaciones en tiempo real y un resumen semanal de progreso.
 
-## Branches
+## Ramas
 
 **Android (Kotlin, Jetpack Compose):**
 
-| Branch | Purpose |
+| Rama | Propósito |
 |---|---|
-| `Incremento-Android` | Main development branch — base for future increments |
-| `Incremento-Android-TestFinal` | Active working/testing branch, merged into `Incremento-Android` periodically |
-| `Informacion-Supabase` | SQL migration files (schema, seed data, drop script) |
-| `Version-Original` | Original codebase before the Android increment |
-| `Test-Diseno-Android` | Design-system-only testing branch |
-| `Test-Funcional-Android` | Functional testing branch |
-| `Test-Supabase-Android` | Standalone spike validating Supabase connectivity from Android |
+| `Incremento-Android` | Rama principal de desarrollo — base para futuros incrementos |
+| `Incremento-Android-TestFinal` | Rama de trabajo/testing activa, fusionada periódicamente en `Incremento-Android` |
+| `Informacion-Supabase` | Archivos de migración SQL (esquema, datos semilla, script de borrado) |
+| `Version-Original` | Código original antes del incremento de Android |
+| `Test-Diseno-Android` | Rama de pruebas de solo sistema de diseño |
+| `Test-Funcional-Android` | Rama de pruebas funcionales |
+| `Test-Supabase-Android` | Prueba de concepto independiente que valida la conectividad con Supabase desde Android |
 
-**Flutter (Dart, cross-platform):**
+**Flutter (Dart, multiplataforma):**
 
-| Branch | Purpose |
+| Rama | Propósito |
 |---|---|
-| `Incremento-Flutter` | Final increment — real Riverpod architecture and Supabase backend |
-| `Incremento-Flutter-TestFinal` | Active working/testing branch, merged into `Incremento-Flutter` periodically |
-| `Test-Diseño-Flutter` | Design-system-only base (themes, components, dummy data) |
-| `Test-Supabase-Flutter` | Standalone spike validating `supabase_flutter` |
+| `Incremento-Flutter` | Incremento final — arquitectura real con Riverpod y backend real de Supabase |
+| `Incremento-Flutter-TestFinal` | Rama de trabajo/testing activa, fusionada periódicamente en `Incremento-Flutter` |
+| `Test-Diseño-Flutter` | Base de solo sistema de diseño (temas, componentes, datos de prueba) |
+| `Test-Supabase-Flutter` | Prueba de concepto independiente que valida `supabase_flutter` |
 
-## Stack
+## Tecnologías
 
 | | Android | Flutter |
 |---|---|---|
-| **Language** | Kotlin | Dart |
-| **UI** | Jetpack Compose + Material 3 | Flutter widgets + Material 3 |
-| **State management** | MVVM with repository pattern | Riverpod |
+| **Lenguaje** | Kotlin | Dart |
+| **UI** | Jetpack Compose + Material 3 | Widgets de Flutter + Material 3 |
+| **Gestión de estado** | MVVM con patrón repositorio | Riverpod |
 | **Backend** | Supabase (PostgreSQL, Auth, Storage, Realtime) | Supabase (PostgreSQL, Auth, Storage, Realtime) |
 | **CI/CD** | GitHub Actions | GitHub Actions |
 
-## Downloads
+## Descargas
 
 **Android:**
 - [⬇️ Descargar DayPilot (Version-Original)](https://github.com/MarTonPerCar/DayPilot/releases/download/v0.1.1/DayPilot.apk)
 - [⬇️ Descargar DayPilot (Incremento-Android)](https://github.com/MarTonPerCar/DayPilot/releases/download/incremento-android-latest/DayPilot-Incremento-Android.apk)
 
 **Flutter (Windows/Linux):**
-- [⬇️ Download DayPilot for Windows](https://github.com/MarTonPerCar/DayPilot/releases/download/incremento-flutter-latest/DayPilot-Setup.exe) — run the installer after downloading
+- [⬇️ Descargar DayPilot para Windows](https://github.com/MarTonPerCar/DayPilot/releases/download/incremento-flutter-latest/DayPilot-Setup.exe) — ejecuta el instalador tras descargarlo
 - Linux (.deb):
   ```bash
   wget -O DayPilot-Setup.deb https://github.com/MarTonPerCar/DayPilot/releases/download/incremento-flutter-latest/DayPilot-Setup.deb && sudo apt install ./DayPilot-Setup.deb
   ```
 
-**iOS / macOS:** not available yet — future development. Distributing an unsigned build isn't practical on either platform: macOS Gatekeeper blocks unsigned apps for normal users, and iOS can't install an unsigned `.ipa` outside Xcode's own device deployment. Both need an Apple Developer account to sign and notarize/distribute properly.
+**iOS / macOS:** todavía no disponible — desarrollo futuro. Distribuir una build sin firmar no es viable en ninguna de las dos plataformas: macOS Gatekeeper bloquea las apps sin firmar para usuarios normales, y iOS no permite instalar un `.ipa` sin firmar fuera del despliegue propio de Xcode a dispositivo. Ambas necesitan una cuenta de Apple Developer para firmar y notarizar/distribuir correctamente.
 
-## Auth pages (`docs/`)
+## Páginas de autenticación (`docs/`)
 
-Static pages Supabase Auth redirects to for email confirmation and password reset (`docs/confirm.html`, `docs/reset-password.html`), plus the HTML email templates configured in the Supabase dashboard (`docs/emails/`). Deployed via GitHub Pages through `.github/workflows/deploy-pages.yml`, which injects `SUPABASE_URL`/`SUPABASE_KEY` from repo secrets into `reset-password.html` at deploy time instead of committing them — requires the repo's Pages source to be set to "GitHub Actions" (Settings → Pages).
+Páginas estáticas a las que Supabase Auth redirige para la confirmación de email y el restablecimiento de contraseña (`docs/confirm.html`, `docs/reset-password.html`), además de las plantillas HTML de email configuradas en el panel de Supabase (`docs/emails/`). Se despliegan mediante GitHub Pages a través de `.github/workflows/deploy-pages.yml`, que inyecta `SUPABASE_URL`/`SUPABASE_KEY` desde los secrets del repositorio en `reset-password.html` en el momento del despliegue en lugar de comitearlos — requiere que el origen de Pages del repositorio esté configurado como "GitHub Actions" (Settings → Pages).
