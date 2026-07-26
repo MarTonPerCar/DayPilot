@@ -26,9 +26,14 @@ class SupabaseTaskRepository(
 
     companion object {
         private const val TAG = "SupabaseTaskRepository"
+        private const val DATE_FORMAT = "%04d-%02d-%02d"
     }
 
     private fun userId(): String? = client.auth.currentUserOrNull()?.id
+
+    private fun formatDate(year: Int, month: Int, day: Int) = DATE_FORMAT.format(year, month, day)
+    private fun formatDate(cal: Calendar) =
+        formatDate(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) + 1, cal.get(Calendar.DAY_OF_MONTH))
 
     override suspend fun getTasks(): List<CalendarTaskData> {
         SessionCache.tasks.value?.let { return it }
@@ -37,8 +42,8 @@ class SupabaseTaskRepository(
             val today = Calendar.getInstance()
             val from = (today.clone() as Calendar).also { it.add(Calendar.DAY_OF_YEAR, -90) }
             val to = (today.clone() as Calendar).also { it.add(Calendar.DAY_OF_YEAR, 180) }
-            val fromDate = "%04d-%02d-%02d".format(from.get(Calendar.YEAR), from.get(Calendar.MONTH) + 1, from.get(Calendar.DAY_OF_MONTH))
-            val toDate = "%04d-%02d-%02d".format(to.get(Calendar.YEAR), to.get(Calendar.MONTH) + 1, to.get(Calendar.DAY_OF_MONTH))
+            val fromDate = formatDate(from)
+            val toDate = formatDate(to)
 
             val result = client.from("calendar_tasks")
                 .select {
@@ -61,7 +66,7 @@ class SupabaseTaskRepository(
     override suspend fun addTask(data: NewTaskData) {
         val uid = userId() ?: return
         val taskId = UUID.randomUUID().toString()
-        val date = "%04d-%02d-%02d".format(data.year, data.month, data.day)
+        val date = formatDate(data.year, data.month, data.day)
 
         try {
             // Read back the id Postgrest actually stored — it can diverge from the
@@ -97,11 +102,7 @@ class SupabaseTaskRepository(
 
                 val recurringDays = mutableListOf<NewTaskDayDto>()
                 while (!cal.after(limit)) {
-                    val recurDate = "%04d-%02d-%02d".format(
-                        cal.get(Calendar.YEAR),
-                        cal.get(Calendar.MONTH) + 1,
-                        cal.get(Calendar.DAY_OF_MONTH)
-                    )
+                    val recurDate = formatDate(cal)
                     recurringDays += NewTaskDayDto(taskId = realTaskId, userId = uid, date = recurDate)
                     cal.add(Calendar.DAY_OF_YEAR, data.recurrenceDays)
                 }

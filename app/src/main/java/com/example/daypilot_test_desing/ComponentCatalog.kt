@@ -22,6 +22,10 @@ import com.example.daypilot_test_desing.core.ui.components.forms.*
 import com.example.daypilot_test_desing.core.data.model.*
 import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
 
+private const val SAMPLE_NAME_MARIO = "Mario García"
+private const val SAMPLE_NAME_ANA = "Ana López"
+private const val SAMPLE_NAME_CARLOS = "Carlos Ruiz"
+
 @Preview(showBackground = true)
 @Composable
 fun CatalogBasicInputs() {
@@ -44,9 +48,9 @@ fun CatalogBasicInputs() {
             }
             CatalogSection("Avatar") {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    DayPilotAvatar(name = "Mario García", size = 40)
-                    DayPilotAvatar(name = "Ana López",    size = 56)
-                    DayPilotAvatar(name = "Carlos Ruiz",  size = 72)
+                    DayPilotAvatar(name = SAMPLE_NAME_MARIO, size = 40)
+                    DayPilotAvatar(name = SAMPLE_NAME_ANA,    size = 56)
+                    DayPilotAvatar(name = SAMPLE_NAME_CARLOS,  size = 72)
                 }
             }
             CatalogSection("Chips") {
@@ -201,16 +205,16 @@ fun CatalogCardsPeople() {
             }
             CatalogSection("Notification Cards") {
                 NotificationCard(title = "Task completed!", message = "You completed 'Go for a run'", timeAgo = "5min ago", type = NotificationType.TASK, isRead = false, onClick = {})
-                NotificationCard(title = "New request", message = "Ana López wants to be your friend", timeAgo = "1h ago", type = NotificationType.SOCIAL, isRead = true, onClick = {})
+                NotificationCard(title = "New request", message = "$SAMPLE_NAME_ANA wants to be your friend", timeAgo = "1h ago", type = NotificationType.SOCIAL, isRead = true, onClick = {})
             }
             CatalogSection("Habit & Friend Cards") {
                 HabitCard(title = "Tech health", description = "App / group limits",  icon = Icons.Default.PhoneAndroid,  onClick = {})
                 HabitCard(title = "Reminders",   description = "Alerts and routines", icon = Icons.Default.Notifications, onClick = {})
-                FriendCard(info = FriendCardInfo(name = "Ana López",   email = "ana@example.com",    points = 520, streak = 14))
-                FriendCard(info = FriendCardInfo(name = "Carlos Ruiz", email = "carlos@example.com", points = 480, streak = 9,
+                FriendCard(info = FriendCardInfo(name = SAMPLE_NAME_ANA,   email = "ana@example.com",    points = 520, streak = 14))
+                FriendCard(info = FriendCardInfo(name = SAMPLE_NAME_CARLOS, email = "carlos@example.com", points = 480, streak = 9,
                     weeklySummary = FriendWeeklySummary(totalPoints = 45, tasksCompleted = 12, totalSteps = 42000, bestStreak = 7)))
-                UserSearchCard(info = UserCardInfo(name = "Mario García", email = "mario@example.com", points = 340, streak = 7), onAddFriend = {})
-                FriendRequestCard(info = UserCardInfo(name = "Ana López", email = "ana@example.com", points = 210, streak = 3), onAccept = {}, onReject = {})
+                UserSearchCard(info = UserCardInfo(name = SAMPLE_NAME_MARIO, email = "mario@example.com", points = 340, streak = 7), onAddFriend = {})
+                FriendRequestCard(info = UserCardInfo(name = SAMPLE_NAME_ANA, email = "ana@example.com", points = 210, streak = 3), onAccept = {}, onReject = {})
             }
         }
     }
@@ -227,12 +231,12 @@ fun CatalogCardsRankingTimer() {
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             CatalogSection("Ranking & Podium") {
-                RankingCard(entry = RankingEntryUi(name = "Ana López",   position = 1, points = 520, streak = 14))
-                RankingCard(entry = RankingEntryUi(name = "Carlos Ruiz", position = 2, points = 480, streak = 9))
-                CurrentUserRankingCard(entry = RankingEntryUi(name = "Mario García", position = 3, points = 340, streak = 7))
+                RankingCard(entry = RankingEntryUi(name = SAMPLE_NAME_ANA,   position = 1, points = 520, streak = 14))
+                RankingCard(entry = RankingEntryUi(name = SAMPLE_NAME_CARLOS, position = 2, points = 480, streak = 9))
+                CurrentUserRankingCard(entry = RankingEntryUi(name = SAMPLE_NAME_MARIO, position = 3, points = 340, streak = 7))
                 PodiumCard(
-                    first  = PodiumEntry("Ana López",     520, 14),
-                    second = PodiumEntry("Carlos Ruiz",   480, 9),
+                    first  = PodiumEntry(SAMPLE_NAME_ANA,     520, 14),
+                    second = PodiumEntry(SAMPLE_NAME_CARLOS,   480, 9),
                     third  = PodiumEntry("Laura Sánchez", 430, 6)
                 )
             }
@@ -270,7 +274,7 @@ fun CatalogCardsStats() {
         ) {
             CatalogSection("Stats & Profile Cards") {
                 StatsCard(rankingPosition = 2, pointsToday = 8, pointsFromTasks = 4, pointsFromSteps = 2, pointsFromHabits = 1, pointsFromTimers = 1)
-                ProfileStatsCard(info = ProfileStatsInfo(name = "Mario García", username = "mariogarcia", level = 7, totalPoints = 340, pointsToNextLevel = 350, currentStreak = 7, longestStreak = 14))
+                ProfileStatsCard(info = ProfileStatsInfo(name = SAMPLE_NAME_MARIO, username = "mariogarcia", level = 7, totalPoints = 340, pointsToNextLevel = 350, currentStreak = 7, longestStreak = 14))
                 ProfileInfoRow(label = "Email",    value = "mario@example.com")
                 ProfileInfoRow(label = "Username", value = "@mariogarcia")
             }
