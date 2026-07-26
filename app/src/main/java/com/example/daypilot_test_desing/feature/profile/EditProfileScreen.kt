@@ -25,46 +25,78 @@ import com.example.daypilot_test_desing.core.data.model.TimeZoneRegion
 import com.yalantis.ucrop.UCrop
 import java.io.File
 
-@OptIn(ExperimentalMaterial3Api::class)
+@Immutable
+data class EditProfileUiState(
+    val currentName: String,
+    val currentUsername: String,
+    val currentRegion: TimeZoneRegion = TimeZoneRegion.EUROPE_MADRID,
+    val avatarUrl: String? = null,
+    val isUploadingAvatar: Boolean = false,
+    val avatarUploadError: Boolean = false,
+    val isSavingProfile: Boolean = false,
+    val profileSaveError: Boolean = false
+)
+
+data class EditProfileActions(
+    val onSave: (name: String, username: String, region: TimeZoneRegion) -> Unit,
+    val onNavigateToResetPassword: () -> Unit,
+    val onPhotoSelected: (Uri) -> Unit,
+    val onAvatarErrorDismissed: () -> Unit = {},
+    val onProfileSaveErrorDismissed: () -> Unit = {},
+    val onBack: () -> Unit
+)
+
 @Composable
-fun EditProfileScreen(
-    currentName: String,
-    currentUsername: String,
-    currentRegion: TimeZoneRegion = TimeZoneRegion.EUROPE_MADRID,
-    avatarUrl: String? = null,
-    isUploadingAvatar: Boolean = false,
-    avatarUploadError: Boolean = false,
-    isSavingProfile: Boolean = false,
-    profileSaveError: Boolean = false,
-    onSave: (name: String, username: String, region: TimeZoneRegion) -> Unit,
-    onNavigateToResetPassword: () -> Unit,
-    onPhotoSelected: (Uri) -> Unit,
-    onAvatarErrorDismissed: () -> Unit = {},
-    onProfileSaveErrorDismissed: () -> Unit = {},
-    onBack: () -> Unit
+private fun AvatarPicker(
+    name: String,
+    avatarUrl: String?,
+    isUploadingAvatar: Boolean,
+    onEditClick: () -> Unit
 ) {
-    val context         = LocalContext.current
-    val snackbarHost    = remember { SnackbarHostState() }
-    var name            by remember { mutableStateOf(currentName) }
-    var username        by remember { mutableStateOf(currentUsername) }
-    var region          by remember { mutableStateOf(currentRegion) }
-    var showPhotoDialog by remember { mutableStateOf(false) }
-
-    val photoErrorMsg = stringResource(R.string.edit_profile_photo_error)
-    LaunchedEffect(avatarUploadError) {
-        if (avatarUploadError) {
-            snackbarHost.showSnackbar(photoErrorMsg)
-            onAvatarErrorDismissed()
+    Box(contentAlignment = Alignment.BottomEnd) {
+        Box(contentAlignment = Alignment.Center) {
+            DayPilotAvatar(
+                name      = name,
+                avatarUrl = avatarUrl,
+                size      = 90
+            )
+            if (isUploadingAvatar) {
+                CircularProgressIndicator(
+                    modifier    = Modifier.size(90.dp),
+                    strokeWidth = 3.dp,
+                    color       = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
+                )
+            }
+        }
+        Box(
+            modifier = Modifier
+                .size(28.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.primary),
+            contentAlignment = Alignment.Center
+        ) {
+            IconButton(
+                onClick  = onEditClick,
+                modifier = Modifier.size(28.dp)
+            ) {
+                Icon(
+                    imageVector        = Icons.Default.CameraAlt,
+                    contentDescription = stringResource(R.string.edit_profile_change_photo),
+                    tint               = MaterialTheme.colorScheme.onPrimary,
+                    modifier           = Modifier.size(14.dp)
+                )
+            }
         }
     }
+}
 
-    val saveErrorMsg = stringResource(R.string.edit_profile_save_error)
-    LaunchedEffect(profileSaveError) {
-        if (profileSaveError) {
-            snackbarHost.showSnackbar(saveErrorMsg)
-            onProfileSaveErrorDismissed()
-        }
-    }
+@Composable
+private fun PhotoPickerDialogHost(
+    show: Boolean,
+    onDismiss: () -> Unit,
+    onPhotoSelected: (Uri) -> Unit
+) {
+    val context = LocalContext.current
 
     val cropLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         val croppedUri = UCrop.getOutput(result.data ?: return@rememberLauncherForActivityResult)
@@ -91,13 +123,11 @@ fun EditProfileScreen(
         uri?.let { launchCrop(it) }
     }
 
-    val regions = TimeZoneRegion.entries
-
-    if (showPhotoDialog) {
+    if (show) {
         DayPilotPhotoPickerDialog(
-            onDismiss         = { showPhotoDialog = false },
+            onDismiss         = onDismiss,
             onPickFromCamera  = {
-                showPhotoDialog = false
+                onDismiss()
                 val tempFile = File(context.cacheDir, "avatar_temp.jpg")
                 val uri = FileProvider.getUriForFile(
                     context,
@@ -108,11 +138,52 @@ fun EditProfileScreen(
                 cameraLauncher.launch(uri)
             },
             onPickFromGallery = {
-                showPhotoDialog = false
+                onDismiss()
                 galleryLauncher.launch("image/*")
             }
         )
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EditProfileScreen(
+    state: EditProfileUiState,
+    actions: EditProfileActions
+) {
+    val (currentName, currentUsername, currentRegion, avatarUrl, isUploadingAvatar,
+        avatarUploadError, isSavingProfile, profileSaveError) = state
+    val (onSave, onNavigateToResetPassword, onPhotoSelected,
+        onAvatarErrorDismissed, onProfileSaveErrorDismissed, onBack) = actions
+    val snackbarHost    = remember { SnackbarHostState() }
+    var name            by remember { mutableStateOf(currentName) }
+    var username        by remember { mutableStateOf(currentUsername) }
+    var region          by remember { mutableStateOf(currentRegion) }
+    var showPhotoDialog by remember { mutableStateOf(false) }
+
+    val photoErrorMsg = stringResource(R.string.edit_profile_photo_error)
+    LaunchedEffect(avatarUploadError) {
+        if (avatarUploadError) {
+            snackbarHost.showSnackbar(photoErrorMsg)
+            onAvatarErrorDismissed()
+        }
+    }
+
+    val saveErrorMsg = stringResource(R.string.edit_profile_save_error)
+    LaunchedEffect(profileSaveError) {
+        if (profileSaveError) {
+            snackbarHost.showSnackbar(saveErrorMsg)
+            onProfileSaveErrorDismissed()
+        }
+    }
+
+    val regions = TimeZoneRegion.entries
+
+    PhotoPickerDialogHost(
+        show = showPhotoDialog,
+        onDismiss = { showPhotoDialog = false },
+        onPhotoSelected = onPhotoSelected
+    )
 
     Scaffold(
         topBar = {
@@ -135,41 +206,12 @@ fun EditProfileScreen(
         ) {
             Spacer(Modifier.height(8.dp))
 
-            Box(contentAlignment = Alignment.BottomEnd) {
-                Box(contentAlignment = Alignment.Center) {
-                    DayPilotAvatar(
-                        name      = name,
-                        avatarUrl = avatarUrl,
-                        size      = 90
-                    )
-                    if (isUploadingAvatar) {
-                        CircularProgressIndicator(
-                            modifier    = Modifier.size(90.dp),
-                            strokeWidth = 3.dp,
-                            color       = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
-                        )
-                    }
-                }
-                Box(
-                    modifier = Modifier
-                        .size(28.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primary),
-                    contentAlignment = Alignment.Center
-                ) {
-                    IconButton(
-                        onClick  = { if (!isUploadingAvatar) showPhotoDialog = true },
-                        modifier = Modifier.size(28.dp)
-                    ) {
-                        Icon(
-                            imageVector        = Icons.Default.CameraAlt,
-                            contentDescription = stringResource(R.string.edit_profile_change_photo),
-                            tint               = MaterialTheme.colorScheme.onPrimary,
-                            modifier           = Modifier.size(14.dp)
-                        )
-                    }
-                }
-            }
+            AvatarPicker(
+                name = name,
+                avatarUrl = avatarUrl,
+                isUploadingAvatar = isUploadingAvatar,
+                onEditClick = { if (!isUploadingAvatar) showPhotoDialog = true }
+            )
 
             TextButton(
                 onClick  = { showPhotoDialog = true },

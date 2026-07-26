@@ -1,24 +1,30 @@
 package com.example.daypilot_test_desing.feature.reminders
 
-import androidx.test.core.app.ApplicationProvider
 import com.example.daypilot_test_desing.core.data.model.FrequencyType
 import com.example.daypilot_test_desing.core.data.model.ReminderFormDataInfo
+import com.example.daypilot_test_desing.support.FakeApplication
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 
 // Unlike the other feature ViewModels, RemindersViewModel constructs its own concrete
 // SharedPrefsReminderRepository/AppPreferences internally instead of taking an injected
-// interface — so this exercises the real, Robolectric-backed SharedPreferences rather than a
+// interface — so this exercises the real, fake-Context-backed SharedPreferences rather than a
 // mock. That's still a fair unit test: no network, no real device, deterministic.
-@RunWith(RobolectricTestRunner::class)
 class RemindersViewModelTest {
 
-    private fun buildViewModel() = RemindersViewModel(ApplicationProvider.getApplicationContext())
+    private lateinit var application: FakeApplication
+
+    @Before
+    fun setUp() {
+        // Shared across buildViewModel() calls within a test, same as a real Context always
+        // returning the same backing store for the same SharedPreferences name.
+        application = FakeApplication()
+    }
+
+    private fun buildViewModel() = RemindersViewModel(application)
 
     @Test
     fun `addReminder with a quick-timer duration adds it to state as enabled`() {

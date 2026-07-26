@@ -10,7 +10,7 @@ import com.example.daypilot_test_desing.support.MainDispatcherRule
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import com.example.daypilot_test_desing.support.realAdvanceUntilIdle
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -45,7 +45,7 @@ class ProfileViewModelTest {
     @Test
     fun `init combines user, weekly summary and today progress`() = runTest {
         val viewModel = buildViewModel()
-        realAdvanceUntilIdle()
+        advanceUntilIdle()
 
         val state = viewModel.uiState.value
         assertEquals("Ana", state.name)
@@ -59,11 +59,11 @@ class ProfileViewModelTest {
     @Test
     fun `updateProfile success reloads and reports success`() = runTest {
         val viewModel = buildViewModel()
-        realAdvanceUntilIdle()
+        advanceUntilIdle()
         coEvery { userRepo.updateProfile("Ana G", "anag", TimeZoneRegion.EUROPE_MADRID) } returns Unit
 
         viewModel.updateProfile("Ana G", "anag", TimeZoneRegion.EUROPE_MADRID)
-        realAdvanceUntilIdle()
+        advanceUntilIdle()
 
         val state = viewModel.uiState.value
         assertFalse(state.isSavingProfile)
@@ -73,13 +73,13 @@ class ProfileViewModelTest {
     @Test
     fun `updateProfile failure reports the error without crashing`() = runTest {
         val viewModel = buildViewModel()
-        realAdvanceUntilIdle()
+        advanceUntilIdle()
         coEvery {
             userRepo.updateProfile("Ana G", "anag", TimeZoneRegion.EUROPE_MADRID)
         } throws RuntimeException("update failed")
 
         viewModel.updateProfile("Ana G", "anag", TimeZoneRegion.EUROPE_MADRID)
-        realAdvanceUntilIdle()
+        advanceUntilIdle()
 
         val state = viewModel.uiState.value
         assertFalse(state.isSavingProfile)

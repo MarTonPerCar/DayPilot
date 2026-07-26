@@ -3,6 +3,7 @@ package com.example.daypilot_test_desing.core.data.local
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
+import androidx.core.content.edit
 import com.example.daypilot_test_desing.core.data.model.ReminderData
 import com.example.daypilot_test_desing.core.data.model.ReminderFormDataInfo
 import com.example.daypilot_test_desing.core.data.repository.ReminderRepository
@@ -33,9 +34,9 @@ class SharedPrefsReminderRepository(context: Context) : ReminderRepository {
     }
 
     private fun save(list: List<ReminderData>) {
-        prefs.edit()
-            .putString("reminders", json.encodeToString(ListSerializer(ReminderData.serializer()), list))
-            .apply()
+        prefs.edit {
+            putString("reminders", json.encodeToString(ListSerializer(ReminderData.serializer()), list))
+        }
     }
 
     override fun getReminders(): List<ReminderData> = load()

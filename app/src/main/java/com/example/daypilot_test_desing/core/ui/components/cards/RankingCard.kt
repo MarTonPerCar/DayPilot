@@ -15,10 +15,14 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -34,18 +38,33 @@ private fun rankMedal(position: Int): String = when (position) {
     else -> "#$position"
 }
 
+@Immutable
+data class RankingEntryUi(
+    val name: String,
+    val position: Int,
+    val points: Int,
+    val streak: Int,
+    val level: Int = 1,
+    val avatarUrl: String? = null
+)
+
 @Composable
 private fun RankingCardBase(
-    name: String,
-    position: Int,
-    points: Int,
-    streak: Int,
-    level: Int = 1,
+    entry: RankingEntryUi,
     modifier: Modifier = Modifier,
-    avatarUrl: String? = null,
-    isCurrentUser: Boolean = false
+    isCurrentUser: Boolean = false,
+    isFeaturedSummary: Boolean = false
 ) {
+    val (name, position, points, streak, level, avatarUrl) = entry
     val shape = RoundedCornerShape(20.dp)
+    val featuredDesc = if (isFeaturedSummary) {
+        val streakPhrase = pluralStringResource(R.plurals.rivalry_streak_phrase, streak, streak)
+        val pointsPhrase = pluralStringResource(R.plurals.rivalry_points_phrase, points, points)
+        stringResource(R.string.rivalry_your_position_desc, name, level, streakPhrase, pointsPhrase)
+    } else null
+    val summaryModifier = if (featuredDesc != null) {
+        Modifier.semantics(mergeDescendants = true) { contentDescription = featuredDesc }
+    } else Modifier
 
     val borderModifier = if (isCurrentUser) {
         Modifier.border(
@@ -63,7 +82,8 @@ private fun RankingCardBase(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .then(borderModifier),
+            .then(borderModifier)
+            .then(summaryModifier),
         shape = shape,
         colors = CardDefaults.cardColors(
             containerColor = if (isCurrentUser)
@@ -116,7 +136,7 @@ private fun RankingCardBase(
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(
-                    text = stringResource(R.string.ranking_streak, streak),
+                    text = pluralStringResource(R.plurals.ranking_streak, streak, streak),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -141,22 +161,12 @@ private fun RankingCardBase(
 
 @Composable
 fun RankingCard(
-    name: String,
-    position: Int,
-    points: Int,
-    streak: Int,
-    level: Int = 1,
+    entry: RankingEntryUi,
     modifier: Modifier = Modifier,
-    avatarUrl: String? = null,
     isCurrentUser: Boolean = false
 ) {
     RankingCardBase(
-        name          = name,
-        avatarUrl     = avatarUrl,
-        position      = position,
-        points        = points,
-        streak        = streak,
-        level         = level,
+        entry         = entry,
         modifier      = modifier,
         isCurrentUser = isCurrentUser
     )
@@ -164,23 +174,14 @@ fun RankingCard(
 
 @Composable
 fun CurrentUserRankingCard(
-    name: String,
-    position: Int,
-    points: Int,
-    streak: Int,
-    level: Int = 1,
-    modifier: Modifier = Modifier,
-    avatarUrl: String? = null
+    entry: RankingEntryUi,
+    modifier: Modifier = Modifier
 ) {
     RankingCardBase(
-        name          = name,
-        avatarUrl     = avatarUrl,
-        position      = position,
-        points        = points,
-        streak        = streak,
-        level         = level,
-        modifier      = modifier,
-        isCurrentUser = true
+        entry             = entry,
+        modifier          = modifier,
+        isCurrentUser     = true,
+        isFeaturedSummary = true
     )
 }
 
@@ -194,11 +195,11 @@ fun RankingCardsPreview() {
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            RankingCard(name = "Ana López", position = 1, points = 520, streak = 14)
-            RankingCard(name = "Carlos Ruiz", position = 2, points = 480, streak = 9)
-            RankingCard(name = "Laura Sánchez", position = 3, points = 430, streak = 6)
-            CurrentUserRankingCard(name = "Mario García", position = 4, points = 340, streak = 7)
-            RankingCard(name = "Pedro Martín", position = 5, points = 290, streak = 3)
+            RankingCard(entry = RankingEntryUi(name = "Ana López", position = 1, points = 520, streak = 14))
+            RankingCard(entry = RankingEntryUi(name = "Carlos Ruiz", position = 2, points = 480, streak = 9))
+            RankingCard(entry = RankingEntryUi(name = "Laura Sánchez", position = 3, points = 430, streak = 6))
+            CurrentUserRankingCard(entry = RankingEntryUi(name = "Mario García", position = 4, points = 340, streak = 7))
+            RankingCard(entry = RankingEntryUi(name = "Pedro Martín", position = 5, points = 290, streak = 3))
         }
     }
 }

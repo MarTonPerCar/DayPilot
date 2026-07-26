@@ -1,11 +1,9 @@
 package com.example.daypilot_test_desing.feature.session
 
-import com.example.daypilot_test_desing.support.initSupabaseSettingsForTest
+import com.example.daypilot_test_desing.support.MainDispatcherRule
 import org.junit.Assert.assertEquals
-import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 
 // AppSessionViewModel has no injected repository at all — it drives the real Supabase Auth
 // plugin directly. There's nothing to mock here, so this covers the manual state-machine
@@ -13,16 +11,12 @@ import org.robolectric.RobolectricTestRunner
 // startup data finishing) instead.
 //
 // Not covered: init{}'s own session-restore check (supabase.auth.awaitInitialization() ->
-// Unauthenticated/DataLoading). Confirmed via an isolated smoke test that awaitInitialization()
-// never resolves under Robolectric even with no ViewModel involved and a 5s real-time timeout —
-// a genuine gap in supabase-kt's Robolectric compatibility, not fixable from the test side.
-@RunWith(RobolectricTestRunner::class)
+// Unauthenticated/DataLoading). The MainDispatcherRule's StandardTestDispatcher never runs that
+// coroutine unless something advances it, which these tests don't need to do.
 class AppSessionViewModelTest {
 
-    @Before
-    fun setUp() {
-        initSupabaseSettingsForTest()
-    }
+    @get:Rule
+    val mainDispatcherRule = MainDispatcherRule()
 
     @Test
     fun `notifyAuthenticated moves to DataLoading`() {

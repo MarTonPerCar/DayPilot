@@ -2,14 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
-    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_HEALTH"/>
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
         tools:ignore="QueryAllPackagesPermission"/>
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION"/>
@@ -24,11 +23,11 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:usesCleartextTraffic="false"
         android:theme="@style/Theme.DayPilotTestDesing">
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:label="@string/app_name"
             android:theme="@style/Theme.DayPilotTestDesing.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -49,7 +48,6 @@
 
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
-            android:screenOrientation="portrait"
             android:theme="@style/UCropTheme"/>
 
         <activity
@@ -60,9 +58,6 @@
 
         <receiver
             android:name=".core.reminders.ReminderReceiver"
-            android:exported="false"/>
-        <receiver
-            android:name=".core.reminders.TechHealthReceiver"
             android:exported="false"/>
         <receiver
             android:name=".core.reminders.DailyNotificationsReceiver"
@@ -86,11 +81,6 @@
                 android:name="android.accessibilityservice"
                 android:resource="@xml/accessibility_config" />
         </service>
-
-        <service
-            android:name=".core.reminders.StepsForegroundService"
-            android:exported="false"
-            android:foregroundServiceType="health"/>
     </application>
 
 </manifest>

@@ -25,10 +25,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Remove
@@ -49,6 +49,7 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -68,26 +69,46 @@ import com.example.daypilot_test_desing.core.data.model.TaskDifficulty
 import com.example.daypilot_test_desing.core.data.model.NewTaskData
 import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
 
+data class TaskFormInitialData(
+    val title: String = "",
+    val description: String = "",
+    val category: TaskCategory = TaskCategory.PERSONAL,
+    val difficulty: TaskDifficulty = TaskDifficulty.EASY,
+    val duration: Int = 30
+)
+
+data class TaskFormResult(
+    val title: String,
+    val category: TaskCategory,
+    val difficulty: TaskDifficulty,
+    val duration: Int,
+    val description: String,
+    val isRecurring: Boolean,
+    val hasReminder: Boolean,
+    val recurrenceDays: Int
+)
+
 @Composable
 fun TaskFormCard(
-    onSave: (title: String, category: TaskCategory, difficulty: TaskDifficulty, duration: Int, description: String, isRecurring: Boolean, hasReminder: Boolean, recurrenceDays: Int) -> Unit,
+    onSave: (TaskFormResult) -> Unit,
     onCancel: () -> Unit,
     modifier: Modifier = Modifier,
     isEditing: Boolean = false,
-    initialTitle: String = "",
-    initialDescription: String = "",
-    initialCategory: TaskCategory = TaskCategory.PERSONAL,
-    initialDifficulty: TaskDifficulty = TaskDifficulty.EASY,
-    initialDuration: Int = 30
+    initialData: TaskFormInitialData = TaskFormInitialData()
 ) {
+    val initialTitle = initialData.title
+    val initialDescription = initialData.description
+    val initialCategory = initialData.category
+    val initialDifficulty = initialData.difficulty
+    val initialDuration = initialData.duration
     var title by remember(initialTitle) { mutableStateOf(initialTitle) }
     var description by remember(initialDescription) { mutableStateOf(initialDescription) }
     var category by remember(initialCategory) { mutableStateOf(initialCategory) }
     var difficulty by remember(initialDifficulty) { mutableStateOf(initialDifficulty) }
-    var duration by remember(initialDuration) { mutableStateOf(initialDuration) }
+    var duration by remember(initialDuration) { mutableIntStateOf(initialDuration) }
     var reminder by remember { mutableStateOf(false) }
     var recurring by remember { mutableStateOf(false) }
-    var recurrenceDays by remember { mutableStateOf(1) }
+    var recurrenceDays by remember { mutableIntStateOf(1) }
 
     Column(
         modifier = modifier
@@ -120,7 +141,7 @@ fun TaskFormCard(
 
         FormSection(
             title = stringResource(R.string.task_section_details),
-            icon = Icons.Default.List
+            icon = Icons.AutoMirrored.Filled.List
         ) {
             Text(
                 text = stringResource(R.string.task_category_label),
@@ -248,7 +269,22 @@ fun TaskFormCard(
                 Text(stringResource(R.string.common_cancel))
             }
             Button(
-                onClick = { if (title.isNotBlank()) onSave(title.trim(), category, difficulty, duration, description.trim(), recurring, reminder, recurrenceDays) },
+                onClick = {
+                    if (title.isNotBlank()) {
+                        onSave(
+                            TaskFormResult(
+                                title = title.trim(),
+                                category = category,
+                                difficulty = difficulty,
+                                duration = duration,
+                                description = description.trim(),
+                                isRecurring = recurring,
+                                hasReminder = reminder,
+                                recurrenceDays = recurrenceDays
+                            )
+                        )
+                    }
+                },
                 enabled = title.isNotBlank(),
                 modifier = Modifier
                     .weight(1f)
@@ -411,9 +447,13 @@ fun DurationSelector(
             onClick = { if (value - step >= min) onValueChange(value - step) },
             modifier = Modifier.size(40.dp),
             shape = RoundedCornerShape(10.dp),
-            border = ButtonDefaults.outlinedButtonBorder
+            border = ButtonDefaults.outlinedButtonBorder(enabled = true)
         ) {
-            Icon(Icons.Default.Remove, contentDescription = null, modifier = Modifier.size(16.dp))
+            Icon(
+                Icons.Default.Remove,
+                contentDescription = stringResource(R.string.task_decrease_duration),
+                modifier = Modifier.size(16.dp)
+            )
         }
         Box(
             modifier = Modifier
@@ -434,9 +474,13 @@ fun DurationSelector(
             onClick = { onValueChange(value + step) },
             modifier = Modifier.size(40.dp),
             shape = RoundedCornerShape(10.dp),
-            border = ButtonDefaults.outlinedButtonBorder
+            border = ButtonDefaults.outlinedButtonBorder(enabled = true)
         ) {
-            Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
+            Icon(
+                Icons.Default.Add,
+                contentDescription = stringResource(R.string.task_increase_duration),
+                modifier = Modifier.size(16.dp)
+            )
         }
     }
 }
@@ -445,7 +489,7 @@ fun DurationSelector(
 fun TaskFormCardPreview() {
     DayPilotTheme(theme = DayPilotTheme.SAGE_GREEN, darkMode = true) {
         Box(Modifier.background(MaterialTheme.colorScheme.background)) {
-            TaskFormCard(onSave = { _, _, _, _, _, _, _, _ -> }, onCancel = {})
+            TaskFormCard(onSave = {}, onCancel = {})
         }
     }
 }

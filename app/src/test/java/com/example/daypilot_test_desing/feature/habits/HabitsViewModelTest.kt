@@ -8,7 +8,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import com.example.daypilot_test_desing.support.realAdvanceUntilIdle
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -51,10 +51,10 @@ class HabitsViewModelTest {
     @Test
     fun `refresh syncs steps then updates points earned and remaining`() = runTest {
         val viewModel = buildViewModel()
-        realAdvanceUntilIdle()
+        advanceUntilIdle()
 
         viewModel.refresh()
-        realAdvanceUntilIdle()
+        advanceUntilIdle()
 
         coVerify { repo.syncSteps(1000, 10_000) }
         val state = viewModel.uiState.value

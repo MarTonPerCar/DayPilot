@@ -19,3 +19,32 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# --- kotlinx.serialization ---
+# Standard rules from https://github.com/Kotlin/kotlinx.serialization#android
+-keepattributes *Annotation*, InnerClasses
+-dontnote kotlinx.serialization.AnnotationsKt
+
+-keepclasseswithmembers class kotlinx.serialization.json.** {
+    kotlinx.serialization.KSerializer serializer(...);
+}
+
+-keep,includedescriptorclasses class com.example.daypilot_test_desing.**$$serializer { *; }
+-keepclassmembers class com.example.daypilot_test_desing.** {
+    *** Companion;
+}
+-keepclasseswithmembers class com.example.daypilot_test_desing.** {
+    kotlinx.serialization.KSerializer serializer(...);
+}
+
+# --- Supabase-kt / Ktor ---
+# Neither library ships consumer ProGuard rules, and both rely on
+# kotlinx.serialization + reflection internally to decode Postgrest/Auth/
+# Realtime/Storage responses. Keeping the whole namespace avoids stripping
+# generated serializers we have no visibility into from the app side.
+-keep class io.github.jan.supabase.** { *; }
+-keepclassmembers class io.github.jan.supabase.** { *; }
+-keep class io.ktor.** { *; }
+-keepclassmembers class io.ktor.** { *; }
+-dontwarn io.github.jan.supabase.**
+-dontwarn io.ktor.**

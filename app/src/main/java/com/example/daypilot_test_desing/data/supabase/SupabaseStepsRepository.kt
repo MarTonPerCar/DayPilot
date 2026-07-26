@@ -2,12 +2,14 @@ package com.example.daypilot_test_desing.data.supabase
 
 import android.content.SharedPreferences
 import android.util.Log
+import androidx.core.content.edit
 import com.example.daypilot_test_desing.core.data.repository.StepsRepository
 import com.example.daypilot_test_desing.core.data.repository.StepsWeeklyStats
 import com.example.daypilot_test_desing.data.supabase.dto.DailyLogDto
 import com.example.daypilot_test_desing.data.supabase.dto.HabitsDailyMilestoneDto
 import com.example.daypilot_test_desing.data.supabase.dto.HabitsDailyUpsertDto
 import com.example.daypilot_test_desing.data.supabase.dto.UserPendingGoalDto
+import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Order
@@ -20,16 +22,20 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
-// "daypilot_steps" prefs are the single local source of truth for steps, shared between the
-// live UI (StepsViewModel) and StepsForegroundService — both just call recordRawSteps()/
-// getCurrentSteps() on their own repository instance rather than keeping their own copy.
-class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepository {
+// Shares "daypilot_steps" prefs with StepsViewModel — this class owns steps_goal/pending_goal/
+// goal_change_date, the ViewModel owns baseline_date/baseline_steps; don't reuse a key across the two.
+class SupabaseStepsRepository(
+    private val prefs: SharedPreferences,
+    private val client: SupabaseClient = supabase
+) : StepsRepository {
 
     companion object {
         private const val TAG = "SupabaseStepsRepository"
     }
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+    private var currentSteps = 0
 
     private fun today() = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
 
@@ -45,15 +51,15 @@ class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepos
         val pendingGoal = prefs.getInt("pending_goal", -1)
         val pendingDate = prefs.getString("goal_change_date", "") ?: ""
         if (pendingGoal > 0 && pendingDate.isNotEmpty() && pendingDate <= today()) {
-            prefs.edit()
-                .putInt("steps_goal", pendingGoal)
-                .putInt("pending_goal", -1)
-                .putString("goal_change_date", "")
-                .apply()
+            prefs.edit {
+                putInt("steps_goal", pendingGoal)
+                putInt("pending_goal", -1)
+                putString("goal_change_date", "")
+            }
         }
     }
 
-    override fun getCurrentSteps(): Int = prefs.getInt("current_steps", 0)
+    override fun getCurrentSteps(): Int = currentSteps
 
     override fun getGoalSteps(): Int {
         applyPendingGoalIfNewDay()
@@ -66,9 +72,9 @@ class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepos
     }
 
     override suspend fun getPointsEarned(): Int {
-        val uid = supabase.auth.currentUserOrNull()?.id ?: return 0
+        val uid = client.auth.currentUserOrNull()?.id ?: return 0
         return try {
-            val level = supabase.from("habits_daily").select {
+            val level = client.from("habits_daily").select {
                 filter { eq("user_id", uid); eq("date", today()) }
                 limit(1)
             }.decodeList<HabitsDailyMilestoneDto>().firstOrNull()?.stepsMilestoneLevel ?: 0
@@ -91,18 +97,18 @@ class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepos
 
     override fun configureGoal(newGoal: Int) {
         val applyDate = tomorrow()
-        prefs.edit()
-            .putInt("pending_goal", newGoal)
-            .putString("goal_change_date", applyDate)
-            .apply()
+        prefs.edit {
+            putInt("pending_goal", newGoal)
+            putString("goal_change_date", applyDate)
+        }
         // Mirrors to users.pending_steps_goal/_date so other devices see the same pending change.
         scope.launch { pushPendingGoalToServer(newGoal, applyDate) }
     }
 
     private suspend fun pushPendingGoalToServer(newGoal: Int, applyDate: String) {
-        val uid = supabase.auth.currentUserOrNull()?.id ?: return
+        val uid = client.auth.currentUserOrNull()?.id ?: return
         try {
-            supabase.from("users").update({
+            client.from("users").update({
                 set("pending_steps_goal", newGoal)
                 set("pending_steps_goal_date", applyDate)
             }) {
@@ -116,9 +122,9 @@ class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepos
 
     // Adopts a pending goal queued from another device so applyPendingGoalIfNewDay() picks it up too.
     private suspend fun pullPendingGoalFromServer() {
-        val uid = supabase.auth.currentUserOrNull()?.id ?: return
+        val uid = client.auth.currentUserOrNull()?.id ?: return
         try {
-            val dto = supabase.from("users").select {
+            val dto = client.from("users").select {
                 filter { eq("id", uid) }
                 limit(1)
             }.decodeList<UserPendingGoalDto>().firstOrNull() ?: return
@@ -128,10 +134,10 @@ class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepos
                 val localGoal = prefs.getInt("pending_goal", -1)
                 val localDate = prefs.getString("goal_change_date", "")
                 if (serverGoal != localGoal || serverDate != localDate) {
-                    prefs.edit()
-                        .putInt("pending_goal", serverGoal)
-                        .putString("goal_change_date", serverDate)
-                        .apply()
+                    prefs.edit {
+                        putInt("pending_goal", serverGoal)
+                        putString("goal_change_date", serverDate)
+                    }
                     Log.d(TAG, "Adopted pending goal from server: $serverGoal effective $serverDate")
                 }
             }
@@ -142,31 +148,14 @@ class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepos
 
     // Milestone points/STEPS_GOAL notification come from the fn_award_steps_milestones
     // trigger server-side — this only stores the raw sensor count for display/upload.
-    override fun recordRawSteps(totalSinceBoot: Int): Int {
-        val today = today()
-        val savedDate = prefs.getString("baseline_date", "")
-        var baseline = prefs.getInt("baseline_steps", -1)
-
-        // A fresh day OR the hardware counter being lower than our stored baseline (only possible
-        // if the device rebooted, since "steps since last reboot" can't otherwise decrease) both
-        // mean: start counting today's steps fresh from this reading.
-        if (baseline < 0 || savedDate != today || totalSinceBoot < baseline) {
-            baseline = totalSinceBoot
-            prefs.edit()
-                .putString("baseline_date", today)
-                .putInt("baseline_steps", baseline)
-                .apply()
-        }
-
-        val dailySteps = maxOf(0, totalSinceBoot - baseline)
-        prefs.edit().putInt("current_steps", dailySteps).apply()
-        return dailySteps
+    override fun setSteps(steps: Int) {
+        currentSteps = steps
     }
 
     override suspend fun syncSteps(steps: Int, goal: Int) {
-        val uid = supabase.auth.currentUserOrNull()?.id ?: return
+        val uid = client.auth.currentUserOrNull()?.id ?: return
         try {
-            supabase.from("habits_daily").upsert(
+            client.from("habits_daily").upsert(
                 HabitsDailyUpsertDto(userId = uid, date = today(), steps = steps, stepsGoal = goal)
             ) { onConflict = "user_id,date" }
             Log.d(TAG, "Synced steps ($steps/$goal)")
@@ -184,16 +173,16 @@ class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepos
     // placeholder default straight back to the DB, clobbering the real goal.
     private suspend fun hydrateActiveGoalIfFirstRun() {
         if (prefs.contains("steps_goal")) return
-        val uid = supabase.auth.currentUserOrNull()?.id ?: return
+        val uid = client.auth.currentUserOrNull()?.id ?: return
         try {
-            val row = supabase.from("habits_daily").select {
+            val row = client.from("habits_daily").select {
                 filter { eq("user_id", uid) }
                 order("date", Order.DESCENDING)
                 limit(1)
             }.decodeList<HabitsDailyUpsertDto>().firstOrNull()
             // Write the placeholder even with no row found, so the guard above stops re-querying forever.
             val goal = if (row != null && row.stepsGoal > 0) row.stepsGoal else 10_000
-            prefs.edit().putInt("steps_goal", goal).apply()
+            prefs.edit { putInt("steps_goal", goal) }
             Log.d(TAG, "Hydrated steps goal from DB: $goal")
         } catch (e: Exception) {
             Log.e(TAG, "Failed to hydrate steps goal from server", e)
@@ -201,9 +190,9 @@ class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepos
     }
 
     override suspend fun getWeeklyStats(): StepsWeeklyStats {
-        val uid = supabase.auth.currentUserOrNull()?.id ?: return StepsWeeklyStats()
+        val uid = client.auth.currentUserOrNull()?.id ?: return StepsWeeklyStats()
         return try {
-            val logs = supabase.from("user_daily_log")
+            val logs = client.from("user_daily_log")
                 .select {
                     filter { eq("user_id", uid) }
                     order("date", Order.DESCENDING)

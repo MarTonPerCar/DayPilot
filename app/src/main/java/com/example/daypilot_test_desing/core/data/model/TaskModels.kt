@@ -85,12 +85,12 @@ enum class Month(val nameRes: Int) {
     DECEMBER(R.string.month_december)
 }
 
-enum class WeekDay(val headerRes: Int) {
-    MONDAY(R.string.day_mon),
-    TUESDAY(R.string.day_tue),
-    WEDNESDAY(R.string.day_wed),
-    THURSDAY(R.string.day_thu),
-    FRIDAY(R.string.day_fri),
-    SATURDAY(R.string.day_sat),
-    SUNDAY(R.string.day_sun)
+enum class WeekDay(val headerRes: Int, val fullNameRes: Int) {
+    MONDAY(R.string.day_mon, R.string.day_mon_full),
+    TUESDAY(R.string.day_tue, R.string.day_tue_full),
+    WEDNESDAY(R.string.day_wed, R.string.day_wed_full),
+    THURSDAY(R.string.day_thu, R.string.day_thu_full),
+    FRIDAY(R.string.day_fri, R.string.day_fri_full),
+    SATURDAY(R.string.day_sat, R.string.day_sat_full),
+    SUNDAY(R.string.day_sun, R.string.day_sun_full)
 }

@@ -13,31 +13,34 @@ import com.example.daypilot_test_desing.data.supabase.dto.UpdateUserDto
 import com.example.daypilot_test_desing.data.supabase.dto.UserDto
 import com.example.daypilot_test_desing.data.supabase.dto.UserStreakDto
 import com.example.daypilot_test_desing.data.supabase.dto.WeeklySummaryRowDto
+import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Order
 import io.github.jan.supabase.storage.storage
 import io.ktor.http.ContentType
 
-class SupabaseUserRepository : UserRepository {
+class SupabaseUserRepository(
+    private val client: SupabaseClient = supabase
+) : UserRepository {
 
     companion object {
         private const val TAG = "SupabaseUserRepository"
     }
 
-    private fun userId() = supabase.auth.currentUserOrNull()?.id
+    private fun userId() = client.auth.currentUserOrNull()?.id
 
     override suspend fun getCurrentUser(): UserProfile {
         SessionCache.userProfile.value?.let { return it }
         val uid = userId() ?: return UserProfile(id = "", name = "", username = "", email = "")
         return try {
-            val dto = supabase.from("users").select {
+            val dto = client.from("users").select {
                 filter { eq("id", uid) }
                 limit(1)
             }.decodeList<UserDto>().firstOrNull()
                 ?: return UserProfile(id = uid, name = "", username = "", email = "")
 
-            val streak = supabase.from("user_streaks").select {
+            val streak = client.from("user_streaks").select {
                 filter { eq("user_id", uid) }
                 limit(1)
             }.decodeList<UserStreakDto>().firstOrNull()
@@ -60,7 +63,7 @@ class SupabaseUserRepository : UserRepository {
                 currentStreak = streak?.currentStreak ?: 0,
                 longestStreak = streak?.longestStreak ?: 0
             )
-            SessionCache.userProfile.value = profile
+            SessionCache.setUserProfile(profile)
             profile
         } catch (e: Exception) {
             Log.e(TAG, "Failed to load profile for $uid", e)
@@ -71,7 +74,7 @@ class SupabaseUserRepository : UserRepository {
     override suspend fun getWeeklySummary(): WeeklySummaryData {
         val uid = userId() ?: return WeeklySummaryData(0, 0, 0, 0)
         return try {
-            val row = supabase.from("user_weekly_summary").select {
+            val row = client.from("user_weekly_summary").select {
                 filter { eq("user_id", uid) }
                 order("week_start", Order.DESCENDING)
                 limit(1)
@@ -79,7 +82,7 @@ class SupabaseUserRepository : UserRepository {
                 ?: return WeeklySummaryData(0, 0, 0, 0)
 
             val reactionRows = try {
-                supabase.from("reactions").select {
+                client.from("reactions").select {
                     filter { eq("weekly_summary_id", row.id) }
                 }.decodeList<ReactionDto>()
             } catch (e: Exception) {
@@ -90,7 +93,7 @@ class SupabaseUserRepository : UserRepository {
             val reactions = if (reactionRows.isNotEmpty()) {
                 val senderIds = reactionRows.map { it.fromUserId }
                 val senders = try {
-                    supabase.from("users").select {
+                    client.from("users").select {
                         filter { isIn("id", senderIds) }
                     }.decodeList<UserDto>()
                 } catch (e: Exception) {
@@ -121,7 +124,7 @@ class SupabaseUserRepository : UserRepository {
 
     override suspend fun updateProfile(name: String, username: String, region: TimeZoneRegion) {
         val uid = userId() ?: return
-        supabase.from("users").update(
+        client.from("users").update(
             UpdateUserDto(
                 name          = name,
                 username      = username,
@@ -131,10 +134,12 @@ class SupabaseUserRepository : UserRepository {
         ) {
             filter { eq("id", uid) }
         }
-        SessionCache.userProfile.value = SessionCache.userProfile.value?.copy(
-            name     = name,
-            username = username,
-            region   = region
+        SessionCache.setUserProfile(
+            SessionCache.userProfile.value?.copy(
+                name     = name,
+                username = username,
+                region   = region
+            )
         )
     }
 
@@ -144,15 +149,15 @@ class SupabaseUserRepository : UserRepository {
         // Path includes timestamp so re-uploads get a fresh URL (Coil doesn't re-fetch same-URL images)
         val path = "$uid/${System.currentTimeMillis()}.$ext"
         return try {
-            supabase.storage.from("avatars").upload(path, bytes) {
+            client.storage.from("avatars").upload(path, bytes) {
                 upsert = true
                 contentType = ContentType.parse(mimeType)
             }
-            val url = supabase.storage.from("avatars").publicUrl(path)
-            supabase.from("users").update({ set("photo_url", url) }) {
+            val url = client.storage.from("avatars").publicUrl(path)
+            client.from("users").update({ set("photo_url", url) }) {
                 filter { eq("id", uid) }
             }
-            SessionCache.userProfile.value = SessionCache.userProfile.value?.copy(avatarUrl = url)
+            SessionCache.setUserProfile(SessionCache.userProfile.value?.copy(avatarUrl = url))
             url
         } catch (e: Exception) {
             Log.e(TAG, "Failed to upload avatar for $uid", e)

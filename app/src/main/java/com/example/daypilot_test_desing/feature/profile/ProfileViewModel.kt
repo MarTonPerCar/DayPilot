@@ -6,10 +6,10 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.daypilot_test_desing.core.connectivity.ConnectivityState
 import com.example.daypilot_test_desing.core.data.model.TimeZoneRegion
 import com.example.daypilot_test_desing.core.data.repository.ProgressRepository
 import com.example.daypilot_test_desing.core.data.repository.UserRepository
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +20,8 @@ import kotlinx.coroutines.withContext
 
 class ProfileViewModel(
     private val userRepo: UserRepository,
-    private val progressRepo: ProgressRepository
+    private val progressRepo: ProgressRepository,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProfileUiState())
@@ -34,10 +35,9 @@ class ProfileViewModel(
 
     /** Suspends until this ViewModel's data has actually loaded (or failed) — used by the
      *  startup join in DayPilotNavGraph, which needs real success/failure, not just "finished". */
-    suspend fun awaitLoad(): Boolean = load()
+    suspend fun awaitLoad(): Boolean = load() // NOSONAR kotlin:S6313 -- startup-join failure detection, see KDoc above
 
     private suspend fun load(): Boolean {
-        if (!ConnectivityState.ensureOnline()) return false
         return try {
             val user    = userRepo.getCurrentUser()
             val summary = userRepo.getWeeklySummary()
@@ -74,10 +74,6 @@ class ProfileViewModel(
     fun updateProfile(name: String, username: String, region: TimeZoneRegion) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isSavingProfile = true, profileSaveError = false)
-            if (!ConnectivityState.ensureOnline()) {
-                _uiState.value = _uiState.value.copy(isSavingProfile = false, profileSaveError = true)
-                return@launch
-            }
             try {
                 userRepo.updateProfile(name, username, region)
                 load()
@@ -99,18 +95,13 @@ class ProfileViewModel(
 
     fun uploadAvatar(uri: Uri, context: Context): Job = viewModelScope.launch {
         _uiState.value = _uiState.value.copy(isUploadingAvatar = true, avatarUploadError = false)
-        if (!ConnectivityState.ensureOnline()) {
-            _uiState.value = _uiState.value.copy(isUploadingAvatar = false, avatarUploadError = true)
-            return@launch
-        }
         val success = try {
-            val (bytes, mimeType) = withContext(Dispatchers.IO) {
+            val (bytes, mimeType) = withContext(ioDispatcher) {
                 val b = context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
                 val m = context.contentResolver.getType(uri) ?: "image/jpeg"
                 Pair(b, m)
             }
-            if (bytes == null) false
-            else userRepo.uploadAvatar(bytes, mimeType) != null
+            bytes != null && userRepo.uploadAvatar(bytes, mimeType) != null
         } catch (e: Exception) {
             Log.e(TAG, "Failed to upload avatar", e)
             false

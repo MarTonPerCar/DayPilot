@@ -19,11 +19,14 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -33,18 +36,31 @@ import com.example.daypilot_test_desing.core.ui.components.basic.DayPilotAvatar
 import com.example.daypilot_test_desing.core.ui.components.basic.ProfileStatBlock
 import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
 
+@Immutable
+data class ProfileStatsInfo(
+    val name: String,
+    val username: String,
+    val level: Int,
+    val totalPoints: Int,
+    val pointsToNextLevel: Int,
+    val currentStreak: Int,
+    val longestStreak: Int,
+    val avatarUrl: String? = null
+)
+
 @Composable
 fun ProfileStatsCard(
-    name: String,
-    username: String,
-    level: Int,
-    totalPoints: Int,
-    pointsToNextLevel: Int,
-    currentStreak: Int,
-    longestStreak: Int,
-    modifier: Modifier = Modifier,
-    avatarUrl: String? = null
+    info: ProfileStatsInfo,
+    modifier: Modifier = Modifier
 ) {
+    val name              = info.name
+    val username          = info.username
+    val level             = info.level
+    val totalPoints       = info.totalPoints
+    val pointsToNextLevel = info.pointsToNextLevel
+    val currentStreak     = info.currentStreak
+    val longestStreak     = info.longestStreak
+    val avatarUrl         = info.avatarUrl
     // Both values are cumulative-since-creation, not per-level — dividing them directly
     // would make the bar look nearly full right after a level-up, so normalize first.
     val previousLevelThreshold = cumulativeThresholdFor(level - 1)
@@ -79,7 +95,11 @@ fun ProfileStatsCard(
                 ) {
                     DayPilotAvatar(name = name, avatarUrl = avatarUrl, size = 64)
 
-                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    val headerDesc = stringResource(R.string.profile_header_desc, name, username, level)
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                        modifier = Modifier.semantics(mergeDescendants = true) { contentDescription = headerDesc }
+                    ) {
                         Text(
                             text = name,
                             style = MaterialTheme.typography.titleLarge,
@@ -94,14 +114,14 @@ fun ProfileStatsCard(
                         Box(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(8.dp))
-                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f))
+                                .background(MaterialTheme.colorScheme.primaryContainer)
                                 .padding(horizontal = 10.dp, vertical = 4.dp)
                         ) {
                             Text(
                                 text = stringResource(R.string.profile_level_badge, level),
                                 style = MaterialTheme.typography.labelMedium,
                                 fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
                             )
                         }
                     }
@@ -177,13 +197,15 @@ fun ProfileStatsCardPreview() {
                 .padding(16.dp)
         ) {
             ProfileStatsCard(
-                name = "Mario García",
-                username = "mariogarcia",
-                level = 7,
-                totalPoints = 340,
-                pointsToNextLevel = 350,
-                currentStreak = 7,
-                longestStreak = 14
+                info = ProfileStatsInfo(
+                    name = "Mario García",
+                    username = "mariogarcia",
+                    level = 7,
+                    totalPoints = 340,
+                    pointsToNextLevel = 350,
+                    currentStreak = 7,
+                    longestStreak = 14
+                )
             )
         }
     }

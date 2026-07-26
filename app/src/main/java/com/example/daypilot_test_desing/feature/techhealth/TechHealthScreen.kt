@@ -34,23 +34,129 @@ import com.example.daypilot_test_desing.core.ui.components.forms.AppLimitFormCar
 import com.example.daypilot_test_desing.core.data.model.AppRestriction
 import com.example.daypilot_test_desing.core.data.model.GroupRestriction
 
+data class TechHealthActions(
+    val onSaveApp: (AppRestriction, isEdit: Boolean) -> Unit,
+    val onSaveGroup: (GroupRestriction, isEdit: Boolean) -> Unit,
+    val onToggleRestriction: (String, Boolean) -> Unit,
+    val onDeleteRestriction: (String) -> Unit,
+    val onToggleGroup: (String, Boolean) -> Unit,
+    val onDeleteGroup: (String) -> Unit,
+    val onBack: () -> Unit
+)
+
+@Composable
+private fun TechHealthInfoDialog(onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.tech_health_point_info_title)) },
+        text  = { Text(stringResource(R.string.tech_health_point_info_body)) },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(android.R.string.ok))
+            }
+        }
+    )
+}
+
+@Composable
+private fun TechHealthPointStatusCard(
+    earned: Boolean,
+    warning: Boolean,
+    onInfoClick: () -> Unit
+) {
+    val containerColor = when {
+        earned  -> MaterialTheme.colorScheme.primaryContainer
+        warning -> MaterialTheme.colorScheme.errorContainer
+        else    -> MaterialTheme.colorScheme.secondaryContainer
+    }
+    val contentColor = when {
+        earned  -> MaterialTheme.colorScheme.onPrimaryContainer
+        warning -> MaterialTheme.colorScheme.onErrorContainer
+        else    -> MaterialTheme.colorScheme.onSecondaryContainer
+    }
+    val icon = when {
+        earned  -> Icons.Default.CheckCircle
+        warning -> Icons.Default.Warning
+        else    -> Icons.Default.Info
+    }
+    val label = when {
+        earned  -> R.string.tech_health_point_earned
+        warning -> R.string.tech_health_point_warning
+        else    -> R.string.tech_health_point_pending
+    }
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .then(
+                if (!earned && !warning)
+                    Modifier.clickable { onInfoClick() }
+                else Modifier
+            ),
+        colors = CardDefaults.cardColors(containerColor = containerColor),
+        shape  = RoundedCornerShape(12.dp)
+    ) {
+        Row(
+            modifier              = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalAlignment     = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector        = icon,
+                contentDescription = null,
+                tint               = contentColor,
+                modifier           = Modifier.size(20.dp)
+            )
+            Text(
+                text  = stringResource(label),
+                style = MaterialTheme.typography.bodySmall,
+                color = contentColor
+            )
+        }
+    }
+}
+
+@Composable
+private fun TechHealthFormSheetContent(
+    editingAppId: String?,
+    editingGroupId: String?,
+    appRestrictions: List<AppRestriction>,
+    groupRestrictions: List<GroupRestriction>,
+    onSaveApp: (AppRestriction) -> Unit,
+    onSaveGroup: (GroupRestriction) -> Unit,
+    onCancel: () -> Unit
+) {
+    AppLimitFormCard(
+        isEditing    = editingAppId != null || editingGroupId != null,
+        initialApp   = appRestrictions.find { it.id == editingAppId },
+        initialGroup = groupRestrictions.find { it.id == editingGroupId },
+        onSaveApp    = onSaveApp,
+        onSaveGroup  = onSaveGroup,
+        onCancel     = onCancel,
+        modifier = Modifier.padding(16.dp)
+    )
+    Spacer(Modifier.height(16.dp))
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TechHealthScreen(
-    appRestrictions: List<AppRestriction>,
-    groupRestrictions: List<GroupRestriction>,
-    hasUsagePermission: Boolean = true,
-    hasAccessibilityPermission: Boolean = false,
-    techHealthPointEarned: Boolean = false,
-    activeRestrictionCount: Int = 0,
-    onSaveApp: (AppRestriction, isEdit: Boolean) -> Unit,
-    onSaveGroup: (GroupRestriction, isEdit: Boolean) -> Unit,
-    onToggleRestriction: (String, Boolean) -> Unit,
-    onDeleteRestriction: (String) -> Unit,
-    onToggleGroup: (String, Boolean) -> Unit,
-    onDeleteGroup: (String) -> Unit,
-    onBack: () -> Unit
+    state: TechHealthUiState,
+    actions: TechHealthActions
 ) {
+    val appRestrictions             = state.appRestrictions
+    val groupRestrictions           = state.groupRestrictions
+    val hasUsagePermission          = state.hasUsagePermission
+    val hasAccessibilityPermission  = state.hasAccessibilityPermission
+    val techHealthPointEarned       = state.techHealthPointEarned
+    val activeRestrictionCount      = state.activeRestrictionCount
+    val onSaveApp             = actions.onSaveApp
+    val onSaveGroup            = actions.onSaveGroup
+    val onToggleRestriction    = actions.onToggleRestriction
+    val onDeleteRestriction    = actions.onDeleteRestriction
+    val onToggleGroup          = actions.onToggleGroup
+    val onDeleteGroup          = actions.onDeleteGroup
+    val onBack                  = actions.onBack
     if (!hasUsagePermission || !hasAccessibilityPermission) {
         TechHealthPermissionGate(
             hasUsagePermission         = hasUsagePermission,
@@ -60,7 +166,6 @@ fun TechHealthScreen(
         return
     }
 
-    val context = LocalContext.current
     var showAddSheet   by remember { mutableStateOf(false) }
     var editingAppId   by remember { mutableStateOf<String?>(null) }
     var editingGroupId by remember { mutableStateOf<String?>(null) }
@@ -69,16 +174,7 @@ fun TechHealthScreen(
     val total          = appRestrictions.size + groupRestrictions.size
 
     if (showInfoDialog) {
-        AlertDialog(
-            onDismissRequest = { showInfoDialog = false },
-            title = { Text(stringResource(R.string.tech_health_point_info_title)) },
-            text  = { Text(stringResource(R.string.tech_health_point_info_body)) },
-            confirmButton = {
-                TextButton(onClick = { showInfoDialog = false }) {
-                    Text(stringResource(android.R.string.ok))
-                }
-            }
-        )
+        TechHealthInfoDialog(onDismiss = { showInfoDialog = false })
     }
 
     if (showAddSheet || editingAppId != null || editingGroupId != null) {
@@ -92,16 +188,17 @@ fun TechHealthScreen(
             shape          = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
             containerColor = MaterialTheme.colorScheme.background
         ) {
-            AppLimitFormCard(
-                isEditing    = editingAppId != null || editingGroupId != null,
-                initialApp   = appRestrictions.find { it.id == editingAppId },
-                initialGroup = groupRestrictions.find { it.id == editingGroupId },
-                onSaveApp    = { restriction ->
+            TechHealthFormSheetContent(
+                editingAppId = editingAppId,
+                editingGroupId = editingGroupId,
+                appRestrictions = appRestrictions,
+                groupRestrictions = groupRestrictions,
+                onSaveApp = { restriction ->
                     onSaveApp(restriction, editingAppId != null)
                     showAddSheet   = false
                     editingAppId   = null
                 },
-                onSaveGroup  = { group ->
+                onSaveGroup = { group ->
                     onSaveGroup(group, editingGroupId != null)
                     showAddSheet   = false
                     editingGroupId = null
@@ -110,10 +207,8 @@ fun TechHealthScreen(
                     showAddSheet   = false
                     editingAppId   = null
                     editingGroupId = null
-                },
-                modifier = Modifier.padding(16.dp)
+                }
             )
-            Spacer(Modifier.height(16.dp))
         }
     }
 
@@ -147,59 +242,11 @@ fun TechHealthScreen(
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             item {
-                val earned  = techHealthPointEarned && activeRestrictionCount >= 3
-                val warning = activeRestrictionCount < 3
-
-                val containerColor = when {
-                    earned  -> MaterialTheme.colorScheme.primaryContainer
-                    warning -> MaterialTheme.colorScheme.errorContainer
-                    else    -> MaterialTheme.colorScheme.secondaryContainer
-                }
-                val contentColor = when {
-                    earned  -> MaterialTheme.colorScheme.onPrimaryContainer
-                    warning -> MaterialTheme.colorScheme.onErrorContainer
-                    else    -> MaterialTheme.colorScheme.onSecondaryContainer
-                }
-                val icon = when {
-                    earned  -> Icons.Default.CheckCircle
-                    warning -> Icons.Default.Warning
-                    else    -> Icons.Default.Info
-                }
-                val label = when {
-                    earned  -> R.string.tech_health_point_earned
-                    warning -> R.string.tech_health_point_warning
-                    else    -> R.string.tech_health_point_pending
-                }
-
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .then(
-                            if (!earned && !warning)
-                                Modifier.clickable { showInfoDialog = true }
-                            else Modifier
-                        ),
-                    colors = CardDefaults.cardColors(containerColor = containerColor),
-                    shape  = RoundedCornerShape(12.dp)
-                ) {
-                    Row(
-                        modifier              = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp),
-                        verticalAlignment     = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector        = icon,
-                            contentDescription = null,
-                            tint               = contentColor,
-                            modifier           = Modifier.size(20.dp)
-                        )
-                        Text(
-                            text  = stringResource(label),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = contentColor
-                        )
-                    }
-                }
+                TechHealthPointStatusCard(
+                    earned = techHealthPointEarned && activeRestrictionCount >= 3,
+                    warning = activeRestrictionCount < 3,
+                    onInfoClick = { showInfoDialog = true }
+                )
             }
 
             item {
@@ -344,6 +391,70 @@ private fun TechHealthPermissionGate(
 }
 
 @Composable
+private fun PermissionStatusBadgeIcon(number: String, isGranted: Boolean) {
+    Box(
+        modifier = Modifier
+            .size(32.dp)
+            .background(
+                color = if (isGranted) MaterialTheme.colorScheme.primary
+                        else MaterialTheme.colorScheme.primaryContainer,
+                shape = CircleShape
+            )
+            .clip(CircleShape),
+        contentAlignment = Alignment.Center
+    ) {
+        if (isGranted) {
+            Icon(
+                imageVector        = Icons.Default.Check,
+                contentDescription = null,
+                tint               = MaterialTheme.colorScheme.onPrimary,
+                modifier           = Modifier.size(18.dp)
+            )
+        } else {
+            Text(
+                text       = number,
+                fontSize   = 14.sp,
+                fontWeight = FontWeight.Bold,
+                color      = MaterialTheme.colorScheme.onPrimaryContainer
+            )
+        }
+    }
+}
+
+@Composable
+private fun PermissionGrantedBadge() {
+    Surface(
+        shape = RoundedCornerShape(8.dp),
+        color = MaterialTheme.colorScheme.primaryContainer
+    ) {
+        Text(
+            text     = stringResource(R.string.tech_health_perm_granted),
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+            style    = MaterialTheme.typography.labelSmall,
+            color    = MaterialTheme.colorScheme.onPrimaryContainer,
+            fontWeight = FontWeight.SemiBold
+        )
+    }
+}
+
+@Composable
+private fun PermissionActionSection(steps: String, buttonText: String, onOpen: () -> Unit) {
+    Text(
+        text       = steps,
+        style      = MaterialTheme.typography.bodySmall,
+        fontWeight = FontWeight.Bold,
+        color      = MaterialTheme.colorScheme.onSurface
+    )
+    Button(
+        onClick  = onOpen,
+        modifier = Modifier.fillMaxWidth(),
+        shape    = RoundedCornerShape(12.dp)
+    ) {
+        Text(buttonText)
+    }
+}
+
+@Composable
 private fun PermissionCard(
     number: String,
     title: String,
@@ -369,33 +480,7 @@ private fun PermissionCard(
                 verticalAlignment     = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(32.dp)
-                        .background(
-                            color = if (isGranted) MaterialTheme.colorScheme.primary
-                                    else MaterialTheme.colorScheme.primaryContainer,
-                            shape = CircleShape
-                        )
-                        .clip(CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    if (isGranted) {
-                        Icon(
-                            imageVector        = Icons.Default.Check,
-                            contentDescription = null,
-                            tint               = MaterialTheme.colorScheme.onPrimary,
-                            modifier           = Modifier.size(18.dp)
-                        )
-                    } else {
-                        Text(
-                            text       = number,
-                            fontSize   = 14.sp,
-                            fontWeight = FontWeight.Bold,
-                            color      = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                    }
-                }
+                PermissionStatusBadgeIcon(number = number, isGranted = isGranted)
                 Text(
                     text       = title,
                     style      = MaterialTheme.typography.titleSmall,
@@ -403,20 +488,7 @@ private fun PermissionCard(
                     color      = MaterialTheme.colorScheme.onSurface,
                     modifier   = Modifier.weight(1f)
                 )
-                if (isGranted) {
-                    Surface(
-                        shape = RoundedCornerShape(8.dp),
-                        color = MaterialTheme.colorScheme.primaryContainer
-                    ) {
-                        Text(
-                            text     = stringResource(R.string.tech_health_perm_granted),
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
-                            style    = MaterialTheme.typography.labelSmall,
-                            color    = MaterialTheme.colorScheme.onPrimaryContainer,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    }
-                }
+                if (isGranted) PermissionGrantedBadge()
             }
 
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
@@ -427,21 +499,7 @@ private fun PermissionCard(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
-            if (!isGranted) {
-                Text(
-                    text       = steps,
-                    style      = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.Bold,
-                    color      = MaterialTheme.colorScheme.onSurface
-                )
-                Button(
-                    onClick  = onOpen,
-                    modifier = Modifier.fillMaxWidth(),
-                    shape    = RoundedCornerShape(12.dp)
-                ) {
-                    Text(buttonText)
-                }
-            }
+            if (!isGranted) PermissionActionSection(steps = steps, buttonText = buttonText, onOpen = onOpen)
         }
     }
 }

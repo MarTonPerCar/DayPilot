@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -36,165 +37,174 @@ import com.example.daypilot_test_desing.core.data.model.ProgressFilter
 import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
 
 @Composable
-fun HomeSectionIndicator(data: HomeSectionData, accentColor: Color) {
-    when (data) {
+private fun CalendarSectionIndicator(data: HomeSectionData.Calendar, accentColor: Color) {
+    val total = data.pendingTasks + data.completedTasks
+    val progress = if (total > 0) data.completedTasks.toFloat() / total else 0f
 
-        is HomeSectionData.Calendar -> {
-            val total = data.pendingTasks + data.completedTasks
-            val progress = if (total > 0) data.completedTasks.toFloat() / total else 0f
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Text(
+            text = pluralStringResource(
+                R.plurals.indicator_tasks_progress,
+                total,
+                data.completedTasks,
+                total
+            ),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        LinearProgressIndicator(
+            progress = { progress },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(6.dp)
+                .clip(RoundedCornerShape(3.dp)),
+            color = accentColor,
+            trackColor = accentColor.copy(alpha = 0.2f)
+        )
+    }
+}
 
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(
-                    text = stringResource(
-                        R.string.indicator_tasks_progress,
-                        data.completedTasks,
-                        total
-                    ),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                LinearProgressIndicator(
-                    progress = { progress },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(6.dp)
-                        .clip(RoundedCornerShape(3.dp)),
-                    color = accentColor,
-                    trackColor = accentColor.copy(alpha = 0.2f)
-                )
-            }
+@Composable
+private fun ProgressSectionIndicator(data: HomeSectionData.Progress, accentColor: Color) {
+    val values = data.data.takeLast(7).map { day ->
+        when (data.currentFilter) {
+            ProgressFilter.POINTS -> day.points
+            ProgressFilter.STEPS -> day.steps
+            ProgressFilter.TASKS -> day.tasksCompleted
         }
+    }
+    val maxValue = values.maxOrNull() ?: 1
 
-        is HomeSectionData.Progress -> {
-            val values = data.data.takeLast(7).map { day ->
-                when (data.currentFilter) {
-                    ProgressFilter.POINTS -> day.points
-                    ProgressFilter.STEPS -> day.steps
-                    ProgressFilter.TASKS -> day.tasksCompleted
-                }
-            }
-            val maxValue = values.maxOrNull() ?: 1
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(40.dp),
+        horizontalArrangement = Arrangement.spacedBy(2.dp),
+        verticalAlignment = Alignment.Bottom
+    ) {
+        values.forEach { value ->
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight(
+                        (value.toFloat() / maxValue).coerceAtLeast(0.05f)
+                    )
+                    .clip(RoundedCornerShape(topStart = 2.dp, topEnd = 2.dp))
+                    .background(accentColor)
+            )
+        }
+    }
+}
 
-            Row(
+@Composable
+private fun HabitsSectionIndicator(data: HomeSectionData.Habits, accentColor: Color) {
+    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
+            Text(
+                text = stringResource(
+                    R.string.indicator_steps_progress,
+                    (data.stepsProgress * 100).toInt()
+                ),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            LinearProgressIndicator(
+                progress = { data.stepsProgress },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(40.dp),
-                horizontalArrangement = Arrangement.spacedBy(2.dp),
-                verticalAlignment = Alignment.Bottom
-            ) {
-                values.forEach { value ->
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxHeight(
-                                (value.toFloat() / maxValue).coerceAtLeast(0.05f)
-                            )
-                            .clip(RoundedCornerShape(topStart = 2.dp, topEnd = 2.dp))
-                            .background(accentColor)
-                    )
-                }
-            }
+                    .height(5.dp)
+                    .clip(RoundedCornerShape(3.dp)),
+                color = accentColor,
+                trackColor = accentColor.copy(alpha = 0.2f)
+            )
         }
 
-        is HomeSectionData.Habits -> {
-            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                    Text(
-                        text = stringResource(
-                            R.string.indicator_steps_progress,
-                            (data.stepsProgress * 100).toInt()
-                        ),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    LinearProgressIndicator(
-                        progress = { data.stepsProgress },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(5.dp)
-                            .clip(RoundedCornerShape(3.dp)),
-                        color = accentColor,
-                        trackColor = accentColor.copy(alpha = 0.2f)
-                    )
-                }
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    Icon(
-                        imageVector = if (data.timerDone) Icons.Default.CheckCircle
-                        else Icons.Default.Timer,
-                        contentDescription = null,
-                        tint = if (data.timerDone) accentColor
-                        else MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(12.dp)
-                    )
-                    Text(
-                        text = stringResource(
-                            if (data.timerDone) R.string.indicator_timer_done
-                            else R.string.indicator_timer_pending
-                        ),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = if (data.timerDone) accentColor
-                        else MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Icon(
+                imageVector = if (data.timerDone) Icons.Default.CheckCircle
+                else Icons.Default.Timer,
+                contentDescription = null,
+                tint = if (data.timerDone) accentColor
+                else MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(12.dp)
+            )
+            Text(
+                text = stringResource(
+                    if (data.timerDone) R.string.indicator_timer_done
+                    else R.string.indicator_timer_pending
+                ),
+                style = MaterialTheme.typography.labelSmall,
+                color = if (data.timerDone) accentColor
+                else MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
+    }
+}
 
-        is HomeSectionData.Rivalry -> {
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(
-                    text = stringResource(
-                        R.string.indicator_rivalry_position,
-                        data.position,
-                        data.totalFriends
-                    ),
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = accentColor
-                )
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(3.dp),
-                    verticalAlignment = Alignment.Bottom
-                ) {
-                    val topCount = minOf(5, data.totalFriends)
-                    repeat(topCount) { index ->
-                        val isCurrentUser = index == data.position - 1
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(if (isCurrentUser) 20.dp else 12.dp)
-                                .clip(RoundedCornerShape(topStart = 3.dp, topEnd = 3.dp))
-                                .background(
-                                    if (isCurrentUser) accentColor
-                                    else accentColor.copy(alpha = 0.25f)
-                                )
+@Composable
+private fun RivalrySectionIndicator(data: HomeSectionData.Rivalry, accentColor: Color) {
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Text(
+            text = stringResource(
+                R.string.indicator_rivalry_position,
+                data.position,
+                data.totalFriends
+            ),
+            style = MaterialTheme.typography.labelMedium,
+            fontWeight = FontWeight.Bold,
+            color = accentColor
+        )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(3.dp),
+            verticalAlignment = Alignment.Bottom
+        ) {
+            val topCount = minOf(5, data.totalFriends)
+            repeat(topCount) { index ->
+                val isCurrentUser = index == data.position - 1
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(if (isCurrentUser) 20.dp else 12.dp)
+                        .clip(RoundedCornerShape(topStart = 3.dp, topEnd = 3.dp))
+                        .background(
+                            if (isCurrentUser) accentColor
+                            else accentColor.copy(alpha = 0.25f)
                         )
-                    }
+                )
+            }
 
-                    if (data.position > 5) {
-                        Spacer(Modifier.width(4.dp))
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(20.dp)
-                                .clip(RoundedCornerShape(topStart = 3.dp, topEnd = 3.dp))
-                                .background(accentColor),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "${data.position}",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = Color.White,
-                                fontSize = 8.sp
-                            )
-                        }
-                    }
+            if (data.position > 5) {
+                Spacer(Modifier.width(4.dp))
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(20.dp)
+                        .clip(RoundedCornerShape(topStart = 3.dp, topEnd = 3.dp))
+                        .background(accentColor),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "${data.position}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color.White,
+                        fontSize = 8.sp
+                    )
                 }
             }
         }
+    }
+}
+
+@Composable
+fun HomeSectionIndicator(data: HomeSectionData, accentColor: Color) {
+    when (data) {
+        is HomeSectionData.Calendar -> CalendarSectionIndicator(data, accentColor)
+        is HomeSectionData.Progress -> ProgressSectionIndicator(data, accentColor)
+        is HomeSectionData.Habits -> HabitsSectionIndicator(data, accentColor)
+        is HomeSectionData.Rivalry -> RivalrySectionIndicator(data, accentColor)
     }
 }
 

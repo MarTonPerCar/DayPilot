@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.addCallback
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -35,6 +36,9 @@ class TechHealthBlockActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Intencional: el bloqueo no debe poder cerrarse con el botón/gesto atrás.
+        // A diferencia de onBackPressed(), esto también intercepta el predictive back gesture.
+        onBackPressedDispatcher.addCallback(this) {}
         // sin esto en algunos móviles la pantalla no aparece encima del bloqueo
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
             setShowWhenLocked(true)
@@ -43,17 +47,13 @@ class TechHealthBlockActivity : ComponentActivity() {
         val appName = intent.getStringExtra(EXTRA_APP_NAME) ?: ""
         val prefs   = AppPreferences(this)
         val theme   = DayPilotTheme.entries.find { it.name == prefs.themeId } ?: DayPilotTheme.SAGE_GREEN
-        val isDark  = if (theme == DayPilotTheme.AMOLED) true else prefs.isDarkMode
+        val isDark  = theme == DayPilotTheme.AMOLED || prefs.isDarkMode
 
         setContent {
             DayPilotTheme(theme = theme, darkMode = isDark) {
                 BlockScreen(appName = appName, onGoHome = ::goHome)
             }
         }
-    }
-
-    @Deprecated("Deprecated in Java") // hay que mantenerlo aunque esté deprecated, el nuevo predictive back no aplica aquí
-    override fun onBackPressed() {
     }
 
     override fun onUserLeaveHint() {

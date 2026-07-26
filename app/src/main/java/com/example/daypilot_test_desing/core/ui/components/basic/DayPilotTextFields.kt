@@ -60,24 +60,39 @@ fun dayPilotTextFieldColors() = OutlinedTextFieldDefaults.colors(
     cursorColor             = MaterialTheme.colorScheme.primary
 )
 
+data class DayPilotTextFieldOptions(
+    val placeholder        : String = "",
+    val leadingIcon        : ImageVector? = null,
+    val trailingIcon       : ImageVector? = null,
+    val onTrailingIconClick: (() -> Unit)? = null,
+    val keyboardType       : KeyboardType = KeyboardType.Text,
+    val singleLine         : Boolean = true,
+    val minLines           : Int = 1,
+    val maxLines           : Int = 1,
+    val enabled            : Boolean = true,
+    val isError            : Boolean = false,
+    val errorMessage       : String = ""
+)
+
 @Composable
 fun DayPilotTextField(
     value              : String,
     onValueChange      : (String) -> Unit,
     label              : String,
     modifier           : Modifier = Modifier,
-    placeholder        : String = "",
-    leadingIcon        : ImageVector? = null,
-    trailingIcon       : ImageVector? = null,
-    onTrailingIconClick: (() -> Unit)? = null,
-    keyboardType       : KeyboardType = KeyboardType.Text,
-    singleLine         : Boolean = true,
-    minLines           : Int = 1,
-    maxLines           : Int = 1,
-    enabled            : Boolean = true,
-    isError            : Boolean = false,
-    errorMessage       : String = ""
+    options            : DayPilotTextFieldOptions = DayPilotTextFieldOptions()
 ) {
+    val placeholder         = options.placeholder
+    val leadingIcon         = options.leadingIcon
+    val trailingIcon        = options.trailingIcon
+    val onTrailingIconClick = options.onTrailingIconClick
+    val keyboardType        = options.keyboardType
+    val singleLine          = options.singleLine
+    val minLines            = options.minLines
+    val maxLines            = options.maxLines
+    val enabled             = options.enabled
+    val isError             = options.isError
+    val errorMessage        = options.errorMessage
     Column(modifier = modifier) {
         OutlinedTextField(
             value         = value,
@@ -194,6 +209,79 @@ fun DayPilotPasswordField(
 }
 
 @Composable
+private fun <T> DropdownOptionRow(
+    option: T,
+    isSelected: Boolean,
+    isLast: Boolean,
+    displayText: (T) -> String,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
+            .background(
+                if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+                else MaterialTheme.colorScheme.surface
+            )
+            .padding(horizontal = 16.dp, vertical = 14.dp),
+        verticalAlignment     = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text  = displayText(option),
+            style = MaterialTheme.typography.bodyMedium,
+            color = if (isSelected) MaterialTheme.colorScheme.primary
+            else MaterialTheme.colorScheme.onSurface
+        )
+        if (isSelected) {
+            Icon(
+                imageVector        = Icons.Default.Check,
+                contentDescription = null,
+                tint               = MaterialTheme.colorScheme.primary,
+                modifier           = Modifier.size(16.dp)
+            )
+        }
+    }
+    if (!isLast) {
+        HorizontalDivider(
+            color     = MaterialTheme.colorScheme.surfaceVariant,
+            thickness = 0.5.dp
+        )
+    }
+}
+
+@Composable
+private fun <T> DropdownOptionsList(
+    options: List<T>,
+    value: T,
+    displayText: (T) -> String,
+    onSelect: (T) -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .border(
+                width  = 1.dp,
+                color  = MaterialTheme.colorScheme.outline,
+                shape  = RoundedCornerShape(12.dp)
+            )
+            .background(MaterialTheme.colorScheme.surface)
+    ) {
+        options.forEach { option ->
+            DropdownOptionRow(
+                option = option,
+                isSelected = option == value,
+                isLast = option == options.last(),
+                displayText = displayText,
+                onClick = { onSelect(option) }
+            )
+        }
+    }
+}
+
+@Composable
 fun <T> DayPilotDropdownField(
     value      : T,
     options    : List<T>,
@@ -241,57 +329,15 @@ fun <T> DayPilotDropdownField(
         )
 
         AnimatedVisibility(visible = expanded) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
-                    .border(
-                        width  = 1.dp,
-                        color  = MaterialTheme.colorScheme.outline,
-                        shape  = RoundedCornerShape(12.dp)
-                    )
-                    .background(MaterialTheme.colorScheme.surface)
-            ) {
-                options.forEach { option ->
-                    val isSelected = option == value
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                onSelect(option)
-                                expanded = false
-                            }
-                            .background(
-                                if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
-                                else MaterialTheme.colorScheme.surface
-                            )
-                            .padding(horizontal = 16.dp, vertical = 14.dp),
-                        verticalAlignment     = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text  = displayText(option),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = if (isSelected) MaterialTheme.colorScheme.primary
-                            else MaterialTheme.colorScheme.onSurface
-                        )
-                        if (isSelected) {
-                            Icon(
-                                imageVector        = Icons.Default.Check,
-                                contentDescription = null,
-                                tint               = MaterialTheme.colorScheme.primary,
-                                modifier           = Modifier.size(16.dp)
-                            )
-                        }
-                    }
-                    if (option != options.last()) {
-                        HorizontalDivider(
-                            color     = MaterialTheme.colorScheme.surfaceVariant,
-                            thickness = 0.5.dp
-                        )
-                    }
+            DropdownOptionsList(
+                options = options,
+                value = value,
+                displayText = displayText,
+                onSelect = { option ->
+                    onSelect(option)
+                    expanded = false
                 }
-            }
+            )
         }
     }
 }
@@ -314,16 +360,20 @@ fun DayPilotTextFieldsPreview() {
                 value         = name,
                 onValueChange = { name = it },
                 label         = "Nombre",
-                leadingIcon   = Icons.Default.Person,
-                placeholder   = "Tu nombre"
+                options = DayPilotTextFieldOptions(
+                    leadingIcon   = Icons.Default.Person,
+                    placeholder   = "Tu nombre"
+                )
             )
             DayPilotTextField(
                 value         = "Campo con error",
                 onValueChange = {},
                 label         = "Email",
-                leadingIcon   = Icons.Default.Email,
-                isError       = true,
-                errorMessage  = "El email no es válido"
+                options = DayPilotTextFieldOptions(
+                    leadingIcon   = Icons.Default.Email,
+                    isError       = true,
+                    errorMessage  = "El email no es válido"
+                )
             )
             DayPilotPasswordField(
                 value         = password,

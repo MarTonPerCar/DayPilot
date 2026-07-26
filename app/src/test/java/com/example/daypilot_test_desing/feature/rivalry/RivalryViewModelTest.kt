@@ -3,22 +3,18 @@ package com.example.daypilot_test_desing.feature.rivalry
 import com.example.daypilot_test_desing.core.data.model.RankingData
 import com.example.daypilot_test_desing.core.data.repository.RankingRepository
 import com.example.daypilot_test_desing.support.MainDispatcherRule
-import com.example.daypilot_test_desing.support.initSupabaseSettingsForTest
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import com.example.daypilot_test_desing.support.realAdvanceUntilIdle
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@RunWith(RobolectricTestRunner::class)
 class RivalryViewModelTest {
 
     @get:Rule
@@ -31,7 +27,6 @@ class RivalryViewModelTest {
 
     @Before
     fun setUp() {
-        initSupabaseSettingsForTest()
         repo = mockk()
         coEvery { repo.getCurrentUserId() } returns "u1"
     }
@@ -43,7 +38,7 @@ class RivalryViewModelTest {
         coEvery { repo.getRanking() } returns listOf(other, me)
 
         val viewModel = buildViewModel()
-        realAdvanceUntilIdle()
+        advanceUntilIdle()
 
         val state = viewModel.uiState.value
         assertEquals("Ana", state.currentUserName)
@@ -57,7 +52,7 @@ class RivalryViewModelTest {
         coEvery { repo.getCurrentUserData() } returns me
 
         val viewModel = buildViewModel()
-        realAdvanceUntilIdle()
+        advanceUntilIdle()
 
         val state = viewModel.uiState.value
         assertEquals("Ana", state.currentUserName)

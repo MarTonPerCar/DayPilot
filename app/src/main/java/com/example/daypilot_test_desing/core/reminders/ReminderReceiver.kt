@@ -35,6 +35,15 @@ class ReminderReceiver : BroadcastReceiver() {
         val contentText  = if (isEarly) context.getString(R.string.reminder_early_body)
                            else context.getString(R.string.reminder_body)
 
+        showNotification(context, notifId, contentTitle, contentText)
+
+        if (!isEarly && reminderId != null) {
+            handleRecurrence(context, reminderId, isOneTime, triggerAt, frequencyType, title)
+            recordReminderNotification(reminderId, contentTitle, contentText)
+        }
+    }
+
+    private fun showNotification(context: Context, notifId: Int, contentTitle: String, contentText: String) {
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(contentTitle)
@@ -45,41 +54,49 @@ class ReminderReceiver : BroadcastReceiver() {
 
         context.getSystemService(NotificationManager::class.java)
             ?.notify(notifId, notification)
+    }
 
-        if (!isEarly && reminderId != null) {
-            if (isOneTime) {
-                SharedPrefsReminderRepository(context).deleteReminder(reminderId)
-            }
+    private fun handleRecurrence(
+        context: Context,
+        reminderId: String,
+        isOneTime: Boolean,
+        triggerAt: Long,
+        frequencyType: String,
+        title: String
+    ) {
+        if (isOneTime) {
+            SharedPrefsReminderRepository(context).deleteReminder(reminderId)
+        }
 
-            if (triggerAt > 0L) {
-                val nextMillis: Long = when (frequencyType) {
-                    "DAILY"  -> triggerAt + 24 * 3600 * 1_000L
-                    "WEEKLY" -> triggerAt + 7 * 24 * 3600 * 1_000L
-                    else     -> 0L
-                }
-                if (nextMillis > 0L) {
-                    ReminderScheduler.schedule(
-                        context       = context,
-                        reminderId    = reminderId,
-                        title         = title,
-                        triggerAtMillis = nextMillis,
-                        frequencyType = frequencyType
-                    )
-                    SharedPrefsReminderRepository(context).updateTriggerTime(reminderId, nextMillis)
-                }
-            }
+        if (triggerAt <= 0L) return
+        val nextMillis: Long = when (frequencyType) {
+            "DAILY"  -> triggerAt + 24 * 3600 * 1_000L
+            "WEEKLY" -> triggerAt + 7 * 24 * 3600 * 1_000L
+            else     -> 0L
+        }
+        if (nextMillis <= 0L) return
 
-            // Skips the early warning to avoid duplicate entries in the notification center.
-            scope.launch {
-                try {
-                    SupabaseNotificationRepository.insertForCurrentUser(
-                        type  = "TASK_REMINDER",
-                        title = contentTitle,
-                        body  = contentText
-                    )
-                } catch (e: Exception) {
-                    Log.e(TAG, "Failed to insert TASK_REMINDER notification for reminder $reminderId", e)
-                }
+        ReminderScheduler.schedule(
+            context       = context,
+            reminderId    = reminderId,
+            title         = title,
+            triggerAtMillis = nextMillis,
+            frequencyType = frequencyType
+        )
+        SharedPrefsReminderRepository(context).updateTriggerTime(reminderId, nextMillis)
+    }
+
+    // Skips the early warning to avoid duplicate entries in the notification center.
+    private fun recordReminderNotification(reminderId: String, contentTitle: String, contentText: String) {
+        scope.launch {
+            try {
+                SupabaseNotificationRepository.insertForCurrentUser(
+                    type  = "TASK_REMINDER",
+                    title = contentTitle,
+                    body  = contentText
+                )
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to insert TASK_REMINDER notification for reminder $reminderId", e)
             }
         }
     }

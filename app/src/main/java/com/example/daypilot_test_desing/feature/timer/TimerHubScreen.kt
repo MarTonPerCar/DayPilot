@@ -42,7 +42,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.hideFromAccessibility
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -51,6 +54,257 @@ import com.example.daypilot_test_desing.core.ui.components.basic.DayPilotTopBar
 import com.example.daypilot_test_desing.core.ui.components.cards.TimerHubCard
 import com.example.daypilot_test_desing.core.data.model.TimerOption
 
+
+@Composable
+private fun CustomTimerSheetContent(
+    customMinutes: Float,
+    onMinutesChange: (Float) -> Unit,
+    onStart: (Int) -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp, vertical = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(20.dp)
+    ) {
+        Text(
+            text = stringResource(R.string.timer_custom_sheet_title),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = pluralStringResource(R.plurals.timer_custom_minutes, customMinutes.toInt(), customMinutes.toInt()),
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF00ACC1)
+            )
+        }
+        Slider(
+            value = customMinutes,
+            onValueChange = onMinutesChange,
+            valueRange = 5f..180f,
+            steps = 34,
+            colors = SliderDefaults.colors(
+                thumbColor = Color(0xFF00ACC1),
+                activeTrackColor = Color(0xFF00ACC1)
+            ),
+            modifier = Modifier.fillMaxWidth()
+        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                "5 min", style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                "3 h", style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            listOf(
+                15 to "15m",
+                30 to "30m",
+                45 to "45m",
+                60 to "1h",
+                90 to "1.5h"
+            ).forEach { (min, label) ->
+                val isSelected = customMinutes.toInt() == min
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(
+                            if (isSelected) Color(0xFF00747F)
+                            else MaterialTheme.colorScheme.surfaceVariant
+                        )
+                        .clickable { onMinutesChange(min.toFloat()) }
+                        .padding(vertical = 8.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = label,
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.SemiBold,
+                        color = if (isSelected) Color.White
+                        else MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        }
+        Button(
+            onClick = { onStart(customMinutes.toInt()) },
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF00ACC1)
+            )
+        ) {
+            Text(
+                stringResource(R.string.timer_custom_start),
+                style = MaterialTheme.typography.labelLarge
+            )
+        }
+        Spacer(Modifier.height(8.dp))
+    }
+}
+
+@Composable
+private fun PomodoroSummaryCard(sessionMinutes: Int) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(14.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFFE53935).copy(alpha = 0.1f)
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text("🔴", fontSize = 20.sp)
+                Text(
+                    text = "25 min",
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFFE53935)
+                )
+                Text(
+                    text = stringResource(R.string.timer_pomodoro_work_label),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text("🔵", fontSize = 20.sp)
+                Text(
+                    text = "5 min",
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF1E88E5)
+                )
+                Text(
+                    text = stringResource(R.string.timer_pomodoro_break_label),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text("⏱", fontSize = 20.sp)
+                Text(
+                    text = "$sessionMinutes min",
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = stringResource(R.string.timer_pomodoro_total_label),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun PomodoroSheetContent(
+    pomodoroSessions: Float,
+    onSessionsChange: (Float) -> Unit,
+    onStart: (Int) -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp, vertical = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(20.dp)
+    ) {
+        Text(
+            text = stringResource(R.string.timer_pomodoro_sheet_title),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+
+        PomodoroSummaryCard(sessionMinutes = pomodoroSessions.toInt() * 30)
+
+        Text(
+            text = stringResource(R.string.timer_pomodoro_sessions_label),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = pluralStringResource(
+                    R.plurals.timer_pomodoro_sessions_value,
+                    pomodoroSessions.toInt(),
+                    pomodoroSessions.toInt()
+                ),
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFFE53935)
+            )
+        }
+        Slider(
+            value = pomodoroSessions,
+            onValueChange = onSessionsChange,
+            valueRange = 1f..8f,
+            steps = 6,
+            colors = SliderDefaults.colors(
+                thumbColor = Color(0xFFE53935),
+                activeTrackColor = Color(0xFFE53935)
+            ),
+            modifier = Modifier.fillMaxWidth()
+        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                stringResource(R.string.timer_pomodoro_min_sessions),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                stringResource(R.string.timer_pomodoro_max_sessions),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+
+        Button(
+            onClick = { onStart(pomodoroSessions.toInt()) },
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFFE53935)
+            )
+        ) {
+            Text(
+                stringResource(R.string.timer_pomodoro_start),
+                style = MaterialTheme.typography.labelLarge
+            )
+        }
+        Spacer(Modifier.height(8.dp))
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -115,105 +369,14 @@ fun TimerHubScreen(
             shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
             containerColor = MaterialTheme.colorScheme.background
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp, vertical = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(20.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.timer_custom_sheet_title),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = stringResource(R.string.timer_custom_minutes, customMinutes.toInt()),
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF00ACC1)
-                    )
+            CustomTimerSheetContent(
+                customMinutes = customMinutes,
+                onMinutesChange = { customMinutes = it },
+                onStart = { minutes ->
+                    showCustomSheet = false
+                    onNavigateToTimer("CUSTOM", minutes)
                 }
-                Slider(
-                    value = customMinutes,
-                    onValueChange = { customMinutes = it },
-                    valueRange = 5f..180f,
-                    steps = 34,
-                    colors = SliderDefaults.colors(
-                        thumbColor = Color(0xFF00ACC1),
-                        activeTrackColor = Color(0xFF00ACC1)
-                    ),
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        "5 min", style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Text(
-                        "3 h", style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    listOf(
-                        15 to "15m",
-                        30 to "30m",
-                        45 to "45m",
-                        60 to "1h",
-                        90 to "1.5h"
-                    ).forEach { (min, label) ->
-                        val isSelected = customMinutes.toInt() == min
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(
-                                    if (isSelected) Color(0xFF00ACC1)
-                                    else MaterialTheme.colorScheme.surfaceVariant
-                                )
-                                .clickable { customMinutes = min.toFloat() }
-                                .padding(vertical = 8.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = label,
-                                style = MaterialTheme.typography.labelSmall,
-                                fontWeight = FontWeight.SemiBold,
-                                color = if (isSelected) Color.White
-                                else MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    }
-                }
-                Button(
-                    onClick = {
-                        showCustomSheet = false
-                        onNavigateToTimer("CUSTOM", customMinutes.toInt())
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF00ACC1)
-                    )
-                ) {
-                    Text(
-                        stringResource(R.string.timer_custom_start),
-                        style = MaterialTheme.typography.labelLarge
-                    )
-                }
-                Spacer(Modifier.height(8.dp))
-            }
+            )
         }
     }
 
@@ -224,146 +387,21 @@ fun TimerHubScreen(
             shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
             containerColor = MaterialTheme.colorScheme.background
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp, vertical = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(20.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.timer_pomodoro_sheet_title),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(14.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color(0xFFE53935).copy(alpha = 0.1f)
-                    ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp),
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("🔴", fontSize = 20.sp)
-                            Text(
-                                text = "25 min",
-                                style = MaterialTheme.typography.labelMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFFE53935)
-                            )
-                            Text(
-                                text = stringResource(R.string.timer_pomodoro_work_label),
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("🔵", fontSize = 20.sp)
-                            Text(
-                                text = "5 min",
-                                style = MaterialTheme.typography.labelMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFF1E88E5)
-                            )
-                            Text(
-                                text = stringResource(R.string.timer_pomodoro_break_label),
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("⏱", fontSize = 20.sp)
-                            Text(
-                                text = "${pomodoroSessions.toInt() * 30} min",
-                                style = MaterialTheme.typography.labelMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                            Text(
-                                text = stringResource(R.string.timer_pomodoro_total_label),
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    }
+            PomodoroSheetContent(
+                pomodoroSessions = pomodoroSessions,
+                onSessionsChange = { pomodoroSessions = it },
+                onStart = { sessions ->
+                    showPomodoroSheet = false
+                    onNavigateToPomodoro(sessions)
                 }
-
-                Text(
-                    text = stringResource(R.string.timer_pomodoro_sessions_label),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = stringResource(
-                            R.string.timer_pomodoro_sessions_value,
-                            pomodoroSessions.toInt()
-                        ),
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFFE53935)
-                    )
-                }
-                Slider(
-                    value = pomodoroSessions,
-                    onValueChange = { pomodoroSessions = it },
-                    valueRange = 1f..8f,
-                    steps = 6,
-                    colors = SliderDefaults.colors(
-                        thumbColor = Color(0xFFE53935),
-                        activeTrackColor = Color(0xFFE53935)
-                    ),
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        stringResource(R.string.timer_pomodoro_min_sessions),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Text(
-                        stringResource(R.string.timer_pomodoro_max_sessions),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-
-                Button(
-                    onClick = {
-                        showPomodoroSheet = false
-                        onNavigateToPomodoro(pomodoroSessions.toInt())
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFE53935)
-                    )
-                ) {
-                    Text(
-                        stringResource(R.string.timer_pomodoro_start),
-                        style = MaterialTheme.typography.labelLarge
-                    )
-                }
-                Spacer(Modifier.height(8.dp))
-            }
+            )
         }
     }
 
+    val sheetOpen = showCustomSheet || showPomodoroSheet
+
     Scaffold(
+        modifier = Modifier.semantics { if (sheetOpen) hideFromAccessibility() },
         topBar = {
             DayPilotTopBar(
                 title = stringResource(R.string.timer_hub_title),

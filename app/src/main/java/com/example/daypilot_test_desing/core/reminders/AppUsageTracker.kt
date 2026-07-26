@@ -12,6 +12,7 @@ object AppUsageTracker {
     fun hasPermission(context: Context): Boolean {
         val ops = context.getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
         val mode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            @Suppress("DEPRECATION")
             ops.unsafeCheckOpNoThrow(
                 AppOpsManager.OPSTR_GET_USAGE_STATS,
                 Process.myUid(),
@@ -38,7 +39,7 @@ object AppUsageTracker {
             set(Calendar.SECOND, 0)
             set(Calendar.MILLISECOND, 0)
         }.timeInMillis
-        val stats = usm.queryUsageStats(
+        val stats: List<android.app.usage.UsageStats> = usm.queryUsageStats(
             UsageStatsManager.INTERVAL_DAILY,
             startOfDay,
             System.currentTimeMillis()

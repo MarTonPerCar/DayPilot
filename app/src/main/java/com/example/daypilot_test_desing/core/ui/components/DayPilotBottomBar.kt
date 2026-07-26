@@ -3,6 +3,7 @@ package com.example.daypilot_test_desing.core.ui.components
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -68,6 +69,83 @@ private fun rootTabFor(route: String?): String? = when (route) {
     else -> null
 }
 
+private fun navigateToTab(
+    navController: NavController,
+    tab: BottomBarTab,
+    activeTab: String?,
+    currentRoute: String?
+) {
+    if (activeTab == tab.route) {
+        // Already in this tab — pop sub-screens to return to tab root
+        if (currentRoute != tab.route) {
+            navController.popBackStack(tab.route, inclusive = false)
+        }
+    } else {
+        navController.navigate(tab.route) {
+            popUpTo(DayPilotDestinations.HOME) { saveState = true }
+            launchSingleTop = true
+            restoreState    = true
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun RowScope.BottomBarItem(
+    tab: BottomBarTab,
+    isSelected: Boolean,
+    unreadNotifications: Int,
+    onClick: () -> Unit
+) {
+    val iconScale by animateFloatAsState(
+        targetValue   = if (isSelected) 1.15f else 1f,
+        animationSpec = tween(200),
+        label         = "icon_scale_${tab.route}"
+    )
+    val labelColor by animateColorAsState(
+        targetValue   = if (isSelected) MaterialTheme.colorScheme.primary
+        else MaterialTheme.colorScheme.onSurfaceVariant,
+        animationSpec = tween(200),
+        label         = "label_color_${tab.route}"
+    )
+    val showBadge = tab.route == DayPilotDestinations.NOTIFICATIONS && unreadNotifications > 0
+
+    NavigationBarItem(
+        selected = isSelected,
+        onClick  = onClick,
+        icon = {
+            BadgedBox(
+                badge = {
+                    if (showBadge) {
+                        Badge {
+                            Text(if (unreadNotifications > 9) "9+" else "$unreadNotifications")
+                        }
+                    }
+                }
+            ) {
+                Icon(
+                    imageVector        = tab.icon,
+                    contentDescription = tab.label,
+                    modifier           = Modifier.scale(iconScale)
+                )
+            }
+        },
+        label = {
+            Text(
+                text       = tab.label,
+                style      = MaterialTheme.typography.labelSmall,
+                fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
+                color      = labelColor
+            )
+        },
+        colors = NavigationBarItemDefaults.colors(
+            selectedIconColor   = MaterialTheme.colorScheme.primary,
+            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            indicatorColor      = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
+        )
+    )
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DayPilotBottomBar(navController: NavController, unreadNotifications: Int = 0) {
@@ -80,68 +158,11 @@ fun DayPilotBottomBar(navController: NavController, unreadNotifications: Int = 0
         tonalElevation = 8.dp
     ) {
         bottomBarTabs.forEach { tab ->
-            val isSelected = activeTab == tab.route
-
-            val iconScale by animateFloatAsState(
-                targetValue   = if (isSelected) 1.15f else 1f,
-                animationSpec = tween(200),
-                label         = "icon_scale_${tab.route}"
-            )
-            val labelColor by animateColorAsState(
-                targetValue   = if (isSelected) MaterialTheme.colorScheme.primary
-                else MaterialTheme.colorScheme.onSurfaceVariant,
-                animationSpec = tween(200),
-                label         = "label_color_${tab.route}"
-            )
-
-            NavigationBarItem(
-                selected = isSelected,
-                onClick  = {
-                    if (activeTab == tab.route) {
-                        // Already in this tab — pop sub-screens to return to tab root
-                        if (currentRoute != tab.route) {
-                            navController.popBackStack(tab.route, inclusive = false)
-                        }
-                    } else {
-                        navController.navigate(tab.route) {
-                            popUpTo(DayPilotDestinations.HOME) { saveState = true }
-                            launchSingleTop = true
-                            restoreState    = true
-                        }
-                    }
-                },
-                icon = {
-                    val showBadge = tab.route == DayPilotDestinations.NOTIFICATIONS &&
-                        unreadNotifications > 0
-                    BadgedBox(
-                        badge = {
-                            if (showBadge) {
-                                Badge {
-                                    Text(if (unreadNotifications > 9) "9+" else "$unreadNotifications")
-                                }
-                            }
-                        }
-                    ) {
-                        Icon(
-                            imageVector        = tab.icon,
-                            contentDescription = tab.label,
-                            modifier           = Modifier.scale(iconScale)
-                        )
-                    }
-                },
-                label = {
-                    Text(
-                        text       = tab.label,
-                        style      = MaterialTheme.typography.labelSmall,
-                        fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-                        color      = labelColor
-                    )
-                },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor   = MaterialTheme.colorScheme.primary,
-                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    indicatorColor      = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
-                )
+            BottomBarItem(
+                tab = tab,
+                isSelected = activeTab == tab.route,
+                unreadNotifications = unreadNotifications,
+                onClick = { navigateToTab(navController, tab, activeTab, currentRoute) }
             )
         }
     }

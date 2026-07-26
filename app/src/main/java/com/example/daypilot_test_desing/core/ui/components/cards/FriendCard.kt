@@ -22,18 +22,29 @@ import com.example.daypilot_test_desing.core.data.model.FriendWeeklySummary
 import com.example.daypilot_test_desing.core.data.model.ReactionType
 import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
 
+@Immutable
+data class FriendCardInfo(
+    val name: String,
+    val email: String,
+    val points: Int,
+    val streak: Int,
+    val avatarUrl: String? = null,
+    val weeklySummary: FriendWeeklySummary? = null
+)
+
 @Composable
 fun FriendCard(
-    name: String,
-    email: String,
-    points: Int,
-    streak: Int,
+    info: FriendCardInfo,
     modifier: Modifier = Modifier,
-    avatarUrl: String? = null,
-    weeklySummary: FriendWeeklySummary? = null,
     onReact: (ReactionType) -> Unit = {},
     onRemove: (() -> Unit)? = null
 ) {
+    val name          = info.name
+    val email         = info.email
+    val points        = info.points
+    val streak        = info.streak
+    val avatarUrl     = info.avatarUrl
+    val weeklySummary = info.weeklySummary
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -153,22 +164,26 @@ fun FriendCardPreview() {
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             FriendCard(
-                name = "Carlos Ruiz",
-                email = "carlos@example.com",
-                points = 480,
-                streak = 9
+                info = FriendCardInfo(
+                    name = "Carlos Ruiz",
+                    email = "carlos@example.com",
+                    points = 480,
+                    streak = 9
+                )
             )
             FriendCard(
-                name = "Ana López",
-                email = "ana@example.com",
-                points = 520,
-                streak = 14,
-                weeklySummary = FriendWeeklySummary(
-                    totalPoints = 45,
-                    tasksCompleted = 12,
-                    totalSteps = 42000,
-                    bestStreak = 7,
-                    myReaction = ReactionType.CLAP
+                info = FriendCardInfo(
+                    name = "Ana López",
+                    email = "ana@example.com",
+                    points = 520,
+                    streak = 14,
+                    weeklySummary = FriendWeeklySummary(
+                        totalPoints = 45,
+                        tasksCompleted = 12,
+                        totalSteps = 42000,
+                        bestStreak = 7,
+                        myReaction = ReactionType.CLAP
+                    )
                 )
             )
         }

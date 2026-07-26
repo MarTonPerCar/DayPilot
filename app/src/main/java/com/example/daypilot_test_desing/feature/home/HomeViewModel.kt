@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.daypilot_test_desing.core.connectivity.ConnectivityState
 import com.example.daypilot_test_desing.core.data.model.buildProgressWindow
 import com.example.daypilot_test_desing.core.data.repository.FriendRepository
 import com.example.daypilot_test_desing.core.data.repository.ProgressRepository
@@ -37,10 +36,9 @@ class HomeViewModel(
 
     /** Suspends until this ViewModel's data has actually loaded (or failed) — used by the
      *  startup join in DayPilotNavGraph, which needs real success/failure, not just "finished". */
-    suspend fun awaitLoad(): Boolean = load()
+    suspend fun awaitLoad(): Boolean = load() // NOSONAR kotlin:S6313 -- startup-join failure detection, see KDoc above
 
     private suspend fun load(): Boolean {
-        if (!ConnectivityState.ensureOnline()) return false
         return try {
             coroutineScope {
                 val userD    = async { userRepo.getCurrentUser() }

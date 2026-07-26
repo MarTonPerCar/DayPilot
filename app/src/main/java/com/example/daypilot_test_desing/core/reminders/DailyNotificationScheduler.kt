@@ -17,17 +17,15 @@ const val ALARM_TASK_REMINDER = "task_reminder"
 const val ALARM_STREAK_DANGER = "streak_danger"
 
 fun createDailyChannel(context: Context) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        val channel = NotificationChannel(
-            DAILY_CHANNEL_ID,
-            context.getString(R.string.daily_channel_name),
-            NotificationManager.IMPORTANCE_HIGH
-        ).apply {
-            description = context.getString(R.string.daily_channel_desc)
-        }
-        context.getSystemService(NotificationManager::class.java)
-            ?.createNotificationChannel(channel)
+    val channel = NotificationChannel(
+        DAILY_CHANNEL_ID,
+        context.getString(R.string.daily_channel_name),
+        NotificationManager.IMPORTANCE_HIGH
+    ).apply {
+        description = context.getString(R.string.daily_channel_desc)
     }
+    context.getSystemService(NotificationManager::class.java)
+        ?.createNotificationChannel(channel)
 }
 
 object DailyNotificationScheduler {
@@ -89,7 +87,7 @@ object DailyNotificationScheduler {
     // not device-local time — anchoring this alarm to UTC (plus a buffer for cron execution
     // lag) keeps it from firing before the row it's meant to read even exists, which it always
     // did for any timezone ahead of UTC when this was computed from the device's local hour.
-    private fun nextAlarmMillis(utcHour: Int): Long {
+    internal fun nextAlarmMillis(utcHour: Int): Long {
         val cal = Calendar.getInstance(TimeZone.getTimeZone("UTC")).apply {
             set(Calendar.HOUR_OF_DAY, utcHour)
             set(Calendar.MINUTE, CRON_BUFFER_MINUTES)

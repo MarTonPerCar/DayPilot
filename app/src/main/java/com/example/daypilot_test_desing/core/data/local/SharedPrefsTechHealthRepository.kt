@@ -3,6 +3,7 @@ package com.example.daypilot_test_desing.core.data.local
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
+import androidx.core.content.edit
 import com.example.daypilot_test_desing.core.data.model.AppRestriction
 import com.example.daypilot_test_desing.core.data.model.GroupRestriction
 import com.example.daypilot_test_desing.core.data.repository.TechHealthRepository
@@ -34,9 +35,9 @@ class SharedPrefsTechHealthRepository(context: Context) : TechHealthRepository {
     }
 
     private fun saveApps(list: List<AppRestriction>) {
-        prefs.edit()
-            .putString("apps", json.encodeToString(ListSerializer(AppRestriction.serializer()), list))
-            .apply()
+        prefs.edit {
+            putString("apps", json.encodeToString(ListSerializer(AppRestriction.serializer()), list))
+        }
     }
 
     private fun loadGroups(): MutableList<GroupRestriction> {
@@ -50,9 +51,9 @@ class SharedPrefsTechHealthRepository(context: Context) : TechHealthRepository {
     }
 
     private fun saveGroups(list: List<GroupRestriction>) {
-        prefs.edit()
-            .putString("groups", json.encodeToString(ListSerializer(GroupRestriction.serializer()), list))
-            .apply()
+        prefs.edit {
+            putString("groups", json.encodeToString(ListSerializer(GroupRestriction.serializer()), list))
+        }
     }
 
     override fun getAppRestrictions(): List<AppRestriction>    = loadApps()
@@ -149,7 +150,7 @@ class SharedPrefsTechHealthRepository(context: Context) : TechHealthRepository {
     }
 
     fun clearAll() {
-        prefs.edit().remove("apps").remove("groups").apply()
+        prefs.edit { remove("apps").remove("groups") }
     }
 
     private fun today() = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
@@ -180,6 +181,6 @@ class SharedPrefsTechHealthRepository(context: Context) : TechHealthRepository {
                 apps                = it.apps.map { app -> app.copy(usedMinutesToday = 0) }
             )
         })
-        prefs.edit().putString("last_reset_date", today).apply()
+        prefs.edit { putString("last_reset_date", today) }
     }
 }

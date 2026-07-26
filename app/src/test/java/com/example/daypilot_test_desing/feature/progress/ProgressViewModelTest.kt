@@ -1,6 +1,7 @@
 package com.example.daypilot_test_desing.feature.progress
 
-import androidx.test.core.app.ApplicationProvider
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.example.daypilot_test_desing.support.FakeApplication
 import com.example.daypilot_test_desing.core.data.repository.ProgressRepository
 import com.example.daypilot_test_desing.data.supabase.dto.DailyProgressDto
 import com.example.daypilot_test_desing.support.MainDispatcherRule
@@ -8,18 +9,18 @@ import com.example.daypilot_test_desing.support.initSupabaseSettingsForTest
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import com.example.daypilot_test_desing.support.realAdvanceUntilIdle
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@RunWith(RobolectricTestRunner::class)
 class ProgressViewModelTest {
+
+    @get:Rule
+    val instantTaskExecutorRule = InstantTaskExecutorRule()
 
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
@@ -38,12 +39,12 @@ class ProgressViewModelTest {
         coEvery { repo.getRankingPosition() } returns 3
     }
 
-    private fun buildViewModel() = ProgressViewModel(ApplicationProvider.getApplicationContext(), repo)
+    private fun buildViewModel() = ProgressViewModel(FakeApplication(), repo)
 
     @Test
     fun `init loads today's progress, history and ranking`() = runTest {
         val viewModel = buildViewModel()
-        realAdvanceUntilIdle()
+        advanceUntilIdle()
 
         val state = viewModel.uiState.value
         assertEquals(40, state.pointsToday)
@@ -55,13 +56,13 @@ class ProgressViewModelTest {
     @Test
     fun `recordTimerComplete reloads when the server awarded points`() = runTest {
         val viewModel = buildViewModel()
-        realAdvanceUntilIdle()
+        advanceUntilIdle()
 
         coEvery { repo.completeTimerSession() } returns true
         coEvery { repo.getTodayProgress() } returns todayB
 
         viewModel.recordTimerComplete()
-        realAdvanceUntilIdle()
+        advanceUntilIdle()
 
         assertEquals(70, viewModel.uiState.value.pointsToday)
         assertEquals(30, viewModel.uiState.value.pointsFromTimers)
@@ -70,13 +71,13 @@ class ProgressViewModelTest {
     @Test
     fun `recordTimerComplete does not reload when nothing was awarded`() = runTest {
         val viewModel = buildViewModel()
-        realAdvanceUntilIdle()
+        advanceUntilIdle()
 
         coEvery { repo.completeTimerSession() } returns false
         coEvery { repo.getTodayProgress() } returns todayB
 
         viewModel.recordTimerComplete()
-        realAdvanceUntilIdle()
+        advanceUntilIdle()
 
         // Stale todayA value, proving the second getTodayProgress() stub was never reached.
         assertEquals(40, viewModel.uiState.value.pointsToday)

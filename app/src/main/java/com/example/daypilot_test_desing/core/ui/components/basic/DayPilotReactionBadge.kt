@@ -22,9 +22,9 @@ import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
 
 @Composable
 fun DayPilotReactionBadge(
-    modifier: Modifier = Modifier,
     name: String,
     reaction: ReactionType,
+    modifier: Modifier = Modifier,
     avatarUrl: String? = null
 ) {
     Column(

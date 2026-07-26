@@ -14,11 +14,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.daypilot_test_desing.core.ui.components.DayPilotCalendar
+import com.example.daypilot_test_desing.core.ui.components.DayPilotCalendarActions
+import com.example.daypilot_test_desing.core.ui.components.DayPilotCalendarState
 import com.example.daypilot_test_desing.core.ui.components.basic.*
 import com.example.daypilot_test_desing.core.ui.components.cards.*
 import com.example.daypilot_test_desing.core.ui.components.forms.*
 import com.example.daypilot_test_desing.core.data.model.*
 import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
+
+private const val SAMPLE_NAME_MARIO = "Mario García"
+private const val SAMPLE_NAME_ANA = "Ana López"
+private const val SAMPLE_NAME_CARLOS = "Carlos Ruiz"
 
 @Preview(showBackground = true)
 @Composable
@@ -42,9 +48,9 @@ fun CatalogBasicInputs() {
             }
             CatalogSection("Avatar") {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    DayPilotAvatar(name = "Mario García", size = 40)
-                    DayPilotAvatar(name = "Ana López",    size = 56)
-                    DayPilotAvatar(name = "Carlos Ruiz",  size = 72)
+                    DayPilotAvatar(name = SAMPLE_NAME_MARIO, size = 40)
+                    DayPilotAvatar(name = SAMPLE_NAME_ANA,    size = 56)
+                    DayPilotAvatar(name = SAMPLE_NAME_CARLOS,  size = 72)
                 }
             }
             CatalogSection("Chips") {
@@ -67,9 +73,9 @@ fun CatalogBasicInputs() {
             CatalogSection("TextFields") {
                 var text by remember { mutableStateOf("") }
                 var pass  by remember { mutableStateOf("") }
-                DayPilotTextField(value = text, onValueChange = { text = it }, label = "Name", leadingIcon = Icons.Default.Person)
+                DayPilotTextField(value = text, onValueChange = { text = it }, label = "Name", options = DayPilotTextFieldOptions(leadingIcon = Icons.Default.Person))
                 DayPilotPasswordField(value = pass, onValueChange = { pass = it })
-                DayPilotTextField(value = "Error field", onValueChange = {}, label = "Email", isError = true, errorMessage = "Invalid email")
+                DayPilotTextField(value = "Error field", onValueChange = {}, label = "Email", options = DayPilotTextFieldOptions(isError = true, errorMessage = "Invalid email"))
             }
         }
     }
@@ -189,23 +195,26 @@ fun CatalogCardsPeople() {
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             CatalogSection("Task Cards") {
-                TaskCard(title = "Finish TFG", category = TaskCategory.STUDY, difficulty = TaskDifficulty.HARD, durationMinutes = 120, isCompleted = false, onToggleComplete = {}, onTap = {})
-                TaskCard(title = "Go for a run", category = TaskCategory.SPORT, difficulty = TaskDifficulty.EASY, durationMinutes = 45, isCompleted = true, onToggleComplete = {}, onTap = {})
+                TaskCard(state = TaskCardUiState(title = "Finish TFG", category = TaskCategory.STUDY, difficulty = TaskDifficulty.HARD, durationMinutes = 120, isCompleted = false), onToggleComplete = {}, onTap = {})
+                TaskCard(state = TaskCardUiState(title = "Go for a run", category = TaskCategory.SPORT, difficulty = TaskDifficulty.EASY, durationMinutes = 45, isCompleted = true), onToggleComplete = {}, onTap = {})
                 TaskMiniCard(title = "Team meeting", difficulty = TaskDifficulty.MEDIUM, onTap = {})
-                TaskDayCard(title = "Presentation", category = TaskCategory.WORK, difficulty = TaskDifficulty.HARD, durationMinutes = 60, isCompleted = false, onToggleComplete = {}, onTap = {}, onEdit = {}, onDelete = {})
+                TaskDayCard(
+                    state = TaskDayCardUiState(title = "Presentation", category = TaskCategory.WORK, difficulty = TaskDifficulty.HARD, durationMinutes = 60, isCompleted = false),
+                    actions = TaskDayCardActions(onToggleComplete = {}, onTap = {}, onEdit = {}, onDelete = {})
+                )
             }
             CatalogSection("Notification Cards") {
                 NotificationCard(title = "Task completed!", message = "You completed 'Go for a run'", timeAgo = "5min ago", type = NotificationType.TASK, isRead = false, onClick = {})
-                NotificationCard(title = "New request", message = "Ana López wants to be your friend", timeAgo = "1h ago", type = NotificationType.SOCIAL, isRead = true, onClick = {})
+                NotificationCard(title = "New request", message = "$SAMPLE_NAME_ANA wants to be your friend", timeAgo = "1h ago", type = NotificationType.SOCIAL, isRead = true, onClick = {})
             }
             CatalogSection("Habit & Friend Cards") {
                 HabitCard(title = "Tech health", description = "App / group limits",  icon = Icons.Default.PhoneAndroid,  onClick = {})
                 HabitCard(title = "Reminders",   description = "Alerts and routines", icon = Icons.Default.Notifications, onClick = {})
-                FriendCard(name = "Ana López",   email = "ana@example.com",    points = 520, streak = 14)
-                FriendCard(name = "Carlos Ruiz", email = "carlos@example.com", points = 480, streak = 9,
-                    weeklySummary = FriendWeeklySummary(totalPoints = 45, tasksCompleted = 12, totalSteps = 42000, bestStreak = 7))
-                UserSearchCard(name = "Mario García", email = "mario@example.com", points = 340, streak = 7, onAddFriend = {})
-                FriendRequestCard(name = "Ana López", email = "ana@example.com", points = 210, streak = 3, onAccept = {}, onReject = {})
+                FriendCard(info = FriendCardInfo(name = SAMPLE_NAME_ANA,   email = "ana@example.com",    points = 520, streak = 14))
+                FriendCard(info = FriendCardInfo(name = SAMPLE_NAME_CARLOS, email = "carlos@example.com", points = 480, streak = 9,
+                    weeklySummary = FriendWeeklySummary(totalPoints = 45, tasksCompleted = 12, totalSteps = 42000, bestStreak = 7)))
+                UserSearchCard(info = UserCardInfo(name = SAMPLE_NAME_MARIO, email = "mario@example.com", points = 340, streak = 7), onAddFriend = {})
+                FriendRequestCard(info = UserCardInfo(name = SAMPLE_NAME_ANA, email = "ana@example.com", points = 210, streak = 3), onAccept = {}, onReject = {})
             }
         }
     }
@@ -222,12 +231,12 @@ fun CatalogCardsRankingTimer() {
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             CatalogSection("Ranking & Podium") {
-                RankingCard(name = "Ana López",   position = 1, points = 520, streak = 14)
-                RankingCard(name = "Carlos Ruiz", position = 2, points = 480, streak = 9)
-                CurrentUserRankingCard(name = "Mario García", position = 3, points = 340, streak = 7)
+                RankingCard(entry = RankingEntryUi(name = SAMPLE_NAME_ANA,   position = 1, points = 520, streak = 14))
+                RankingCard(entry = RankingEntryUi(name = SAMPLE_NAME_CARLOS, position = 2, points = 480, streak = 9))
+                CurrentUserRankingCard(entry = RankingEntryUi(name = SAMPLE_NAME_MARIO, position = 3, points = 340, streak = 7))
                 PodiumCard(
-                    first  = PodiumEntry("Ana López",     520, 14),
-                    second = PodiumEntry("Carlos Ruiz",   480, 9),
+                    first  = PodiumEntry(SAMPLE_NAME_ANA,     520, 14),
+                    second = PodiumEntry(SAMPLE_NAME_CARLOS,   480, 9),
                     third  = PodiumEntry("Laura Sánchez", 430, 6)
                 )
             }
@@ -265,7 +274,7 @@ fun CatalogCardsStats() {
         ) {
             CatalogSection("Stats & Profile Cards") {
                 StatsCard(rankingPosition = 2, pointsToday = 8, pointsFromTasks = 4, pointsFromSteps = 2, pointsFromHabits = 1, pointsFromTimers = 1)
-                ProfileStatsCard(name = "Mario García", username = "mariogarcia", level = 7, totalPoints = 340, pointsToNextLevel = 350, currentStreak = 7, longestStreak = 14)
+                ProfileStatsCard(info = ProfileStatsInfo(name = SAMPLE_NAME_MARIO, username = "mariogarcia", level = 7, totalPoints = 340, pointsToNextLevel = 350, currentStreak = 7, longestStreak = 14))
                 ProfileInfoRow(label = "Email",    value = "mario@example.com")
                 ProfileInfoRow(label = "Username", value = "@mariogarcia")
             }
@@ -274,10 +283,10 @@ fun CatalogCardsStats() {
                     summary = WeeklySummaryData(totalPoints = 45, tasksCompleted = 12, totalSteps = 42000, bestStreak = 7,
                         reactions = listOf(ReceivedReaction("Ana", ReactionType.CLAP), ReceivedReaction("Carlos", ReactionType.FIRE)))
                 )
-                DailySummaryCard(userName = "Mario", streak = 7, stepsToday = 1200, stepsGoal = 2000, tasksCompleted = 3, tasksTotal = 5, pointsToday = 8, rankingPosition = 2)
+                DailySummaryCard(info = DailySummaryInfo(userName = "Mario", streak = 7, stepsToday = 1200, stepsGoal = 2000, tasksCompleted = 3, tasksTotal = 5, pointsToday = 8, rankingPosition = 2))
             }
             CatalogSection("Steps & App Limit Cards") {
-                StepsCard(currentSteps = 1200, goalSteps = 2000, pointsEarned = 1, pointsRemaining = 5, onConfigureGoal = { _ -> })
+                StepsCard(info = StepsCardInfo(currentSteps = 1200, goalSteps = 2000, pointsEarned = 1, pointsRemaining = 5), onConfigureGoal = { _ -> })
                 StepsSummaryCard(totalSteps7Days = 42000, bestDaySteps = 8500, dailyAverage = 6000, goalStreak = 4)
                 AppLimitCard(
                     restriction = AppRestriction(id = "1", appName = "YouTube", packageName = "com.google.youtube", dailyLimitMinutes = 120, isEnabled = true, usedMinutesToday = 45),
@@ -318,17 +327,21 @@ fun CatalogCardsCalendar() {
             }
             CatalogSection("Calendar") {
                 DayPilotCalendar(
-                    month = 5, year = 2026,
-                    taskDots = listOf(
-                        CalendarTaskDot(day = 5,  month = 5, year = 2026, color = Color(0xFF4CAF50)),
-                        CalendarTaskDot(day = 10, month = 5, year = 2026, color = Color(0xFFFF9800)),
-                        CalendarTaskDot(day = 15, month = 5, year = 2026, color = Color(0xFFF44336))
+                    state = DayPilotCalendarState(
+                        month = 5, year = 2026,
+                        taskDots = listOf(
+                            CalendarTaskDot(day = 5,  month = 5, year = 2026, color = Color(0xFF4CAF50)),
+                            CalendarTaskDot(day = 10, month = 5, year = 2026, color = Color(0xFFFF9800)),
+                            CalendarTaskDot(day = 15, month = 5, year = 2026, color = Color(0xFFF44336))
+                        ),
+                        selectedDay     = 5
                     ),
-                    selectedDay     = 5,
-                    onDaySelected   = {},
-                    onPreviousMonth = {},
-                    onNextMonth     = {},
-                    onAddTask       = {}
+                    actions = DayPilotCalendarActions(
+                        onDaySelected   = {},
+                        onPreviousMonth = {},
+                        onNextMonth     = {},
+                        onAddTask       = {}
+                    )
                 )
             }
         }
@@ -346,7 +359,7 @@ fun CatalogForms() {
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             CatalogSection("Task Form") {
-                TaskFormCard(onSave = { _, _, _, _, _, _, _, _ -> }, onCancel = {})
+                TaskFormCard(onSave = {}, onCancel = {})
             }
             CatalogSection("Reminder Form") {
                 ReminderFormCard(onSave = {}, onCancel = {})

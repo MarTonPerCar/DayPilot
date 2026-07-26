@@ -92,10 +92,12 @@ fun ResetPasswordScreen(
                 value         = email,
                 onValueChange = { email = it },
                 label         = stringResource(R.string.email),
-                keyboardType  = KeyboardType.Email,
-                isError       = errorMessage.isNotEmpty(),
-                errorMessage  = errorMessage,
-                enabled       = !isSuccess
+                options = DayPilotTextFieldOptions(
+                    keyboardType  = KeyboardType.Email,
+                    isError       = errorMessage.isNotEmpty(),
+                    errorMessage  = errorMessage,
+                    enabled       = !isSuccess
+                )
             )
 
             DayPilotButtonPrimary(

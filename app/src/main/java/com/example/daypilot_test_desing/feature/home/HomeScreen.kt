@@ -10,25 +10,34 @@ import com.example.daypilot_test_desing.core.data.model.DayProgress
 import com.example.daypilot_test_desing.core.data.model.HomeSection
 import com.example.daypilot_test_desing.core.data.model.HomeSectionData
 
+data class HomeActions(
+    val onNavigateToCalendar: () -> Unit,
+    val onNavigateToHabits: () -> Unit,
+    val onNavigateToProgress: () -> Unit,
+    val onNavigateToRivalry: () -> Unit
+)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    userName: String,
-    streak: Int,
-    stepsToday: Int,
-    stepsGoal: Int,
-    tasksCompleted: Int,
-    tasksTotal: Int,
-    progressData: List<DayProgress>,
-    pointsToday: Int,
-    rankingPosition: Int,
-    friendCount: Int,
-    timerCompletedToday: Boolean,
-    onNavigateToCalendar: () -> Unit,
-    onNavigateToHabits: () -> Unit,
-    onNavigateToProgress: () -> Unit,
-    onNavigateToRivalry: () -> Unit
+    state: HomeUiState,
+    actions: HomeActions
 ) {
+    val userName            = state.userName
+    val streak              = state.streak
+    val stepsToday          = state.stepsToday
+    val stepsGoal           = state.stepsGoal
+    val tasksCompleted      = state.tasksCompleted
+    val tasksTotal          = state.tasksTotal
+    val progressData        = state.progressData
+    val pointsToday         = state.pointsToday
+    val rankingPosition     = state.rankingPosition
+    val friendCount         = state.friendCount
+    val timerCompletedToday = state.timerCompletedToday
+    val onNavigateToCalendar = actions.onNavigateToCalendar
+    val onNavigateToHabits   = actions.onNavigateToHabits
+    val onNavigateToProgress = actions.onNavigateToProgress
+    val onNavigateToRivalry  = actions.onNavigateToRivalry
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
@@ -47,14 +56,16 @@ fun HomeScreen(
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 DailySummaryCard(
-                    userName        = userName,
-                    streak          = streak,
-                    stepsToday      = stepsToday,
-                    stepsGoal       = stepsGoal,
-                    tasksCompleted  = tasksCompleted,
-                    tasksTotal      = tasksTotal,
-                    pointsToday     = pointsToday,
-                    rankingPosition = rankingPosition,
+                    info = DailySummaryInfo(
+                        userName        = userName,
+                        streak          = streak,
+                        stepsToday      = stepsToday,
+                        stepsGoal       = stepsGoal,
+                        tasksCompleted  = tasksCompleted,
+                        tasksTotal      = tasksTotal,
+                        pointsToday     = pointsToday,
+                        rankingPosition = rankingPosition
+                    ),
                     modifier        = Modifier
                         .fillMaxWidth()
                         .height(summaryHeight)

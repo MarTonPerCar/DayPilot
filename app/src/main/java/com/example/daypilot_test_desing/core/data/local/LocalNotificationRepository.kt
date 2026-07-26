@@ -3,6 +3,7 @@ package com.example.daypilot_test_desing.core.data.local
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
+import androidx.core.content.edit
 import com.example.daypilot_test_desing.core.data.model.NotificationData
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -32,9 +33,9 @@ class LocalNotificationRepository(context: Context) {
     }
 
     private fun save(list: List<NotificationData>) {
-        prefs.edit()
-            .putString("notifications", json.encodeToString(ListSerializer(NotificationData.serializer()), list))
-            .apply()
+        prefs.edit {
+            putString("notifications", json.encodeToString(ListSerializer(NotificationData.serializer()), list))
+        }
     }
 
     private val _notifications = MutableStateFlow(load())

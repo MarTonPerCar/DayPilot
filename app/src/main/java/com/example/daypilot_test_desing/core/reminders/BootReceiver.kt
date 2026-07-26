@@ -25,9 +25,5 @@ class BootReceiver : BroadcastReceiver() {
             taskOn               = appPrefs.taskRemindersEnabled,
             streakOn             = appPrefs.streakAlertsEnabled
         )
-
-        // A reboot is exactly the case StepsForegroundService's baseline-reset logic exists for —
-        // restart it so counting resumes without needing the app to be opened first.
-        startStepsService(context)
     }
 }

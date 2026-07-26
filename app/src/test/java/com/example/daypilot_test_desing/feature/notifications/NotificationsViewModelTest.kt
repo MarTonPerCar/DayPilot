@@ -1,6 +1,9 @@
 package com.example.daypilot_test_desing.feature.notifications
 
-import androidx.test.core.app.ApplicationProvider
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelStore
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.example.daypilot_test_desing.support.FakeContext
 import com.example.daypilot_test_desing.core.data.local.NotificationHub
 import com.example.daypilot_test_desing.core.data.model.NotificationData
 import com.example.daypilot_test_desing.core.data.model.NotificationType
@@ -11,19 +14,19 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import com.example.daypilot_test_desing.support.realAdvanceUntilIdle
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@RunWith(RobolectricTestRunner::class)
 class NotificationsViewModelTest {
+
+    @get:Rule
+    val instantTaskExecutorRule = InstantTaskExecutorRule()
 
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
@@ -36,27 +39,39 @@ class NotificationsViewModelTest {
     @Before
     fun setUp() {
         initSupabaseSettingsForTest()
-        NotificationHub.init(ApplicationProvider.getApplicationContext())
+        NotificationHub.init(FakeContext())
         NotificationHub.clear()
         repo = mockk()
     }
 
-    private fun buildViewModel() = NotificationsViewModel(ApplicationProvider.getApplicationContext(), repo)
+    private fun buildViewModel() = NotificationsViewModel(repo)
+
+    // ViewModel.clear() is internal; routing through a ViewModelStore is the public way to
+    // trigger onCleared() and cancel viewModelScope from a test.
+    private fun clearViewModel(viewModel: ViewModel) {
+        ViewModelStore().apply { put("vm", viewModel) }.clear()
+    }
 
     @Test
     fun `awaitLoad merges the server's notifications into the shared hub`() = runTest {
         coEvery { repo.getCurrentUserId() } returns "u1"
         coEvery { repo.getAll("u1") } returns listOf(item1, item2)
         val viewModel = buildViewModel()
+        try {
+            // Deliberately not advancing the dispatcher past this direct suspend call: doing so
+            // would also let subscribeToRealtime()'s nested launch run, which opens a real
+            // Supabase realtime socket — reading NotificationHub's own state directly instead
+            // proves the merge happened without needing that risk.
+            val result = viewModel.awaitLoad()
 
-        // Deliberately not advancing the dispatcher past this direct suspend call: doing so
-        // would also let subscribeToRealtime()'s nested launch run, which opens a real
-        // Supabase realtime socket — reading NotificationHub's own state directly instead
-        // proves the merge happened without needing that risk.
-        val result = viewModel.awaitLoad()
-
-        assertTrue(result)
-        assertEquals(listOf(item1, item2), NotificationHub.repo.notificationsFlow.value)
+            assertTrue(result)
+            assertEquals(listOf(item1, item2), NotificationHub.repo.notificationsFlow.value)
+        } finally {
+            // init{}'s viewModelScope.collect() never completes on its own; without cancelling
+            // it here, runTest sees it as a leaked coroutine and fails with
+            // UncompletedCoroutinesError since this test never calls advanceUntilIdle().
+            clearViewModel(viewModel)
+        }
     }
 
     @Test
@@ -64,14 +79,17 @@ class NotificationsViewModelTest {
         NotificationHub.repo.mergeServerNotifications(listOf(item1, item2))
         coEvery { repo.markAsRead("n1") } returns Unit
         val viewModel = buildViewModel()
+        try {
+            viewModel.markAsRead("n1")
+            advanceUntilIdle()
 
-        viewModel.markAsRead("n1")
-        realAdvanceUntilIdle()
-
-        val stored = NotificationHub.repo.notificationsFlow.value
-        assertTrue(stored.first { it.id == "n1" }.isRead)
-        assertTrue(!stored.first { it.id == "n2" }.isRead)
-        coVerify { repo.markAsRead("n1") }
+            val stored = NotificationHub.repo.notificationsFlow.value
+            assertTrue(stored.first { it.id == "n1" }.isRead)
+            assertTrue(!stored.first { it.id == "n2" }.isRead)
+            coVerify { repo.markAsRead("n1") }
+        } finally {
+            clearViewModel(viewModel)
+        }
     }
 
     @Test
@@ -80,11 +98,14 @@ class NotificationsViewModelTest {
         coEvery { repo.getCurrentUserId() } returns "u1"
         coEvery { repo.markAllAsRead("u1") } returns Unit
         val viewModel = buildViewModel()
+        try {
+            viewModel.markAllAsRead()
+            advanceUntilIdle()
 
-        viewModel.markAllAsRead()
-        realAdvanceUntilIdle()
-
-        assertTrue(NotificationHub.repo.notificationsFlow.value.all { it.isRead })
-        coVerify { repo.markAllAsRead("u1") }
+            assertTrue(NotificationHub.repo.notificationsFlow.value.all { it.isRead })
+            coVerify { repo.markAllAsRead("u1") }
+        } finally {
+            clearViewModel(viewModel)
+        }
     }
 }

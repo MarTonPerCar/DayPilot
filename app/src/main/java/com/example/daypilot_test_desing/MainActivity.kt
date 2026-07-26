@@ -14,15 +14,12 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.daypilot_test_desing.data.supabase.SupabaseUserRepository
 import com.example.daypilot_test_desing.core.data.local.NotificationHub
-import com.example.daypilot_test_desing.core.data.preferences.AppPreferences
 import com.example.daypilot_test_desing.core.navigation.DayPilotNavGraph
 import com.example.daypilot_test_desing.feature.settings.SettingsViewModel
-import com.example.daypilot_test_desing.core.reminders.ReliabilitySettings
 import com.example.daypilot_test_desing.core.reminders.createDailyChannel
 import com.example.daypilot_test_desing.core.reminders.createNotificationChannel
-import com.example.daypilot_test_desing.core.reminders.createStepsChannel
+import com.example.daypilot_test_desing.core.reminders.scheduleStepsWorker
 import com.example.daypilot_test_desing.core.reminders.scheduleTechHealthWorker
-import com.example.daypilot_test_desing.core.reminders.startStepsService
 import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
 
 class MainActivity : ComponentActivity() {
@@ -35,8 +32,8 @@ class MainActivity : ComponentActivity() {
         NotificationHub.init(this)
         createNotificationChannel(this)
         createDailyChannel(this)
-        createStepsChannel(this)
         scheduleTechHealthWorker(this)
+        scheduleStepsWorker(this)
 
         val toRequest = mutableListOf<String>()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
@@ -48,15 +45,6 @@ class MainActivity : ComponentActivity() {
                 != PackageManager.PERMISSION_GRANTED
         ) toRequest.add(Manifest.permission.ACTIVITY_RECOGNITION)
         if (toRequest.isNotEmpty()) requestPermissions.launch(toRequest.toTypedArray())
-
-        startStepsService(this)
-
-        val appPrefs = AppPreferences(this)
-        if (!appPrefs.hasRequestedReliabilityPermissions) {
-            appPrefs.hasRequestedReliabilityPermissions = true
-            ReliabilitySettings.requestMissingOnce(this)
-        }
-
         setTheme(R.style.Theme_DayPilotTestDesing)
         enableEdgeToEdge()
         setContent {
@@ -67,7 +55,7 @@ class MainActivity : ComponentActivity() {
 
             val theme = DayPilotTheme.entries.find { it.name == settings.selectedThemeId }
                 ?: DayPilotTheme.SAGE_GREEN
-            val isDark = if (theme == DayPilotTheme.AMOLED) true else settings.isDarkMode
+            val isDark = theme == DayPilotTheme.AMOLED || settings.isDarkMode
 
             DayPilotTheme(theme = theme, darkMode = isDark) {
                 DayPilotNavGraph()

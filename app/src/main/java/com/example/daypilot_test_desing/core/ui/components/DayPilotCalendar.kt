@@ -22,12 +22,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -40,18 +44,34 @@ import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
 import java.util.Calendar
 
 
+@Immutable
+data class DayPilotCalendarState(
+    val month: Int,
+    val year: Int,
+    val taskDots: List<CalendarTaskDot>,
+    val selectedDay: Int?
+)
+
+data class DayPilotCalendarActions(
+    val onDaySelected: (Int) -> Unit,
+    val onPreviousMonth: () -> Unit,
+    val onNextMonth: () -> Unit,
+    val onAddTask: (day: Int) -> Unit
+)
+
 @Composable
 fun DayPilotCalendar(
-    month: Int,
-    year: Int,
-    taskDots: List<CalendarTaskDot>,
-    selectedDay: Int?,
-    onDaySelected: (Int) -> Unit,
-    onPreviousMonth: () -> Unit,
-    onNextMonth: () -> Unit,
-    onAddTask: (day: Int) -> Unit,
+    state: DayPilotCalendarState,
+    actions: DayPilotCalendarActions,
     modifier: Modifier = Modifier
 ) {
+    val month       = state.month
+    val year        = state.year
+    val taskDots    = state.taskDots
+    val selectedDay = state.selectedDay
+    val onDaySelected   = actions.onDaySelected
+    val onPreviousMonth = actions.onPreviousMonth
+    val onNextMonth     = actions.onNextMonth
     val cal = Calendar.getInstance().apply {
         set(Calendar.YEAR, year)
         set(Calendar.MONTH, month - 1)
@@ -73,6 +93,7 @@ fun DayPilotCalendar(
 
     val monthNames = Month.entries.map { stringResource(it.nameRes) }
     val dayHeaders = WeekDay.entries.map { stringResource(it.headerRes) }
+    val dayHeaderFullNames = WeekDay.entries.map { stringResource(it.fullNameRes) }
 
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -116,10 +137,12 @@ fun DayPilotCalendar(
             }
 
             Row(modifier = Modifier.fillMaxWidth()) {
-                dayHeaders.forEach { header ->
+                dayHeaders.forEachIndexed { index, header ->
                     Text(
                         text = header,
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier
+                            .weight(1f)
+                            .semantics { contentDescription = dayHeaderFullNames[index] },
                         textAlign = TextAlign.Center,
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.SemiBold,
@@ -183,6 +206,7 @@ fun CalendarDayCell(
                 }
             )
             .clickable { onClick() }
+            .minimumInteractiveComponentSize()
             .padding(vertical = 4.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(2.dp)
@@ -232,16 +256,20 @@ fun DayPilotCalendarPreview() {
                 .padding(16.dp)
         ) {
             DayPilotCalendar(
-                month = 5,
-                year = 2026,
-                taskDots = listOf(
-                    CalendarTaskDot(day = 5, month = 5, year = 2026, color = Color(0xFF4CAF50))
+                state = DayPilotCalendarState(
+                    month = 5,
+                    year = 2026,
+                    taskDots = listOf(
+                        CalendarTaskDot(day = 5, month = 5, year = 2026, color = Color(0xFF4CAF50))
+                    ),
+                    selectedDay = 5
                 ),
-                selectedDay = 5,
-                onDaySelected = {},
-                onPreviousMonth = {},
-                onNextMonth = {},
-                onAddTask = {}
+                actions = DayPilotCalendarActions(
+                    onDaySelected = {},
+                    onPreviousMonth = {},
+                    onNextMonth = {},
+                    onAddTask = {}
+                )
             )
         }
     }

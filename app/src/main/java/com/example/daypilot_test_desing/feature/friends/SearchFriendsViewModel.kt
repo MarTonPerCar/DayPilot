@@ -5,8 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.daypilot_test_desing.R
-import com.example.daypilot_test_desing.core.connectivity.ConnectivityState
-import com.example.daypilot_test_desing.core.connectivity.isConnectivityError
 import com.example.daypilot_test_desing.core.data.repository.FriendRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -45,10 +43,6 @@ class SearchFriendsViewModel(private val repo: FriendRepository) : ViewModel() {
         searchJob = viewModelScope.launch {
             delay(400)
             _uiState.update { it.copy(isLoading = true) }
-            if (!ConnectivityState.ensureOnline()) {
-                _uiState.update { it.copy(isLoading = false) }
-                return@launch
-            }
             try {
                 val results = repo.searchUsers(query)
                 val sentIds = _uiState.value.sentRequestUserIds
@@ -62,7 +56,6 @@ class SearchFriendsViewModel(private val repo: FriendRepository) : ViewModel() {
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to search users for '$query'", e)
-                if (isConnectivityError(e)) ConnectivityState.setOffline(true)
                 _uiState.update { it.copy(isLoading = false) }
             }
         }
@@ -82,17 +75,10 @@ class SearchFriendsViewModel(private val repo: FriendRepository) : ViewModel() {
             )
         }
         viewModelScope.launch {
-            if (!ConnectivityState.ensureOnline()) {
-                _uiState.update { state ->
-                    state.copy(requestJustSent = false, sentRequestUserIds = originalSentIds, searchResults = originalResults)
-                }
-                return@launch
-            }
             try {
                 repo.addFriend(userId)
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to send friend request to $userId", e)
-                if (isConnectivityError(e)) ConnectivityState.setOffline(true)
                 _uiState.update { state ->
                     state.copy(
                         requestJustSent    = false,

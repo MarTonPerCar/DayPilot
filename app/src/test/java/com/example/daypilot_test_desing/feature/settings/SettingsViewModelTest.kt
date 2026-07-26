@@ -1,32 +1,30 @@
 package com.example.daypilot_test_desing.feature.settings
 
-import androidx.test.core.app.ApplicationProvider
 import com.example.daypilot_test_desing.core.data.model.UserProfile
 import com.example.daypilot_test_desing.core.data.repository.UserRepository
+import com.example.daypilot_test_desing.support.FakeApplication
 import com.example.daypilot_test_desing.support.MainDispatcherRule
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import com.example.daypilot_test_desing.support.realAdvanceUntilIdle
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 
 // SettingsViewModel constructs its own concrete AppPreferences internally (not injected), so
 // this exercises the real, Robolectric-backed SharedPreferences rather than a mock for that part.
 @OptIn(ExperimentalCoroutinesApi::class)
-@RunWith(RobolectricTestRunner::class)
 class SettingsViewModelTest {
 
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
     private lateinit var userRepo: UserRepository
+    private lateinit var application: FakeApplication
 
     @Before
     fun setUp() {
@@ -34,14 +32,17 @@ class SettingsViewModelTest {
         coEvery { userRepo.getCurrentUser() } returns UserProfile(
             id = "u1", name = "Ana", username = "ana", email = "ana@daypilot.test"
         )
+        // Shared across buildViewModel() calls within a test, same as a real Context always
+        // returning the same backing store for the same SharedPreferences name.
+        application = FakeApplication()
     }
 
-    private fun buildViewModel() = SettingsViewModel(ApplicationProvider.getApplicationContext(), userRepo)
+    private fun buildViewModel() = SettingsViewModel(application, userRepo)
 
     @Test
     fun `init reflects the default preferences and loads the user's name`() = runTest {
         val viewModel = buildViewModel()
-        realAdvanceUntilIdle()
+        advanceUntilIdle()
 
         val state = viewModel.uiState.value
         assertEquals("Ana", state.name)
@@ -52,7 +53,7 @@ class SettingsViewModelTest {
     @Test
     fun `toggleDarkMode persists the new value and updates state`() = runTest {
         val viewModel = buildViewModel()
-        realAdvanceUntilIdle()
+        advanceUntilIdle()
 
         viewModel.toggleDarkMode(false)
 
@@ -66,7 +67,7 @@ class SettingsViewModelTest {
     @Test
     fun `disabling the master notifications switch cancels scheduled alarms without crashing`() = runTest {
         val viewModel = buildViewModel()
-        realAdvanceUntilIdle()
+        advanceUntilIdle()
 
         viewModel.toggleNotifications(false)
 

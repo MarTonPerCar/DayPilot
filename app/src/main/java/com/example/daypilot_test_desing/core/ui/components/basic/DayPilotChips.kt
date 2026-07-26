@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -21,14 +22,14 @@ fun DifficultyChip(difficulty: TaskDifficulty) {
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(6.dp))
-            .background(difficulty.color.copy(alpha = 0.15f))
+            .background(difficulty.color)
             .padding(horizontal = 8.dp, vertical = 3.dp)
     ) {
         Text(
             text = stringResource(difficulty.labelRes),
             style = MaterialTheme.typography.labelSmall,
             fontWeight = FontWeight.SemiBold,
-            color = difficulty.color
+            color = Color.Black
         )
     }
 }

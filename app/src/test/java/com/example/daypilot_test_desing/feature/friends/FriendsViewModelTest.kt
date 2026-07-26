@@ -1,6 +1,7 @@
 package com.example.daypilot_test_desing.feature.friends
 
-import androidx.test.core.app.ApplicationProvider
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.example.daypilot_test_desing.support.FakeContext
 import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.core.data.local.NotificationHub
 import com.example.daypilot_test_desing.core.data.model.FriendData
@@ -10,19 +11,19 @@ import com.example.daypilot_test_desing.support.initSupabaseSettingsForTest
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import com.example.daypilot_test_desing.support.realAdvanceUntilIdle
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@RunWith(RobolectricTestRunner::class)
 class FriendsViewModelTest {
+
+    @get:Rule
+    val instantTaskExecutorRule = InstantTaskExecutorRule()
 
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
@@ -35,7 +36,7 @@ class FriendsViewModelTest {
     @Before
     fun setUp() {
         initSupabaseSettingsForTest()
-        NotificationHub.init(ApplicationProvider.getApplicationContext())
+        NotificationHub.init(FakeContext())
         NotificationHub.clear()
         repo = mockk()
         coEvery { repo.getFriends() } returns listOf(friend1)
@@ -47,7 +48,7 @@ class FriendsViewModelTest {
     @Test
     fun `init loads friends and friend requests`() = runTest {
         val viewModel = buildViewModel()
-        realAdvanceUntilIdle()
+        advanceUntilIdle()
 
         val state = viewModel.uiState.value
         assertEquals(listOf(friend1), state.friends)
@@ -57,14 +58,14 @@ class FriendsViewModelTest {
     @Test
     fun `acceptRequest moves the request into friends optimistically then confirms`() = runTest {
         val viewModel = buildViewModel()
-        realAdvanceUntilIdle()
+        advanceUntilIdle()
 
         coEvery { repo.acceptRequest("u2") } returns Unit
         coEvery { repo.getFriends() } returns listOf(friend1, request)
         coEvery { repo.getFriendRequests() } returns emptyList()
 
         viewModel.acceptRequest(request.id)
-        realAdvanceUntilIdle()
+        advanceUntilIdle()
 
         val state = viewModel.uiState.value
         assertTrue(state.justAcceptedRequest)
@@ -75,12 +76,12 @@ class FriendsViewModelTest {
     @Test
     fun `removeFriend failure rolls back the optimistic removal`() = runTest {
         val viewModel = buildViewModel()
-        realAdvanceUntilIdle()
+        advanceUntilIdle()
 
         coEvery { repo.removeFriend("u3") } throws RuntimeException("remove failed")
 
         viewModel.removeFriend("u3")
-        realAdvanceUntilIdle()
+        advanceUntilIdle()
 
         val state = viewModel.uiState.value
         assertEquals(listOf(friend1), state.friends)

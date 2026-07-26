@@ -39,6 +39,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -51,6 +52,277 @@ import com.example.daypilot_test_desing.core.data.model.GroupRestriction
 import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
 
 @Composable
+private fun DeleteGroupDialog(groupName: String, onDismiss: () -> Unit, onConfirm: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                stringResource(R.string.tech_health_delete_group_title),
+                fontWeight = FontWeight.Bold
+            )
+        },
+        text = {
+            Text(
+                stringResource(
+                    R.string.tech_health_delete_group_message,
+                    groupName
+                )
+            )
+        },
+        confirmButton = {
+            TextButton(onClick = onConfirm) {
+                Text(
+                    stringResource(R.string.tech_health_delete_tomorrow),
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.common_cancel))
+            }
+        },
+        shape = RoundedCornerShape(20.dp)
+    )
+}
+
+@Composable
+private fun GroupLimitHeaderRow(restriction: GroupRestriction, onToggle: (Boolean) -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(44.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .background(MaterialTheme.colorScheme.tertiary.copy(alpha = 0.15f)),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.Folder,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.tertiary,
+                modifier = Modifier.size(22.dp)
+            )
+        }
+
+        Column(modifier = Modifier.weight(1f)) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                Text(
+                    text = restriction.groupName,
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(MaterialTheme.colorScheme.tertiary.copy(alpha = 0.15f))
+                        .padding(horizontal = 6.dp, vertical = 2.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.tech_health_group_badge),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.tertiary
+                    )
+                }
+            }
+            Text(
+                text = pluralStringResource(
+                    R.plurals.tech_health_group_apps_count,
+                    restriction.apps.size,
+                    restriction.apps.size
+                ),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+
+        Switch(
+            checked = restriction.isEnabled,
+            onCheckedChange = onToggle,
+            enabled = !restriction.pendingDelete,
+            colors = SwitchDefaults.colors(
+                checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
+                checkedTrackColor = MaterialTheme.colorScheme.primary
+            )
+        )
+    }
+}
+
+@Composable
+private fun GroupPendingStatusTexts(restriction: GroupRestriction) {
+    // Unlike pendingDelete, a pending toggle/limit change doesn't lock the card.
+    if (restriction.pendingDelete) return
+    if (restriction.pendingActive != null) {
+        Text(
+            text = stringResource(
+                if (restriction.pendingActive) R.string.tech_health_pending_activate
+                else R.string.tech_health_pending_deactivate
+            ),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.tertiary
+        )
+    }
+    if (restriction.pendingLimitMinutes != null) {
+        Text(
+            text = stringResource(R.string.tech_health_pending_limit, restriction.pendingLimitMinutes),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.tertiary
+        )
+    }
+}
+
+@Composable
+private fun GroupUsageProgressSection(restriction: GroupRestriction, isOverLimit: Boolean, progress: Float) {
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        LinearProgressIndicator(
+            progress = { progress },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(6.dp)
+                .clip(RoundedCornerShape(3.dp)),
+            color = if (isOverLimit) MaterialTheme.colorScheme.error
+            else MaterialTheme.colorScheme.tertiary,
+            trackColor = MaterialTheme.colorScheme.surfaceVariant
+        )
+        Text(
+            text = stringResource(
+                R.string.tech_health_usage_today,
+                restriction.usedMinutesToday,
+                restriction.dailyLimitMinutes
+            ),
+            style = MaterialTheme.typography.labelSmall,
+            color = if (isOverLimit) MaterialTheme.colorScheme.error
+            else MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+@Composable
+private fun GroupAppRow(app: AppRestriction) {
+    val context = LocalContext.current
+    val appIcon: Bitmap? = remember(app.packageName) {
+        try { context.packageManager.getApplicationIcon(app.packageName).toBitmap() }
+        catch (_: Exception) { null }
+    }
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        if (appIcon != null) {
+            Image(
+                bitmap             = appIcon.asImageBitmap(),
+                contentDescription = null,
+                contentScale       = ContentScale.Fit,
+                modifier           = Modifier.size(28.dp).clip(RoundedCornerShape(6.dp))
+            )
+        } else {
+            Box(
+                modifier = Modifier
+                    .size(28.dp)
+                    .clip(RoundedCornerShape(6.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = app.appName.first().uppercase(),
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+        Text(
+            text = app.appName,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.weight(1f)
+        )
+        Text(
+            text = "${app.usedMinutesToday}${stringResource(R.string.common_minutes)}",
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+@Composable
+private fun GroupAppsToggle(expanded: Boolean, appCount: Int, onToggle: () -> Unit) {
+    TextButton(
+        onClick = onToggle,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(
+            text = if (expanded)
+                stringResource(R.string.tech_health_group_hide_apps)
+            else
+                stringResource(R.string.tech_health_group_show_apps, appCount),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+@Composable
+private fun GroupLimitActionsRow(restriction: GroupRestriction, onEdit: () -> Unit, onDeleteRequest: () -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        if (restriction.pendingDelete) {
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(MaterialTheme.colorScheme.error.copy(alpha = 0.1f))
+                    .padding(vertical = 8.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = stringResource(R.string.tech_health_pending_delete),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+        } else {
+            OutlinedButton(
+                onClick = onEdit,
+                modifier = Modifier.weight(1f),
+                shape = RoundedCornerShape(10.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = null,
+                    modifier = Modifier.size(14.dp)
+                )
+                Spacer(Modifier.width(4.dp))
+                Text(
+                    stringResource(R.string.common_edit),
+                    style = MaterialTheme.typography.labelMedium
+                )
+            }
+            TextButton(
+                onClick = onDeleteRequest,
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = stringResource(R.string.common_delete),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+        }
+    }
+}
+
+@Composable
 fun GroupLimitCard(
     restriction: GroupRestriction,
     onToggle: (Boolean) -> Unit,
@@ -60,46 +332,19 @@ fun GroupLimitCard(
 ) {
     var showDeleteConfirm by remember { mutableStateOf(false) }
     var expanded by remember { mutableStateOf(false) }
-    val context = LocalContext.current
 
     val progress = (restriction.usedMinutesToday.toFloat() /
             restriction.dailyLimitMinutes).coerceIn(0f, 1f)
     val isOverLimit = restriction.usedMinutesToday >= restriction.dailyLimitMinutes
 
     if (showDeleteConfirm) {
-        AlertDialog(
-            onDismissRequest = { showDeleteConfirm = false },
-            title = {
-                Text(
-                    stringResource(R.string.tech_health_delete_group_title),
-                    fontWeight = FontWeight.Bold
-                )
-            },
-            text = {
-                Text(
-                    stringResource(
-                        R.string.tech_health_delete_group_message,
-                        restriction.groupName
-                    )
-                )
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    showDeleteConfirm = false
-                    onDelete()
-                }) {
-                    Text(
-                        stringResource(R.string.tech_health_delete_tomorrow),
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDeleteConfirm = false }) {
-                    Text(stringResource(R.string.common_cancel))
-                }
-            },
-            shape = RoundedCornerShape(20.dp)
+        DeleteGroupDialog(
+            groupName = restriction.groupName,
+            onDismiss = { showDeleteConfirm = false },
+            onConfirm = {
+                showDeleteConfirm = false
+                onDelete()
+            }
         )
     }
 
@@ -115,228 +360,31 @@ fun GroupLimitCard(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(44.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(MaterialTheme.colorScheme.tertiary.copy(alpha = 0.15f)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Folder,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.tertiary,
-                        modifier = Modifier.size(22.dp)
-                    )
-                }
+            GroupLimitHeaderRow(restriction = restriction, onToggle = onToggle)
 
-                Column(modifier = Modifier.weight(1f)) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
-                    ) {
-                        Text(
-                            text = restriction.groupName,
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(4.dp))
-                                .background(MaterialTheme.colorScheme.tertiary.copy(alpha = 0.15f))
-                                .padding(horizontal = 6.dp, vertical = 2.dp)
-                        ) {
-                            Text(
-                                text = stringResource(R.string.tech_health_group_badge),
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.tertiary
-                            )
-                        }
-                    }
-                    Text(
-                        text = stringResource(
-                            R.string.tech_health_group_apps_count,
-                            restriction.apps.size
-                        ),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
+            GroupPendingStatusTexts(restriction = restriction)
 
-                Switch(
-                    checked = restriction.isEnabled,
-                    onCheckedChange = onToggle,
-                    enabled = !restriction.pendingDelete,
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
-                        checkedTrackColor = MaterialTheme.colorScheme.primary
-                    )
-                )
-            }
+            GroupUsageProgressSection(restriction = restriction, isOverLimit = isOverLimit, progress = progress)
 
-            // Unlike pendingDelete below, a pending toggle/limit change doesn't lock the card.
-            if (!restriction.pendingDelete) {
-                if (restriction.pendingActive != null) {
-                    Text(
-                        text = stringResource(
-                            if (restriction.pendingActive) R.string.tech_health_pending_activate
-                            else R.string.tech_health_pending_deactivate
-                        ),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.tertiary
-                    )
-                }
-                if (restriction.pendingLimitMinutes != null) {
-                    Text(
-                        text = stringResource(R.string.tech_health_pending_limit, restriction.pendingLimitMinutes),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.tertiary
-                    )
-                }
-            }
-
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                LinearProgressIndicator(
-                    progress = { progress },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(6.dp)
-                        .clip(RoundedCornerShape(3.dp)),
-                    color = if (isOverLimit) MaterialTheme.colorScheme.error
-                    else MaterialTheme.colorScheme.tertiary,
-                    trackColor = MaterialTheme.colorScheme.surfaceVariant
-                )
-                Text(
-                    text = stringResource(
-                        R.string.tech_health_usage_today,
-                        restriction.usedMinutesToday,
-                        restriction.dailyLimitMinutes
-                    ),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = if (isOverLimit) MaterialTheme.colorScheme.error
-                    else MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-
-            TextButton(
-                onClick = { expanded = !expanded },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = if (expanded)
-                        stringResource(R.string.tech_health_group_hide_apps)
-                    else
-                        stringResource(R.string.tech_health_group_show_apps, restriction.apps.size),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
+            GroupAppsToggle(
+                expanded = expanded,
+                appCount = restriction.apps.size,
+                onToggle = { expanded = !expanded }
+            )
 
             if (expanded) {
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     restriction.apps.forEach { app ->
-                        val appIcon: Bitmap? = remember(app.packageName) {
-                            try { context.packageManager.getApplicationIcon(app.packageName).toBitmap() }
-                            catch (_: Exception) { null }
-                        }
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            if (appIcon != null) {
-                                Image(
-                                    bitmap             = appIcon.asImageBitmap(),
-                                    contentDescription = null,
-                                    contentScale       = ContentScale.Fit,
-                                    modifier           = Modifier.size(28.dp).clip(RoundedCornerShape(6.dp))
-                                )
-                            } else {
-                                Box(
-                                    modifier = Modifier
-                                        .size(28.dp)
-                                        .clip(RoundedCornerShape(6.dp))
-                                        .background(MaterialTheme.colorScheme.surfaceVariant),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        text = app.appName.first().uppercase(),
-                                        fontSize = 12.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.primary
-                                    )
-                                }
-                            }
-                            Text(
-                                text = app.appName,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurface,
-                                modifier = Modifier.weight(1f)
-                            )
-                            Text(
-                                text = "${app.usedMinutesToday}${stringResource(R.string.common_minutes)}",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
+                        GroupAppRow(app = app)
                     }
                 }
             }
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                if (restriction.pendingDelete) {
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(MaterialTheme.colorScheme.error.copy(alpha = 0.1f))
-                            .padding(vertical = 8.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = stringResource(R.string.tech_health_pending_delete),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.error
-                        )
-                    }
-                } else {
-                    OutlinedButton(
-                        onClick = onEdit,
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(10.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = null,
-                            modifier = Modifier.size(14.dp)
-                        )
-                        Spacer(Modifier.width(4.dp))
-                        Text(
-                            stringResource(R.string.common_edit),
-                            style = MaterialTheme.typography.labelMedium
-                        )
-                    }
-                    TextButton(
-                        onClick = { showDeleteConfirm = true },
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.common_delete),
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.error
-                        )
-                    }
-                }
-            }
+            GroupLimitActionsRow(
+                restriction = restriction,
+                onEdit = onEdit,
+                onDeleteRequest = { showDeleteConfirm = true }
+            )
         }
     }
 }

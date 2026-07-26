@@ -16,22 +16,14 @@ import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class DayPilotAccessibilityService : AccessibilityService() {
 
     companion object {
         private const val TAG = "DayPilotAccessibility"
-        // TYPE_WINDOW_STATE_CHANGED only fires on an app *switch* — staying inside the same
-        // restricted app afterward never fires another event, so limits crossed mid-session
-        // would otherwise never get enforced until the user switches away and back. This polls
-        // while a given package stays in the foreground to catch that case.
-        private const val POLL_INTERVAL_MS = 15_000L
 
         fun isEnabled(context: Context): Boolean {
             val expected = ComponentName(context, DayPilotAccessibilityService::class.java)
@@ -52,9 +44,6 @@ class DayPilotAccessibilityService : AccessibilityService() {
     @Volatile private var lastBlockedPkg = ""
     @Volatile private var lastBlockMs    = 0L
 
-    private var pollingJob: Job? = null
-    private var currentPkg = ""
-
     private lateinit var repo: SharedPrefsTechHealthRepository
 
     override fun onServiceConnected() {
@@ -69,42 +58,23 @@ class DayPilotAccessibilityService : AccessibilityService() {
     override fun onAccessibilityEvent(event: AccessibilityEvent) {
         if (event.eventType != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return
         val pkg = event.packageName?.toString() ?: return
-        if (pkg == currentPkg) return // still the same foreground app, not a real switch
-        currentPkg = pkg
-        pollingJob?.cancel()
 
         if (pkg == packageName || pkg == "android" || pkg.startsWith("com.android.systemui")) return
 
-        val sessionStartMs = System.currentTimeMillis()
-        pollingJob = scope.launch {
-            var baselineMinutes: Int? = null
-            while (isActive) {
-                if (baselineMinutes == null) baselineMinutes = baselineMinutesFor(pkg)
-                checkAndBlock(pkg, sessionStartMs, baselineMinutes!!)
-                delay(POLL_INTERVAL_MS)
-            }
-        }
+        val now = System.currentTimeMillis()
+        if (pkg == lastBlockedPkg && now - lastBlockMs < 2_500L) return
+
+        checkAndBlock(pkg)
     }
 
-    // UsageStatsManager.queryUsageStats() never reflects time from the still-open current
-    // session — it only accounts for it once the app leaves the foreground — so staying inside
-    // one restricted app forever reads back the same stale (pre-session) total. baselineMinutes
-    // is that pre-session total, captured once per session; checkAndBlock adds our own live
-    // elapsed-time timer on top of it instead of re-querying the system value for this pkg.
-    private fun baselineMinutesFor(pkg: String): Int {
-        val usageMap = AppUsageTracker.getTodayUsage(this)
-        usageMap[pkg]?.let { return it }
-        return repo.getAppRestrictions().find { it.packageName == pkg }?.usedMinutesToday ?: 0
-    }
-
-    private fun checkAndBlock(pkg: String, sessionStartMs: Long, baselineMinutes: Int) {
+    private fun checkAndBlock(pkg: String) {
         try {
             val usageMap = AppUsageTracker.getTodayUsage(this)
-            val liveMinutesForPkg = baselineMinutes + ((System.currentTimeMillis() - sessionStartMs) / 60_000L).toInt()
 
             val appRestriction = repo.getAppRestrictions().find { it.packageName == pkg && it.isEnabled }
             if (appRestriction != null) {
-                if (liveMinutesForPkg >= appRestriction.dailyLimitMinutes) {
+                val usedMinutes = usageMap[pkg] ?: appRestriction.usedMinutesToday
+                if (usedMinutes >= appRestriction.dailyLimitMinutes) {
                     block(pkg, appRestriction.appName)
                     if (!appRestriction.isViolatedToday) {
                         repo.markViolated(appRestriction.id)
@@ -116,9 +86,7 @@ class DayPilotAccessibilityService : AccessibilityService() {
 
             val group = repo.getGroupRestrictions().find { g -> g.isEnabled && g.apps.any { it.packageName == pkg } }
             if (group != null) {
-                val usedMinutes = group.apps.sumOf { app ->
-                    if (app.packageName == pkg) liveMinutesForPkg else (usageMap[app.packageName] ?: 0)
-                }
+                val usedMinutes = group.apps.sumOf { usageMap[it.packageName] ?: 0 }
                 if (usedMinutes >= group.dailyLimitMinutes) {
                     block(pkg, group.groupName)
                     if (!group.isViolatedToday) {
@@ -134,10 +102,8 @@ class DayPilotAccessibilityService : AccessibilityService() {
     }
 
     private fun block(pkg: String, label: String) {
-        val now = System.currentTimeMillis()
-        if (pkg == lastBlockedPkg && now - lastBlockMs < 2_500L) return
         lastBlockedPkg = pkg
-        lastBlockMs    = now
+        lastBlockMs    = System.currentTimeMillis()
         startActivity(
             Intent(this, TechHealthBlockActivity::class.java).apply {
                 addFlags(
@@ -173,7 +139,9 @@ class DayPilotAccessibilityService : AccessibilityService() {
         }
     }
 
-    override fun onInterrupt() {}
+    override fun onInterrupt() {
+        // Required AccessibilityService override; nothing to clean up on interrupt.
+    }
 
     override fun onDestroy() {
         scope.cancel()

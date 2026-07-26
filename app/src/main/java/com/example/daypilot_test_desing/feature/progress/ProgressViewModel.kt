@@ -7,16 +7,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.daypilot_test_desing.core.cache.SessionCache
-import com.example.daypilot_test_desing.core.connectivity.ConnectivityState
-import com.example.daypilot_test_desing.core.connectivity.isConnectivityError
 import com.example.daypilot_test_desing.core.data.model.buildProgressWindow
 import com.example.daypilot_test_desing.core.data.repository.ProgressRepository
+import com.example.daypilot_test_desing.data.supabase.freshRealtimeChannel
+import com.example.daypilot_test_desing.data.supabase.realtimeCleanupScope
+import com.example.daypilot_test_desing.data.supabase.removeRealtimeChannel
 import com.example.daypilot_test_desing.data.supabase.supabase
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.query.filter.FilterOperator
 import io.github.jan.supabase.realtime.PostgresAction
 import io.github.jan.supabase.realtime.RealtimeChannel
-import io.github.jan.supabase.realtime.channel
 import io.github.jan.supabase.realtime.postgresChangeFlow
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,9 +25,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 class ProgressViewModel(
     application: Application,
@@ -38,7 +35,6 @@ class ProgressViewModel(
     val uiState: StateFlow<ProgressUiState> = _uiState.asStateFlow()
 
     private var realtimeChannel: RealtimeChannel? = null
-    private var realtimeSubscribing = false
 
     init { viewModelScope.launch { load() } }
 
@@ -51,7 +47,6 @@ class ProgressViewModel(
     suspend fun awaitLoad(): Boolean = load()
 
     private suspend fun load(): Boolean {
-        if (!ConnectivityState.ensureOnline()) return false
         return try {
             val todayProgress = repo.getTodayProgress()
             val history       = repo.getHistory(30)
@@ -77,28 +72,21 @@ class ProgressViewModel(
 
     // daily_progress is write-through with no TTL, so without realtime a change from
     // another device wouldn't surface here until the date rolls over.
-    //
-    // realtimeSubscribing is set synchronously (not after the async subscribe work below
-    // finishes) because load() can run concurrently from both init and the startup awaitLoad()
-    // join — without it, both calls see realtimeChannel == null and each try to join a channel
-    // with the same topic name, and the second one crashes ("cannot call postgresChangeFlow
-    // after joining the channel").
-    private fun subscribeToRealtimeOnce() {
-        if (realtimeChannel != null || realtimeSubscribing) return
-        realtimeSubscribing = true
+    private suspend fun subscribeToRealtimeOnce() {
+        if (realtimeChannel != null) return
         val uid = supabase.auth.currentUserOrNull()?.id ?: return
         subscribeToRealtime(uid)
     }
 
-    private fun subscribeToRealtime(userId: String) {
-        val channel = supabase.channel("daily-progress-$userId")
+    private suspend fun subscribeToRealtime(userId: String) {
+        val channel = freshRealtimeChannel("daily-progress-$userId")
         realtimeChannel = channel
 
         channel.postgresChangeFlow<PostgresAction.Update>(schema = "public") {
             table = "daily_progress"
             filter("user_id", FilterOperator.EQ, userId)
         }.onEach {
-            SessionCache.todayProgress.value = null
+            SessionCache.setTodayProgress(null)
             load()
         }.launchIn(viewModelScope)
 
@@ -106,22 +94,21 @@ class ProgressViewModel(
             table = "user_daily_log"
             filter("user_id", FilterOperator.EQ, userId)
         }.onEach {
-            SessionCache.weeklyHistory.value    = null
+            SessionCache.setWeeklyHistory(null)
             SessionCache.weeklyHistoryFetchedAt = 0L
             load()
         }.launchIn(viewModelScope)
 
-        viewModelScope.launch { channel.subscribe() }
+        channel.subscribe()
     }
 
     override fun onCleared() {
         super.onCleared()
-        viewModelScope.launch { runCatching { realtimeChannel?.unsubscribe() } }
+        realtimeCleanupScope.launch { removeRealtimeChannel(realtimeChannel) }
     }
 
     fun recordTimerComplete() {
         viewModelScope.launch {
-            if (!ConnectivityState.ensureOnline()) return@launch
             try {
                 val awarded = repo.completeTimerSession()  // server-side gated via habits_daily
                 if (!awarded) return@launch
@@ -129,12 +116,9 @@ class ProgressViewModel(
                 // TIMER_DONE notification is now inserted by a Supabase DB trigger.
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to record timer completion", e)
-                if (isConnectivityError(e)) ConnectivityState.setOffline(true)
             }
         }
     }
-
-    private fun today() = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
 
     companion object {
         private const val TAG = "ProgressViewModel"

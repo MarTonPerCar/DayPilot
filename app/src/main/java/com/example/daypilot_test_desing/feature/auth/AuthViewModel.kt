@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.daypilot_test_desing.core.connectivity.ConnectivityState
 import com.example.daypilot_test_desing.core.data.repository.AuthRepository
 import com.example.daypilot_test_desing.core.data.repository.RegisterOutcome
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,10 +24,6 @@ class AuthViewModel(private val repo: AuthRepository) : ViewModel() {
         }
         viewModelScope.launch {
             _uiState.update { it.copy(loginLoading = true, loginError = "") }
-            if (!ConnectivityState.ensureOnline()) {
-                _uiState.update { it.copy(loginLoading = false) }
-                return@launch
-            }
             try {
                 repo.login(email, password)
                 _uiState.update { it.copy(loginLoading = false) }
@@ -54,10 +49,6 @@ class AuthViewModel(private val repo: AuthRepository) : ViewModel() {
         }
         viewModelScope.launch {
             _uiState.update { it.copy(registerLoading = true, registerError = "") }
-            if (!ConnectivityState.ensureOnline()) {
-                _uiState.update { it.copy(registerLoading = false) }
-                return@launch
-            }
             try {
                 when (repo.register(name, username, email, password, region)) {
                     RegisterOutcome.Success -> {
@@ -91,10 +82,6 @@ class AuthViewModel(private val repo: AuthRepository) : ViewModel() {
     fun sendResetEmail(email: String) {
         viewModelScope.launch {
             _uiState.update { it.copy(resetLoading = true, resetError = "", resetSent = false) }
-            if (!ConnectivityState.ensureOnline()) {
-                _uiState.update { it.copy(resetLoading = false) }
-                return@launch
-            }
             try {
                 repo.sendResetEmail(email)
                 _uiState.update { it.copy(resetLoading = false, resetSent = true) }

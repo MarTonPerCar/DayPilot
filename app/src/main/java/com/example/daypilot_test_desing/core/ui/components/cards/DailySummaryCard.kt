@@ -18,10 +18,12 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -30,18 +32,31 @@ import com.example.daypilot_test_desing.R
 import com.example.daypilot_test_desing.core.ui.components.basic.DailySummaryStat
 import com.example.daypilot_test_desing.core.ui.theme.DayPilotTheme
 
+@Immutable
+data class DailySummaryInfo(
+    val userName: String,
+    val streak: Int,
+    val stepsToday: Int,
+    val stepsGoal: Int,
+    val tasksCompleted: Int,
+    val tasksTotal: Int = 0,
+    val pointsToday: Int,
+    val rankingPosition: Int
+)
+
 @Composable
 fun DailySummaryCard(
-    userName: String,
-    streak: Int,
-    stepsToday: Int,
-    stepsGoal: Int,
-    tasksCompleted: Int,
-    tasksTotal: Int = 0,
-    pointsToday: Int,
-    rankingPosition: Int,
+    info: DailySummaryInfo,
     modifier: Modifier = Modifier
 ) {
+    val userName        = info.userName
+    val streak          = info.streak
+    val stepsToday       = info.stepsToday
+    val stepsGoal        = info.stepsGoal
+    val tasksCompleted   = info.tasksCompleted
+    val tasksTotal       = info.tasksTotal
+    val pointsToday      = info.pointsToday
+    val rankingPosition  = info.rankingPosition
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
@@ -98,7 +113,7 @@ fun DailySummaryCard(
                                 style = MaterialTheme.typography.titleMedium
                             )
                             Text(
-                                text = stringResource(R.string.daily_summary_streak_days, streak),
+                                text = pluralStringResource(R.plurals.daily_summary_streak_days, streak, streak),
                                 style = MaterialTheme.typography.labelSmall,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.primary
@@ -160,14 +175,16 @@ fun DailySummaryCardPreview() {
                 .padding(16.dp)
         ) {
             DailySummaryCard(
-                userName = "Mario",
-                streak = 7,
-                stepsToday = 1200,
-                stepsGoal = 2000,
-                tasksCompleted = 3,
-                tasksTotal = 5,
-                pointsToday = 8,
-                rankingPosition = 2
+                info = DailySummaryInfo(
+                    userName = "Mario",
+                    streak = 7,
+                    stepsToday = 1200,
+                    stepsGoal = 2000,
+                    tasksCompleted = 3,
+                    tasksTotal = 5,
+                    pointsToday = 8,
+                    rankingPosition = 2
+                )
             )
         }
     }

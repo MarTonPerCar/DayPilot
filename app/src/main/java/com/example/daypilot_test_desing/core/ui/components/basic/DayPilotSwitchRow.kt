@@ -29,8 +29,8 @@ fun DayPilotSwitchRow(
     icon: ImageVector,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
-    enabled: Boolean = true,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true
 ) {
     val contentAlpha = if (enabled) 1f else 0.4f
     Row(

@@ -1,18 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- App -->
     <string name="app_name">DayPilot</string>
 
     <!-- Auth -->
-    <string name="login_title">Anmelden</string>
-    <string name="register_title">Konto erstellen</string>
     <string name="email">E-Mail</string>
     <string name="password">Passwort</string>
     <string name="username">Benutzername</string>
     <string name="name">Name</string>
     <string name="region">Region / Zeitzone</string>
-    <string name="enter">Einloggen</string>
-    <string name="register">Registrieren</string>
     <string name="forgot_password">Passwort vergessen?</string>
     <string name="back_to_login">Zurück zur Anmeldung</string>
 
@@ -23,12 +19,10 @@
     <string name="reset_password_success">✅ E-Mail gesendet. Überprüfe deinen Posteingang.</string>
 
     <!-- Home -->
-    <string name="home_title">DayPilot</string>
-    <string name="home_sections">Bereiche</string>
 
     <!-- Friends -->
     <string name="search_friends_title">Buscar amigos</string>
-    <string name="search_friends_placeholder">Buscar por nombre o username...</string>
+    <string name="search_friends_placeholder">Buscar por nombre o username…</string>
     <string name="search_friends_empty_query">Escribe al menos una letra\npara buscar usuarios</string>
     <string name="search_friends_no_results">No se encontraron usuarios\npara \"%1$s\"</string>
     <string name="search_friends_clear">Limpiar</string>
@@ -40,27 +34,13 @@
     <string name="weekly_summary_steps">Schritte</string>
     <string name="weekly_summary_streak">beste Serie</string>
     <string name="weekly_summary_reactions">Reaktionen deiner Freunde</string>
-    <string name="weekly_summary_no_reactions">Noch keine Reaktionen</string>
-    <string name="weekly_friend_summary">Wochenzusammenfassung</string>
-    <string name="weekly_friend_react">Reagieren</string>
-    <string name="weekly_friend_reacted">Bereits reagiert</string>
+    <string name="weekly_summary_no_data">Noch keine Wochenübersicht verfügbar</string>
 
     <!-- Profile -->
     <string name="profile_title">Profil</string>
     <string name="profile_email">E-Mail</string>
     <string name="profile_since">Seit</string>
     <string name="profile_username">Benutzername</string>
-    <string name="profile_section_account">Konto</string>
-    <string name="profile_section_stats">Heutige Statistiken</string>
-    <string name="profile_section_weekly">Wöchentliche Aktivität</string>
-    <string name="profile_points_today">Punkte heute</string>
-    <string name="profile_points_tasks">Aufgaben</string>
-    <string name="profile_points_steps">Schritte</string>
-    <string name="profile_points_habits">Gewohnheiten</string>
-    <string name="profile_points_timers">Timer</string>
-    <string name="profile_ranking">Rangliste</string>
-    <string name="profile_account">Konto</string>
-    <string name="profile_edit">Profil bearbeiten</string>
 
     <!-- Edit Profile -->
     <string name="edit_profile_title">Profil bearbeiten</string>
@@ -70,6 +50,7 @@
     <string name="edit_profile_change_password">Passwort ändern</string>
     <string name="edit_profile_save">Änderungen speichern</string>
     <string name="edit_profile_photo_error">Foto konnte nicht hochgeladen werden. Bitte erneut versuchen.</string>
+    <string name="edit_profile_save_error">Änderungen konnten nicht gespeichert werden. Bitte erneut versuchen.</string>
 
     <!-- Photo Picker -->
     <string name="photo_picker_title">Foto ändern</string>
@@ -79,38 +60,21 @@
 
     <!-- Settings -->
     <string name="settings_title">Einstellungen</string>
-    <string name="settings_profile_section">Profil</string>
     <string name="settings_edit_profile">Profil bearbeiten</string>
     <string name="settings_edit_profile_description">Name, Benutzername, Region und Passwort</string>
-    <string name="settings_appearance">Erscheinungsbild</string>
     <string name="settings_dark_mode">Dunkelmodus</string>
     <string name="settings_dark_mode_description">Dunkles Theme aktivieren</string>
     <string name="settings_notifications">Benachrichtigungen</string>
     <string name="settings_notifications_description">Benachrichtigungen aktivieren oder deaktivieren</string>
     <string name="settings_language">Sprache</string>
-    <string name="settings_reliability_section">Zuverlässigkeit</string>
-    <string name="settings_exact_alarms">Exakte Alarme</string>
-    <string name="settings_exact_alarms_description">Damit Aufgaben­erinnerungen und Serien-Warnungen pünktlich ankommen</string>
-    <string name="settings_exact_alarms_granted">Aktiviert</string>
-    <string name="settings_exact_alarms_action">Aktivieren</string>
-    <string name="settings_battery_optimization">Akku-Optimierung</string>
-    <string name="settings_battery_optimization_description">Verhindert, dass das System die Schritterfassung im Hintergrund blockiert</string>
-    <string name="settings_battery_optimization_granted">Deaktiviert</string>
-    <string name="settings_battery_optimization_action">Deaktivieren</string>
-    <string name="settings_autostart_info_title">Zusätzliche Herstellereinstellung</string>
-    <string name="settings_autostart_info_description">Manche Hersteller (Oppo, Xiaomi, Vivo, Huawei, Realme…) haben eine zusätzliche Einstellung für „Autostart“ oder „Im Hintergrund ausführen“, die du für diese App manuell aktivieren musst. Ohne sie funktionieren Schritte und tägliche Erinnerungen möglicherweise nicht, wenn die App länger geschlossen war.</string>
-    <string name="settings_autostart_open_settings">App-Einstellungen öffnen</string>
     <string name="settings_logout">Abmelden</string>
 
     <!-- Calendar -->
     <string name="calendar_title">Kalender</string>
-    <string name="calendar_day_tasks">Aufgaben für Tag %1$d</string>
     <string name="calendar_no_tasks">Keine Aufgaben für diesen Tag</string>
-    <string name="calendar_add_task">Aufgabe hinzufügen</string>
 
     <!-- Habits -->
     <string name="habits_title">Gewohnheiten</string>
-    <string name="habits_timers">Timer</string>
     <string name="habits_other">Andere Gewohnheiten</string>
     <string name="habits_tech_health_title">Tech-Gesundheit</string>
     <string name="habits_tech_health_description">App / Gruppen-Limits + Benachrichtigungen</string>
@@ -119,20 +83,18 @@
 
     <!-- Steps -->
     <string name="steps_title">Schritte</string>
+    <string name="steps_section_desc">Abschnitt Schritte</string>
 
     <string name="habits_timers_title">Timer</string>
     <string name="habits_timers_description">Pomodoro, Training und mehr</string>
 
     <!-- Timer -->
-    <string name="timer_completed">Abgeschlossen! 🎉</string>
-    <string name="timer_restart">Neustart</string>
 
     <!-- Progress -->
     <string name="progress_title">Fortschritt</string>
 
     <!-- Rivalry -->
     <string name="rivalry_title">Rivalität</string>
-    <string name="rivalry_your_position">Deine Position</string>
     <string name="rivalry_ranking">Rangliste</string>
     <string name="rivalry_no_friends">Du hast noch keine Freunde zum Wettkampf.\nFüge jemanden hinzu!</string>
 
@@ -155,7 +117,6 @@
     <string name="notifications_filter_streak">Serie</string>
     <string name="notifications_filter_reminders">Erinnerungen</string>
     <string name="notifications_filter_achievements">Erfolge</string>
-    <string name="notifications_unread">ungelesen</string>
 
     <!-- Reminders -->
     <string name="reminders_title">Erinnerungen</string>
@@ -164,25 +125,22 @@
 
     <!-- Tech Health -->
     <string name="tech_health_title">Tech-Gesundheit</string>
-    <string name="tech_health_screen_usage">Bildschirmnutzung heute</string>
-    <string name="tech_health_used_minutes">%1$d Min. genutzt</string>
-    <string name="tech_health_limit_minutes">Limit %1$d Min.</string>
     <string name="tech_health_point_earned">Tagespunkt verdient</string>
     <string name="tech_health_point_pending">Halte alle deine Limits heute ein, um 1 Punkt zu verdienen</string>
-    <string name="tech_health_no_permission_title">Zugriff auf App-Nutzung erforderlich</string>
-    <string name="tech_health_no_permission_body">Um die Bildschirmzeit zu verfolgen, gehe zu Einstellungen → Datenzugang zu Apps und aktiviere DayPilot.</string>
-    <string name="tech_health_open_settings">Einstellungen öffnen</string>
-    <string name="tech_health_daily_limit">Tageslimit</string>
-    <string name="tech_health_app_limits">App-Limits</string>
+    <string name="tech_health_point_warning">Du benötigst mindestens 3 aktive Einschränkungen, um den Punkt zu erhalten</string>
+    <string name="tech_health_point_info_title">Punkt für digitale Gesundheit</string>
+    <string name="tech_health_point_info_body">Aktiviere mindestens 3 Einschränkungen und überschreite an diesem Tag kein Limit. Wenn dir das gelingt, erhältst du 10 Extrapunkte, die morgen zu deinen Punkten hinzugefügt werden.</string>
+    <string name="accessibility_service_description">DayPilot nutzt diesen Dienst, um zu erkennen, welche App im Vordergrund läuft, damit die in Digitale Gesundheit festgelegten Nutzungslimits durchgesetzt werden können.</string>
+    <string name="block_limit_reached">Limit erreicht</string>
+    <string name="block_motivational">Zeit für etwas anderes!</string>
+    <string name="block_explanation">Du hast die für %1$s festgelegte Nutzungszeit überschritten. Mach eine Pause und versuche es später erneut.</string>
+    <string name="block_go_home">Zum Start</string>
 
     <!-- Common -->
     <string name="common_back">Zurück</string>
     <string name="common_save">Speichern</string>
     <string name="common_cancel">Abbrechen</string>
-    <string name="common_confirm">Bestätigen</string>
     <string name="common_delete">Löschen</string>
-    <string name="common_loading">Laden...</string>
-    <string name="common_error">Ein Fehler ist aufgetreten</string>
     <string name="common_retry">Erneut versuchen</string>
     <string name="common_settings">Einstellungen</string>
     <string name="common_points">Pkt.</string>
@@ -192,7 +150,6 @@
     <!-- App Picker -->
     <string name="app_picker_title">App auswählen</string>
     <string name="app_picker_group_title">Gruppen-Apps</string>
-    <string name="app_picker_selected_count">%1$d ausgewählt</string>
     <string name="app_picker_search">Suchen</string>
     <string name="app_picker_close">Schließen</string>
     <string name="app_picker_confirm">Fertig</string>
@@ -238,6 +195,13 @@
     <string name="day_fri">F</string>
     <string name="day_sat">S</string>
     <string name="day_sun">S</string>
+    <string name="day_mon_full">Montag</string>
+    <string name="day_tue_full">Dienstag</string>
+    <string name="day_wed_full">Mittwoch</string>
+    <string name="day_thu_full">Donnerstag</string>
+    <string name="day_fri_full">Freitag</string>
+    <string name="day_sat_full">Samstag</string>
+    <string name="day_sun_full">Sonntag</string>
 
     <!-- Reaction emojis -->
     <string name="reaction_fire_emoji">🔥</string>
@@ -266,10 +230,10 @@
     <string name="task_category_label">Kategorie</string>
     <string name="task_difficulty_label">Schwierigkeitsgrad</string>
     <string name="task_duration_label">Geschätzte Dauer</string>
+    <string name="task_decrease_duration">Dauer verringern</string>
+    <string name="task_increase_duration">Dauer erhöhen</string>
     <string name="task_section_info">Informationen</string>
     <string name="task_section_details">Details</string>
-    <string name="task_section_reminder">Erinnerung</string>
-    <string name="task_section_recurrence">Wiederholung</string>
     <string name="task_section_extras">Erinnerung &amp; Wiederholung</string>
     <string name="task_reminder_label">Erinnerung aktivieren</string>
     <string name="task_reminder_description">Du erhältst eine Benachrichtigung</string>
@@ -314,7 +278,6 @@
 
 
     <!-- Home Section Indicator -->
-    <string name="indicator_tasks_progress">%1$d/%2$d Aufgaben</string>
     <string name="indicator_steps_progress">👣 %1$d%% Schritte</string>
     <string name="indicator_timer_done">Timer abgeschlossen</string>
     <string name="indicator_timer_pending">Timer ausstehend</string>
@@ -326,6 +289,10 @@
     <string name="tech_health_delete_app_message">Die Einschränkung für \"%1$s\" wird morgen gelöscht. Sie bleibt heute aktiv, wenn du die App bereits genutzt hast.</string>
     <string name="tech_health_delete_tomorrow">Morgen löschen</string>
     <string name="tech_health_app_badge">App</string>
+    <string name="tech_health_app_badge_desc">%1$s App-Abzeichen</string>
+    <string name="tech_health_switch_desc">Aktiviert, %1$s-Limit</string>
+    <string name="tech_health_edit_desc">%1$s-Limit bearbeiten</string>
+    <string name="tech_health_delete_desc">%1$s-Limit löschen</string>
     <string name="tech_health_pending_delete">🗑 Wird morgen gelöscht</string>
     <string name="tech_health_pending_activate">Wird morgen aktiviert</string>
     <string name="tech_health_pending_deactivate">Wird morgen deaktiviert</string>
@@ -339,7 +306,6 @@
     <!-- Daily Summary Card -->
     <string name="daily_summary_hello">Hallo, %1$s!</string>
     <string name="daily_summary_subtitle">Heutige Zusammenfassung</string>
-    <string name="daily_summary_streak_days">%1$d Tage</string>
     <string name="daily_summary_steps_goal">Ziel %1$d</string>
     <string name="daily_summary_tasks_completed">erledigt</string>
     <string name="daily_summary_points_today">heute</string>
@@ -355,13 +321,13 @@
     <string name="tech_health_delete_group_title">Gruppe löschen</string>
     <string name="tech_health_delete_group_message">Die Gruppe \"%1$s\" wird morgen gelöscht. Sie bleibt heute aktiv, wenn du die Apps bereits genutzt hast.</string>
     <string name="tech_health_group_badge">Gruppe</string>
-    <string name="tech_health_group_apps_count">%1$d Apps</string>
     <string name="tech_health_group_hide_apps">▲ Apps ausblenden</string>
     <string name="tech_health_group_show_apps">▼ Apps anzeigen (%1$d)</string>
 
 
     <!-- Profile Stats Card -->
     <string name="profile_level_badge">⚡ Stufe %1$d</string>
+    <string name="profile_header_desc">%1$s, @%2$s, Stufe %3$d</string>
     <string name="profile_level_progress">Fortschritt Stufe %1$d</string>
     <string name="profile_level_points">%1$d / %2$d Pkt.</string>
     <string name="profile_stat_total_points">Gesamtpunkte</string>
@@ -379,8 +345,8 @@
 
 
     <!-- Ranking Card -->
-    <string name="ranking_streak">%1$d🔥 Serie</string>
     <string name="ranking_points">Punkte</string>
+    <string name="rivalry_your_position_desc">Deine Position: %1$s, Stufe %2$d, %3$s, %4$s</string>
 
 
     <!-- Reminder Card -->
@@ -400,20 +366,19 @@
 
     <!-- Steps Card -->
     <string name="steps_label">Schritte</string>
+    <string name="steps_widget_desc">Schritte-Widget</string>
     <string name="steps_configure_goal">Ziel konfigurieren</string>
     <string name="steps_goal_locked">Bis morgen gesperrt</string>
-    <string name="steps_pending_goal">Ausstehendes Ziel: %1$d Schritte (aktiv morgen)</string>
     <string name="steps_goal_sheet_title">Schrittziel konfigurieren</string>
-    <string name="steps_goal_value">%1$d Schritte</string>
     <string name="steps_goal_of">von %1$d</string>
     <string name="steps_quick_goals">Schnellziele</string>
     <string name="steps_milestones">Meilensteine</string>
+    <string name="steps_milestone_reached">Meilenstein %1$s, erreicht</string>
+    <string name="steps_milestone_pending">Meilenstein %1$s, ausstehend</string>
     <string name="steps_next_milestone">Nächster Meilenstein</string>
     <string name="steps_points_earned">Heute verdiente Punkte</string>
     <string name="steps_pts_value">%1$d Pkt.</string>
     <string name="steps_goal_reached">Ziel erreicht!</string>
-    <string name="steps_see_details">Details</string>
-    <string name="steps_sensor_unavailable">Schrittzähler-Sensor nicht verfügbar auf diesem Gerät. Verbinde ein physisches Gerät um deine Schritte zu erfassen.</string>
 
 
     <!-- Steps Summary Card -->
@@ -426,6 +391,10 @@
 
     <!-- Task Cards -->
     <string name="task_reminder_icon">Erinnerung</string>
+    <string name="task_detail_recurring">Wiederkehrende Aufgabe</string>
+    <string name="task_detail_reminder">Erinnerung aktiviert</string>
+    <string name="task_mark_done">Als erledigt markieren</string>
+    <string name="task_mark_pending">Als ausstehend markieren</string>
     <string name="task_delete_title">Aufgabe löschen</string>
     <string name="task_delete_message">Möchtest du \"%1$s\" wirklich löschen?</string>
 
@@ -440,6 +409,12 @@
     <string name="user_add_friend">Freund hinzufügen</string>
     <string name="user_accept_request">Akzeptieren</string>
     <string name="user_reject_request">Ablehnen</string>
+    <string name="friends_remove_confirm_title">Freund entfernen?</string>
+    <string name="friends_remove_confirm_message">Möchtest du %1$s wirklich aus deiner Freundesliste entfernen?</string>
+    <string name="user_request_sent">Anfrage gesendet</string>
+    <string name="user_request_sent_dialog_title">Anfrage gesendet</string>
+    <string name="user_request_sent_dialog_message">Deine Freundschaftsanfrage wurde erfolgreich gesendet.</string>
+    <string name="user_request_sent_dialog_button">Verstanden</string>
 
 
     <!-- App Limit Form -->
@@ -454,10 +429,6 @@
     <string name="app_limit_form_group_apps_label">Gruppen-Apps</string>
     <string name="app_limit_form_group_apps_pick">Apps auswählen</string>
     <string name="app_limit_form_group_apps_change">Apps ändern</string>
-    <string name="app_limit_form_notif_title">Benachrichtigungen</string>
-    <string name="app_limit_form_notif_description">Warnen wenn Limit überschritten</string>
-    <string name="app_limit_form_notif_interval_label">Benachrichtigung wiederholen (5s → 60s)</string>
-    <string name="app_limit_form_notif_selected">Ausgewählt: %1$ds</string>
     <string name="app_limit_form_limit_group">Tageslimit (1.5h → 10h)</string>
     <string name="app_limit_form_limit_app">Tageslimit (30 Min → 6 Std)</string>
     <string name="app_limit_form_limit_selected">Ausgewählt: %1$s</string>
@@ -468,7 +439,8 @@
     <!-- Auth Components -->
     <string name="auth_login">Anmelden</string>
     <string name="auth_register">Konto erstellen</string>
-    <string name="auth_forgot_password">Passwort vergessen?</string>
+    <string name="auth_login_tab">Anmelde-Tab</string>
+    <string name="auth_register_tab">Registrierungs-Tab</string>
     <string name="auth_enter">Einloggen</string>
     <string name="auth_name_label">Name</string>
     <string name="auth_username_label">Benutzername</string>
@@ -516,7 +488,8 @@
     <!-- Tech Health Screen -->
     <string name="tech_health_add_restriction">Einschränkung hinzufügen</string>
     <string name="tech_health_restrictions_title">Einschränkungen</string>
-    <string name="tech_health_restrictions_count">%1$d gesamt</string>
+    <!-- "gesamt" is invariant across quantities (adverbial, not a noun) — not a real plural case. -->
+    <string name="tech_health_restrictions_count" tools:ignore="PluralsCandidate">%1$d gesamt</string>
     <string name="tech_health_empty">Keine Einschränkungen\nTippe + um eine zu erstellen.</string>
     <string name="tech_health_groups_title">Gruppen</string>
 
@@ -538,14 +511,12 @@
     <!-- Timer Hub Screen -->
     <string name="timer_hub_title">Timer</string>
     <string name="timer_custom_sheet_title">Benutzerdefinierter Timer</string>
-    <string name="timer_custom_minutes">%1$d Minuten</string>
     <string name="timer_custom_start">Starten</string>
     <string name="timer_pomodoro_sheet_title">Pomodoro konfigurieren</string>
     <string name="timer_pomodoro_work_label">Arbeit</string>
     <string name="timer_pomodoro_break_label">Pause</string>
     <string name="timer_pomodoro_total_label">Gesamt</string>
     <string name="timer_pomodoro_sessions_label">Anzahl der Sitzungen</string>
-    <string name="timer_pomodoro_sessions_value">%1$d Sitzungen</string>
     <string name="timer_pomodoro_min_sessions">1 Sitzung (30 Min.)</string>
     <string name="timer_pomodoro_max_sessions">8 Sitzungen (4 Std.)</string>
     <string name="timer_pomodoro_start">Pomodoro starten</string>
@@ -561,19 +532,11 @@
     <string name="reminder_early_body">Deine Erinnerung aktiviert in 10 Minuten</string>
 
     <!-- Tech Health Notifications -->
-    <string name="tech_health_channel_name">Tech-Gesundheit</string>
-    <string name="tech_health_channel_desc">Benachrichtigungen wenn das Nutzungslimit einer App erreicht wird</string>
-    <string name="tech_health_notif_title">Limit erreicht: %s</string>
-    <string name="tech_health_notif_body">Du hast %1$d Min. von %2$d Min. genutzt</string>
 
     <!-- Daily phone notifications -->
     <string name="daily_channel_name">Tägliche Erinnerungen</string>
     <string name="daily_channel_desc">Aufgaben- und Serienerinnerungen</string>
-    <string name="steps_channel_name">Schrittzählung</string>
-    <string name="steps_channel_desc">Hält den Schrittzähler im Hintergrund aktiv</string>
-    <string name="steps_notification_text">Deine Schritte werden im Hintergrund gezählt</string>
     <string name="notif_task_reminder_title">Heutige Aufgaben</string>
-    <string name="notif_task_reminder_count">Du hast %1$d Aufgaben für heute</string>
     <string name="notif_task_reminder_none">Keine Aufgaben für heute ✓</string>
     <string name="notif_task_reminder_generic">Überprüfe deine heutigen Aufgaben</string>
     <string name="notif_streak_danger_title">Serie in Gefahr! 🔥</string>
@@ -598,7 +561,5 @@
     <string name="error_add_friend">Freundschaftsanfrage konnte nicht gesendet werden. Bitte erneut versuchen.</string>
     <string name="error_react_friend">Reaktion konnte nicht gesendet werden. Bitte erneut versuchen.</string>
     <string name="error_startup_load">Deine Daten konnten nicht geladen werden. Verbindung prüfen und erneut versuchen.</string>
-    <string name="no_internet_title">Keine Internetverbindung</string>
-    <string name="no_internet_subtitle">Überprüfe deine Verbindung und versuche es erneut.</string>
 
 </resources>
