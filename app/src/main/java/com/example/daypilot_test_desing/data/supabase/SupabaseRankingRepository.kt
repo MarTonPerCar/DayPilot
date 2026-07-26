@@ -10,6 +10,7 @@ import com.example.daypilot_test_desing.data.supabase.dto.FriendRowDto
 import com.example.daypilot_test_desing.data.supabase.dto.FriendsRankingDto
 import com.example.daypilot_test_desing.data.supabase.dto.UserDto
 import com.example.daypilot_test_desing.data.supabase.dto.UserStreakDto
+import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
 import java.text.SimpleDateFormat
@@ -17,17 +18,19 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
-class SupabaseRankingRepository : RankingRepository {
+class SupabaseRankingRepository(
+    private val client: SupabaseClient = supabase
+) : RankingRepository {
 
     companion object {
         private const val TAG = "SupabaseRankingRepo"
     }
 
-    private fun userId() = supabase.auth.currentUserOrNull()?.id
+    private fun userId() = client.auth.currentUserOrNull()?.id
 
     private suspend fun getFriendIds(uid: String): List<String> {
         val asRequester = try {
-            supabase.from("friends").select {
+            client.from("friends").select {
                 filter { eq("requester_id", uid) }
             }.decodeList<FriendRowDto>().map { it.receiverId }
         } catch (e: Exception) {
@@ -35,7 +38,7 @@ class SupabaseRankingRepository : RankingRepository {
             emptyList()
         }
         val asReceiver = try {
-            supabase.from("friends").select {
+            client.from("friends").select {
                 filter { eq("receiver_id", uid) }
             }.decodeList<FriendRowDto>().map { it.requesterId }
         } catch (e: Exception) {
@@ -49,7 +52,7 @@ class SupabaseRankingRepository : RankingRepository {
         val friendIds = getFriendIds(uid)
         val allIds = (friendIds + uid).distinct()
         return try {
-            supabase.from("friends_ranking").select {
+            client.from("friends_ranking").select {
                 filter { isIn("id", allIds) }
             }.decodeList<FriendsRankingDto>()
                 .sortedByDescending { it.pointsLast30Days }
@@ -88,13 +91,13 @@ class SupabaseRankingRepository : RankingRepository {
     override suspend fun getCurrentUserData(): RankingData? {
         val uid = userId() ?: return null
         return try {
-            val user = supabase.from("users").select {
+            val user = client.from("users").select {
                 filter { eq("id", uid) }
                 limit(1)
             }.decodeList<UserDto>().firstOrNull() ?: return null
 
             val streak = try {
-                supabase.from("user_streaks").select {
+                client.from("user_streaks").select {
                     filter { eq("user_id", uid) }
                     limit(1)
                 }.decodeList<UserStreakDto>().firstOrNull()?.currentStreak ?: 0
@@ -109,7 +112,7 @@ class SupabaseRankingRepository : RankingRepository {
                 Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -30) }.time
             )
             val last30DaysPoints = try {
-                supabase.from("user_daily_log").select {
+                client.from("user_daily_log").select {
                     filter { eq("user_id", uid); gte("date", thirtyDaysAgo) }
                 }.decodeList<DailyLogDto>().sumOf { it.totalPoints }
             } catch (e: Exception) {
@@ -117,7 +120,7 @@ class SupabaseRankingRepository : RankingRepository {
                 0
             }
             val todayPoints = try {
-                supabase.from("daily_progress").select {
+                client.from("daily_progress").select {
                     filter { eq("user_id", uid) }
                     limit(1)
                 }.decodeList<DailyProgressDto>().firstOrNull()?.totalPoints ?: 0
