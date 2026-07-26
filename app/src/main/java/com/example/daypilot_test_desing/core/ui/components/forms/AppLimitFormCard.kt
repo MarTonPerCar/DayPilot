@@ -448,6 +448,37 @@ private fun GroupAppPickerSheetDialog(
     }
 }
 
+/** All the form's editable state, derived once from [initialApp]/[initialGroup] — pulled out of
+ *  [AppLimitFormCard] purely to keep that function's cognitive complexity down. */
+private class AppLimitFormState(
+    initialApp: AppRestriction?,
+    initialGroup: GroupRestriction?
+) {
+    var restrictionType by mutableStateOf(if (initialGroup != null) RestrictionType.GROUP else RestrictionType.APP)
+    val isGroup get() = restrictionType == RestrictionType.GROUP
+
+    var selectedApp by mutableStateOf(initialApp?.let { AppInfo(it.appName, it.packageName) })
+
+    var groupName by mutableStateOf(initialGroup?.groupName ?: "")
+    var groupApps: List<AppInfo> by mutableStateOf(
+        initialGroup?.apps?.map { AppInfo(it.appName, it.packageName) } ?: emptyList()
+    )
+
+    var limitMinutes by mutableFloatStateOf(
+        (initialApp?.dailyLimitMinutes ?: initialGroup?.dailyLimitMinutes ?: 60)
+            .toFloat().coerceAtMost(if (isGroup) 600f else 360f)
+    )
+
+    var showAppPicker by mutableStateOf(false)
+    var showGroupAppPicker by mutableStateOf(false)
+
+    val isValid get() = if (isGroup) groupName.isNotBlank() && groupApps.isNotEmpty() else selectedApp != null
+}
+
+@Composable
+private fun rememberAppLimitFormState(initialApp: AppRestriction?, initialGroup: GroupRestriction?) =
+    remember { AppLimitFormState(initialApp, initialGroup) }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppLimitFormCard(
@@ -459,46 +490,20 @@ fun AppLimitFormCard(
     initialApp: AppRestriction? = null,
     initialGroup: GroupRestriction? = null,
 ) {
-    var restrictionType by remember {
-        mutableStateOf(if (initialGroup != null) RestrictionType.GROUP else RestrictionType.APP)
-    }
-    val isGroup = restrictionType == RestrictionType.GROUP
-
-    var selectedApp by remember {
-        mutableStateOf(initialApp?.let { AppInfo(it.appName, it.packageName) })
-    }
-
-    var groupName by remember { mutableStateOf(initialGroup?.groupName ?: "") }
-    var groupApps: List<AppInfo> by remember {
-        mutableStateOf(
-            initialGroup?.apps?.map { AppInfo(it.appName, it.packageName) } ?: emptyList()
-        )
-    }
-
-    val maxMinutes = if (isGroup) 600f else 360f
-    var limitMinutes by remember {
-        mutableFloatStateOf(
-            (initialApp?.dailyLimitMinutes ?: initialGroup?.dailyLimitMinutes ?: 60)
-                .toFloat().coerceAtMost(maxMinutes)
-        )
-    }
-    var showAppPicker by remember { mutableStateOf(false) }
-    var showGroupAppPicker by remember { mutableStateOf(false) }
-
-    val isValid = if (isGroup) groupName.isNotBlank() && groupApps.isNotEmpty()
-    else selectedApp != null
+    val form = rememberAppLimitFormState(initialApp, initialGroup)
+    val isGroup = form.isGroup
 
     AppPickerSheetDialog(
-        show = showAppPicker,
-        onDismiss = { showAppPicker = false },
-        onSelect = { selectedApp = it }
+        show = form.showAppPicker,
+        onDismiss = { form.showAppPicker = false },
+        onSelect = { form.selectedApp = it }
     )
 
     GroupAppPickerSheetDialog(
-        show = showGroupAppPicker,
-        initialSelected = groupApps,
-        onDismiss = { showGroupAppPicker = false },
-        onConfirm = { groupApps = it }
+        show = form.showGroupAppPicker,
+        initialSelected = form.groupApps,
+        onDismiss = { form.showGroupAppPicker = false },
+        onConfirm = { form.groupApps = it }
     )
 
     Card(
@@ -524,43 +529,46 @@ fun AppLimitFormCard(
             )
 
             if (!isEditing) {
-                RestrictionTypeSelector(restrictionType = restrictionType, onSelect = { restrictionType = it })
+                RestrictionTypeSelector(
+                    restrictionType = form.restrictionType,
+                    onSelect = { form.restrictionType = it }
+                )
             }
 
             if (!isGroup) {
                 AppPickerButton(
-                    selectedApp = selectedApp,
+                    selectedApp = form.selectedApp,
                     isEditing = isEditing,
-                    onClick = { showAppPicker = true }
+                    onClick = { form.showAppPicker = true }
                 )
             }
 
             if (isGroup) {
                 GroupNameAndAppsSection(
-                    groupName = groupName,
-                    onGroupNameChange = { groupName = it },
-                    groupApps = groupApps,
-                    onRemoveApp = { groupApps = groupApps - it },
-                    onPickApps = { showGroupAppPicker = true }
+                    groupName = form.groupName,
+                    onGroupNameChange = { form.groupName = it },
+                    groupApps = form.groupApps,
+                    onRemoveApp = { form.groupApps = form.groupApps - it },
+                    onPickApps = { form.showGroupAppPicker = true }
                 )
             }
 
             LimitSliderSection(
                 isGroup = isGroup,
-                limitMinutes = limitMinutes,
-                onChange = { limitMinutes = it }
+                limitMinutes = form.limitMinutes,
+                onChange = { form.limitMinutes = it }
             )
 
             AppLimitFormActionsRow(
-                isValid = isValid,
+                isValid = form.isValid,
                 isEditing = isEditing,
                 onCancel = onCancel,
                 onSave = {
-                    if (isValid) {
+                    if (form.isValid) {
                         if (isGroup) {
-                            onSaveGroup(buildGroupRestriction(initialGroup, groupName, groupApps, limitMinutes))
+                            onSaveGroup(buildGroupRestriction(initialGroup, form.groupName, form.groupApps, form.limitMinutes))
                         } else {
-                            onSaveApp(buildAppRestriction(initialApp, selectedApp!!, limitMinutes))
+                            onSaveApp(buildAppRestriction(initialApp, form.selectedApp!!, form.limitMinutes))
                         }
                     }
                 }

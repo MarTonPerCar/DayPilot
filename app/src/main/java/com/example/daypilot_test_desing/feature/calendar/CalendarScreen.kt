@@ -43,6 +43,22 @@ data class CalendarActions(
     val onUpdateTask: (id: String, title: String, category: TaskCategory, difficulty: TaskDifficulty, duration: Int, description: String) -> Unit = { _, _, _, _, _, _ -> }
 )
 
+private fun previousMonth(month: Int, year: Int): Pair<Int, Int> =
+    if (month == 1) 12 to year - 1 else month - 1 to year
+
+private fun nextMonth(month: Int, year: Int): Pair<Int, Int> =
+    if (month == 12) 1 to year + 1 else month + 1 to year
+
+private fun CalendarTaskData.matchesFilters(
+    day: Int,
+    month: Int,
+    year: Int,
+    difficulty: TaskDifficulty?,
+    category: TaskCategory?
+) = this.day == day && this.month == month && this.year == year &&
+    (difficulty == null || this.difficulty == difficulty) &&
+    (category   == null || this.category   == category)
+
 private fun autoSelectDayFor(newMonth: Int, newYear: Int, todayDay: Int, todayMonth: Int, todayYear: Int): Int = when {
     newYear > todayYear || (newYear == todayYear && newMonth > todayMonth) -> 1
     newYear < todayYear || (newYear == todayYear && newMonth < todayMonth) -> {
@@ -241,38 +257,65 @@ private fun TaskFormSheet(
 }
 
 @Composable
+private fun DifficultyDropdownTrigger(selectedDifficulty: TaskDifficulty?, onClick: () -> Unit) {
+    OutlinedButton(
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        colors = ButtonDefaults.outlinedButtonColors(
+            containerColor = if (selectedDifficulty != null)
+                selectedDifficulty.color.copy(alpha = 0.12f)
+            else MaterialTheme.colorScheme.surface
+        )
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = selectedDifficulty?.let { stringResource(it.labelRes) }
+                    ?: stringResource(R.string.task_difficulty_label),
+                style = MaterialTheme.typography.labelMedium,
+                color = selectedDifficulty?.color ?: MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Icon(
+                imageVector = Icons.Default.KeyboardArrowDown,
+                contentDescription = null,
+                modifier = Modifier.size(16.dp),
+                tint = selectedDifficulty?.color ?: MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
+@Composable
+private fun DifficultyDropdownItem(diff: TaskDifficulty, isSelected: Boolean, onClick: () -> Unit) {
+    DropdownMenuItem(
+        text = {
+            Text(
+                stringResource(diff.labelRes),
+                color = diff.color,
+                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+            )
+        },
+        onClick = onClick,
+        leadingIcon = {
+            Box(modifier = Modifier.size(12.dp).clip(CircleShape).background(diff.color))
+        },
+        trailingIcon = {
+            if (isSelected) {
+                Icon(Icons.Default.Check, contentDescription = null, tint = diff.color, modifier = Modifier.size(14.dp))
+            }
+        }
+    )
+}
+
+@Composable
 private fun DifficultyFilterDropdown(selectedDifficulty: TaskDifficulty?, onSelect: (TaskDifficulty?) -> Unit, modifier: Modifier = Modifier) {
     var showMenu by remember { mutableStateOf(false) }
     Box(modifier = modifier) {
-        OutlinedButton(
-            onClick = { showMenu = true },
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.outlinedButtonColors(
-                containerColor = if (selectedDifficulty != null)
-                    selectedDifficulty.color.copy(alpha = 0.12f)
-                else MaterialTheme.colorScheme.surface
-            )
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = selectedDifficulty?.let { stringResource(it.labelRes) }
-                        ?: stringResource(R.string.task_difficulty_label),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = selectedDifficulty?.color ?: MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Icon(
-                    imageVector = Icons.Default.KeyboardArrowDown,
-                    contentDescription = null,
-                    modifier = Modifier.size(16.dp),
-                    tint = selectedDifficulty?.color ?: MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        }
+        DifficultyDropdownTrigger(selectedDifficulty = selectedDifficulty, onClick = { showMenu = true })
         DropdownMenu(
             expanded = showMenu,
             onDismissRequest = { showMenu = false }
@@ -283,25 +326,12 @@ private fun DifficultyFilterDropdown(selectedDifficulty: TaskDifficulty?, onSele
                 leadingIcon = { Icon(Icons.Default.List, contentDescription = null, modifier = Modifier.size(16.dp)) }
             )
             TaskDifficulty.entries.forEach { diff ->
-                DropdownMenuItem(
-                    text = {
-                        Text(
-                            stringResource(diff.labelRes),
-                            color = diff.color,
-                            fontWeight = if (selectedDifficulty == diff) FontWeight.Bold else FontWeight.Normal
-                        )
-                    },
+                DifficultyDropdownItem(
+                    diff = diff,
+                    isSelected = selectedDifficulty == diff,
                     onClick = {
                         onSelect(if (selectedDifficulty == diff) null else diff)
                         showMenu = false
-                    },
-                    leadingIcon = {
-                        Box(modifier = Modifier.size(12.dp).clip(CircleShape).background(diff.color))
-                    },
-                    trailingIcon = {
-                        if (selectedDifficulty == diff) {
-                            Icon(Icons.Default.Check, contentDescription = null, tint = diff.color, modifier = Modifier.size(14.dp))
-                        }
                     }
                 )
             }
@@ -310,51 +340,78 @@ private fun DifficultyFilterDropdown(selectedDifficulty: TaskDifficulty?, onSele
 }
 
 @Composable
+private fun CategoryDropdownTrigger(selectedCategory: TaskCategory?, onClick: () -> Unit) {
+    OutlinedButton(
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        colors = ButtonDefaults.outlinedButtonColors(
+            containerColor = if (selectedCategory != null)
+                selectedCategory.color.copy(alpha = 0.12f)
+            else MaterialTheme.colorScheme.surface
+        )
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if (selectedCategory != null) {
+                    Icon(
+                        imageVector = selectedCategory.icon,
+                        contentDescription = null,
+                        modifier = Modifier.size(14.dp),
+                        tint = selectedCategory.color
+                    )
+                }
+                Text(
+                    text = selectedCategory?.let { stringResource(it.labelRes) }
+                        ?: stringResource(R.string.task_category_label),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = selectedCategory?.color ?: MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            Icon(
+                imageVector = Icons.Default.KeyboardArrowDown,
+                contentDescription = null,
+                modifier = Modifier.size(16.dp),
+                tint = selectedCategory?.color ?: MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
+@Composable
+private fun CategoryDropdownItem(cat: TaskCategory, isSelected: Boolean, onClick: () -> Unit) {
+    DropdownMenuItem(
+        text = {
+            Text(
+                stringResource(cat.labelRes),
+                color = cat.color,
+                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+            )
+        },
+        onClick = onClick,
+        leadingIcon = {
+            Icon(cat.icon, contentDescription = null, tint = cat.color, modifier = Modifier.size(16.dp))
+        },
+        trailingIcon = {
+            if (isSelected) {
+                Icon(Icons.Default.Check, contentDescription = null, tint = cat.color, modifier = Modifier.size(14.dp))
+            }
+        }
+    )
+}
+
+@Composable
 private fun CategoryFilterDropdown(selectedCategory: TaskCategory?, onSelect: (TaskCategory?) -> Unit, modifier: Modifier = Modifier) {
     var showMenu by remember { mutableStateOf(false) }
     Box(modifier = modifier) {
-        OutlinedButton(
-            onClick = { showMenu = true },
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.outlinedButtonColors(
-                containerColor = if (selectedCategory != null)
-                    selectedCategory.color.copy(alpha = 0.12f)
-                else MaterialTheme.colorScheme.surface
-            )
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    if (selectedCategory != null) {
-                        Icon(
-                            imageVector = selectedCategory.icon,
-                            contentDescription = null,
-                            modifier = Modifier.size(14.dp),
-                            tint = selectedCategory.color
-                        )
-                    }
-                    Text(
-                        text = selectedCategory?.let { stringResource(it.labelRes) }
-                            ?: stringResource(R.string.task_category_label),
-                        style = MaterialTheme.typography.labelMedium,
-                        color = selectedCategory?.color ?: MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-                Icon(
-                    imageVector = Icons.Default.KeyboardArrowDown,
-                    contentDescription = null,
-                    modifier = Modifier.size(16.dp),
-                    tint = selectedCategory?.color ?: MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        }
+        CategoryDropdownTrigger(selectedCategory = selectedCategory, onClick = { showMenu = true })
         DropdownMenu(
             expanded = showMenu,
             onDismissRequest = { showMenu = false }
@@ -365,25 +422,12 @@ private fun CategoryFilterDropdown(selectedCategory: TaskCategory?, onSelect: (T
                 leadingIcon = { Icon(Icons.Default.List, contentDescription = null, modifier = Modifier.size(16.dp)) }
             )
             TaskCategory.entries.forEach { cat ->
-                DropdownMenuItem(
-                    text = {
-                        Text(
-                            stringResource(cat.labelRes),
-                            color = cat.color,
-                            fontWeight = if (selectedCategory == cat) FontWeight.Bold else FontWeight.Normal
-                        )
-                    },
+                CategoryDropdownItem(
+                    cat = cat,
+                    isSelected = selectedCategory == cat,
                     onClick = {
                         onSelect(if (selectedCategory == cat) null else cat)
                         showMenu = false
-                    },
-                    leadingIcon = {
-                        Icon(cat.icon, contentDescription = null, tint = cat.color, modifier = Modifier.size(16.dp))
-                    },
-                    trailingIcon = {
-                        if (selectedCategory == cat) {
-                            Icon(Icons.Default.Check, contentDescription = null, tint = cat.color, modifier = Modifier.size(14.dp))
-                        }
                     }
                 )
             }
@@ -539,11 +583,7 @@ fun CalendarScreen(
     val tasksForSelectedDay by remember(tasks, selectedDay, currentMonth, currentYear, selectedDifficulty, selectedCategory) {
         derivedStateOf {
             val day = selectedDay ?: return@derivedStateOf emptyList<CalendarTaskData>()
-            tasks.filter {
-                it.day == day && it.month == currentMonth && it.year == currentYear &&
-                (selectedDifficulty == null || it.difficulty == selectedDifficulty) &&
-                (selectedCategory   == null || it.category   == selectedCategory)
-            }
+            tasks.filter { it.matchesFilters(day, currentMonth, currentYear, selectedDifficulty, selectedCategory) }
         }
     }
 
@@ -607,15 +647,13 @@ fun CalendarScreen(
                 actions = DayPilotCalendarActions(
                     onDaySelected = { selectedDay = it },
                     onPreviousMonth = {
-                        val newMonth = if (currentMonth == 1) 12 else currentMonth - 1
-                        val newYear  = if (currentMonth == 1) currentYear - 1 else currentYear
+                        val (newMonth, newYear) = previousMonth(currentMonth, currentYear)
                         currentMonth = newMonth
                         currentYear  = newYear
                         selectedDay  = autoSelectDay(newMonth, newYear)
                     },
                     onNextMonth = {
-                        val newMonth = if (currentMonth == 12) 1 else currentMonth + 1
-                        val newYear  = if (currentMonth == 12) currentYear + 1 else currentYear
+                        val (newMonth, newYear) = nextMonth(currentMonth, currentYear)
                         currentMonth = newMonth
                         currentYear  = newYear
                         selectedDay  = autoSelectDay(newMonth, newYear)

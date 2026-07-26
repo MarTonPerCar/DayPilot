@@ -229,6 +229,30 @@ private fun EarlyWarningToggle(earlyWarning: Boolean, onToggle: (Boolean) -> Uni
     }
 }
 
+private fun buildReminderOrNull(
+    title: String,
+    frequency: FrequencyType,
+    earlyWarning: Boolean,
+    quickMinutes: Int?,
+    selectedDate: Calendar?,
+    isValid: Boolean
+): ReminderFormDataInfo? = if (!isValid) null else ReminderFormDataInfo(
+    title = title,
+    frequencyType = frequency,
+    earlyWarning = earlyWarning,
+    quickMinutes = quickMinutes,
+    scheduledDateTime = selectedDate
+)
+
+private fun formatDateLabel(selectedDate: Calendar?): String? = selectedDate?.let { cal ->
+    val day = cal.get(Calendar.DAY_OF_MONTH)
+    val month = cal.get(Calendar.MONTH) + 1
+    val year = cal.get(Calendar.YEAR)
+    val hour = cal.get(Calendar.HOUR_OF_DAY)
+    val min = cal.get(Calendar.MINUTE)
+    "%02d/%02d/%d %02d:%02d".format(day, month, year, hour, min)
+}
+
 @Composable
 private fun ReminderFormActionsRow(isValid: Boolean, onCancel: () -> Unit, onSave: () -> Unit) {
     Row(
@@ -263,15 +287,7 @@ fun ReminderFormCard(
     var selectedDate by remember { mutableStateOf<Calendar?>(null) }
 
     val isValid = title.isNotBlank() && (quickMinutes != null || selectedDate != null)
-
-    val dateLabel = selectedDate?.let { cal ->
-        val day = cal.get(Calendar.DAY_OF_MONTH)
-        val month = cal.get(Calendar.MONTH) + 1
-        val year = cal.get(Calendar.YEAR)
-        val hour = cal.get(Calendar.HOUR_OF_DAY)
-        val min = cal.get(Calendar.MINUTE)
-        "%02d/%02d/%d %02d:%02d".format(day, month, year, hour, min)
-    } ?: stringResource(R.string.reminder_form_no_date)
+    val dateLabel = formatDateLabel(selectedDate) ?: stringResource(R.string.reminder_form_no_date)
 
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -335,17 +351,8 @@ fun ReminderFormCard(
                 isValid = isValid,
                 onCancel = onCancel,
                 onSave = {
-                    if (isValid) {
-                        onSave(
-                            ReminderFormDataInfo(
-                                title = title,
-                                frequencyType = frequency,
-                                earlyWarning = earlyWarning,
-                                quickMinutes = quickMinutes,
-                                scheduledDateTime = selectedDate
-                            )
-                        )
-                    }
+                    buildReminderOrNull(title, frequency, earlyWarning, quickMinutes, selectedDate, isValid)
+                        ?.let(onSave)
                 }
             )
         }
