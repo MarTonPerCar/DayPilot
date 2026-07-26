@@ -50,7 +50,7 @@ class SupabaseTaskRepository(
                 }
                 .decodeList<CalendarTaskDto>()
                 .map { it.toModel() }
-            SessionCache.tasks.value = result
+            SessionCache.setTasks(result)
             result
         } catch (e: Exception) {
             Log.e(TAG, "Failed to load tasks", e)
@@ -115,7 +115,7 @@ class SupabaseTaskRepository(
             throw e
         }
 
-        SessionCache.tasks.value = null
+        SessionCache.setTasks(null)
     }
 
     override suspend fun updateTask(
@@ -142,7 +142,7 @@ class SupabaseTaskRepository(
             Log.e(TAG, "Failed to update task $id", e)
             throw e
         }
-        SessionCache.tasks.value = null
+        SessionCache.setTasks(null)
     }
 
     override suspend fun toggleTask(occurrenceId: String, isDone: Boolean) {
@@ -165,7 +165,7 @@ class SupabaseTaskRepository(
             Log.e(TAG, "Failed to toggle task occurrence $occurrenceId to isDone=$isDone", e)
             throw e
         }
-        SessionCache.tasks.value = null
+        SessionCache.setTasks(null)
     }
 
     override suspend fun deleteTask(id: String) {
@@ -179,7 +179,7 @@ class SupabaseTaskRepository(
             Log.e(TAG, "Failed to delete task $id", e)
             throw e
         }
-        SessionCache.tasks.value = null
+        SessionCache.setTasks(null)
     }
 }
 

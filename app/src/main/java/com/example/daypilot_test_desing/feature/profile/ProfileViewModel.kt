@@ -99,8 +99,7 @@ class ProfileViewModel(
                 val m = context.contentResolver.getType(uri) ?: "image/jpeg"
                 Pair(b, m)
             }
-            if (bytes == null) false
-            else userRepo.uploadAvatar(bytes, mimeType) != null
+            bytes != null && userRepo.uploadAvatar(bytes, mimeType) != null
         } catch (e: Exception) {
             Log.e(TAG, "Failed to upload avatar", e)
             false

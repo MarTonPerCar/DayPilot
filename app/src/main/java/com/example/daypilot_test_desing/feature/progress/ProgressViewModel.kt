@@ -25,9 +25,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 class ProgressViewModel(
     application: Application,
@@ -89,7 +86,7 @@ class ProgressViewModel(
             table = "daily_progress"
             filter("user_id", FilterOperator.EQ, userId)
         }.onEach {
-            SessionCache.todayProgress.value = null
+            SessionCache.setTodayProgress(null)
             load()
         }.launchIn(viewModelScope)
 
@@ -97,7 +94,7 @@ class ProgressViewModel(
             table = "user_daily_log"
             filter("user_id", FilterOperator.EQ, userId)
         }.onEach {
-            SessionCache.weeklyHistory.value    = null
+            SessionCache.setWeeklyHistory(null)
             SessionCache.weeklyHistoryFetchedAt = 0L
             load()
         }.launchIn(viewModelScope)
@@ -122,8 +119,6 @@ class ProgressViewModel(
             }
         }
     }
-
-    private fun today() = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
 
     companion object {
         private const val TAG = "ProgressViewModel"

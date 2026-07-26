@@ -153,7 +153,7 @@ class SupabaseFriendRepository(
                 weeklySummary = weeklySummary
             )
         }.also { result ->
-            SessionCache.friends.value    = result
+            SessionCache.setFriends(result)
             SessionCache.friendsFetchedAt = now
             Log.d(TAG, "getFriends: fetched ${result.size} friend(s) for $uid")
         }

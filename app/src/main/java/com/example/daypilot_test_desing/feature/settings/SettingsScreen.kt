@@ -36,7 +36,6 @@ fun SettingsScreen(
     state: SettingsUiState,
     actions: SettingsActions
 ) {
-    val name                 = state.name
     val isDarkMode           = state.isDarkMode
     val selectedThemeId      = state.selectedThemeId
     val selectedLanguage     = state.selectedLanguage

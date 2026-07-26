@@ -69,7 +69,7 @@ class SupabaseFriendRepositoryTest {
     @Test
     fun `getFriends returns the cached list within the TTL without hitting the network`() = runTest {
         val cached = listOf(FriendData(id = "f1", name = "Cached", email = "c@x.com", points = 1, streak = 1))
-        SessionCache.friends.value = cached
+        SessionCache.setFriends(cached)
         SessionCache.friendsFetchedAt = System.currentTimeMillis()
         val repo = SupabaseFriendRepository(fakeSupabaseClient { error("no HTTP expected") })
 

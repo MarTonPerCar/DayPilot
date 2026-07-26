@@ -80,7 +80,7 @@ class NotificationsViewModel(private val repo: NotificationRepository) : ViewMod
                 NotificationHub.repo.add(dto.toModel())
                 if (dto.type == "FRIEND_REQUEST" || dto.type == "FRIEND_ACCEPTED") {
                     // Drop the cache slot so the refresh this triggers fetches fresh data.
-                    SessionCache.friends.value    = null
+                    SessionCache.setFriends(null)
                     SessionCache.friendsFetchedAt = 0L
                     NotificationHub.notifyFriendsChanged()
                 }

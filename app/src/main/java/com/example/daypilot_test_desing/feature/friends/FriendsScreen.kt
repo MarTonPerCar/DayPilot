@@ -191,7 +191,6 @@ fun FriendsScreen(
     val userMessage         = state.userMessage
     val onAcceptRequest      = actions.onAcceptRequest
     val onRejectRequest      = actions.onRejectRequest
-    val onTapFriend          = actions.onTapFriend
     val onRemoveFriend       = actions.onRemoveFriend
     val onNavigateToSearch   = actions.onNavigateToSearch
     val onReactToFriend      = actions.onReactToFriend

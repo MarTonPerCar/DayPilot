@@ -46,7 +46,7 @@ class SupabaseProgressRepository(
                 limit(1)
             }.decodeList<DailyProgressDto>().firstOrNull()
                 ?: DailyProgressDto(userId = uid, date = today())
-            SessionCache.todayProgress.value = result
+            SessionCache.setTodayProgress(result)
             result
         } catch (e: Exception) {
             Log.e(TAG, "Failed to load today's progress for $uid", e)
@@ -66,7 +66,7 @@ class SupabaseProgressRepository(
                 order("date", Order.DESCENDING)
                 limit(days.toLong())
             }.decodeList<DailyLogDto>()
-            SessionCache.weeklyHistory.value    = result
+            SessionCache.setWeeklyHistory(result)
             SessionCache.weeklyHistoryFetchedAt = now
             result
         } catch (e: Exception) {
@@ -80,24 +80,28 @@ class SupabaseProgressRepository(
         client.from("points_log").insert(
             InsertPointsLogDto(userId = uid, points = points, source = source, dayKey = today())
         )
-        SessionCache.todayProgress.value = SessionCache.todayProgress.value?.let { current ->
-            current.copy(
-                tasksPoints      = current.tasksPoints      + if (source == "TASKS")       points else 0,
-                stepsPoints      = current.stepsPoints      + if (source == "STEPS")       points else 0,
-                wellnessPoints   = current.wellnessPoints   + if (source == "WELLNESS")    points else 0,
-                timerPoints      = current.timerPoints      + if (source == "TIMER")       points else 0,
-                techHealthPoints = current.techHealthPoints + if (source == "TECH_HEALTH") points else 0,
-                totalPoints      = current.totalPoints      + points
-            )
-        }
+        SessionCache.setTodayProgress(
+            SessionCache.todayProgress.value?.let { current ->
+                current.copy(
+                    tasksPoints      = current.tasksPoints      + if (source == "TASKS")       points else 0,
+                    stepsPoints      = current.stepsPoints      + if (source == "STEPS")       points else 0,
+                    wellnessPoints   = current.wellnessPoints   + if (source == "WELLNESS")    points else 0,
+                    timerPoints      = current.timerPoints      + if (source == "TIMER")       points else 0,
+                    techHealthPoints = current.techHealthPoints + if (source == "TECH_HEALTH") points else 0,
+                    totalPoints      = current.totalPoints      + points
+                )
+            }
+        )
         val profile = SessionCache.userProfile.value
         if (profile != null) {
             val newTotal = profile.totalPoints + points
             val newLevel = calculateLevel(newTotal)
-            SessionCache.userProfile.value = profile.copy(
-                totalPoints       = newTotal,
-                level             = newLevel,
-                pointsToNextLevel = pointsToNextLevel(newLevel)
+            SessionCache.setUserProfile(
+                profile.copy(
+                    totalPoints       = newTotal,
+                    level             = newLevel,
+                    pointsToNextLevel = pointsToNextLevel(newLevel)
+                )
             )
             // LEVEL_UP notification is now inserted by a Supabase DB trigger.
         }
@@ -133,16 +137,18 @@ class SupabaseProgressRepository(
                 filter { isIn("id", allIds) }
             }.decodeList<FriendsRankingDto>()
                 .sortedByDescending { it.pointsLast30Days }
-            SessionCache.ranking.value       = ranking.map { dto ->
-                RankingData(
-                    id        = dto.id,
-                    name      = dto.name.ifBlank { dto.username },
-                    points    = dto.pointsLast30Days,
-                    streak    = dto.currentStreak ?: 0,
-                    level     = dto.level,
-                    avatarUrl = dto.photoUrl
-                )
-            }
+            SessionCache.setRanking(
+                ranking.map { dto ->
+                    RankingData(
+                        id        = dto.id,
+                        name      = dto.name.ifBlank { dto.username },
+                        points    = dto.pointsLast30Days,
+                        streak    = dto.currentStreak ?: 0,
+                        level     = dto.level,
+                        avatarUrl = dto.photoUrl
+                    )
+                }
+            )
             SessionCache.rankingFetchedAt    = System.currentTimeMillis()
             val idx = ranking.indexOfFirst { it.id == uid }
             if (idx >= 0) idx + 1 else ranking.size + 1

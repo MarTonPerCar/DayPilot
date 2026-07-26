@@ -155,7 +155,6 @@ fun EditProfileScreen(
         avatarUploadError, isSavingProfile, profileSaveError) = state
     val (onSave, onNavigateToResetPassword, onPhotoSelected,
         onAvatarErrorDismissed, onProfileSaveErrorDismissed, onBack) = actions
-    val context         = LocalContext.current
     val snackbarHost    = remember { SnackbarHostState() }
     var name            by remember { mutableStateOf(currentName) }
     var username        by remember { mutableStateOf(currentUsername) }

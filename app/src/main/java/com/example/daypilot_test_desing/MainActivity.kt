@@ -55,7 +55,7 @@ class MainActivity : ComponentActivity() {
 
             val theme = DayPilotTheme.entries.find { it.name == settings.selectedThemeId }
                 ?: DayPilotTheme.SAGE_GREEN
-            val isDark = if (theme == DayPilotTheme.AMOLED) true else settings.isDarkMode
+            val isDark = theme == DayPilotTheme.AMOLED || settings.isDarkMode
 
             DayPilotTheme(theme = theme, darkMode = isDark) {
                 DayPilotNavGraph()

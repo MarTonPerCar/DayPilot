@@ -260,7 +260,6 @@ fun StepsCard(
     val currentSteps    = info.currentSteps
     val goalSteps        = info.goalSteps
     val pointsEarned      = info.pointsEarned
-    val pointsRemaining   = info.pointsRemaining
     val goalLocked        = info.goalLocked
     val pendingGoal       = info.pendingGoal
     var showGoalSheet by remember { mutableStateOf(false) }

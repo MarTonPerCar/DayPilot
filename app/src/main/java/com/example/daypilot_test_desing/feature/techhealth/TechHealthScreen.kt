@@ -166,7 +166,6 @@ fun TechHealthScreen(
         return
     }
 
-    val context = LocalContext.current
     var showAddSheet   by remember { mutableStateOf(false) }
     var editingAppId   by remember { mutableStateOf<String?>(null) }
     var editingGroupId by remember { mutableStateOf<String?>(null) }

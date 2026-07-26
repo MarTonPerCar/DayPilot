@@ -44,7 +44,7 @@ class RivalryViewModel(private val repo: RankingRepository) : ViewModel() {
     fun refresh(): Job = viewModelScope.launch { load() }
 
     fun invalidate() {
-        SessionCache.ranking.value    = null
+        SessionCache.setRanking(null)
         SessionCache.rankingFetchedAt = 0L
     }
 

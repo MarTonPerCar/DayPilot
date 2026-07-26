@@ -24,7 +24,8 @@ fun scheduleTechHealthWorker(context: Context) {
     )
 }
 
-// FIXME: aggressive battery-saver modes on some devices may prevent this from running.
+// Known limitation: aggressive battery-saver modes on some OEM devices may prevent this
+// periodic work from running on schedule. WorkManager's own retry/backoff is the mitigation.
 class TechHealthWorker(
     context: Context,
     params: WorkerParameters

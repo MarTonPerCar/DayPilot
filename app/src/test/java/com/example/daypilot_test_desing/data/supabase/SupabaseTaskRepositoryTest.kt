@@ -54,7 +54,7 @@ class SupabaseTaskRepositoryTest {
             title = "Cached", category = TaskCategory.WORK, difficulty = TaskDifficulty.EASY,
             duration = 10, isDone = false
         ))
-        SessionCache.tasks.value = cached
+        SessionCache.setTasks(cached)
         val repo = SupabaseTaskRepository(fakeSupabaseClient { error("no HTTP expected") })
 
         assertEquals(cached, repo.getTasks())
@@ -151,7 +151,7 @@ class SupabaseTaskRepositoryTest {
 
     @Test
     fun `addTask invalidates a previously cached task list`() = runTest {
-        SessionCache.tasks.value = emptyList()
+        SessionCache.setTasks(emptyList())
         val client = fakeSupabaseClient { request ->
             when {
                 request.url.encodedPath.endsWith("/tasks") -> respond("""[{"id":"real-id"}]""", headers = jsonHeaders)
@@ -215,7 +215,7 @@ class SupabaseTaskRepositoryTest {
 
     @Test
     fun `updateTask sends the new fields and invalidates the cache`() = runTest {
-        SessionCache.tasks.value = emptyList()
+        SessionCache.setTasks(emptyList())
         var captured: String? = null
         val client = fakeSupabaseClient { request ->
             captured = String(request.body.toByteArray())
@@ -307,7 +307,7 @@ class SupabaseTaskRepositoryTest {
 
     @Test
     fun `deleteTask removes the row and invalidates the cache`() = runTest {
-        SessionCache.tasks.value = emptyList()
+        SessionCache.setTasks(emptyList())
         val client = fakeSupabaseClient { request ->
             assertTrue(request.url.encodedPath.endsWith("/tasks"))
             respond("[]", headers = jsonHeaders)

@@ -115,7 +115,7 @@ class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
         Log.d(TAG, "refreshFromRealtime(): triggered")
         refreshing = true
         // Drop the cache slot so getFriends() fetches fresh instead of serving the stale TTL'd list.
-        SessionCache.friends.value    = null
+        SessionCache.setFriends(null)
         SessionCache.friendsFetchedAt = 0L
         viewModelScope.launch {
             try {
@@ -146,9 +146,9 @@ class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
         viewModelScope.launch {
             try {
                 repo.acceptRequest(userId)
-                SessionCache.friends.value    = _uiState.value.friends
+                SessionCache.setFriends(_uiState.value.friends)
                 SessionCache.friendsFetchedAt = System.currentTimeMillis()
-                SessionCache.ranking.value    = null
+                SessionCache.setRanking(null)
                 SessionCache.rankingFetchedAt = 0L
                 // FRIEND_ACCEPTED notification is inserted by a Supabase DB trigger, not here.
             } catch (e: Exception) {
@@ -201,7 +201,7 @@ class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
                 // REACTION notification is inserted by a Supabase DB trigger; the
                 // "reaction sent" confirmation below is local-only, never stored.
                 repo.reactToFriend(userId, reaction)
-                SessionCache.friends.value    = _uiState.value.friends
+                SessionCache.setFriends(_uiState.value.friends)
                 SessionCache.friendsFetchedAt = System.currentTimeMillis()
                 _uiState.update { it.copy(userMessage = R.string.friends_reaction_sent) }
             } catch (e: Exception) {
@@ -219,9 +219,9 @@ class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
         viewModelScope.launch {
             try {
                 repo.removeFriend(userId)
-                SessionCache.friends.value    = _uiState.value.friends
+                SessionCache.setFriends(_uiState.value.friends)
                 SessionCache.friendsFetchedAt = System.currentTimeMillis()
-                SessionCache.ranking.value    = null
+                SessionCache.setRanking(null)
                 SessionCache.rankingFetchedAt = 0L
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to remove friend $userId", e)

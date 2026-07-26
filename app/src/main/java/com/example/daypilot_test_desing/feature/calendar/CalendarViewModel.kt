@@ -86,7 +86,7 @@ class CalendarViewModel(
     private fun refreshFromRealtime() {
         if (refreshing) return // a burst of changes shouldn't queue up overlapping fetches
         refreshing = true
-        SessionCache.tasks.value = null // getTasks() short-circuits on cache otherwise
+        SessionCache.setTasks(null) // getTasks() short-circuits on cache otherwise
         viewModelScope.launch {
             try {
                 load()
@@ -126,7 +126,7 @@ class CalendarViewModel(
             try {
                 taskRepo.addTask(data)
                 load()
-                SessionCache.tasks.value = _uiState.value.tasks
+                SessionCache.setTasks(_uiState.value.tasks)
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to create task '${data.title}' (recurring=${data.isRecurring})", e)
                 _uiState.update { state ->
@@ -155,7 +155,7 @@ class CalendarViewModel(
         viewModelScope.launch {
             try {
                 taskRepo.updateTask(id, title, category, difficulty, duration, description)
-                SessionCache.tasks.value = _uiState.value.tasks
+                SessionCache.setTasks(_uiState.value.tasks)
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to update task $id", e)
                 _uiState.update { state ->
@@ -189,7 +189,7 @@ class CalendarViewModel(
                     progressRepo.logPoints(20, "TASKS")
                     // TASK_COMPLETED notification is now inserted by a Supabase DB trigger.
                 }
-                SessionCache.tasks.value = _uiState.value.tasks
+                SessionCache.setTasks(_uiState.value.tasks)
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to toggle task occurrence $occurrenceId to isDone=$isDone", e)
                 _uiState.update { state ->
@@ -209,7 +209,7 @@ class CalendarViewModel(
         viewModelScope.launch {
             try {
                 taskRepo.deleteTask(id)
-                SessionCache.tasks.value = _uiState.value.tasks
+                SessionCache.setTasks(_uiState.value.tasks)
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to delete task $id", e)
                 _uiState.update { it.copy(tasks = snapshot, userMessage = R.string.error_task_delete) }

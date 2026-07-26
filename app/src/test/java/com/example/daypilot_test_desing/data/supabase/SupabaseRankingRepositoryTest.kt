@@ -41,7 +41,7 @@ class SupabaseRankingRepositoryTest {
     @Test
     fun `getRanking returns the cached value within the TTL`() = runTest {
         val cached = listOf(RankingData(id = "f1", name = "F1", points = 1, streak = 0, level = 1))
-        SessionCache.ranking.value = cached
+        SessionCache.setRanking(cached)
         SessionCache.rankingFetchedAt = System.currentTimeMillis()
         val repo = SupabaseRankingRepository(fakeSupabaseClient { error("no HTTP expected") })
 

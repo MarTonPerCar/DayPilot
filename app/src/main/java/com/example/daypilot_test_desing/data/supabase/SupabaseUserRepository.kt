@@ -63,7 +63,7 @@ class SupabaseUserRepository(
                 currentStreak = streak?.currentStreak ?: 0,
                 longestStreak = streak?.longestStreak ?: 0
             )
-            SessionCache.userProfile.value = profile
+            SessionCache.setUserProfile(profile)
             profile
         } catch (e: Exception) {
             Log.e(TAG, "Failed to load profile for $uid", e)
@@ -134,10 +134,12 @@ class SupabaseUserRepository(
         ) {
             filter { eq("id", uid) }
         }
-        SessionCache.userProfile.value = SessionCache.userProfile.value?.copy(
-            name     = name,
-            username = username,
-            region   = region
+        SessionCache.setUserProfile(
+            SessionCache.userProfile.value?.copy(
+                name     = name,
+                username = username,
+                region   = region
+            )
         )
     }
 
@@ -155,7 +157,7 @@ class SupabaseUserRepository(
             client.from("users").update({ set("photo_url", url) }) {
                 filter { eq("id", uid) }
             }
-            SessionCache.userProfile.value = SessionCache.userProfile.value?.copy(avatarUrl = url)
+            SessionCache.setUserProfile(SessionCache.userProfile.value?.copy(avatarUrl = url))
             url
         } catch (e: Exception) {
             Log.e(TAG, "Failed to upload avatar for $uid", e)

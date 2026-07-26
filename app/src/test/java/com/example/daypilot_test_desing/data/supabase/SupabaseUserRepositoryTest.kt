@@ -45,7 +45,7 @@ class SupabaseUserRepositoryTest {
     @Test
     fun `getCurrentUser returns the cached profile without hitting the network`() = runTest {
         val cached = UserProfile(id = "u1", name = "Cached", username = "cached", email = "c@x.com")
-        SessionCache.userProfile.value = cached
+        SessionCache.setUserProfile(cached)
         val repo = SupabaseUserRepository(fakeSupabaseClient { error("no HTTP expected") })
 
         assertEquals(cached, repo.getCurrentUser())
@@ -232,7 +232,7 @@ class SupabaseUserRepositoryTest {
 
     @Test
     fun `updateProfile sends lowercased username and updates the cached profile`() = runTest {
-        SessionCache.userProfile.value = UserProfile(id = "u1", name = "Old", username = "old", email = "e@x.com")
+        SessionCache.setUserProfile(UserProfile(id = "u1", name = "Old", username = "old", email = "e@x.com"))
         var captured: String? = null
         val client = fakeSupabaseClient { request ->
             captured = String(request.body.toByteArray())
@@ -255,7 +255,7 @@ class SupabaseUserRepositoryTest {
 
     @Test
     fun `uploadAvatar stores the file, updates photo_url and the cached profile`() = runTest {
-        SessionCache.userProfile.value = UserProfile(id = "u1", name = "Ana", username = "ana", email = "a@x.com")
+        SessionCache.setUserProfile(UserProfile(id = "u1", name = "Ana", username = "ana", email = "a@x.com"))
         val client = fakeSupabaseClient { request ->
             when {
                 request.url.encodedPath.contains("/object/avatars/") ->

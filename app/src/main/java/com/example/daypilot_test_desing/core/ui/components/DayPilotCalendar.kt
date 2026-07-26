@@ -72,7 +72,6 @@ fun DayPilotCalendar(
     val onDaySelected   = actions.onDaySelected
     val onPreviousMonth = actions.onPreviousMonth
     val onNextMonth     = actions.onNextMonth
-    val onAddTask       = actions.onAddTask
     val cal = Calendar.getInstance().apply {
         set(Calendar.YEAR, year)
         set(Calendar.MONTH, month - 1)

@@ -80,7 +80,7 @@ class SupabaseRankingRepository(
                 avatarUrl = dto.photoUrl
             )
         }
-        SessionCache.ranking.value    = result
+        SessionCache.setRanking(result)
         SessionCache.rankingFetchedAt = now
         return result
     }

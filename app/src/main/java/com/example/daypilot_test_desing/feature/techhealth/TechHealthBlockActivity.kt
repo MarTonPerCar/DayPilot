@@ -47,7 +47,7 @@ class TechHealthBlockActivity : ComponentActivity() {
         val appName = intent.getStringExtra(EXTRA_APP_NAME) ?: ""
         val prefs   = AppPreferences(this)
         val theme   = DayPilotTheme.entries.find { it.name == prefs.themeId } ?: DayPilotTheme.SAGE_GREEN
-        val isDark  = if (theme == DayPilotTheme.AMOLED) true else prefs.isDarkMode
+        val isDark  = theme == DayPilotTheme.AMOLED || prefs.isDarkMode
 
         setContent {
             DayPilotTheme(theme = theme, darkMode = isDark) {

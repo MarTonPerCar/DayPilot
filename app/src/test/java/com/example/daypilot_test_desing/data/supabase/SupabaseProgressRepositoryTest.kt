@@ -45,7 +45,7 @@ class SupabaseProgressRepositoryTest {
     @Test
     fun `getTodayProgress returns the cached value when it's already for today`() = runTest {
         val cached = DailyProgressDto(userId = "u1", date = today(), steps = 500)
-        SessionCache.todayProgress.value = cached
+        SessionCache.setTodayProgress(cached)
         val repo = SupabaseProgressRepository(fakeSupabaseClient { error("no HTTP expected") })
 
         assertEquals(cached, repo.getTodayProgress())
@@ -53,7 +53,7 @@ class SupabaseProgressRepositoryTest {
 
     @Test
     fun `getTodayProgress refetches when the cached value is for a different day`() = runTest {
-        SessionCache.todayProgress.value = DailyProgressDto(userId = "u1", date = "2000-01-01")
+        SessionCache.setTodayProgress(DailyProgressDto(userId = "u1", date = "2000-01-01"))
         val client = fakeSupabaseClient {
             respond("""[{"user_id":"u1","date":"${today()}","steps":900}]""", headers = jsonHeaders)
         }
@@ -102,7 +102,7 @@ class SupabaseProgressRepositoryTest {
     @Test
     fun `getHistory returns the cached value within the TTL`() = runTest {
         val cached = listOf(com.example.daypilot_test_desing.data.supabase.dto.DailyLogDto(userId = "u1", date = today(), steps = 1, tasksCompleted = 1, totalPoints = 1))
-        SessionCache.weeklyHistory.value = cached
+        SessionCache.setWeeklyHistory(cached)
         SessionCache.weeklyHistoryFetchedAt = System.currentTimeMillis()
         val repo = SupabaseProgressRepository(fakeSupabaseClient { error("no HTTP expected") })
 
@@ -150,8 +150,8 @@ class SupabaseProgressRepositoryTest {
 
     @Test
     fun `logPoints inserts the row and updates cached today-progress and profile`() = runTest {
-        SessionCache.todayProgress.value = DailyProgressDto(userId = "u1", date = today(), tasksPoints = 5, totalPoints = 5)
-        SessionCache.userProfile.value = UserProfile(id = "u1", name = "N", username = "n", email = "e@x.com", totalPoints = 100, level = 3)
+        SessionCache.setTodayProgress(DailyProgressDto(userId = "u1", date = today(), tasksPoints = 5, totalPoints = 5))
+        SessionCache.setUserProfile(UserProfile(id = "u1", name = "N", username = "n", email = "e@x.com", totalPoints = 100, level = 3))
         val client = fakeSupabaseClient { respond("[]", headers = jsonHeaders) }
         client.fakeLogin("u1")
         val repo = SupabaseProgressRepository(client)
@@ -183,9 +183,11 @@ class SupabaseProgressRepositoryTest {
 
     @Test
     fun `getRankingPosition uses the cached ranking when present`() = runTest {
-        SessionCache.ranking.value = listOf(
-            com.example.daypilot_test_desing.core.data.model.RankingData(id = "f1", name = "F1", points = 100, streak = 0, level = 1),
-            com.example.daypilot_test_desing.core.data.model.RankingData(id = "u1", name = "Me", points = 50, streak = 0, level = 1)
+        SessionCache.setRanking(
+            listOf(
+                com.example.daypilot_test_desing.core.data.model.RankingData(id = "f1", name = "F1", points = 100, streak = 0, level = 1),
+                com.example.daypilot_test_desing.core.data.model.RankingData(id = "u1", name = "Me", points = 50, streak = 0, level = 1)
+            )
         )
         val client = fakeSupabaseClient { error("no HTTP expected") }
         client.fakeLogin("u1")
