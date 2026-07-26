@@ -2,15 +2,19 @@ package com.example.daypilot_test_desing.data.supabase
 
 import android.content.SharedPreferences
 import androidx.test.core.app.ApplicationProvider
+import com.example.daypilot_test_desing.support.SharedFakeSupabaseClient
 import com.example.daypilot_test_desing.support.fakeLogin
-import com.example.daypilot_test_desing.support.fakeSupabaseClient
+import io.ktor.client.engine.mock.MockRequestHandleScope
 import com.example.daypilot_test_desing.support.initSupabaseSettingsForTest
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.respondError
 import io.ktor.client.engine.mock.toByteArray
+import io.ktor.client.request.HttpRequestData
+import io.ktor.client.request.HttpResponseData
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -42,11 +46,20 @@ private fun yesterday(): String {
 @RunWith(RobolectricTestRunner::class)
 class SupabaseStepsRepositoryTest {
 
+    companion object {
+        private val shared = SharedFakeSupabaseClient()
+    }
+
+    private fun fakeSupabaseClient(
+        handler: suspend MockRequestHandleScope.(HttpRequestData) -> HttpResponseData
+    ) = shared.use(handler)
+
     private lateinit var prefs: SharedPreferences
 
     @Before
-    fun setUp() {
+    fun setUp() = runBlocking {
         initSupabaseSettingsForTest()
+        shared.resetAuth()
         prefs = ApplicationProvider.getApplicationContext<android.content.Context>()
             .getSharedPreferences("test_steps_${System.nanoTime()}", android.content.Context.MODE_PRIVATE)
     }
