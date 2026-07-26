@@ -102,6 +102,27 @@ Durante la revisión de código se identificaron y corrigieron los siguientes pr
 
 ---
 
+## Calidad de código (SonarCloud)
+
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/quality_gate?project=daypilot-test_daypilot-android&branch=Incremento-Android-TestFinal)](https://sonarcloud.io/summary/new_code?id=daypilot-test_daypilot-android&branch=Incremento-Android-TestFinal)
+
+El análisis de SonarCloud corre en CI solo en esta rama (no en `Incremento-Android`, que se mantiene libre de la integración). Última medición sobre el código completo, no solo el nuevo:
+
+| Métrica | Valor |
+|---|---|
+| Quality Gate | ✅ OK |
+| Cobertura | 57.4 % |
+| Bugs | 0 |
+| Vulnerabilidades | 0 |
+| Code Smells | 0 |
+| Duplicación | 1.3 % |
+| Fiabilidad | A |
+| Seguridad | A |
+| Revisión de seguridad | A |
+| Mantenibilidad | A |
+
+---
+
 ## Estructura de ramas relacionadas
 
 | Rama | Propósito |
