@@ -294,6 +294,30 @@ fun PomodoroScreen(
         isFinished = next.isFinished
     }
 
+    fun skipPhase() {
+        isRunning = false
+        applyPhase(
+            PomodoroPhase(currentSession, isWorkPhase, secondsLeft, isFinished)
+                .advance(totalSessions, workSeconds, breakSeconds)
+        )
+    }
+
+    suspend fun runTicker() {
+        while (isRunning && !isFinished) {
+            delay(1000)
+            secondsLeft--
+
+            if (secondsLeft <= 0) {
+                isRunning = false
+                phaseEndCount++
+                applyPhase(
+                    PomodoroPhase(currentSession, isWorkPhase, secondsLeft, isFinished)
+                        .advance(totalSessions, workSeconds, breakSeconds)
+                )
+            }
+        }
+    }
+
     val totalSeconds = if (isWorkPhase) workSeconds else breakSeconds
     val progress     = secondsLeft.toFloat() / totalSeconds
 
@@ -309,21 +333,7 @@ fun PomodoroScreen(
 
     val surfaceVarColor = MaterialTheme.colorScheme.surfaceVariant
 
-    LaunchedEffect(isRunning) {
-        while (isRunning && !isFinished) {
-            delay(1000)
-            secondsLeft--
-
-            if (secondsLeft <= 0) {
-                isRunning = false
-                phaseEndCount++
-                applyPhase(
-                    PomodoroPhase(currentSession, isWorkPhase, secondsLeft, isFinished)
-                        .advance(totalSessions, workSeconds, breakSeconds)
-                )
-            }
-        }
-    }
+    LaunchedEffect(isRunning) { runTicker() }
 
     LaunchedEffect(isFinished) {
         if (!isFinished) return@LaunchedEffect
@@ -391,15 +401,7 @@ fun PomodoroScreen(
                     isFinished     = false
                 },
                 onToggle = { if (!isFinished) isRunning = !isRunning },
-                onSkip = {
-                    if (!isFinished) {
-                        isRunning = false
-                        applyPhase(
-                            PomodoroPhase(currentSession, isWorkPhase, secondsLeft, isFinished)
-                                .advance(totalSessions, workSeconds, breakSeconds)
-                        )
-                    }
-                }
+                onSkip = { if (!isFinished) skipPhase() }
             )
 
             if (isFinished) {

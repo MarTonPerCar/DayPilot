@@ -199,7 +199,13 @@ fun TimerScreen(
         label         = "timer_progress"
     )
 
-    LaunchedEffect(isRunning) {
+    fun resetTimer() {
+        secondsLeft = totalSeconds
+        isRunning   = false
+        isFinished  = false
+    }
+
+    suspend fun runTicker() {
         while (isRunning && secondsLeft > 0) {
             delay(1000)
             secondsLeft--
@@ -209,6 +215,8 @@ fun TimerScreen(
             }
         }
     }
+
+    LaunchedEffect(isRunning) { runTicker() }
 
     LaunchedEffect(isFinished) {
         if (!isFinished) return@LaunchedEffect
@@ -258,11 +266,7 @@ fun TimerScreen(
             TimerControlsRow(
                 isRunning = isRunning,
                 isFinished = isFinished,
-                onReset = {
-                    secondsLeft = totalSeconds
-                    isRunning   = false
-                    isFinished  = false
-                },
+                onReset = { resetTimer() },
                 onToggle = { if (!isFinished) isRunning = !isRunning }
             )
         }

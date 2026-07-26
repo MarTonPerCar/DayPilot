@@ -233,6 +233,55 @@ private fun StepsProgressRing(
 }
 
 @Composable
+private fun nextMilestoneLabel(milestone50: Boolean, milestone75: Boolean, milestone100: Boolean): String = when {
+    !milestone50 -> "50%"
+    !milestone75 -> "75%"
+    !milestone100 -> "100%"
+    else -> stringResource(R.string.steps_goal_reached)
+}
+
+@Composable
+private fun StepsCardHeader(goalLocked: Boolean, onConfigureGoal: () -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.DirectionsWalk,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(22.dp)
+            )
+            val stepsWidgetDesc = stringResource(R.string.steps_widget_desc)
+            Text(
+                text = stringResource(R.string.steps_label),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.semantics { contentDescription = stepsWidgetDesc }
+            )
+        }
+        TextButton(
+            onClick  = onConfigureGoal,
+            enabled  = !goalLocked
+        ) {
+            Text(
+                text  = if (goalLocked) stringResource(R.string.steps_goal_locked)
+                        else stringResource(R.string.steps_configure_goal),
+                style = MaterialTheme.typography.labelSmall,
+                color = if (goalLocked) MaterialTheme.colorScheme.onSurfaceVariant
+                        else MaterialTheme.colorScheme.primary
+            )
+        }
+    }
+}
+
+@Composable
 private fun PendingGoalBanner(pendingGoal: Int) {
     Row(
         modifier = Modifier
@@ -279,12 +328,7 @@ fun StepsCard(
     val milestone75 = currentSteps >= goalSteps * 0.75f
     val milestone100 = currentSteps >= goalSteps
 
-    val nextMilestone = when {
-        !milestone50 -> "50%"
-        !milestone75 -> "75%"
-        !milestone100 -> "100%"
-        else -> stringResource(R.string.steps_goal_reached)
-    }
+    val nextMilestone = nextMilestoneLabel(milestone50, milestone75, milestone100)
 
     val primaryColor = MaterialTheme.colorScheme.primary
     val surfaceVarColor = MaterialTheme.colorScheme.surfaceVariant
@@ -320,43 +364,10 @@ fun StepsCard(
                 .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.DirectionsWalk,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(22.dp)
-                    )
-                    val stepsWidgetDesc = stringResource(R.string.steps_widget_desc)
-                    Text(
-                        text = stringResource(R.string.steps_label),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.semantics { contentDescription = stepsWidgetDesc }
-                    )
-                }
-                TextButton(
-                    onClick  = { if (!goalLocked) showGoalSheet = true },
-                    enabled  = !goalLocked
-                ) {
-                    Text(
-                        text  = if (goalLocked) stringResource(R.string.steps_goal_locked)
-                                else stringResource(R.string.steps_configure_goal),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = if (goalLocked) MaterialTheme.colorScheme.onSurfaceVariant
-                                else MaterialTheme.colorScheme.primary
-                    )
-                }
-            }
+            StepsCardHeader(
+                goalLocked = goalLocked,
+                onConfigureGoal = { if (!goalLocked) showGoalSheet = true }
+            )
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
