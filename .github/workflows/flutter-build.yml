@@ -147,6 +147,53 @@ jobs:
         with:
           files: DayPilot-Setup.deb
 
+      - name: Build AppImage
+        run: |
+          set -e
+          APPDIR="$GITHUB_WORKSPACE/DayPilot.AppDir"
+          mkdir -p "$APPDIR/usr/bin"
+          mkdir -p "$APPDIR/usr/share/icons/hicolor/256x256/apps"
+
+          cp -r build/linux/x64/release/bundle/* "$APPDIR/usr/bin/"
+          cp assets/icon/icon.png "$APPDIR/usr/share/icons/hicolor/256x256/apps/daypilot.png"
+          cp assets/icon/icon.png "$APPDIR/daypilot.png"
+
+          {
+            printf '%s\n' "[Desktop Entry]"
+            printf '%s\n' "Type=Application"
+            printf '%s\n' "Name=DayPilot"
+            printf '%s\n' "Exec=daypilot"
+            printf '%s\n' "Icon=daypilot"
+            printf '%s\n' "Categories=Utility;"
+            printf '%s\n' "Terminal=false"
+          } > "$APPDIR/daypilot.desktop"
+
+          {
+            printf '%s\n' "#!/bin/sh"
+            printf '%s\n' 'HERE="$(dirname "$(readlink -f "$0")")"'
+            printf '%s\n' 'exec "$HERE/usr/bin/daypilot" "$@"'
+          } > "$APPDIR/AppRun"
+          chmod +x "$APPDIR/AppRun"
+
+          wget -O appimagetool https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage
+          chmod +x appimagetool
+          # --appimage-extract-and-run: CI containers usually lack FUSE, which appimagetool
+          # (itself an AppImage) needs to mount and run normally — this flag makes it
+          # self-extract to a temp dir and run from there instead, no FUSE required.
+          ./appimagetool --appimage-extract-and-run "$APPDIR" DayPilot-x86_64.AppImage
+
+      - name: Upload AppImage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: DayPilot-AppImage
+          path: DayPilot-x86_64.AppImage
+
+      - name: Create GitHub Release (tags only)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: DayPilot-x86_64.AppImage
+
   update-latest:
     needs: [build-windows, build-linux]
     if: startsWith(github.ref, 'refs/tags/')
@@ -159,10 +206,15 @@ jobs:
         with:
           name: DayPilot-Setup
 
-      - name: Download Linux artifact
+      - name: Download Linux .deb artifact
         uses: actions/download-artifact@v4
         with:
           name: DayPilot-Setup-deb
+
+      - name: Download Linux AppImage artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: DayPilot-AppImage
 
       - name: Move floating "latest" tag
         run: |
@@ -179,3 +231,4 @@ jobs:
           files: |
             DayPilot-Setup.exe
             DayPilot-Setup.deb
+            DayPilot-x86_64.AppImage
