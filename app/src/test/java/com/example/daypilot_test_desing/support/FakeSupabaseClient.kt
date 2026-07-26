@@ -8,6 +8,7 @@ import io.github.jan.supabase.auth.user.UserInfo
 import io.github.jan.supabase.auth.user.UserSession
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.storage.Storage
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.MockEngineConfig
 import io.ktor.client.engine.mock.MockRequestHandleScope
@@ -40,6 +41,7 @@ fun fakeSupabaseClient(
         dispatcher = Dispatchers.Unconfined
     })
     install(Postgrest)
+    install(Storage)
     install(Auth) { minimalConfig() }
 }
 
