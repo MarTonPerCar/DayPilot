@@ -3,10 +3,12 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'auth_repository.dart';
 import 'friends_repository.dart';
+import 'local_reminder_repository.dart';
 import 'notifications_repository.dart';
 import 'profile_repository.dart';
 import 'progress_repository.dart';
 import 'ranking_repository.dart';
+import 'reminder_repository.dart';
 import 'steps_repository.dart';
 import 'supabase_auth_repository.dart';
 import 'supabase_friends_repository.dart';
@@ -58,4 +60,8 @@ final notificationsRepositoryProvider = Provider<NotificationsRepository>((ref) 
 
 final techHealthRepositoryProvider = Provider<TechHealthRepository>((ref) {
   return SupabaseTechHealthRepository(ref.read(supabaseClientProvider));
+});
+
+final reminderRepositoryProvider = Provider<ReminderRepository>((ref) {
+  return LocalReminderRepository();
 });

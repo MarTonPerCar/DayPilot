@@ -6,7 +6,6 @@ import '../../components/basic/divider.dart';
 import '../../components/forms/form_section.dart';
 import '../../components/forms/switch_tile.dart';
 import '../../components/forms/theme_swatch_picker.dart';
-import '../../component_catalog.dart';
 import '../../core/prefs/app_prefs.dart';
 import '../../core/window/desktop_window.dart';
 import '../../features/auth/auth_notifier.dart';
@@ -257,23 +256,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 ],
               );
             },
-          ),
-          const SizedBox(height: 16),
-
-          DayPilotFormSection(
-            title: l10n.settingsDeveloper,
-            children: [
-              ListTile(
-                leading: Icon(Icons.developer_mode_rounded, color: colors.tertiary),
-                title: Text(l10n.settingsComponentCatalog,
-                    style: TextStyle(color: colors.tertiary)),
-                trailing: Icon(Icons.open_in_new_rounded, color: colors.tertiary, size: 18),
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const ComponentCatalog()),
-                ),
-              ),
-            ],
           ),
           const SizedBox(height: 16),
 

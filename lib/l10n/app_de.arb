@@ -67,8 +67,6 @@
   "settingsAvatarUploadError": "Foto konnte nicht hochgeladen werden",
   "settingsLanguage": "Sprache",
   "settingsChooseLanguage": "Sprache auswählen",
-  "settingsDeveloper": "Entwickler",
-  "settingsComponentCatalog": "Komponentenkatalog",
   "settingsSignOut": "Abmelden",
 
   "themeSageGreen": "Salbeigrün",
@@ -181,6 +179,10 @@
   "reminderNotifyBefore": "Vorherige Erinnerung",
   "reminderNotifyBeforeSubtitle": "Benachrichtigt 10 Min. vorher",
   "reminderCreateButton": "Erinnerung erstellen",
+  "reminderFiredBody": "Zeit für deine Erinnerung!",
+  "reminderFiredEarlyTitle": "In 10 Minuten: {title}",
+  "@reminderFiredEarlyTitle": {"placeholders": {"title": {"type": "String"}}},
+  "reminderFiredEarlyBody": "Deine Erinnerung aktiviert in 10 Minuten",
 
   "taskDetailReminderActive": "Erinnerung aktiv",
   "taskDetailMarkPending": "Als ausstehend markieren",

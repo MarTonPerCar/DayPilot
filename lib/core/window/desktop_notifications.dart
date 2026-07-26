@@ -82,10 +82,12 @@ Future<void> _maybeShowNative({
   if (type == 'TASK_REMINDER' && !prefs.taskRemindersEnabled) return;
   if (type == 'STREAK_RISK' && !prefs.streakAlertsEnabled) return;
 
-  await _showSystemNotification(title, body);
+  await showDesktopNotification(title, body);
 }
 
-Future<void> _showSystemNotification(String title, String body) async {
+/// Shows a native OS notification via `local_notifier`. Desktop only (Windows/Linux/macOS) —
+/// callers should guard with [isDesktopPlatform] first.
+Future<void> showDesktopNotification(String title, String body) async {
   if (!_localNotifierReady) {
     await localNotifier.setup(appName: 'DayPilot');
     _localNotifierReady = true;

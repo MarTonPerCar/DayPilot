@@ -207,12 +207,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsChooseLanguage => 'Elige un idioma';
 
   @override
-  String get settingsDeveloper => 'Desarrollador';
-
-  @override
-  String get settingsComponentCatalog => 'Catálogo de componentes';
-
-  @override
   String get settingsSignOut => 'Cerrar sesión';
 
   @override
@@ -493,6 +487,18 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get reminderCreateButton => 'Crear recordatorio';
+
+  @override
+  String get reminderFiredBody => '¡Es hora de tu recordatorio!';
+
+  @override
+  String reminderFiredEarlyTitle(String title) {
+    return 'En 10 minutos: $title';
+  }
+
+  @override
+  String get reminderFiredEarlyBody =>
+      'Tu recordatorio se activará en 10 minutos';
 
   @override
   String get taskDetailReminderActive => 'Recordatorio activado';

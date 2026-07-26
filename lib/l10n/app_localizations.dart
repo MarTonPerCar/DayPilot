@@ -478,18 +478,6 @@ abstract class AppLocalizations {
   /// **'Elige un idioma'**
   String get settingsChooseLanguage;
 
-  /// No description provided for @settingsDeveloper.
-  ///
-  /// In es, this message translates to:
-  /// **'Desarrollador'**
-  String get settingsDeveloper;
-
-  /// No description provided for @settingsComponentCatalog.
-  ///
-  /// In es, this message translates to:
-  /// **'Catálogo de componentes'**
-  String get settingsComponentCatalog;
-
   /// No description provided for @settingsSignOut.
   ///
   /// In es, this message translates to:
@@ -1005,6 +993,24 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Crear recordatorio'**
   String get reminderCreateButton;
+
+  /// No description provided for @reminderFiredBody.
+  ///
+  /// In es, this message translates to:
+  /// **'¡Es hora de tu recordatorio!'**
+  String get reminderFiredBody;
+
+  /// No description provided for @reminderFiredEarlyTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'En 10 minutos: {title}'**
+  String reminderFiredEarlyTitle(String title);
+
+  /// No description provided for @reminderFiredEarlyBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu recordatorio se activará en 10 minutos'**
+  String get reminderFiredEarlyBody;
 
   /// No description provided for @taskDetailReminderActive.
   ///
