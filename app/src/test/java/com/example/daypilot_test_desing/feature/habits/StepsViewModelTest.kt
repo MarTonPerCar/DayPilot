@@ -1,6 +1,7 @@
 package com.example.daypilot_test_desing.feature.habits
 
-import androidx.test.core.app.ApplicationProvider
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.example.daypilot_test_desing.support.FakeApplication
 import com.example.daypilot_test_desing.core.data.repository.StepsRepository
 import com.example.daypilot_test_desing.core.data.repository.StepsWeeklyStats
 import io.mockk.coEvery
@@ -15,11 +16,10 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import org.junit.After
+import org.junit.Rule
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 
 // StepsViewModel starts an infinite `while (true) { delay(5 min); ... }` periodic-sync loop in
 // init{}. runTest {}'s auto-drain-on-completion tries to advanceUntilIdle() the dispatcher even
@@ -27,8 +27,10 @@ import org.robolectric.RobolectricTestRunner
 // forever — confirmed empirically. Driving the scheduler directly, outside runTest {}, avoids
 // that auto-drain entirely: only the time span this test explicitly asks for gets run.
 @OptIn(ExperimentalCoroutinesApi::class)
-@RunWith(RobolectricTestRunner::class)
 class StepsViewModelTest {
+
+    @get:Rule
+    val instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private val scheduler = TestCoroutineScheduler()
     private val testDispatcher = StandardTestDispatcher(scheduler)
@@ -57,7 +59,7 @@ class StepsViewModelTest {
         Dispatchers.resetMain()
     }
 
-    private fun buildViewModel() = StepsViewModel(ApplicationProvider.getApplicationContext(), repo)
+    private fun buildViewModel() = StepsViewModel(FakeApplication(), repo)
 
     @Test
     fun `init hydrates the goal from the server and loads points and weekly stats`() {

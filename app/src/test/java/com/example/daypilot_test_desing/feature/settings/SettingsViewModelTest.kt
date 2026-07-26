@@ -1,8 +1,8 @@
 package com.example.daypilot_test_desing.feature.settings
 
-import androidx.test.core.app.ApplicationProvider
 import com.example.daypilot_test_desing.core.data.model.UserProfile
 import com.example.daypilot_test_desing.core.data.repository.UserRepository
+import com.example.daypilot_test_desing.support.FakeApplication
 import com.example.daypilot_test_desing.support.MainDispatcherRule
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -14,19 +14,17 @@ import org.junit.Assert.assertFalse
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 
 // SettingsViewModel constructs its own concrete AppPreferences internally (not injected), so
 // this exercises the real, Robolectric-backed SharedPreferences rather than a mock for that part.
 @OptIn(ExperimentalCoroutinesApi::class)
-@RunWith(RobolectricTestRunner::class)
 class SettingsViewModelTest {
 
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
     private lateinit var userRepo: UserRepository
+    private lateinit var application: FakeApplication
 
     @Before
     fun setUp() {
@@ -34,9 +32,12 @@ class SettingsViewModelTest {
         coEvery { userRepo.getCurrentUser() } returns UserProfile(
             id = "u1", name = "Ana", username = "ana", email = "ana@daypilot.test"
         )
+        // Shared across buildViewModel() calls within a test, same as a real Context always
+        // returning the same backing store for the same SharedPreferences name.
+        application = FakeApplication()
     }
 
-    private fun buildViewModel() = SettingsViewModel(ApplicationProvider.getApplicationContext(), userRepo)
+    private fun buildViewModel() = SettingsViewModel(application, userRepo)
 
     @Test
     fun `init reflects the default preferences and loads the user's name`() = runTest {

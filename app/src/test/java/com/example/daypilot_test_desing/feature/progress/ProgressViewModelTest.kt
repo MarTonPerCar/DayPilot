@@ -1,6 +1,7 @@
 package com.example.daypilot_test_desing.feature.progress
 
-import androidx.test.core.app.ApplicationProvider
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.example.daypilot_test_desing.support.FakeApplication
 import com.example.daypilot_test_desing.core.data.repository.ProgressRepository
 import com.example.daypilot_test_desing.data.supabase.dto.DailyProgressDto
 import com.example.daypilot_test_desing.support.MainDispatcherRule
@@ -14,12 +15,12 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@RunWith(RobolectricTestRunner::class)
 class ProgressViewModelTest {
+
+    @get:Rule
+    val instantTaskExecutorRule = InstantTaskExecutorRule()
 
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
@@ -38,7 +39,7 @@ class ProgressViewModelTest {
         coEvery { repo.getRankingPosition() } returns 3
     }
 
-    private fun buildViewModel() = ProgressViewModel(ApplicationProvider.getApplicationContext(), repo)
+    private fun buildViewModel() = ProgressViewModel(FakeApplication(), repo)
 
     @Test
     fun `init loads today's progress, history and ranking`() = runTest {

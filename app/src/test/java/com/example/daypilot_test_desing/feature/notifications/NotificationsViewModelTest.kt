@@ -2,7 +2,8 @@ package com.example.daypilot_test_desing.feature.notifications
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelStore
-import androidx.test.core.app.ApplicationProvider
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.example.daypilot_test_desing.support.FakeContext
 import com.example.daypilot_test_desing.core.data.local.NotificationHub
 import com.example.daypilot_test_desing.core.data.model.NotificationData
 import com.example.daypilot_test_desing.core.data.model.NotificationType
@@ -20,12 +21,12 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@RunWith(RobolectricTestRunner::class)
 class NotificationsViewModelTest {
+
+    @get:Rule
+    val instantTaskExecutorRule = InstantTaskExecutorRule()
 
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
@@ -38,7 +39,7 @@ class NotificationsViewModelTest {
     @Before
     fun setUp() {
         initSupabaseSettingsForTest()
-        NotificationHub.init(ApplicationProvider.getApplicationContext())
+        NotificationHub.init(FakeContext())
         NotificationHub.clear()
         repo = mockk()
     }

@@ -3,7 +3,6 @@ package com.example.daypilot_test_desing.feature.rivalry
 import com.example.daypilot_test_desing.core.data.model.RankingData
 import com.example.daypilot_test_desing.core.data.repository.RankingRepository
 import com.example.daypilot_test_desing.support.MainDispatcherRule
-import com.example.daypilot_test_desing.support.initSupabaseSettingsForTest
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -14,11 +13,8 @@ import org.junit.Assert.assertFalse
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@RunWith(RobolectricTestRunner::class)
 class RivalryViewModelTest {
 
     @get:Rule
@@ -31,7 +27,6 @@ class RivalryViewModelTest {
 
     @Before
     fun setUp() {
-        initSupabaseSettingsForTest()
         repo = mockk()
         coEvery { repo.getCurrentUserId() } returns "u1"
     }
