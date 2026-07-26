@@ -7,6 +7,7 @@ import com.example.daypilot_test_desing.core.data.model.RawTodayNotification
 import com.example.daypilot_test_desing.core.data.repository.NotificationRepository
 import com.example.daypilot_test_desing.data.supabase.dto.InsertNotificationDto
 import com.example.daypilot_test_desing.data.supabase.dto.NotificationDto
+import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Order
@@ -19,15 +20,18 @@ import java.util.UUID
 
 object SupabaseNotificationRepository : NotificationRepository {
 
+    // Reassignable only for tests — an `object` can't take a constructor parameter.
+    internal var client: SupabaseClient = supabase
+
     private const val TAG = "SupabaseNotificationRepo"
     private const val DISPLAY_LIMIT = 30
     private const val RETAIN_LIMIT  = 50
 
-    override suspend fun getCurrentUserId(): String? = supabase.auth.currentUserOrNull()?.id
+    override suspend fun getCurrentUserId(): String? = client.auth.currentUserOrNull()?.id
 
     override suspend fun getUnreadCount(userId: String): Int {
         return try {
-            supabase.from("notifications").select {
+            client.from("notifications").select {
                 filter {
                     eq("user_id", userId)
                     eq("is_read", false)
@@ -41,7 +45,7 @@ object SupabaseNotificationRepository : NotificationRepository {
 
     override suspend fun getAll(userId: String): List<NotificationData> {
         return try {
-            supabase.from("notifications").select {
+            client.from("notifications").select {
                 filter { eq("user_id", userId) }
                 order("created_at", Order.DESCENDING)
                 limit(DISPLAY_LIMIT.toLong())
@@ -54,7 +58,7 @@ object SupabaseNotificationRepository : NotificationRepository {
 
     override suspend fun markAsRead(notificationId: String) {
         try {
-            supabase.from("notifications").update({ set("is_read", true) }) {
+            client.from("notifications").update({ set("is_read", true) }) {
                 filter { eq("id", notificationId) }
             }
         } catch (e: Exception) {
@@ -64,7 +68,7 @@ object SupabaseNotificationRepository : NotificationRepository {
 
     override suspend fun markAllAsRead(userId: String) {
         try {
-            supabase.from("notifications").update({ set("is_read", true) }) {
+            client.from("notifications").update({ set("is_read", true) }) {
                 filter {
                     eq("user_id", userId)
                     eq("is_read", false)
@@ -77,7 +81,7 @@ object SupabaseNotificationRepository : NotificationRepository {
 
     override suspend fun insert(userId: String, type: String, title: String, body: String) {
         try {
-            supabase.from("notifications").insert(
+            client.from("notifications").insert(
                 InsertNotificationDto(
                     id     = UUID.randomUUID().toString(),
                     userId = userId,
@@ -98,7 +102,7 @@ object SupabaseNotificationRepository : NotificationRepository {
                 .atStartOfDay(ZoneId.systemDefault())
                 .toInstant()
                 .toString()
-            supabase.from("notifications").select {
+            client.from("notifications").select {
                 filter {
                     eq("user_id", userId)
                     eq("type", type)
@@ -117,21 +121,21 @@ object SupabaseNotificationRepository : NotificationRepository {
 
     suspend fun insertForCurrentUser(type: String, title: String, body: String) {
         // Auth may still be restoring the session when called from a BroadcastReceiver.
-        supabase.auth.awaitInitialization()
-        val uid = supabase.auth.currentUserOrNull()?.id ?: return
+        client.auth.awaitInitialization()
+        val uid = client.auth.currentUserOrNull()?.id ?: return
         insert(uid, type, title, body)
     }
 
     private suspend fun pruneOldest(userId: String) {
         try {
-            val all = supabase.from("notifications").select {
+            val all = client.from("notifications").select {
                 filter { eq("user_id", userId) }
                 order("created_at", Order.DESCENDING)
                 limit(1000)
             }.decodeList<NotificationDto>()
             if (all.size > RETAIN_LIMIT) {
                 val ids = all.drop(RETAIN_LIMIT).map { it.id }
-                supabase.from("notifications").delete {
+                client.from("notifications").delete {
                     filter { isIn("id", ids) }
                 }
             }
