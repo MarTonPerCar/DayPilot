@@ -100,9 +100,13 @@ Listado de las dependencias declaradas en `Incremento-Android` (`gradle/libs.ver
 
 **Flutter (Windows/Linux):**
 - [⬇️ Descargar DayPilot para Windows](https://github.com/MarTonPerCar/DayPilot/releases/download/incremento-flutter-latest/DayPilot-Setup.exe) — ejecuta el instalador tras descargarlo
-- Linux (.deb):
+- Linux, Debian/Ubuntu y derivadas (.deb):
   ```bash
   wget -O DayPilot-Setup.deb https://github.com/MarTonPerCar/DayPilot/releases/download/incremento-flutter-latest/DayPilot-Setup.deb && sudo apt install ./DayPilot-Setup.deb
+  ```
+- Linux, Fedora/openSUSE/RHEL y derivadas (sin build `.rpm` propia — se convierte el `.deb` con `alien`):
+  ```bash
+  wget -O DayPilot-Setup.deb https://github.com/MarTonPerCar/DayPilot/releases/download/incremento-flutter-latest/DayPilot-Setup.deb && sudo alien -r DayPilot-Setup.deb && sudo rpm -i daypilot*.rpm
   ```
 
 **iOS / macOS:** todavía no disponible — desarrollo futuro. Distribuir una build sin firmar no es viable en ninguna de las dos plataformas: macOS Gatekeeper bloquea las apps sin firmar para usuarios normales, y iOS no permite instalar un `.ipa` sin firmar fuera del despliegue propio de Xcode a dispositivo. Ambas necesitan una cuenta de Apple Developer para firmar y notarizar/distribuir correctamente.
