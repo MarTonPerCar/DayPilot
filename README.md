@@ -37,6 +37,61 @@ Los usuarios registran tareas diarias, pasos y límites de uso de apps, y compit
 | **Backend** | Supabase (PostgreSQL, Auth, Storage, Realtime) | Supabase (PostgreSQL, Auth, Storage, Realtime) |
 | **CI/CD** | GitHub Actions | GitHub Actions |
 
+## Dependencias
+
+Listado de las dependencias declaradas en `Incremento-Android` (`gradle/libs.versions.toml` + `app/build.gradle.kts`) y `Incremento-Flutter` (`pubspec.yaml`), las ramas de producción de cada plataforma.
+
+### Android (`Incremento-Android`)
+
+| Dependencia | Versión | Uso |
+|---|---|---|
+| `androidx.core:core-ktx` | 1.17.0 | Extensiones Kotlin para las APIs core de AndroidX |
+| `androidx.lifecycle:lifecycle-runtime-ktx` | 2.10.0 | Coroutines conscientes del ciclo de vida |
+| `androidx.activity:activity-compose` | 1.13.0 | Integración de Compose con `Activity` |
+| `androidx.compose:compose-bom` | 2026.06.01 | BOM de versiones de Jetpack Compose |
+| `androidx.compose.ui:ui` / `ui-graphics` / `ui-tooling-preview` | via BOM | Toolkit base de Jetpack Compose |
+| `androidx.compose.material3:material3` | via BOM | Componentes Material 3 |
+| `androidx.compose.animation:animation` | 1.11.4 | Animaciones de Compose |
+| `androidx.compose.material:material-icons-extended` | via BOM | Set extendido de iconos Material |
+| `androidx.navigation:navigation-compose` | 2.9.8 | Navegación entre pantallas en Compose |
+| `androidx.work:work-runtime-ktx` | 2.11.2 | Tareas periódicas en segundo plano (WorkManager) |
+| `io.github.jan-tennert.supabase:bom` | 3.3.0 | BOM de versiones del SDK de Supabase |
+| `supabase:postgrest-kt` / `auth-kt` / `realtime-kt` / `storage-kt` | via BOM | Cliente de Supabase (BD, Auth, Realtime, Storage) |
+| `io.ktor:ktor-client-okhttp` | 3.3.0 | Motor HTTP para el cliente Ktor de Supabase |
+| `io.coil-kt.coil3:coil-compose` / `coil-network-okhttp` | 3.5.0 | Carga asíncrona de imágenes |
+| `com.github.yalantis:ucrop` | 2.2.9 | Recorte de imágenes (foto de perfil) |
+| `junit:junit` | 4.13.2 | Framework de tests unitarios |
+| `io.mockk:mockk` | 1.14.11 | Mocking en Kotlin |
+| `kotlinx-coroutines-test` | 1.11.0 | Utilidades de test para coroutines |
+| `androidx.test:core` | 1.7.0 | Utilidades de test de AndroidX (`ApplicationProvider`, etc.) |
+| `androidx.arch.core:core-testing` | 2.2.0 | `InstantTaskExecutorRule` para código dirigido por lifecycle/LiveData |
+| `org.robolectric:robolectric` | 4.16.1 | Simulación del framework Android en JVM |
+| `io.ktor:ktor-client-mock` | 3.3.0 | Mocking HTTP para el cliente Ktor en tests |
+| `androidx.test.ext:junit` / `espresso-core` | 1.3.0 / 3.7.0 | Tests instrumentados (`androidTest`) |
+
+### Flutter (`Incremento-Flutter`)
+
+| Dependencia | Versión | Uso |
+|---|---|---|
+| `flutter_localizations` / `intl` | SDK / 0.20.2 | Localización (es/en/de) |
+| `cupertino_icons` | ^1.0.8 | Set de iconos estilo iOS |
+| `window_manager` | ^0.5.2 | Gestión de la ventana en escritorio (tamaño, posición) |
+| `tray_manager` | ^0.5.3 | Icono en la bandeja del sistema |
+| `screen_retriever` | ^0.2.2 | Información de la pantalla para posicionar la ventana |
+| `supabase_flutter` | ^2.15.4 | Cliente de Supabase (BD, Auth, Storage, Realtime) |
+| `flutter_riverpod` | ^3.3.2 | Gestión de estado |
+| `uuid` | ^4.5.3 | Generación de identificadores únicos |
+| `shared_preferences` | ^2.5.5 | Persistencia local clave-valor |
+| `image_picker` | ^1.2.3 | Selección de foto de perfil |
+| `launch_at_startup` | ^0.5.1 | Autoarranque en escritorio |
+| `win32` / `ffi` | ^5.15.0 / ^2.2.0 | Bindings nativos de Windows |
+| `local_notifier` | ^0.1.6 | Notificaciones locales en escritorio |
+| `flutter_test` | SDK | Framework de tests |
+| `flutter_lints` | ^6.0.0 | Reglas de lint recomendadas |
+| `flutter_launcher_icons` | ^0.14.4 | Generación del icono de la app |
+| `mocktail` | ^1.0.4 | Mocking en Dart |
+| `http` | ^1.6.0 | Cliente HTTP (usado en tests) |
+
 ## Descargas
 
 **Android:**
