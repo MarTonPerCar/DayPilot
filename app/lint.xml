@@ -7,4 +7,9 @@
     <issue id="ObsoleteSdkInt">
         <ignore path="src/main/res/mipmap-anydpi-v26" />
     </issue>
+
+    <!-- compileSdk/targetSdk 36 is already the newest stable platform installed in this
+         toolchain (and what CI has available) — Lint's "latest" reference here is ahead of
+         what's actually released/installable, not something we can act on. -->
+    <issue id="OldTargetApi" severity="ignore" />
 </lint>
