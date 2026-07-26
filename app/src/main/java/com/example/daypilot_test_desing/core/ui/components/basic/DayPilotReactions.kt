@@ -134,7 +134,7 @@ fun ReactionButton(
             modifier = Modifier
                 .size(44.dp)
                 .scale(scale)
-                .offset(y = offsetY.dp)
+                .offset { IntOffset(x = 0, y = offsetY.dp.roundToPx()) }
                 .clip(CircleShape)
                 .background(
                     if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)

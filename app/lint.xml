@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<lint>
+    <!-- AAPT2 requires the -v26 qualifier for the adaptive-icon XML to resolve here even
+         though minSdkVersion is already 26 — merging into a plain `anydpi` folder breaks
+         resource linking (AAPT: error: resource mipmap/ic_launcher not found). Verified by
+         reverting the rename and confirming compileDebugKotlin fails without it. -->
+    <issue id="ObsoleteSdkInt">
+        <ignore path="src/main/res/mipmap-anydpi-v26" />
+    </issue>
+</lint>

@@ -14,17 +14,15 @@ import com.example.daypilot_test_desing.core.data.model.FrequencyType
 const val CHANNEL_ID = "daypilot_reminders"
 
 fun createNotificationChannel(context: Context) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        val channel = NotificationChannel(
-            CHANNEL_ID,
-            context.getString(R.string.reminder_channel_name),
-            NotificationManager.IMPORTANCE_HIGH
-        ).apply {
-            description = context.getString(R.string.reminder_channel_desc)
-        }
-        context.getSystemService(NotificationManager::class.java)
-            ?.createNotificationChannel(channel)
+    val channel = NotificationChannel(
+        CHANNEL_ID,
+        context.getString(R.string.reminder_channel_name),
+        NotificationManager.IMPORTANCE_HIGH
+    ).apply {
+        description = context.getString(R.string.reminder_channel_desc)
     }
+    context.getSystemService(NotificationManager::class.java)
+        ?.createNotificationChannel(channel)
 }
 
 object ReminderScheduler {

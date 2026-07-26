@@ -49,6 +49,7 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -93,10 +94,10 @@ fun TaskFormCard(
     var description by remember(initialDescription) { mutableStateOf(initialDescription) }
     var category by remember(initialCategory) { mutableStateOf(initialCategory) }
     var difficulty by remember(initialDifficulty) { mutableStateOf(initialDifficulty) }
-    var duration by remember(initialDuration) { mutableStateOf(initialDuration) }
+    var duration by remember(initialDuration) { mutableIntStateOf(initialDuration) }
     var reminder by remember { mutableStateOf(false) }
     var recurring by remember { mutableStateOf(false) }
-    var recurrenceDays by remember { mutableStateOf(1) }
+    var recurrenceDays by remember { mutableIntStateOf(1) }
 
     Column(
         modifier = modifier

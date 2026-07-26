@@ -54,14 +54,14 @@ private fun dayTextTarget(isSelected: Boolean, isToday: Boolean, isCurrentMonth:
 }
 
 @Composable
-private fun todayBorderModifier(isToday: Boolean, isSelected: Boolean): Modifier =
+private fun Modifier.todayBorder(isToday: Boolean, isSelected: Boolean): Modifier =
     if (isToday && !isSelected) {
-        Modifier.border(
+        this.border(
             width = 1.dp,
             color = MaterialTheme.colorScheme.primary,
             shape = RoundedCornerShape(10.dp)
         )
-    } else Modifier
+    } else this
 
 @Composable
 private fun TaskDotsRow(hasEasyTask: Boolean, hasMediumTask: Boolean, hasHardTask: Boolean) {
@@ -105,7 +105,7 @@ fun CalendarDayCard(
             .aspectRatio(1f)
             .clip(RoundedCornerShape(10.dp))
             .background(bgColor)
-            .then(todayBorderModifier(isToday, isSelected))
+            .todayBorder(isToday, isSelected)
             .clickable { onClick() }
             .padding(4.dp),
         horizontalAlignment = Alignment.CenterHorizontally,

@@ -109,7 +109,8 @@ private fun AppIconOrInitial(appIcon: Bitmap?, appName: String) {
 
 @Composable
 private fun AppLimitHeaderRow(restriction: AppRestriction, appIcon: Bitmap?, onToggle: (Boolean) -> Unit) {
-    val context = LocalContext.current
+    val badgeDesc = stringResource(R.string.tech_health_app_badge_desc, restriction.appName)
+    val switchDesc = stringResource(R.string.tech_health_switch_desc, restriction.appName)
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -134,9 +135,7 @@ private fun AppLimitHeaderRow(restriction: AppRestriction, appIcon: Bitmap?, onT
                         .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f))
                         .padding(horizontal = 6.dp, vertical = 2.dp)
                         .semantics {
-                            contentDescription = context.getString(
-                                R.string.tech_health_app_badge_desc, restriction.appName
-                            )
+                            contentDescription = badgeDesc
                         }
                 ) {
                     Text(
@@ -162,9 +161,7 @@ private fun AppLimitHeaderRow(restriction: AppRestriction, appIcon: Bitmap?, onT
                 checkedTrackColor = MaterialTheme.colorScheme.primary
             ),
             modifier = Modifier.semantics {
-                contentDescription = context.getString(
-                    R.string.tech_health_switch_desc, restriction.appName
-                )
+                contentDescription = switchDesc
             }
         )
     }
@@ -221,7 +218,8 @@ private fun UsageProgressSection(restriction: AppRestriction, isOverLimit: Boole
 
 @Composable
 private fun AppLimitActionsRow(restriction: AppRestriction, onEdit: () -> Unit, onDeleteRequest: () -> Unit) {
-    val context = LocalContext.current
+    val editDesc = stringResource(R.string.tech_health_edit_desc, restriction.appName)
+    val deleteDesc = stringResource(R.string.tech_health_delete_desc, restriction.appName)
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -247,9 +245,7 @@ private fun AppLimitActionsRow(restriction: AppRestriction, onEdit: () -> Unit, 
                 modifier = Modifier
                     .weight(1f)
                     .semantics {
-                        contentDescription = context.getString(
-                            R.string.tech_health_edit_desc, restriction.appName
-                        )
+                        contentDescription = editDesc
                     },
                 shape = RoundedCornerShape(10.dp)
             ) {
@@ -269,9 +265,7 @@ private fun AppLimitActionsRow(restriction: AppRestriction, onEdit: () -> Unit, 
                 modifier = Modifier
                     .weight(1f)
                     .semantics {
-                        contentDescription = context.getString(
-                            R.string.tech_health_delete_desc, restriction.appName
-                        )
+                        contentDescription = deleteDesc
                     }
             ) {
                 Text(

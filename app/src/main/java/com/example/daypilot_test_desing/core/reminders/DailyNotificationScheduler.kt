@@ -17,17 +17,15 @@ const val ALARM_TASK_REMINDER = "task_reminder"
 const val ALARM_STREAK_DANGER = "streak_danger"
 
 fun createDailyChannel(context: Context) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        val channel = NotificationChannel(
-            DAILY_CHANNEL_ID,
-            context.getString(R.string.daily_channel_name),
-            NotificationManager.IMPORTANCE_HIGH
-        ).apply {
-            description = context.getString(R.string.daily_channel_desc)
-        }
-        context.getSystemService(NotificationManager::class.java)
-            ?.createNotificationChannel(channel)
+    val channel = NotificationChannel(
+        DAILY_CHANNEL_ID,
+        context.getString(R.string.daily_channel_name),
+        NotificationManager.IMPORTANCE_HIGH
+    ).apply {
+        description = context.getString(R.string.daily_channel_desc)
     }
+    context.getSystemService(NotificationManager::class.java)
+        ?.createNotificationChannel(channel)
 }
 
 object DailyNotificationScheduler {

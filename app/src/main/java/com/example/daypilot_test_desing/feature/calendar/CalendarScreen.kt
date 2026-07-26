@@ -501,7 +501,7 @@ fun CalendarScreen(
     var showAddSheet  by remember { mutableStateOf(false) }
     var editingTaskId by remember { mutableStateOf<String?>(null) }
     var detailTaskId  by remember { mutableStateOf<String?>(null) }
-    var dayForNewTask by remember { mutableStateOf(1) }
+    var dayForNewTask by remember { mutableIntStateOf(1) }
 
     val sheetState   = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val snackbarHost = remember { SnackbarHostState() }

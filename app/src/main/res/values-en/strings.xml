@@ -22,7 +22,7 @@
 
     <!-- Friends -->
     <string name="search_friends_title">Buscar amigos</string>
-    <string name="search_friends_placeholder">Buscar por nombre o username...</string>
+    <string name="search_friends_placeholder">Buscar por nombre o username…</string>
     <string name="search_friends_empty_query">Escribe al menos una letra\npara buscar usuarios</string>
     <string name="search_friends_no_results">No se encontraron usuarios\npara \"%1$s\"</string>
     <string name="search_friends_clear">Limpiar</string>
