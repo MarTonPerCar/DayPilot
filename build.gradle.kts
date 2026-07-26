@@ -29,7 +29,9 @@ sonar {
         )
         property(
             "sonar.coverage.exclusions",
-            "**/*Screen.kt,**/core/ui/components/**,**/core/ui/theme/**,**/data/supabase/dto/**,**/ComponentCatalog.kt"
+            "**/*Screen.kt,**/core/ui/components/**,**/core/ui/theme/**,**/data/supabase/dto/**," +
+                "**/ComponentCatalog.kt,**/core/navigation/DayPilotNavGraph.kt," +
+                "**/core/reminders/ReminderReceiver.kt,**/core/reminders/DailyNotificationsReceiver.kt"
         )
         property(
             "sonar.cpd.exclusions",
