@@ -5,6 +5,7 @@ import com.example.daypilot_test_desing.core.data.repository.AuthRepository
 import com.example.daypilot_test_desing.core.data.repository.RegisterOutcome
 import com.example.daypilot_test_desing.data.supabase.dto.NewUserDto
 import com.example.daypilot_test_desing.data.supabase.dto.UserDto
+import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.user.UserInfo
@@ -14,20 +15,22 @@ import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 
-class SupabaseAuthRepository : AuthRepository {
+class SupabaseAuthRepository(
+    private val client: SupabaseClient = supabase
+) : AuthRepository {
 
     companion object {
         private const val TAG = "SupabaseAuthRepository"
     }
 
     override suspend fun login(email: String, password: String) {
-        supabase.auth.signInWith(Email) {
+        client.auth.signInWith(Email) {
             this.email = email
             this.password = password
         }
         // register() has no session to insert the profile row with (email confirmation
         // required) — this is the first point a confirmed user actually has one.
-        supabase.auth.currentUserOrNull()?.let { ensureProfileExists(it) }
+        client.auth.currentUserOrNull()?.let { ensureProfileExists(it) }
     }
 
     override suspend fun register(
@@ -38,7 +41,7 @@ class SupabaseAuthRepository : AuthRepository {
         region: String
     ): RegisterOutcome {
         try {
-            supabase.auth.signUpWith(Email) {
+            client.auth.signUpWith(Email) {
                 this.email = email
                 this.password = password
                 data = buildJsonObject {
@@ -51,7 +54,7 @@ class SupabaseAuthRepository : AuthRepository {
             // could be a real existing account, or an orphan from a failed signup — sign in to tell them apart
             if (e.message?.contains("User already registered", ignoreCase = true) == true) {
                 try {
-                    supabase.auth.signInWith(Email) {
+                    client.auth.signInWith(Email) {
                         this.email = email
                         this.password = password
                     }
@@ -63,15 +66,15 @@ class SupabaseAuthRepository : AuthRepository {
                 }
             } else throw e
         }
-        val uid = supabase.auth.currentUserOrNull()?.id ?: return RegisterOutcome.PendingEmailConfirmation
+        val uid = client.auth.currentUserOrNull()?.id ?: return RegisterOutcome.PendingEmailConfirmation
 
-        val hasProfile = supabase.from("users").select {
+        val hasProfile = client.from("users").select {
             filter { eq("id", uid) }
             limit(1)
         }.decodeList<UserDto>().isNotEmpty()
         if (hasProfile) return RegisterOutcome.AlreadyExists
 
-        supabase.from("users").insert(
+        client.from("users").insert(
             NewUserDto(
                 id = uid,
                 email = email,
@@ -85,11 +88,11 @@ class SupabaseAuthRepository : AuthRepository {
     }
 
     override suspend fun sendResetEmail(email: String) {
-        supabase.auth.resetPasswordForEmail(email)
+        client.auth.resetPasswordForEmail(email)
     }
 
     private suspend fun ensureProfileExists(user: UserInfo) {
-        val hasProfile = supabase.from("users").select {
+        val hasProfile = client.from("users").select {
             filter { eq("id", user.id) }
             limit(1)
         }.decodeList<UserDto>().isNotEmpty()
@@ -97,7 +100,7 @@ class SupabaseAuthRepository : AuthRepository {
 
         val metadata = user.userMetadata
         val username = metadata?.get("username")?.jsonPrimitive?.contentOrNull ?: user.email?.substringBefore("@") ?: user.id
-        supabase.from("users").insert(
+        client.from("users").insert(
             NewUserDto(
                 id = user.id,
                 email = user.email ?: "",
