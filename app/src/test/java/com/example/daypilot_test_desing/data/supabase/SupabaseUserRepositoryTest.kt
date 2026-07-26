@@ -23,12 +23,9 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 
 private val jsonHeaders = headersOf(HttpHeaders.ContentType, "application/json")
 
-@RunWith(RobolectricTestRunner::class)
 class SupabaseUserRepositoryTest {
 
     companion object {
@@ -41,7 +38,6 @@ class SupabaseUserRepositoryTest {
 
     @Before
     fun setUp() = runBlocking {
-        initSupabaseSettingsForTest()
         shared.resetAuth()
         SessionCache.clear()
     }

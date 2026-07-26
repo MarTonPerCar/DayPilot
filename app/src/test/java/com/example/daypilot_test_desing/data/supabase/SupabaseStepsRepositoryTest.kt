@@ -1,11 +1,10 @@
 package com.example.daypilot_test_desing.data.supabase
 
 import android.content.SharedPreferences
-import androidx.test.core.app.ApplicationProvider
+import com.example.daypilot_test_desing.support.FakeSharedPreferences
 import com.example.daypilot_test_desing.support.SharedFakeSupabaseClient
 import com.example.daypilot_test_desing.support.fakeLogin
 import io.ktor.client.engine.mock.MockRequestHandleScope
-import com.example.daypilot_test_desing.support.initSupabaseSettingsForTest
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.respondError
 import io.ktor.client.engine.mock.toByteArray
@@ -22,8 +21,6 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -43,7 +40,6 @@ private fun yesterday(): String {
     return SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(cal.time)
 }
 
-@RunWith(RobolectricTestRunner::class)
 class SupabaseStepsRepositoryTest {
 
     companion object {
@@ -58,10 +54,8 @@ class SupabaseStepsRepositoryTest {
 
     @Before
     fun setUp() = runBlocking {
-        initSupabaseSettingsForTest()
         shared.resetAuth()
-        prefs = ApplicationProvider.getApplicationContext<android.content.Context>()
-            .getSharedPreferences("test_steps_${System.nanoTime()}", android.content.Context.MODE_PRIVATE)
+        prefs = FakeSharedPreferences()
     }
 
     @Test

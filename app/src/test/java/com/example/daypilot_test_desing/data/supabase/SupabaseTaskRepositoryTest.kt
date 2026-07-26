@@ -6,7 +6,6 @@ import com.example.daypilot_test_desing.core.data.model.TaskCategory
 import com.example.daypilot_test_desing.core.data.model.TaskDifficulty
 import com.example.daypilot_test_desing.support.SharedFakeSupabaseClient
 import com.example.daypilot_test_desing.support.fakeLogin
-import com.example.daypilot_test_desing.support.initSupabaseSettingsForTest
 import io.ktor.client.engine.mock.MockRequestHandleScope
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.respondError
@@ -23,12 +22,9 @@ import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 
 private val jsonHeaders = headersOf(HttpHeaders.ContentType, "application/json")
 
-@RunWith(RobolectricTestRunner::class)
 class SupabaseTaskRepositoryTest {
 
     companion object {
@@ -41,7 +37,6 @@ class SupabaseTaskRepositoryTest {
 
     @Before
     fun setUp() = runBlocking {
-        initSupabaseSettingsForTest()
         shared.resetAuth()
         SessionCache.clear()
     }

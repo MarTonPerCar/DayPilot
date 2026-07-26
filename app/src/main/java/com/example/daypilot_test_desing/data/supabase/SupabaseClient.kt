@@ -1,6 +1,7 @@
 package com.example.daypilot_test_desing.data.supabase
 
 import com.example.daypilot_test_desing.BuildConfig
+import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
@@ -13,14 +14,19 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 
-val supabase = createSupabaseClient(
-    supabaseUrl = BuildConfig.SUPABASE_URL,
-    supabaseKey = BuildConfig.SUPABASE_KEY
-) {
-    install(Postgrest)
-    install(Auth)
-    install(Realtime)
-    install(Storage)
+// Lazy so merely loading/referencing this file (e.g. a repository class's default parameter,
+// or a repository object's property initializer) doesn't eagerly build the real client — that
+// would need a real Android Context, which unit tests that inject a fake client don't have.
+val supabase: SupabaseClient by lazy {
+    createSupabaseClient(
+        supabaseUrl = BuildConfig.SUPABASE_URL,
+        supabaseKey = BuildConfig.SUPABASE_KEY
+    ) {
+        install(Postgrest)
+        install(Auth)
+        install(Realtime)
+        install(Storage)
+    }
 }
 
 /**

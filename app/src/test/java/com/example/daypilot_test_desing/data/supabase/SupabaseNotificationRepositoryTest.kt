@@ -3,7 +3,6 @@ package com.example.daypilot_test_desing.data.supabase
 import com.example.daypilot_test_desing.core.data.model.NotificationType
 import com.example.daypilot_test_desing.support.SharedFakeSupabaseClient
 import com.example.daypilot_test_desing.support.fakeLogin
-import com.example.daypilot_test_desing.support.initSupabaseSettingsForTest
 import io.ktor.client.engine.mock.MockRequestHandleScope
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.respondError
@@ -20,13 +19,10 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 import java.time.Instant
 
 private val jsonHeaders = headersOf(HttpHeaders.ContentType, "application/json")
 
-@RunWith(RobolectricTestRunner::class)
 class SupabaseNotificationRepositoryTest {
 
     companion object {
@@ -39,7 +35,6 @@ class SupabaseNotificationRepositoryTest {
 
     @Before
     fun setUp() = runBlocking {
-        initSupabaseSettingsForTest()
         shared.resetAuth()
         SupabaseNotificationRepository.client = shared.client
     }

@@ -9,6 +9,7 @@ import io.github.jan.supabase.auth.user.UserSession
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.storage.Storage
+import io.github.jan.supabase.storage.resumable.MemoryResumableCache
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.MockEngineConfig
 import io.ktor.client.engine.mock.MockRequestHandleScope
@@ -41,7 +42,9 @@ fun fakeSupabaseClient(
         dispatcher = Dispatchers.Unconfined
     })
     install(Postgrest)
-    install(Storage)
+    // Without a Context (no Robolectric), Storage's default resumable cache tries to build an
+    // Android SharedPreferences-backed Settings() and NPEs — swap it for an in-memory one.
+    install(Storage) { resumable { cache = MemoryResumableCache() } }
     install(Auth) { minimalConfig() }
 }
 

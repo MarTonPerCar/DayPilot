@@ -20,8 +20,14 @@ import java.util.UUID
 
 object SupabaseNotificationRepository : NotificationRepository {
 
-    // Reassignable only for tests — an `object` can't take a constructor parameter.
-    internal var client: SupabaseClient = supabase
+    // Reassignable only for tests — an `object` can't take a constructor parameter. Backed by a
+    // nullable field so the default only touches the real `supabase` client if a test never
+    // overrides it, instead of unconditionally at class-init time (which would need a real
+    // Android Context).
+    private var _client: SupabaseClient? = null
+    internal var client: SupabaseClient
+        get() = _client ?: supabase
+        set(value) { _client = value }
 
     private const val TAG = "SupabaseNotificationRepo"
     private const val DISPLAY_LIMIT = 30
