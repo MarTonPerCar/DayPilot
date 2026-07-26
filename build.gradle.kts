@@ -29,7 +29,7 @@ sonar {
         )
         property(
             "sonar.coverage.exclusions",
-            "**/*Screen.kt,**/core/ui/components/**,**/core/ui/theme/**,**/data/**"
+            "**/*Screen.kt,**/core/ui/components/**,**/core/ui/theme/**,**/data/supabase/dto/**,**/ComponentCatalog.kt"
         )
         property(
             "sonar.cpd.exclusions",
