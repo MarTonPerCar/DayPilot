@@ -9,6 +9,7 @@ import com.example.daypilot_test_desing.data.supabase.dto.DailyLogDto
 import com.example.daypilot_test_desing.data.supabase.dto.HabitsDailyMilestoneDto
 import com.example.daypilot_test_desing.data.supabase.dto.HabitsDailyUpsertDto
 import com.example.daypilot_test_desing.data.supabase.dto.UserPendingGoalDto
+import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Order
@@ -23,7 +24,10 @@ import java.util.Locale
 
 // Shares "daypilot_steps" prefs with StepsViewModel — this class owns steps_goal/pending_goal/
 // goal_change_date, the ViewModel owns baseline_date/baseline_steps; don't reuse a key across the two.
-class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepository {
+class SupabaseStepsRepository(
+    private val prefs: SharedPreferences,
+    private val client: SupabaseClient = supabase
+) : StepsRepository {
 
     companion object {
         private const val TAG = "SupabaseStepsRepository"
@@ -68,9 +72,9 @@ class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepos
     }
 
     override suspend fun getPointsEarned(): Int {
-        val uid = supabase.auth.currentUserOrNull()?.id ?: return 0
+        val uid = client.auth.currentUserOrNull()?.id ?: return 0
         return try {
-            val level = supabase.from("habits_daily").select {
+            val level = client.from("habits_daily").select {
                 filter { eq("user_id", uid); eq("date", today()) }
                 limit(1)
             }.decodeList<HabitsDailyMilestoneDto>().firstOrNull()?.stepsMilestoneLevel ?: 0
@@ -102,9 +106,9 @@ class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepos
     }
 
     private suspend fun pushPendingGoalToServer(newGoal: Int, applyDate: String) {
-        val uid = supabase.auth.currentUserOrNull()?.id ?: return
+        val uid = client.auth.currentUserOrNull()?.id ?: return
         try {
-            supabase.from("users").update({
+            client.from("users").update({
                 set("pending_steps_goal", newGoal)
                 set("pending_steps_goal_date", applyDate)
             }) {
@@ -118,9 +122,9 @@ class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepos
 
     // Adopts a pending goal queued from another device so applyPendingGoalIfNewDay() picks it up too.
     private suspend fun pullPendingGoalFromServer() {
-        val uid = supabase.auth.currentUserOrNull()?.id ?: return
+        val uid = client.auth.currentUserOrNull()?.id ?: return
         try {
-            val dto = supabase.from("users").select {
+            val dto = client.from("users").select {
                 filter { eq("id", uid) }
                 limit(1)
             }.decodeList<UserPendingGoalDto>().firstOrNull() ?: return
@@ -149,9 +153,9 @@ class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepos
     }
 
     override suspend fun syncSteps(steps: Int, goal: Int) {
-        val uid = supabase.auth.currentUserOrNull()?.id ?: return
+        val uid = client.auth.currentUserOrNull()?.id ?: return
         try {
-            supabase.from("habits_daily").upsert(
+            client.from("habits_daily").upsert(
                 HabitsDailyUpsertDto(userId = uid, date = today(), steps = steps, stepsGoal = goal)
             ) { onConflict = "user_id,date" }
             Log.d(TAG, "Synced steps ($steps/$goal)")
@@ -169,9 +173,9 @@ class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepos
     // placeholder default straight back to the DB, clobbering the real goal.
     private suspend fun hydrateActiveGoalIfFirstRun() {
         if (prefs.contains("steps_goal")) return
-        val uid = supabase.auth.currentUserOrNull()?.id ?: return
+        val uid = client.auth.currentUserOrNull()?.id ?: return
         try {
-            val row = supabase.from("habits_daily").select {
+            val row = client.from("habits_daily").select {
                 filter { eq("user_id", uid) }
                 order("date", Order.DESCENDING)
                 limit(1)
@@ -186,9 +190,9 @@ class SupabaseStepsRepository(private val prefs: SharedPreferences) : StepsRepos
     }
 
     override suspend fun getWeeklyStats(): StepsWeeklyStats {
-        val uid = supabase.auth.currentUserOrNull()?.id ?: return StepsWeeklyStats()
+        val uid = client.auth.currentUserOrNull()?.id ?: return StepsWeeklyStats()
         return try {
-            val logs = supabase.from("user_daily_log")
+            val logs = client.from("user_daily_log")
                 .select {
                     filter { eq("user_id", uid) }
                     order("date", Order.DESCENDING)
