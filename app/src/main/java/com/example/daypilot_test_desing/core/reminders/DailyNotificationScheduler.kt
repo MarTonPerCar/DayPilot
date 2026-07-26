@@ -87,7 +87,7 @@ object DailyNotificationScheduler {
     // not device-local time — anchoring this alarm to UTC (plus a buffer for cron execution
     // lag) keeps it from firing before the row it's meant to read even exists, which it always
     // did for any timezone ahead of UTC when this was computed from the device's local hour.
-    private fun nextAlarmMillis(utcHour: Int): Long {
+    internal fun nextAlarmMillis(utcHour: Int): Long {
         val cal = Calendar.getInstance(TimeZone.getTimeZone("UTC")).apply {
             set(Calendar.HOUR_OF_DAY, utcHour)
             set(Calendar.MINUTE, CRON_BUFFER_MINUTES)
