@@ -54,7 +54,7 @@ class NotificationsViewModel(private val repo: NotificationRepository) : ViewMod
 
     /** Suspends until this ViewModel's data has actually loaded (or failed) — used by the
      *  startup join in DayPilotNavGraph, which needs real success/failure, not just "finished". */
-    suspend fun awaitLoad(): Boolean {
+    suspend fun awaitLoad(): Boolean { // NOSONAR kotlin:S6313 -- startup-join failure detection, see KDoc above
         return try {
             val uid = repo.getCurrentUserId() ?: return false
             val fromDb = repo.getAll(uid)

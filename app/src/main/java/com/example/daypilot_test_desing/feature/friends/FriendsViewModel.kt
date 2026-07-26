@@ -55,7 +55,7 @@ class FriendsViewModel(private val repo: FriendRepository) : ViewModel() {
 
     /** Suspends until this ViewModel's data has actually loaded (or failed) — used by the
      *  startup join in DayPilotNavGraph, which needs real success/failure, not just "finished". */
-    suspend fun awaitLoad(): Boolean = load()
+    suspend fun awaitLoad(): Boolean = load() // NOSONAR kotlin:S6313 -- startup-join failure detection, see KDoc above
 
     private suspend fun load(): Boolean = loadMutex.withLock {
         try {
