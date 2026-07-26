@@ -26,24 +26,6 @@ class TimerPreset {
   });
 }
 
-class AppReminder {
-  final String id;
-  final String title;
-  final DateTime dateTime;
-  final String frequency;
-  final bool notifyBefore;
-  bool enabled;
-
-  AppReminder({
-    required this.id,
-    required this.title,
-    required this.dateTime,
-    this.frequency = 'once',
-    this.notifyBefore = false,
-    this.enabled = true,
-  });
-}
-
 enum RestrictionType { app, group }
 
 class TechRestriction {
@@ -145,8 +127,6 @@ class AppData {
       minutes: 30,
     ),
   ];
-
-  static List<AppReminder> newReminderList() => [];
 
   static List<TechRestriction> newRestrictionList() => [
         TechRestriction(

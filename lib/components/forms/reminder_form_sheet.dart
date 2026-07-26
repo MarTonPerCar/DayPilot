@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../../data/app_data.dart';
+import '../../core/data/models/app_reminder.dart';
 import '../../l10n/app_localizations.dart';
 import '../basic/quick_pick_chip.dart';
 import '../basic/sheet_handle.dart';

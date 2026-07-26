@@ -11,6 +11,7 @@ import 'core/connectivity/offline_notifier.dart';
 import 'core/logging/app_logger.dart';
 import 'core/prefs/app_prefs.dart';
 import 'core/window/desktop_window.dart';
+import 'features/reminders/reminders_notifier.dart';
 import 'l10n/app_localizations.dart';
 import 'l10n/locale_notifier.dart';
 import 'screens/no_internet_screen.dart';
@@ -112,6 +113,17 @@ class DayPilotApp extends StatelessWidget {
                             builder: (context, ref, _) {
                               if (!ref.watch(isOfflineProvider)) return const SizedBox.shrink();
                               return const Positioned.fill(child: NoInternetScreen());
+                            },
+                          ),
+                          Consumer(
+                            builder: (context, ref, _) {
+                              // Keeps the reminders notifier's notification text in the
+                              // user's current locale — it fires off a Timer, not a widget
+                              // build, so it has no BuildContext of its own to read from.
+                              ref
+                                  .read(remindersNotifierProvider.notifier)
+                                  .configureLocalization(AppLocalizations.of(context));
+                              return const SizedBox.shrink();
                             },
                           ),
                         ],

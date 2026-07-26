@@ -67,8 +67,6 @@
   "settingsAvatarUploadError": "No se pudo subir la foto",
   "settingsLanguage": "Idioma",
   "settingsChooseLanguage": "Elige un idioma",
-  "settingsDeveloper": "Desarrollador",
-  "settingsComponentCatalog": "Catálogo de componentes",
   "settingsSignOut": "Cerrar sesión",
 
   "themeSageGreen": "Verde Salvia",
@@ -181,6 +179,10 @@
   "reminderNotifyBefore": "Aviso previo",
   "reminderNotifyBeforeSubtitle": "Notifica 10 min antes",
   "reminderCreateButton": "Crear recordatorio",
+  "reminderFiredBody": "¡Es hora de tu recordatorio!",
+  "reminderFiredEarlyTitle": "En 10 minutos: {title}",
+  "@reminderFiredEarlyTitle": {"placeholders": {"title": {"type": "String"}}},
+  "reminderFiredEarlyBody": "Tu recordatorio se activará en 10 minutos",
 
   "taskDetailReminderActive": "Recordatorio activado",
   "taskDetailMarkPending": "Marcar como pendiente",

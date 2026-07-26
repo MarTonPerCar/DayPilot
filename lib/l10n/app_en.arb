@@ -67,8 +67,6 @@
   "settingsAvatarUploadError": "Couldn't upload the photo",
   "settingsLanguage": "Language",
   "settingsChooseLanguage": "Choose a language",
-  "settingsDeveloper": "Developer",
-  "settingsComponentCatalog": "Component catalog",
   "settingsSignOut": "Sign out",
 
   "themeSageGreen": "Sage Green",
@@ -181,6 +179,10 @@
   "reminderNotifyBefore": "Advance notice",
   "reminderNotifyBeforeSubtitle": "Notifies 10 min before",
   "reminderCreateButton": "Create reminder",
+  "reminderFiredBody": "Time for your reminder!",
+  "reminderFiredEarlyTitle": "In 10 minutes: {title}",
+  "@reminderFiredEarlyTitle": {"placeholders": {"title": {"type": "String"}}},
+  "reminderFiredEarlyBody": "Your reminder fires in 10 minutes",
 
   "taskDetailReminderActive": "Reminder on",
   "taskDetailMarkPending": "Mark as pending",
