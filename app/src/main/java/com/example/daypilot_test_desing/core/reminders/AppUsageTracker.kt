@@ -38,7 +38,7 @@ object AppUsageTracker {
             set(Calendar.SECOND, 0)
             set(Calendar.MILLISECOND, 0)
         }.timeInMillis
-        val stats = usm.queryUsageStats(
+        val stats: List<android.app.usage.UsageStats> = usm.queryUsageStats(
             UsageStatsManager.INTERVAL_DAILY,
             startOfDay,
             System.currentTimeMillis()

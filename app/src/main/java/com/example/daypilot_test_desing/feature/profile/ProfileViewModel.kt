@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.daypilot_test_desing.core.data.model.TimeZoneRegion
 import com.example.daypilot_test_desing.core.data.repository.ProgressRepository
 import com.example.daypilot_test_desing.core.data.repository.UserRepository
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +20,8 @@ import kotlinx.coroutines.withContext
 
 class ProfileViewModel(
     private val userRepo: UserRepository,
-    private val progressRepo: ProgressRepository
+    private val progressRepo: ProgressRepository,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProfileUiState())
@@ -94,7 +96,7 @@ class ProfileViewModel(
     fun uploadAvatar(uri: Uri, context: Context): Job = viewModelScope.launch {
         _uiState.value = _uiState.value.copy(isUploadingAvatar = true, avatarUploadError = false)
         val success = try {
-            val (bytes, mimeType) = withContext(Dispatchers.IO) {
+            val (bytes, mimeType) = withContext(ioDispatcher) {
                 val b = context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
                 val m = context.contentResolver.getType(uri) ?: "image/jpeg"
                 Pair(b, m)
