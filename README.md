@@ -64,6 +64,8 @@ El análisis de SonarCloud corre en CI solo en esta rama (no en `Incremento-Flut
 | `Test-Diseño-Flutter` | Base de solo sistema de diseño sobre la que se construye esta rama |
 | `Test-Supabase-Flutter` | Prueba de concepto independiente que valida `supabase_flutter` contra la base de datos real del proyecto |
 
+Para la lista completa de dependencias (Android y Flutter), consulta la sección [Dependencias](https://github.com/MarTonPerCar/DayPilot/blob/master/README.md#dependencias) del README de `master`.
+
 ## Descargas
 
 Los releases de esta rama se etiquetan como `v2.2.X.Y.Z` (el esquema del repositorio completo: `V`=plataforma — `1` Android, `2` Flutter — `SV`=rama — `1` main, `2` TestFinal — seguido de la versión semántica real). La CI también mantiene una etiqueta flotante `incremento-flutter-testfinal-latest` que siempre apunta a la build más reciente de esta rama en concreto — a diferencia del "latest" general del repositorio, que mezcla ramas de Android y Flutter no relacionadas y puede acabar apuntando a la build equivocada.
