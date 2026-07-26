@@ -13,6 +13,7 @@ import com.example.daypilot_test_desing.data.supabase.dto.FriendsRankingDto
 import com.example.daypilot_test_desing.data.supabase.dto.HabitsDailyReadTimerDto
 import com.example.daypilot_test_desing.data.supabase.dto.HabitsDailyTimerDto
 import com.example.daypilot_test_desing.data.supabase.dto.InsertPointsLogDto
+import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Order
@@ -20,14 +21,16 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class SupabaseProgressRepository : ProgressRepository {
+class SupabaseProgressRepository(
+    private val client: SupabaseClient = supabase
+) : ProgressRepository {
 
     companion object {
         private const val TAG = "SupabaseProgressRepo"
     }
 
     private fun today() = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
-    private fun userId() = supabase.auth.currentUserOrNull()?.id
+    private fun userId() = client.auth.currentUserOrNull()?.id
 
     override suspend fun getTodayProgress(): DailyProgressDto {
         SessionCache.todayProgress.value?.let { cached ->
@@ -35,7 +38,7 @@ class SupabaseProgressRepository : ProgressRepository {
         }
         val uid = userId() ?: return DailyProgressDto(userId = "", date = today())
         return try {
-            val result = supabase.from("daily_progress").select {
+            val result = client.from("daily_progress").select {
                 filter {
                     eq("user_id", uid)
                     eq("date", today())
@@ -58,7 +61,7 @@ class SupabaseProgressRepository : ProgressRepository {
         }
         val uid = userId() ?: return emptyList()
         return try {
-            val result = supabase.from("user_daily_log").select {
+            val result = client.from("user_daily_log").select {
                 filter { eq("user_id", uid) }
                 order("date", Order.DESCENDING)
                 limit(days.toLong())
@@ -74,7 +77,7 @@ class SupabaseProgressRepository : ProgressRepository {
 
     override suspend fun logPoints(points: Int, source: String) {
         val uid = userId() ?: return
-        supabase.from("points_log").insert(
+        client.from("points_log").insert(
             InsertPointsLogDto(userId = uid, points = points, source = source, dayKey = today())
         )
         SessionCache.todayProgress.value = SessionCache.todayProgress.value?.let { current ->
@@ -109,7 +112,7 @@ class SupabaseProgressRepository : ProgressRepository {
         val uid = userId() ?: return 0
         return try {
             val asRequester = try {
-                supabase.from("friends").select {
+                client.from("friends").select {
                     filter { eq("requester_id", uid) }
                 }.decodeList<FriendRowDto>().map { it.receiverId }
             } catch (e: Exception) {
@@ -117,7 +120,7 @@ class SupabaseProgressRepository : ProgressRepository {
                 emptyList()
             }
             val asReceiver = try {
-                supabase.from("friends").select {
+                client.from("friends").select {
                     filter { eq("receiver_id", uid) }
                 }.decodeList<FriendRowDto>().map { it.requesterId }
             } catch (e: Exception) {
@@ -126,7 +129,7 @@ class SupabaseProgressRepository : ProgressRepository {
             }
             val friendIds = (asRequester + asReceiver).distinct()
             val allIds    = (friendIds + uid).distinct()
-            val ranking = supabase.from("friends_ranking").select {
+            val ranking = client.from("friends_ranking").select {
                 filter { isIn("id", allIds) }
             }.decodeList<FriendsRankingDto>()
                 .sortedByDescending { it.pointsLast30Days }
@@ -152,7 +155,7 @@ class SupabaseProgressRepository : ProgressRepository {
     override suspend fun completeTimerSession(): Boolean {
         val uid = userId() ?: return false
         val alreadyEarned = try {
-            supabase.from("habits_daily").select {
+            client.from("habits_daily").select {
                 filter { eq("user_id", uid); eq("date", today()) }
                 limit(1)
             }.decodeList<HabitsDailyReadTimerDto>()
@@ -164,7 +167,7 @@ class SupabaseProgressRepository : ProgressRepository {
         if (alreadyEarned) return false
 
         logPoints(10, "TIMER")
-        supabase.from("habits_daily").upsert(
+        client.from("habits_daily").upsert(
             HabitsDailyTimerDto(userId = uid, date = today(), timerPointEarned = true)
         ) { onConflict = "user_id,date" }
         return true
